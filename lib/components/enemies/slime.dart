@@ -149,7 +149,7 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     position.x = _moveDirection == 1 ? _leftBorder : _rightBorder;
 
     // delete all remaining particles
-    game.level.children.whereType<GhostParticle>().where((p) => p.owner == this).forEach((p) => p.removeFromParent());
+    game.world.children.whereType<GhostParticle>().where((p) => p.owner == this).forEach((p) => p.removeFromParent());
   }
 
   void _startParticleTimer() {
@@ -180,7 +180,7 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     final particlePosition = position + particleOffset;
 
     final ghostParticle = SlimeParticle(spawnOnLeftSide: spawnOnLeftSide, position: particlePosition);
-    game.level.add(ghostParticle);
+    game.world.add(ghostParticle);
   }
 
   void collidedWithPlayer(Vector2 collisionPoint) {

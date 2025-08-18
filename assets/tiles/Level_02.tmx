@@ -100,7 +100,7 @@
     <property name="offsetPos" type="float" value="5"/>
    </properties>
   </object>
-  <object id="33" name="Trampoline" type="Fan" x="32" y="304" width="16" height="16"/>
+  <object id="33" name="Trampoline" type="Trampoline" x="32" y="288" width="32" height="32"/>
   <object id="37" name="Spikes" type="Spikes" x="144" y="48" width="32" height="16">
    <properties>
     <property name="side" type="int" value="3"/>

@@ -28,22 +28,25 @@ import 'package:pixel_adventure/components/traps/spikes.dart';
 import 'package:pixel_adventure/components/traps/trampoline.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-enum LevelName {
-  firstLevel('Level_01'),
-  secondLevel('Level_02'),
-  thirdLevel('Level_03');
+enum MyLevels {
+  level_1('Level_01', 1),
+  level_2('Level_02', 2),
+  level_3('Level_03', 3);
 
   final String name;
-  const LevelName(this.name);
+  final int levelIndex;
+
+  const MyLevels(this.name, this.levelIndex);
 }
 
 class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
-  final LevelName levelName;
+  final MyLevels levelName;
   Level({required this.levelName});
 
   // level map from Tiled file
   late final TiledComponent _levelMap;
 
+  // level background
   late final LevelBackground _levelBackground;
 
   // all collision blocks
@@ -52,7 +55,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
   // player
   late final Player _player;
 
-  // mobile controls
+  // mobile controls HUD
   late final JoystickComponent? _joystick;
   late final JumpBtn? _jumpBtn;
 
@@ -62,19 +65,19 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
     _addLevelBackground();
     _addSpawningObjects();
     _addCollisions();
-    if (game.showMobileControls) _addMobileControls();
-
+    _setUpCamera();
     return super.onLoad();
   }
 
   @override
-  Future<void> onRemove() async {
-    // remove mobile controls from game
-    if (_joystick != null && _jumpBtn != null) {
-      game.remove(_joystick);
-      game.remove(_jumpBtn);
-    }
+  void onMount() {
+    if (game.showMobileControls) _addMobileControls();
+    super.onMount();
+  }
 
+  @override
+  Future<void> onRemove() async {
+    if (game.showMobileControls) _removeMobileControls();
     return super.onRemove();
   }
 
@@ -85,12 +88,13 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
   }
 
   void _addLevelBackground() {
-    final backgroundLayer = _levelMap.tileMap.getLayer('Background');
+    final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
       final backgroundColor = backgroundLayer.properties.getValue('BackgroundColor');
       const allowedColors = ['Blue', 'Brown', 'Gray', 'Green', 'Pink', 'Purple', 'Yellow'];
       final safeColor = allowedColors.contains(backgroundColor) ? backgroundColor : 'Gray';
-      _levelBackground = LevelBackground(color: safeColor, position: Vector2.zero())..priority = PixelAdventure.backgroundLayerLevel;
+      _levelBackground = LevelBackground(color: safeColor, position: Vector2.zero(), size: Vector2(_levelMap.width, _levelMap.height))
+        ..priority = PixelAdventure.backgroundLayerLevel;
       add(_levelBackground);
     }
   }
@@ -340,6 +344,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
   }
 
   void _addCollisions() {
+    _addWorldBorders();
     final collisionsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Collisions');
     if (collisionsLayer != null) {
       for (var collision in collisionsLayer.objects) {
@@ -357,21 +362,44 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             _collisionBlocks.add(block);
         }
       }
+
       addAll(_collisionBlocks);
     }
     _player.collisionBlocks = _collisionBlocks;
+  }
+
+  void _addWorldBorders() {
+    const borderWidth = 16.0;
+    final borders = [
+      // position, size
+      [Vector2(-borderWidth, -borderWidth), Vector2(borderWidth, _levelMap.height + borderWidth * 2)], // left
+      [Vector2(_levelMap.width, -borderWidth), Vector2(borderWidth, _levelMap.height + borderWidth * 2)], // right
+      [Vector2(0, -borderWidth), Vector2(_levelMap.width, borderWidth)], // top
+      [Vector2(0, _levelMap.height), Vector2(_levelMap.width, borderWidth)], // bottom
+    ];
+
+    _collisionBlocks.addAll(borders.map((b) => CollisionBlock(position: b[0], size: b[1])));
   }
 
   void _addMobileControls() {
     _joystick = JoystickComponent(
       knob: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Knob.png'))),
       background: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Joystick.png'))),
-      margin: const EdgeInsets.only(left: 32, bottom: 32),
-      knobRadius: 64,
+      margin: EdgeInsets.only(left: game.hudMargin, bottom: game.hudMargin),
     );
     _player.setJoystick(_joystick!);
     _jumpBtn = JumpBtn(_player);
-    game.add(_joystick);
-    game.add(_jumpBtn!);
+    game.camera.viewport.add(_joystick);
+    game.camera.viewport.add(_jumpBtn!);
+  }
+
+  void _removeMobileControls() {
+    game.camera.viewport.remove(_joystick!);
+    game.camera.viewport.remove(_jumpBtn!);
+  }
+
+  void _setUpCamera() {
+    game.camera.follow(PlayerHitboxPositionProvider(_player), horizontalOnly: true);
+    game.setCameraBounds(_levelMap.width);
   }
 }

@@ -119,7 +119,7 @@ class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     );
     final bulletPosition = position + bulletOffset;
     final bullet = PlantBullet(position: bulletPosition, isLeft: isLeft);
-    game.level.add(bullet);
+    game.world.add(bullet);
   }
 
   void collidedWithPlayer(Vector2 collisionPoint) {

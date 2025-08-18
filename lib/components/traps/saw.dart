@@ -104,7 +104,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
             )
             ..debugMode = game.customDebug
             ..debugColor = AppTheme.debugColorTrapHitbox;
-      game.level.add(chain);
+      game.world.add(chain);
       offset += chainSize;
     }
   }

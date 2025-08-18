@@ -317,7 +317,7 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     final bulletOffset = Vector2(isLeft ? hitbox.position.x - TrunkBullet.fixedSize.x : -hitbox.position.x, hitbox.position.y + 3);
     final bulletPosition = position + bulletOffset;
     final bullet = TrunkBullet(position: bulletPosition, isLeft: isLeft);
-    game.level.add(bullet);
+    game.world.add(bullet);
   }
 
   void collidedWithPlayer(Vector2 collisionPoint) {

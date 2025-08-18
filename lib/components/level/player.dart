@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/components/enemies/blue_bird.dart';
@@ -441,11 +442,11 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     }
     final disappearingAnimation = animationTickers![PlayerState.disappearing]!;
     disappearingAnimation.completed.whenComplete(() {
-      position = Vector2.all(-200);
+      position = Vector2(position.x, -200);
       Future.delayed(Duration(seconds: 3), () async {
         current = PlayerState.idle;
         _hasReachedCheckpoint = false;
-        await game.loadNextLevel();
+        game.nextLevel();
       });
     });
   }
@@ -466,4 +467,18 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.offsetX : x - hitbox.offsetX - hitbox.width;
     hitboxPositionRightX = hitboxPositionLeftX + hitbox.width;
   }
+}
+
+class PlayerHitboxPositionProvider extends PositionProvider {
+  final Player player;
+
+  PlayerHitboxPositionProvider(this.player);
+
+  @override
+  Vector2 get position {
+    return Vector2(player.hitboxPositionLeftX, player.position.y);
+  }
+
+  @override
+  set position(Vector2 value) {}
 }

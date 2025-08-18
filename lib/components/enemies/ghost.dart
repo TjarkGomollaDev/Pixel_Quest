@@ -189,7 +189,7 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     position.x = _moveDirection == 1 ? _leftBorder : _rightBorder;
 
     // delete all remaining particles
-    game.level.children.whereType<GhostParticle>().where((p) => p.owner == this).forEach((p) => p.removeFromParent());
+    game.world.children.whereType<GhostParticle>().where((p) => p.owner == this).forEach((p) => p.removeFromParent());
   }
 
   Future<void> _spawnGhostParticles() async {
@@ -210,7 +210,7 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
       }
       final particleOffset = Vector2(spawnOnLeftSide ? _particleOffsets[i].x * -1 : _particleOffsets[i].x, _particleOffsets[i].y);
       final ghostParticle = GhostParticle(owner: this, spawnOnLeftSide: spawnOnLeftSide, position: particleBasePosition + particleOffset);
-      game.level.add(ghostParticle);
+      game.world.add(ghostParticle);
     }
   }
 

@@ -1,24 +1,22 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/components/level/level.dart';
 import 'package:pixel_adventure/components/level/player.dart';
 
-class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
+class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker {
   @override
   Color backgroundColor() => const Color(0xFF211F30);
-
-  // levels
-  late Level level;
-  late CameraComponent cam;
-  final List<LevelName> levels = LevelName.values;
-  int currentLevelIndex = 2;
 
   // character
   final List<PlayerCharacter> characters = PlayerCharacter.values;
   int yourCharacterIndex = 0;
+
+  // router
+  late final RouterComponent router;
 
   // mobile
   bool showMobileControls = false;
@@ -41,6 +39,10 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
   // tile size
   final double tileSize = 16;
 
+  // margin HUD elements
+  final double hudMargin = 32;
+  final hudMobileControlsSize = 64;
+
   // collision
   final double toleranceEnemieCollision = 5;
 
@@ -50,37 +52,44 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
 
   @override
   Future<void> onLoad() async {
-    // load all images into cache
-    await images.loadAllImages();
-    _loadLevel();
-
+    await _loadAllImagesIntoCache();
+    _setUpCam();
+    _setUpRouter();
     return super.onLoad();
   }
 
-  Future<void> loadNextLevel() async {
-    if (currentLevelIndex < levels.length - 1) {
-      currentLevelIndex++;
-      await _removeLevel();
-      _loadLevel();
+  Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
+
+  void _setUpCam() {
+    final fixedHeight = 368.0;
+    final aspectRatio = size.x / size.y;
+    final dynamicWidth = fixedHeight * aspectRatio;
+
+    camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight, world: world);
+    camera.viewfinder.anchor = Anchor(0.25, 0);
+    add(camera);
+  }
+
+  void setCameraBounds(double mapWidth) {
+    final leftBound = size.x * 0.25;
+    final rightBound = size.x * 0.75;
+    camera.setBounds(Rectangle.fromLTRB(leftBound, 0, mapWidth - rightBound, 0));
+  }
+
+  void _setUpRouter() {
+    final levelRoutes = {
+      for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(levelName: level), maintainState: false),
+    };
+
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: '3'));
+  }
+
+  void nextLevel() {
+    final index = int.parse(router.currentRoute.name!);
+    if (index < MyLevels.values.length) {
+      router.pushReplacementNamed((index + 1).toString());
     } else {
-      // no more levels
+      debugPrint('no more level');
     }
-  }
-
-  Future<void> _removeLevel() async {
-    remove(level);
-    await level.removed;
-    remove(cam);
-    await cam.removed;
-  }
-
-  void _loadLevel() {
-    level = Level(levelName: levels[currentLevelIndex]);
-
-    cam = CameraComponent.withFixedResolution(width: 640, height: 368, world: level);
-    cam.viewfinder.anchor = Anchor.topLeft;
-    cam.priority = 0;
-
-    addAll([cam, level]);
   }
 }
