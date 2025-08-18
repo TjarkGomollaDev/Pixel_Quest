@@ -1,0 +1,66 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "Alle Dateien (*)",
+    "fileStates": {
+        "Level_01.tmx": {
+            "expandedObjectLayers": [
+                3,
+                4
+            ],
+            "scale": 1.1656,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 333.7336993822924,
+                "y": 261.66781056966374
+            }
+        },
+        "Level_02.tmx": {
+            "expandedObjectLayers": [
+                2,
+                3
+            ],
+            "scale": 1.4379,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 301.82905626260526,
+                "y": 143.95994158147298
+            }
+        },
+        "Level_03.tmx": {
+            "expandedObjectLayers": [
+                2,
+                3
+            ],
+            "scale": 1.39234375,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 320.3231960498261,
+                "y": 183.86264167882393
+            }
+        }
+    },
+    "last.imagePath": "/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/images/Terrain",
+    "map.height": 23,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 40,
+    "openFiles": [
+    ],
+    "project": "Pixel Adventure.tiled-project",
+    "property.type": "string",
+    "recentFiles": [
+        "Level_01.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
