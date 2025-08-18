@@ -28,11 +28,17 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final double offsetPos;
   final bool isLeft;
 
-  Ghost({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  Ghost({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(12, 6), size: Vector2(25, 26));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(12, 6), size: Vector2(25, 26));
 
   // player ref
   final Player _player;
@@ -66,9 +72,9 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final double _particleDelayBetweenBurst = 0.8; // [Adjustable]
 
   // particle burst
-  final _particleOffsets = [Vector2(1, 4), Vector2(4, 16), Vector2(8, 9), Vector2(13, 15)]; // [Adjustable]
-  final _particleDelays = [0, 100, 80, 120]; // [Adjustable]
-  final _offsetCloserToGhost = 8; // [Adjustable] higher means closer
+  final List<Vector2> _particleOffsets = [Vector2(1, 4), Vector2(4, 16), Vector2(8, 9), Vector2(13, 15)]; // [Adjustable]
+  final List<int> _particleDelays = [0, 100, 80, 120]; // [Adjustable]
+  final double _offsetCloserToGhost = 8; // [Adjustable] higher means closer
 
   // got stomped
   bool _gotStomped = false;
@@ -176,7 +182,7 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     }
 
     // movement
-    final double newPositionX = position.x + _moveDirection * _moveSpeed * dt;
+    final newPositionX = position.x + _moveDirection * _moveSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 

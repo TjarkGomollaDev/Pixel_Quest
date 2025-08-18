@@ -22,10 +22,10 @@ enum FireTrapState implements AnimationState {
 }
 
 class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  FireTrap({super.position, super.size, required Player player}) : _player = player;
+  FireTrap({required super.position, required super.size, required Player player}) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
 
   // player ref
   final Player _player;

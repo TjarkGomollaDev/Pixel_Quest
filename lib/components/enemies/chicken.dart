@@ -26,11 +26,17 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
   final double offsetPos;
   final bool isLeft;
 
-  Chicken({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  Chicken({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 26));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 26));
 
   // player ref
   final Player _player;
@@ -147,7 +153,7 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
 
     // movement towards the player
     _velocity.x = _moveDirection * _runSpeed;
-    double newPositionX = position.x + _velocity.x * dt;
+    final newPositionX = position.x + _velocity.x * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
     _updateHitboxEdges();
   }

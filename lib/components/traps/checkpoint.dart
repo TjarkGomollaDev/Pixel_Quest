@@ -21,10 +21,10 @@ enum CheckpointState implements AnimationState {
 }
 
 class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Checkpoint({super.position, super.size});
+  Checkpoint({required super.position, required super.size});
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(12, 46));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(12, 46));
 
   // animation settings
   final double _stepTime = 0.05;

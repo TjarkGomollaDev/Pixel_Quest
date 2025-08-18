@@ -26,10 +26,10 @@ enum TurtleState implements AnimationState {
 class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final bool isLeft;
 
-  Turtle({this.isLeft = true, super.position, super.size, required Player player}) : _player = player;
+  Turtle({required this.isLeft, required super.position, required super.size, required Player player}) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(10, 9), size: Vector2(29, 23));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 9), size: Vector2(29, 23));
 
   // player ref
   final Player _player;

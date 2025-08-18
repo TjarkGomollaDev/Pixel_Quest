@@ -22,15 +22,21 @@ enum MovingPlatformState implements AnimationState {
 }
 
 class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final bool isVertical;
   final double offsetNeg;
   final double offsetPos;
+  final bool isVertical;
 
-  MovingPlatform({this.isVertical = false, this.offsetNeg = 0, this.offsetPos = 0, super.position, super.size, required Player player})
-    : _player = player;
+  MovingPlatform({
+    required this.isVertical,
+    required this.offsetNeg,
+    required this.offsetPos,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
 
   // player ref
   final Player _player;
@@ -45,8 +51,8 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
   final String _pathEnd = ' (32x8).png';
 
   // range
-  double rangeNeg = 0;
-  double rangePos = 0;
+  late final double rangeNeg;
+  late final double rangePos;
 
   // movement
   final double _moveSpeed = 30;

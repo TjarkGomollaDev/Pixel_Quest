@@ -21,13 +21,13 @@ enum FanState implements AnimationState {
 }
 
 class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure> {
-  Fan({required Player player, super.position}) : _player = player, super(size: _fixedSize) {
-    position += _fixedOffset;
+  Fan({required super.position, required Player player}) : _player = player, super(size: fixedSize) {
+    position += fixedOffset;
   }
 
   // size
-  static final Vector2 _fixedSize = Vector2(28, 8);
-  static final Vector2 _fixedOffset = Vector2(2, 8);
+  static final Vector2 fixedSize = Vector2(28, 8);
+  static final Vector2 fixedOffset = Vector2(2, 8);
 
   // player ref
   final Player _player;
@@ -39,7 +39,7 @@ class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdven
   final String _pathEnd = '.png';
 
   // air stream
-  late final FanAirStream airStream;
+  late final FanAirStream _airStream;
 
   @override
   FutureOr<void> onLoad() {
@@ -71,7 +71,7 @@ class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdven
   }
 
   void _loadFanAirStream() {
-    airStream = FanAirStream(width, 200, player: _player, position: Vector2(0, 0));
-    add(airStream);
+    _airStream = FanAirStream(baseWidth: width, airStreamHeight: 200, player: _player, position: Vector2(0, 0));
+    add(_airStream);
   }
 }

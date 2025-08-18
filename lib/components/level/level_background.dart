@@ -3,10 +3,13 @@ import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/rendering.dart';
 
+// ignore: constant_identifier_names
+enum BackgroundTileColor { Blue, Brown, Gray, Green, Pink, Purple, Yellow }
+
 class LevelBackground extends ParallaxComponent {
   final String color;
 
-  LevelBackground({this.color = 'Gray', super.position, super.size});
+  LevelBackground({required this.color, required super.position, required super.size});
 
   final double scrollSpeed = 40;
 

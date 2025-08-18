@@ -26,11 +26,17 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   final double offsetPos;
   final bool isLeft;
 
-  BlueBird({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  BlueBird({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 19));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 19));
 
   // player ref
   final Player _player;
@@ -148,8 +154,8 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     }
 
     // movement
-    final double currentSpeed = _calculateCurrentSpeed(dt);
-    final double newPositionX = position.x + _moveDirection * currentSpeed * dt;
+    final currentSpeed = _calculateCurrentSpeed(dt);
+    final newPositionX = position.x + _moveDirection * currentSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 

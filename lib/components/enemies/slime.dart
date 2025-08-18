@@ -27,11 +27,17 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final double offsetPos;
   final bool isLeft;
 
-  Slime({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  Slime({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(6, 6), size: Vector2(36, 26));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(6, 6), size: Vector2(36, 26));
 
   // player ref
   final Player _player;
@@ -136,7 +142,7 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     }
 
     // movement
-    final double newPositionX = position.x + _moveDirection * _moveSpeed * dt;
+    final newPositionX = position.x + _moveDirection * _moveSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 

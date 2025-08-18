@@ -8,7 +8,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
   final bool clockwise;
 
-  SawCircleSingleSaw({this.clockwise = false, super.position}) : super(size: fixedSize);
+  SawCircleSingleSaw({required this.clockwise, required super.position}) : super(size: fixedSize);
 
   // size
   static Vector2 fixedSize = Vector2.all(32);

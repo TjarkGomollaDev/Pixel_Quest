@@ -10,10 +10,10 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
   final double offsetPos;
   final bool isVertical;
 
-  Saw({this.offsetNeg = 0, this.offsetPos = 0, this.isVertical = false, super.position}) : super(size: _fixedSize);
+  Saw({required this.offsetNeg, required this.offsetPos, required this.isVertical, required super.position}) : super(size: fixedSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 fixedSize = Vector2.all(32);
 
   // actual hitbox
   final CircleHitbox hitbox = CircleHitbox();
@@ -26,8 +26,8 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
   final String _pathChain = 'Traps/Platforms/Chain.png';
 
   // range
-  double _rangeNeg = 0;
-  double _rangePos = 0;
+  late final double _rangeNeg;
+  late final double _rangePos;
 
   // movement
   double _moveDirection = -1;
@@ -75,22 +75,20 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
       _rangeNeg = position.x - offsetNeg * game.tileSize + width / 2;
       _rangePos = position.x + offsetPos * game.tileSize + width / 2;
     }
-    _rangeNeg += game.rangeOffset;
-    _rangePos -= game.rangeOffset;
   }
 
   void _createChainPath() {
     final chainSprite = loadSprite(game, _pathChain);
-    final double chainSize = 8;
+    final chainSize = 8.0;
 
     // calculate the startpoint of the chain
     final startPoint = Vector2(
-      isVertical ? position.x - chainSize / 2 : _rangeNeg - width / 2 - game.rangeOffset,
-      isVertical ? _rangeNeg - game.rangeOffset : position.y + height / 2 - chainSize / 2,
+      isVertical ? position.x - chainSize / 2 : _rangeNeg - width / 2,
+      isVertical ? _rangeNeg : position.y + height / 2 - chainSize / 2,
     );
 
     // calculate the length of the chain
-    final length = ((_rangePos - _rangeNeg + width + 2 * game.rangeOffset) / game.tileSize);
+    final length = ((_rangePos - _rangeNeg + width) / game.tileSize);
     double offset = chainSize * 2;
 
     // exactly two chain elements fit into a tile and a tile is left free at both ends
@@ -120,7 +118,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     }
 
     // movement
-    final double newPositionX = position.y + _moveDirection * _moveSpeed * dt;
+    final newPositionX = position.y + _moveDirection * _moveSpeed * dt;
     position.y = newPositionX.clamp(_rangeNeg, _rangePos);
   }
 
@@ -135,7 +133,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     }
 
     // movement
-    final double newPositionX = position.x + _moveDirection * _moveSpeed * dt;
+    final newPositionX = position.x + _moveDirection * _moveSpeed * dt;
     position.x = newPositionX.clamp(_rangeNeg, _rangePos);
   }
 }

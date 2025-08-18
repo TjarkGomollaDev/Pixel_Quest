@@ -32,13 +32,13 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final bool isLeft;
 
   Trunk({
-    this.offsetNeg = 0,
-    this.offsetPos = 0,
-    this.extandNegAttack = 0,
-    this.extandPosAttack = 0,
-    this.isLeft = true,
-    super.position,
-    super.size,
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.extandNegAttack,
+    required this.extandPosAttack,
+    required this.isLeft,
+    required super.position,
+    required super.size,
     required Player player,
   }) : _player = player;
 
@@ -231,8 +231,8 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (_accelProgress == 0) current = TrunkState.run;
 
     // movement
-    final double currentSpeed = _calculateCurrentSpeed(dt);
-    final double newPositionX = position.x + _moveDirection * currentSpeed * dt;
+    final currentSpeed = _calculateCurrentSpeed(dt);
+    final newPositionX = position.x + _moveDirection * currentSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
     _updateHitboxEdges();
   }

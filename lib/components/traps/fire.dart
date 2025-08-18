@@ -6,10 +6,10 @@ import 'package:pixel_adventure/components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class Fire extends SpriteAnimationComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Fire({super.position, super.size});
+  Fire({required super.position, required super.size});
 
   // actual hitbox
-  final hitbox = RectangleHitbox();
+  final RectangleHitbox hitbox = RectangleHitbox();
 
   // animation settings
   final double _stepTime = 0.05;

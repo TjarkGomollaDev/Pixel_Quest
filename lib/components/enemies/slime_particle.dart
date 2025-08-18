@@ -7,10 +7,13 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 class SlimeParticle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
   final bool spawnOnLeftSide;
 
-  SlimeParticle({required this.spawnOnLeftSide, super.position}) : super(size: Vector2(16, 16));
+  SlimeParticle({required this.spawnOnLeftSide, required super.position}) : super(size: fixedSize);
+
+  // size
+  static final Vector2 fixedSize = Vector2.all(16);
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
 
   // animation settings
   final double _stepTime = 0.07;

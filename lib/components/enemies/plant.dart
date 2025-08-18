@@ -26,7 +26,8 @@ class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final bool isLeft;
   final bool doubleShot;
 
-  Plant({this.isLeft = true, this.doubleShot = false, super.position, super.size, required Player player}) : _player = player;
+  Plant({required this.isLeft, required this.doubleShot, required super.position, required super.size, required Player player})
+    : _player = player;
 
   // actual hitbox
   final hitbox = RectangleHitbox(position: Vector2(10, 8), size: Vector2(17, 24));
@@ -43,8 +44,8 @@ class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   // attack
   double _timeSinceLastAttack = 0.0;
   bool _isAttacking = false;
-  final double _timeUntilNextAttack = 5; // [Adjustable]
-  final Duration _delayBetweenDoubleShot = Duration(milliseconds: 500); // [Adjustable]
+  final _timeUntilNextAttack = 5; // [Adjustable]
+  final _delayBetweenDoubleShot = Duration(milliseconds: 500); // [Adjustable]
 
   // got stomped
   bool _gotStomped = false;

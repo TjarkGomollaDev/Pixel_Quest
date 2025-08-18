@@ -10,13 +10,13 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final bool isLeft;
 
-  TrunkBullet({this.isLeft = true, super.position}) : super(size: fixedSize);
+  TrunkBullet({required this.isLeft, required super.position}) : super(size: fixedSize);
 
   // size
-  static Vector2 fixedSize = Vector2.all(16);
+  static final Vector2 fixedSize = Vector2.all(16);
 
   // actual hitbox
-  final hitbox = CircleHitbox(position: Vector2(4, 4), radius: 4);
+  final CircleHitbox hitbox = CircleHitbox(position: Vector2(4, 4), radius: 4);
 
   // animation settings
   final String _path = 'Enemies/Trunk/Bullet.png';

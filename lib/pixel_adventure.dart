@@ -4,12 +4,14 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/components/level/level.dart';
 import 'package:pixel_adventure/components/level/player.dart';
 
-class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker {
+class PixelAdventure extends FlameGame
+    with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
   @override
-  Color backgroundColor() => const Color(0xFF211F30);
+  Color backgroundColor() => AppTheme.backgroundColor;
 
   // character
   final List<PlayerCharacter> characters = PlayerCharacter.values;
@@ -19,10 +21,10 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
   late final RouterComponent router;
 
   // mobile
-  bool showMobileControls = false;
+  final bool showMobileControls = false;
 
   // custom debug mode
-  bool customDebug = true;
+  final bool customDebug = true;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -35,6 +37,20 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
   static const int playerLayerLevel = 20;
+
+  // default spawn values
+  static const bool isLeftDefault = true;
+  static const bool isVerticalDefault = false;
+  static const bool doubleShotDefault = false;
+  static const bool doubleSawDefault = false;
+  static const bool clockwiseDefault = false;
+  static const int sideDefault = 1;
+  static const double offsetNegDefault = 1.0;
+  static const double offsetPosDefault = 1.0;
+  static const double extandNegAttackDefault = 0.0;
+  static const double extandPosAttackDefault = 0.0;
+  static const double circleWidthDefault = 6.0;
+  static const double circleHeightDefault = 4.0;
 
   // tile size
   final double tileSize = 16;
@@ -81,7 +97,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
       for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(levelName: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: '3'));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: '1'));
   }
 
   void nextLevel() {

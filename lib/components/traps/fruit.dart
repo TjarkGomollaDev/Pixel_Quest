@@ -19,13 +19,16 @@ enum FruitState implements AnimationState {
   const FruitState(this.name, this.amount, {this.loop = true});
 }
 
+// ignore: constant_identifier_names
+enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Strawberry }
+
 class Fruit extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final String name;
 
-  Fruit({this.name = 'Apple', super.position, super.size});
+  Fruit({required this.name, required super.position, required super.size});
 
   // hitbox
-  final hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
 
   // animation settings
   final double _stepTime = 0.05;

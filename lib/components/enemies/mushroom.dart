@@ -27,11 +27,17 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   final double offsetPos;
   final bool isLeft;
 
-  Mushroom({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  Mushroom({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
 
   // player ref
   final Player _player;
@@ -140,8 +146,8 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     if (_accelProgress == 0) current = MushroomState.run;
 
     // movement
-    final double currentSpeed = _calculateCurrentSpeed(dt);
-    final double newPositionX = position.x + _moveDirection * currentSpeed * dt;
+    final currentSpeed = _calculateCurrentSpeed(dt);
+    final newPositionX = position.x + _moveDirection * currentSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 

@@ -9,7 +9,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 class Spikes extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final int side;
 
-  Spikes({this.side = 1, super.position, super.size});
+  Spikes({required this.side, required super.position, required super.size});
 
   // actual hitbox
   late final RectangleHitbox hitbox;

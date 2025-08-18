@@ -21,10 +21,10 @@ enum TrampolineState implements AnimationState {
 }
 
 class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Trampoline({super.position, super.size, required Player player}) : _player = player;
+  Trampoline({required super.position, required super.size, required Player player}) : _player = player;
 
   // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(2, 20), size: Vector2(28, 12));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(2, 20), size: Vector2(28, 12));
 
   // player ref
   final Player _player;

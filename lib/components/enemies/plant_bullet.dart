@@ -11,7 +11,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final bool isLeft;
 
-  PlantBullet({this.isLeft = true, super.position}) : super(size: fixedSize);
+  PlantBullet({required this.isLeft, required super.position}) : super(size: fixedSize);
 
   // size
   static final Vector2 fixedSize = Vector2.all(16);
@@ -19,7 +19,7 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
   static const double hitboxRadius = 4;
 
   // actual hitbox
-  final hitbox = CircleHitbox(position: hitboxOffset, radius: hitboxRadius);
+  final CircleHitbox hitbox = CircleHitbox(position: hitboxOffset, radius: hitboxRadius);
 
   // animation settings
   final String _path = 'Enemies/Plant/Bullet.png';

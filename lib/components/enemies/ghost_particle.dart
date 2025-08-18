@@ -8,7 +8,7 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
   final Ghost owner;
   final bool spawnOnLeftSide;
 
-  GhostParticle({required this.owner, required this.spawnOnLeftSide, super.position}) : super(size: Vector2(16, 16));
+  GhostParticle({required this.owner, required this.spawnOnLeftSide, required super.position}) : super(size: Vector2(16, 16));
 
   // animation settings
   final double _stepTime = 0.07;

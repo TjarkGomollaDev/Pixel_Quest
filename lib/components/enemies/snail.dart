@@ -34,8 +34,14 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final double offsetPos;
   final bool isLeft;
 
-  Snail({this.offsetNeg = 0, this.offsetPos = 0, this.isLeft = true, super.position, super.size, required Player player})
-    : _player = player;
+  Snail({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
 
   // actual snail hitbox
   final hitbox = RectangleHitbox(position: Vector2(8, 4), size: Vector2(36, 28));
@@ -165,8 +171,8 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (_accelProgress == 0) current = SnailState.snailWalk;
 
     // movement
-    final double currentSpeed = _calculateCurrentSnailSpeed(dt);
-    final double newPositionX = position.x + _moveDirection * currentSpeed * dt;
+    final currentSpeed = _calculateCurrentSnailSpeed(dt);
+    final newPositionX = position.x + _moveDirection * currentSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
@@ -208,7 +214,7 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     }
 
     // movement
-    final double newPositionX = position.x + _shellMoveDirection * _shellMoveSpeed * dt;
+    final newPositionX = position.x + _shellMoveDirection * _shellMoveSpeed * dt;
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
@@ -258,8 +264,8 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   void _handleShellKick() {
     current = SnailState.shellSpin;
     _shellGotKicked = true;
-    final double shellPositionLeftX = (scale.x > 0) ? position.x + hitbox.position.x : position.x - hitbox.position.x - hitbox.width;
-    double shellPositionRightX = shellPositionLeftX + hitbox.width;
+    final shellPositionLeftX = (scale.x > 0) ? position.x + hitbox.position.x : position.x - hitbox.position.x - hitbox.width;
+    final shellPositionRightX = shellPositionLeftX + hitbox.width;
     final shellCenter = (shellPositionLeftX + shellPositionRightX) / 2;
     final playerCenter = (_player.hitboxPositionLeftX + _player.hitboxPositionRightX) / 2;
     _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;

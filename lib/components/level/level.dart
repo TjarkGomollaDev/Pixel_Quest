@@ -90,10 +90,11 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
   void _addLevelBackground() {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
-      final backgroundColor = backgroundLayer.properties.getValue('BackgroundColor');
-      const allowedColors = ['Blue', 'Brown', 'Gray', 'Green', 'Pink', 'Purple', 'Yellow'];
-      final safeColor = allowedColors.contains(backgroundColor) ? backgroundColor : 'Gray';
-      _levelBackground = LevelBackground(color: safeColor, position: Vector2.zero(), size: Vector2(_levelMap.width, _levelMap.height))
+      final backgroundColor = backgroundLayer.properties.getValue<String?>('BackgroundColor');
+      final safeColor = BackgroundTileColor.values.map((e) => e.name).contains(backgroundColor)
+          ? backgroundColor
+          : BackgroundTileColor.Gray.name;
+      _levelBackground = LevelBackground(color: safeColor!, position: Vector2.zero(), size: Vector2(_levelMap.width, _levelMap.height))
         ..priority = PixelAdventure.backgroundLayerLevel;
       add(_levelBackground);
     }
@@ -117,17 +118,19 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
       for (var spawnPoint in spawnPointsLayer.objects) {
         switch (spawnPoint.class_) {
           case 'Fruit':
+            final fruitName = spawnPoint.name;
+            final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
             final fruit = Fruit(
-              name: spawnPoint.name,
+              name: safeName,
               position: Vector2(spawnPoint.x, spawnPoint.y),
               size: Vector2(spawnPoint.width, spawnPoint.height),
             );
             add(fruit);
             break;
           case 'Saw':
-            final bool isVertical = spawnPoint.properties.getValue('isVertical');
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
             final saw = Saw(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -137,10 +140,10 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(saw);
             break;
           case 'SawCircle':
-            final double circleWidth = spawnPoint.properties.getValue('circleWidth');
-            final double circleHeight = spawnPoint.properties.getValue('circleHeight');
-            final bool doubleSaw = spawnPoint.properties.getValue('doubleSaw');
-            final bool clockwise = spawnPoint.properties.getValue('clockwise');
+            final circleWidth = spawnPoint.properties.getValue<double?>('circleWidth') ?? PixelAdventure.circleWidthDefault;
+            final circleHeight = spawnPoint.properties.getValue<double?>('circleHeight') ?? PixelAdventure.circleHeightDefault;
+            final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? PixelAdventure.doubleSawDefault;
+            final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? PixelAdventure.clockwiseDefault;
             final sawCircle = SawCircle(
               doubleSaw: doubleSaw,
               clockwise: clockwise,
@@ -150,9 +153,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(sawCircle);
             break;
           case 'Chicken':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final chicken = Chicken(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -193,9 +196,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(fire);
             break;
           case 'Moving Platform':
-            final bool isVertical = spawnPoint.properties.getValue('isVertical');
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
             final movingPlatform = MovingPlatform(
               isVertical: isVertical,
               offsetNeg: offsetNeg,
@@ -213,8 +216,8 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(movingPlatform);
             break;
           case 'Plant':
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
-            final bool doubleShot = spawnPoint.properties.getValue('doubleShot');
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? PixelAdventure.doubleShotDefault;
             final plant = Plant(
               isLeft: isLeft,
               doubleShot: doubleShot,
@@ -225,9 +228,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(plant);
             break;
           case 'Blue Bird':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final bird = BlueBird(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -239,9 +242,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(bird);
             break;
           case 'Snail':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final snail = Snail(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -253,9 +256,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(snail);
             break;
           case 'Ghost':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final ghost = Ghost(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -267,9 +270,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(ghost);
             break;
           case 'Mushroom':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final mushroom = Mushroom(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -281,11 +284,11 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(mushroom);
             break;
           case 'Trunk':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final double extandNegAttack = spawnPoint.properties.getValue('extandNegAttack');
-            final double extandPosAttack = spawnPoint.properties.getValue('extandPosAttack');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? PixelAdventure.extandNegAttackDefault;
+            final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? PixelAdventure.extandPosAttackDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final trunk = Trunk(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -299,9 +302,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(trunk);
             break;
           case 'Slime':
-            final double offsetNeg = spawnPoint.properties.getValue('offsetNeg');
-            final double offsetPos = spawnPoint.properties.getValue('offsetPos');
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final slime = Slime(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -313,7 +316,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(slime);
             break;
           case 'Turtle':
-            final bool isLeft = spawnPoint.properties.getValue('isLeft');
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
             final turtle = Turtle(
               isLeft: isLeft,
               position: Vector2(spawnPoint.x, spawnPoint.y),
@@ -323,7 +326,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(turtle);
             break;
           case 'Spikes':
-            final int side = spawnPoint.properties.getValue('side');
+            final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
             final spikes = Spikes(
               side: side,
               position: Vector2(spawnPoint.x, spawnPoint.y),

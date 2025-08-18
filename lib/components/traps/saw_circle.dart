@@ -9,7 +9,7 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
   final bool doubleSaw;
   final bool clockwise;
 
-  SawCircle({this.doubleSaw = false, this.clockwise = true, super.position, super.size});
+  SawCircle({required this.doubleSaw, required this.clockwise, required super.position, required super.size});
 
   // actual hitbox
   final RectangleHitbox hitbox = RectangleHitbox();

@@ -42,14 +42,14 @@ abstract class AppTheme {
   static const redDark = Color.fromRGBO(255, 69, 58, 1);
   static const greenDark = Color.fromRGBO(48, 209, 88, 1);
   static const mintDark = Color.fromRGBO(99, 230, 226, 1);
-  static const Color orangeDark = Color.fromRGBO(255, 159, 10, 1);
-  static const Color yellowDark = Color.fromRGBO(255, 214, 10, 1);
-  static const Color tealDark = Color.fromRGBO(64, 200, 224, 1);
-  static const Color cyanDark = Color.fromRGBO(100, 210, 255, 1);
-  static const Color indigoDark = Color.fromRGBO(94, 92, 230, 1);
-  static const Color purpleDark = Color.fromRGBO(191, 90, 242, 1);
-  static const Color pinkDark = Color.fromRGBO(255, 55, 95, 1);
-  static const Color brownDark = Color.fromRGBO(172, 142, 104, 1);
+  static const orangeDark = Color.fromRGBO(255, 159, 10, 1);
+  static const yellowDark = Color.fromRGBO(255, 214, 10, 1);
+  static const tealDark = Color.fromRGBO(64, 200, 224, 1);
+  static const cyanDark = Color.fromRGBO(100, 210, 255, 1);
+  static const indigoDark = Color.fromRGBO(94, 92, 230, 1);
+  static const purpleDark = Color.fromRGBO(191, 90, 242, 1);
+  static const pinkDark = Color.fromRGBO(255, 55, 95, 1);
+  static const brownDark = Color.fromRGBO(172, 142, 104, 1);
 
   // debug colors
   static const debugColorEnemie = pinkLight;
@@ -59,4 +59,7 @@ abstract class AppTheme {
   static const debugColorCollectibles = brownLight;
   static const debugColorcollectiblesHitbox = redLight;
   static const debugColorPlayerHitbox = orangeDark;
+
+  // background color
+  static const backgroundColor = Color(0xFF211F30);
 }

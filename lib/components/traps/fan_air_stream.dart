@@ -9,7 +9,8 @@ class FanAirStream extends PositionComponent with HasGameReference<PixelAdventur
   final double baseWidth;
   final double airStreamHeight;
 
-  FanAirStream(this.baseWidth, this.airStreamHeight, {required Player player, super.position}) : _player = player {
+  FanAirStream({required this.baseWidth, required this.airStreamHeight, required super.position, required Player player})
+    : _player = player {
     final airStreamWidth = baseWidth * _widenFactor;
     final airStreamOffset = Vector2(-(airStreamWidth - baseWidth) / 2, -airStreamHeight);
     size = Vector2(airStreamWidth, airStreamHeight);
