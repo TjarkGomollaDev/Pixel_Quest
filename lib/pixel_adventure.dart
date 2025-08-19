@@ -3,10 +3,11 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/components/level/level.dart';
-import 'package:pixel_adventure/components/level/player.dart';
+import 'package:pixel_adventure/game_components/level/level.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
+import 'package:pixel_adventure/menu/menu_screen.dart';
 
 class PixelAdventure extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
@@ -57,7 +58,7 @@ class PixelAdventure extends FlameGame
 
   // margin HUD elements
   final double hudMargin = 32;
-  final hudMobileControlsSize = 64;
+  final double hudMobileControlsSize = 64;
 
   // collision
   final double toleranceEnemieCollision = 5;
@@ -87,13 +88,14 @@ class PixelAdventure extends FlameGame
   }
 
   void setCameraBounds(double mapWidth) {
-    final leftBound = size.x * 0.25;
-    final rightBound = size.x * 0.75;
+    final leftBound = size.x * camera.viewfinder.anchor.x;
+    final rightBound = size.x * (1 - camera.viewfinder.anchor.x);
     camera.setBounds(Rectangle.fromLTRB(leftBound, 0, mapWidth - rightBound, 0));
   }
 
   void _setUpRouter() {
     final levelRoutes = {
+      'menu': Route(MenuScreen.new),
       for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(levelName: level), maintainState: false),
     };
 

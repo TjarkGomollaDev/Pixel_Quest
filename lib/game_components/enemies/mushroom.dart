@@ -1,0 +1,192 @@
+import 'dart:async';
+import 'dart:math' as math;
+import 'package:flame/collisions.dart';
+import 'package:flame/components.dart';
+import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
+import 'package:pixel_adventure/game_components/utils.dart';
+import 'package:pixel_adventure/pixel_adventure.dart';
+
+enum MushroomState implements AnimationState {
+  idle('Idle', 14),
+  run('Run', 16),
+  hit('Hit', 5, loop: false);
+
+  @override
+  final String name;
+  @override
+  final int amount;
+  @override
+  final bool loop;
+
+  const MushroomState(this.name, this.amount, {this.loop = true});
+}
+
+class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+  final double offsetNeg;
+  final double offsetPos;
+  final bool isLeft;
+
+  Mushroom({
+    required this.offsetNeg,
+    required this.offsetPos,
+    required this.isLeft,
+    required super.position,
+    required super.size,
+    required Player player,
+  }) : _player = player;
+
+  // actual hitbox
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
+
+  // player ref
+  final Player _player;
+
+  // animation settings
+  final double _stepTime = 0.05;
+  final Vector2 _textureSize = Vector2(32, 32);
+  final String _path = 'Enemies/Mushroom/';
+  final String _pathEnd = ' (32x32).png';
+
+  // range
+  late final double _rangeNeg;
+  late final double _rangePos;
+
+  // actual borders that compensate for the hitbox and flip offset, depending on the moveDirection
+  late double _leftBorder;
+  late double _rightBorder;
+
+  // movement
+  late double _moveDirection;
+  final double _moveSpeed = 48; // [Adjustable]
+  double _speedFactor = 1;
+
+  // acceleration
+  double _accelProgress = 1; //
+  final double _accelDuration = 2.6; // [Adjustable]
+
+  // delay after direction change
+  double _pauseTimer = 0;
+  final double _pauseDuration = 2; // [Adjustable]
+
+  // got stomped
+  bool _gotStomped = false;
+
+  @override
+  FutureOr<void> onLoad() {
+    _initialSetup();
+    _loadAllAnimations();
+    _setUpRange();
+    _setUpMoveDirection();
+    return super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    if (!_gotStomped) _movement(dt);
+    super.update(dt);
+  }
+
+  void _initialSetup() {
+    // debug
+    if (game.customDebug) {
+      debugMode = true;
+      debugColor = AppTheme.debugColorEnemie;
+      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+    }
+
+    // general
+    priority = PixelAdventure.enemieLayerLevel;
+    hitbox.collisionType = CollisionType.passive;
+    add(hitbox);
+  }
+
+  void _loadAllAnimations() {
+    final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, _stepTime, _textureSize);
+
+    // list of all animations
+    animations = {for (var state in MushroomState.values) state: loadAnimation(state)};
+
+    // set current animation state
+    current = MushroomState.run;
+  }
+
+  void _setUpRange() {
+    _rangeNeg = position.x - offsetNeg * game.tileSize + game.rangeOffset;
+    _rangePos = position.x + offsetPos * game.tileSize + width - game.rangeOffset;
+  }
+
+  void _setUpMoveDirection() {
+    _moveDirection = isLeft ? -1 : 1;
+    if (_moveDirection == 1) flipHorizontallyAroundCenter();
+    _updateActualBorders();
+  }
+
+  void _updateActualBorders() {
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+  }
+
+  void _movement(double dt) {
+    // short break after direction change
+    if (_pauseTimer > 0) {
+      _pauseTimer -= dt;
+      return;
+    }
+
+    // change move direction if we reached the borders
+    if (position.x >= _rightBorder && _moveDirection != -1) {
+      _changeDirection(-1);
+      return;
+    } else if (position.x <= _leftBorder && _moveDirection != 1) {
+      _changeDirection(1);
+      return;
+    }
+
+    if (_accelProgress == 0) current = MushroomState.run;
+
+    // movement
+    final currentSpeed = _calculateCurrentSpeed(dt);
+    final newPositionX = position.x + _moveDirection * currentSpeed * dt;
+    position.x = newPositionX.clamp(_leftBorder, _rightBorder);
+  }
+
+  void _changeDirection(double newDirection) {
+    current = MushroomState.idle;
+    _moveDirection = newDirection;
+    flipHorizontallyAroundCenter();
+
+    // after changing the direction, we need to adjust the borders and overwrite the x position manually
+    _updateActualBorders();
+    position.x = _moveDirection == 1 ? _leftBorder : _rightBorder;
+
+    // reset acceleration and timer
+    _speedFactor = 0;
+    _accelProgress = 0;
+    _pauseTimer = _pauseDuration;
+  }
+
+  double _calculateCurrentSpeed(double dt) {
+    // check whether we have reached maximum speed
+    if (!(_accelProgress < 1)) return _moveSpeed;
+
+    // calculate speed factor
+    _accelProgress = (_accelProgress + dt / _accelDuration).clamp(0.0, 1.0);
+    _speedFactor = 1 - math.pow(1 - _accelProgress, 3).toDouble();
+
+    // calculate current speed
+    return _moveSpeed * _speedFactor;
+  }
+
+  void collidedWithPlayer(Vector2 collisionPoint) {
+    if (_gotStomped) return;
+    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+      _gotStomped = true;
+      _player.bounceUp();
+      current = MushroomState.hit;
+      animationTickers![MushroomState.hit]!.completed.whenComplete(() => removeFromParent());
+    } else {
+      _player.collidedWithEnemy();
+    }
+  }
+}
