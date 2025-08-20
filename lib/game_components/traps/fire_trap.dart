@@ -21,20 +21,33 @@ enum FireTrapState implements AnimationState {
   const FireTrapState(this.name, this.amount, {this.loop = true});
 }
 
+/// A flame trap that activates when the player steps on its trigger area.
+///
+/// Initially idle in the [FireTrapState.off] state, it switches to [FireTrapState.hit]
+/// when triggered from above. After a short delay, the fire ignites into the
+/// [FireTrapState.on] state, dealing continuous damage while active. Once the
+/// burn duration ends, the trap returns to its idle state and can be triggered again.
+///
+/// Damage is only applied while the fire is burning. Triggering and timing
+/// are fully animation-driven, allowing the trap to synchronize visuals with
+/// its collision behavior for fair player feedback.
 class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  FireTrap({required super.position, required super.size, required Player player}) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
-
-  // player ref
+  // constructor parameters
   final Player _player;
 
+  FireTrap({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2(16, 32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(16, 32);
-  final String _path = 'Traps/Fire/';
-  final String _pathEnd = ' (16x32).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(16, 32);
+  static const String _path = 'Traps/Fire/';
+  static const String _pathEnd = ' (16x32).png';
 
   // fire
   bool _isFireActivated = false;
@@ -56,26 +69,25 @@ class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapBehindLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in FireTrapState.values) state: loadAnimation(state)};
+
     // set current animation state
     current = FireTrapState.off;
   }
 
   Future<void> collidedWithPlayer(Vector2 collisionPoint) async {
-    if (!_isFireActivated && collisionPoint.y == position.y + hitbox.height) {
+    if (!_isFireActivated && collisionPoint.y == position.y + _hitbox.height) {
       current = FireTrapState.hit;
       _isFireActivated = true;
       await animationTickers![FireTrapState.hit]!.completed;

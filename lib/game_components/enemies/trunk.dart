@@ -172,13 +172,13 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * game.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * game.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpAttackRange() {
-    _attackRangeNeg = _rangeNeg - extandNegAttack * game.tileSize;
-    _attackRangePos = _rangePos + extandPosAttack * game.tileSize;
+    _attackRangeNeg = _rangeNeg - extandNegAttack * PixelAdventure.tileSize;
+    _attackRangePos = _rangePos + extandPosAttack * PixelAdventure.tileSize;
   }
 
   void _setUpMoveDirection() {

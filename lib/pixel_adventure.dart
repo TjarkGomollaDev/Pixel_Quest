@@ -54,7 +54,7 @@ class PixelAdventure extends FlameGame
   static const double circleHeightDefault = 4.0;
 
   // tile size
-  final double tileSize = 16;
+  static const double tileSize = 16;
 
   // margin HUD elements
   final double hudMargin = 32;
@@ -99,7 +99,7 @@ class PixelAdventure extends FlameGame
       for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(name: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: '2'));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: '3'));
   }
 
   void nextLevel() {

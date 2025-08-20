@@ -120,6 +120,9 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   JoystickComponent? _joystick;
   JoystickDirection _lastJoystickDirection = JoystickDirection.idle;
 
+  // count fruits
+  int _fruitCounter = 0;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
@@ -156,16 +159,16 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
         other.collidedWithPlayer();
         break;
       case Saw():
-        _respawn();
+        other.collidedWithPlayer();
         break;
       case SawCircleSingleSaw():
-        _respawn();
+        other.collidedWithPlayer();
         break;
       case Spikes():
-        _respawn();
+        other.collidedWithPlayer();
         break;
       case Fire():
-        _respawn();
+        other.collidedWithPlayer();
         break;
       case Chicken():
         other.collidedWithPlayer(intersectionPoint);
@@ -207,7 +210,6 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
         break;
       case Checkpoint():
         other.collidedWithPlayer();
-        _reachedCheckpoint();
         break;
       case FanAirStream():
         other.collidedWithPlayer(intersectionPoint);
@@ -444,7 +446,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     });
   }
 
-  void _reachedCheckpoint() {
+  void reachedCheckpoint() {
     _hasReachedCheckpoint = true;
     current = PlayerState.disappearing;
     if (scale.x > 0) {
@@ -474,6 +476,8 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
       canDoubleJump = true;
     }
   }
+
+  void increaseFruitCounter() => _fruitCounter++;
 
   void _updateHitboxEdges() {
     hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.offsetX : x - hitbox.offsetX - hitbox.width;

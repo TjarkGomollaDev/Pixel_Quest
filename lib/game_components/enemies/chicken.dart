@@ -111,8 +111,8 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * game.tileSize;
-    _rangePos = position.x + offsetPos * game.tileSize + width;
+    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize;
+    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width;
   }
 
   void _setUpMoveDirection() {

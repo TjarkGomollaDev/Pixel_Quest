@@ -2,17 +2,32 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/traps/saw_circle_single_saw.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
+/// A circular saw trap that moves one or two saws along the edges of a rectangular path.
+///
+/// The saws can travel clockwise or counterclockwise and automatically follow
+/// a continuous loop around the trap’s bounding box. The path is normalized
+/// to align with the game’s tile grid, ensuring consistent placement.
+///
+/// A single saw moves around the full loop, while a double-saw configuration
+/// places a second saw on the opposite side of the path, keeping both in sync.
+/// The saws act as passive collision areas that can interact with the [Player].
 class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
-  final bool doubleSaw;
-  final bool clockwise;
+  // constructor parameters
+  final bool _doubleSaw;
+  final bool _clockwise;
+  final Player _player;
 
-  SawCircle({required this.doubleSaw, required this.clockwise, required super.position, required super.size});
+  SawCircle({required bool doubleSaw, required bool clockwise, required Player player, required super.position, required super.size})
+    : _clockwise = clockwise,
+      _doubleSaw = doubleSaw,
+      _player = player;
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox();
+  final RectangleHitbox _hitbox = RectangleHitbox();
 
   // single saws
   late final SawCircleSingleSaw _saw1;
@@ -49,21 +64,21 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapBehindLayerLevel;
-    hitbox.collisionType = CollisionType.inactive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.inactive;
+    add(_hitbox);
   }
 
   void _setUpPath() {
     _path = [
-      Vector2(game.tileSize, game.tileSize), // top left
-      Vector2(game.tileSize, height - game.tileSize), // bottom left
-      Vector2(width - game.tileSize, height - game.tileSize), // bottom right
-      Vector2(width - game.tileSize, game.tileSize), // top right
+      Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize), // top left
+      Vector2(PixelAdventure.tileSize, height - PixelAdventure.tileSize), // bottom left
+      Vector2(width - PixelAdventure.tileSize, height - PixelAdventure.tileSize), // bottom right
+      Vector2(width - PixelAdventure.tileSize, PixelAdventure.tileSize), // top right
     ];
     _pathWidth = _path[3].x - _path[0].x;
     _pathHeight = _path[1].y - _path[0].y;
@@ -71,26 +86,26 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
   }
 
   void _addSingleSaws() {
-    _saw1 = SawCircleSingleSaw(clockwise: clockwise, position: _path[0]);
+    _saw1 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[0]);
     add(_saw1);
 
     // if needed, add the second saw
-    if (doubleSaw) {
-      _saw2 = SawCircleSingleSaw(clockwise: clockwise, position: _path[2]);
+    if (_doubleSaw) {
+      _saw2 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[2]);
       add(_saw2!);
     } else {
       _saw2 = null;
     }
 
     // by default, the saw moves counterclockwise.
-    if (clockwise) _distanceOnPathSaw1 = _pathWidth + _pathHeight * 2;
+    if (_clockwise) _distanceOnPathSaw1 = _pathWidth + _pathHeight * 2;
   }
 
   void _movement(double dt) {
     final moveStep = _nextStepOnPath(_distanceOnPathSaw1, dt);
 
     // add the new step to the position of the saw
-    if (clockwise && moveStep.x != 0) {
+    if (_clockwise && moveStep.x != 0) {
       // when moving clockwise, we have to reverse the movement on the top and bottom edges
       _saw1.position += moveStep * -1;
       if (_saw2 != null) _saw2.position += moveStep;
@@ -107,7 +122,7 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
     // but we have a hard reset with absolute values, which eliminates potential inaccuracies in the long run => sync point
     if (_distanceOnPathSaw1 >= _pathLength) {
       _distanceOnPathSaw1 = 0;
-      if (!clockwise) {
+      if (!_clockwise) {
         _saw1.position = _path[0];
         if (_saw2 != null) _saw2.position = _path[2];
       } else {

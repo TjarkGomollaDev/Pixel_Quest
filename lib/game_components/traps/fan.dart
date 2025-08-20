@@ -20,23 +20,31 @@ enum FanState implements AnimationState {
   const FanState(this.name, this.amount);
 }
 
+/// A fan trap that continuously blows air upwards.
+///
+/// The fan has a visual representation ([Fan]) and an invisible
+/// air stream component ([FanAirStream]) that applies upward force
+/// to the player when they are inside it. The air stream also
+/// resets the player's ability to double jump while they are being
+/// pushed upward.
+///
+/// The fan animation plays continuously while the trap is active.
+/// Damage is not applied; this trap only manipulates player movement.
 class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure> {
-  Fan({required super.position, required Player player}) : _player = player, super(size: fixedSize) {
-    position += fixedOffset;
-  }
-
-  // size
-  static final Vector2 fixedSize = Vector2(28, 8);
-  static final Vector2 fixedOffset = Vector2(2, 8);
-
-  // player ref
+  // constructor parameters
   final Player _player;
 
+  Fan({required Player player, required Vector2 position}) : _player = player, super(size: _fixedSize, position: position + _fixedOffset);
+
+  // size
+  static final Vector2 _fixedSize = Vector2(28, 8);
+  static final Vector2 _fixedOffset = Vector2(2, 8);
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(24, 8);
-  final String _path = 'Traps/Fan/';
-  final String _pathEnd = '.png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(24, 8);
+  static const String _path = 'Traps/Fan/';
+  static const String _pathEnd = '.png';
 
   // air stream
   late final FanAirStream _airStream;
@@ -62,8 +70,6 @@ class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdven
 
   void _loadAllAnimation() {
     final loadAnimation = spriteAnimationWrapper<FanState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in FanState.values) state: loadAnimation(state)};
 
     // set current animation state
@@ -71,7 +77,7 @@ class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdven
   }
 
   void _loadFanAirStream() {
-    _airStream = FanAirStream(baseWidth: width, airStreamHeight: 200, player: _player, position: Vector2(0, 0));
+    _airStream = FanAirStream(baseWidth: width, airStreamHeight: position.y, player: _player, position: Vector2(0, 0));
     add(_airStream);
   }
 }

@@ -2,31 +2,45 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
+/// A single saw unit used inside a [SawCircle].
+///
+/// The saw is rendered as a rotating sprite animation with a circular hitbox,
+/// anchored at its center. Depending on configuration, it can be mirrored
+/// to represent clockwise or counterclockwise motion within the circular trap.
+///
+/// This component does not move by itself, but is positioned and updated
+/// by its parent [SawCircle]. It acts as a passive collision area
+/// that can interact with the [Player].
 class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
-  final bool clockwise;
+  // constructor parameters
+  final bool _clockwise;
+  final Player _player;
 
-  SawCircleSingleSaw({required this.clockwise, required super.position}) : super(size: fixedSize);
+  SawCircleSingleSaw({required bool clockwise, required Player player, required super.position})
+    : _clockwise = clockwise,
+      _player = player,
+      super(size: _fixedSize);
 
   // size
-  static Vector2 fixedSize = Vector2.all(32);
+  static final Vector2 _fixedSize = Vector2.all(32);
 
   // actual hitbox
-  final CircleHitbox hitbox = CircleHitbox();
+  final CircleHitbox _hitbox = CircleHitbox();
 
   // animation settings
-  final double _stepTime = 0.03;
-  final Vector2 _textureSize = Vector2.all(38);
-  final int _amount = 8;
-  final String _path = 'Traps/Saw/On (38x38).png';
+  static const double _stepTime = 0.03;
+  static final Vector2 _textureSize = Vector2.all(38);
+  static const int _amount = 8;
+  static const String _path = 'Traps/Saw/On (38x38).png';
 
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadSpriteAnimation();
-
     return super.onLoad();
   }
 
@@ -35,15 +49,17 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.center;
-    add(hitbox);
-    if (clockwise) flipHorizontally();
+    add(_hitbox);
+    if (_clockwise) flipHorizontally();
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
+
+  void collidedWithPlayer() => _player.collidedWithEnemy();
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -22,27 +21,34 @@ enum RockHeadState implements AnimationState {
   const RockHeadState(this.name, this.amount, {this.loop = true});
 }
 
+/// A heavy stone trap that repeatedly slams down and retracts vertically
+/// within a defined range.
+///
+/// The RockHead starts at the top of its range and drops quickly with high
+/// downward speed, then retracts upward more slowly. At both the top and
+/// bottom borders it plays a hit animation before pausing for a short delay,
+/// creating a rhythmic crushing pattern.
 class RockHead extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetPos;
-
-  RockHead({required this.offsetPos, required super.position, required super.size, required Player player, required CollisionBlock block})
-    : _player = player,
-      _block = block;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(6, 6), size: Vector2(36, 36));
-
-  // player ref
-  final Player _player;
-
-  // collision block ref
+  // constructor parameters
+  final double _offsetPos;
   final CollisionBlock _block;
 
+  RockHead({required double offsetPos, required CollisionBlock block, required super.position})
+    : _offsetPos = offsetPos,
+      _block = block,
+      super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2.all(48);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(6, 6), size: Vector2(36, 36));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(42, 42);
-  final String _path = 'Traps/Rock Head/';
-  final String _pathEnd = ' (42x42).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(42, 42);
+  static const String _path = 'Traps/Rock Head/';
+  static const String _pathEnd = ' (42x42).png';
 
   // range
   late final double _rangeNeg;
@@ -54,9 +60,9 @@ class RockHead extends SpriteAnimationGroupComponent with HasGameReference<Pixel
 
   // movement
   double _moveDirection = 1;
+  late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]
-  late double _moveSpeed;
 
   // direction change
   bool _directionChangePending = false;
@@ -85,19 +91,17 @@ class RockHead extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in RockHeadState.values) state: loadAnimation(state)};
 
     // set current animation state
@@ -106,12 +110,12 @@ class RockHead extends SpriteAnimationGroupComponent with HasGameReference<Pixel
 
   void _setUpRange() {
     _rangeNeg = position.y;
-    _rangePos = position.y + height + offsetPos * game.tileSize;
+    _rangePos = position.y + height + _offsetPos * PixelAdventure.tileSize;
   }
 
   void _setUpActualBorders() {
-    _topBorder = _rangeNeg - hitbox.position.y;
-    _bottomtBorder = _rangePos - height + hitbox.position.y;
+    _topBorder = _rangeNeg - _hitbox.position.y;
+    _bottomtBorder = _rangePos - height + _hitbox.position.y;
   }
 
   void _correctingStartPosition() {
@@ -120,8 +124,8 @@ class RockHead extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   }
 
   void _setUpCollisionBlock() {
-    _block.size = hitbox.size;
-    _block.position = position + hitbox.position;
+    _block.size = _hitbox.size;
+    _block.position = position + _hitbox.position;
   }
 
   void _movement(double dt) {
@@ -134,7 +138,7 @@ class RockHead extends SpriteAnimationGroupComponent with HasGameReference<Pixel
       // movement
       final newPositionY = position.y + _moveDirection * _moveSpeed * dt;
       position.y = newPositionY.clamp(_topBorder, _bottomtBorder);
-      _block.y = position.y + hitbox.position.y;
+      _block.y = position.y + _hitbox.position.y;
     }
   }
 

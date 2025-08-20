@@ -22,29 +22,40 @@ enum MushroomState implements AnimationState {
   const MushroomState(this.name, this.amount, {this.loop = true});
 }
 
+/// A mushroom enemy that patrols horizontally within a specified range.
+///
+/// This enemy continuously moves left and right within its movement range,
+/// pausing briefly and accelerating smoothly when changing direction.
+/// The mushroom can be stomped by the [Player], playing a hit animation before disappearing,
+/// or it will harm the player if touched from the side.
 class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
+  final Player _player;
 
-  Mushroom({required this.offsetNeg, required this.offsetPos, required this.isLeft, required super.position, required Player player})
-    : _player = player,
-      super(size: _textureSize);
+  Mushroom({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _isLeft = isLeft,
+      _offsetPos = offsetPos,
+      _offsetNeg = offsetNeg,
+      _player = player,
+      super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2.all(32);
 
   // actual hitbox
-  static final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
-
-  // player ref
-  final Player _player;
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
 
   // animation settings
   static const double _stepTime = 0.05;
-  static final Vector2 _textureSize = Vector2(32, 32);
+  static final Vector2 _textureSize = Vector2.all(32);
   static const String _path = 'Enemies/Mushroom/';
   static const String _pathEnd = ' (32x32).png';
 
   // range
-  static late final double _rangeNeg;
+  late final double _rangeNeg;
   late final double _rangePos;
 
   // actual borders that compensate for the hitbox and flip offset, depending on the moveDirection
@@ -57,7 +68,7 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   double _speedFactor = 1;
 
   // acceleration
-  double _accelProgress = 1; //
+  double _accelProgress = 1;
   final double _accelDuration = 2.6; // [Adjustable]
 
   // delay after direction change
@@ -87,19 +98,17 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in MushroomState.values) state: loadAnimation(state)};
 
     // set current animation state
@@ -107,19 +116,19 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * game.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * game.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _movement(double dt) {
@@ -175,7 +184,7 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
 
   void collidedWithPlayer(Vector2 collisionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && collisionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = MushroomState.hit;

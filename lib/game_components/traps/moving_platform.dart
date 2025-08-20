@@ -21,34 +21,46 @@ enum MovingPlatformState implements AnimationState {
   const MovingPlatformState(this.name, this.amount);
 }
 
+/// A moving platform that can travel horizontally or vertically
+/// within a predefined range.
+///
+/// The player can stand on top of the platform
+/// and be carried along as it moves.
+///
+/// The platform automatically reverses direction when reaching the end
+/// of its movement range.
 class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isVertical;
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isVertical;
+  final Player _player;
+  final CollisionBlock _block;
 
   MovingPlatform({
-    required this.isVertical,
-    required this.offsetNeg,
-    required this.offsetPos,
-    required super.position,
-    required super.size,
+    required bool isVertical,
+    required double offsetNeg,
+    required double offsetPos,
     required Player player,
-  }) : _player = player;
+    required CollisionBlock block,
+    required super.position,
+  }) : _isVertical = isVertical,
+       _offsetPos = offsetPos,
+       _offsetNeg = offsetNeg,
+       _player = player,
+       _block = block,
+       super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2(32, 16);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
-
-  // player ref
-  final Player _player;
-
-  // collision block ref
-  late final CollisionBlock _block;
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(32, 16);
-  final String _path = 'Traps/Platforms/Grey ';
-  final String _pathEnd = ' (32x8).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(32, 16);
+  static const String _path = 'Traps/Platforms/Grey ';
+  static const String _pathEnd = ' (32x8).png';
 
   // range
   late final double _rangeNeg;
@@ -71,7 +83,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
 
   @override
   void update(double dt) {
-    isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
+    _isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
     super.update(dt);
   }
 
@@ -80,20 +92,18 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     if (game.customDebug) {
       // debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.topCenter;
-    add(hitbox);
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
 
     // set current animation state
@@ -103,17 +113,13 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
   }
 
   void _setUpRange() {
-    if (isVertical) {
-      _rangeNeg = position.y - offsetNeg * game.tileSize;
-      _rangePos = position.y + offsetPos * game.tileSize;
+    if (_isVertical) {
+      _rangeNeg = position.y - _offsetNeg * PixelAdventure.tileSize;
+      _rangePos = position.y + _offsetPos * PixelAdventure.tileSize;
     } else {
-      _rangeNeg = position.x - offsetNeg * game.tileSize + width / 2;
-      _rangePos = position.x + offsetPos * game.tileSize + width / 2;
+      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width / 2;
+      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width / 2;
     }
-  }
-
-  void setCollisionBlock(CollisionBlock block) {
-    _block = block;
   }
 
   // moves the saw vertically and changes direction if the end of the range is reached
@@ -158,7 +164,5 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     }
   }
 
-  void collidedWithPlayerEnd() {
-    _playerOnTop = false;
-  }
+  void collidedWithPlayerEnd() => _playerOnTop = false;
 }

@@ -2,28 +2,46 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
+/// A moving saw trap that travels back and forth along a defined path.
+///
+/// The saw can move either horizontally or vertically between two offsets,
+/// automatically calculating its movement range in tile units.
+/// A chain of sprites is rendered along the travel path for visual clarity,
+/// creating the appearance of the saw being suspended.
+///
+/// The saw continuously animates while moving and flips direction
+/// once reaching the end of its range. It acts as a passive collision area
+/// that can interact with the [Player].
 class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isVertical;
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isVertical;
+  final Player _player;
 
-  Saw({required this.offsetNeg, required this.offsetPos, required this.isVertical, required super.position}) : super(size: fixedSize);
+  Saw({required double offsetNeg, required double offsetPos, required bool isVertical, required Player player, required super.position})
+    : _isVertical = isVertical,
+      _offsetPos = offsetPos,
+      _offsetNeg = offsetNeg,
+      _player = player,
+      super(size: _fixedSize);
 
   // size
-  static final Vector2 fixedSize = Vector2.all(32);
+  static final Vector2 _fixedSize = Vector2.all(32);
 
   // actual hitbox
-  final CircleHitbox hitbox = CircleHitbox();
+  final CircleHitbox _hitbox = CircleHitbox();
 
   // animation settings
-  final double _stepTime = 0.03;
-  final Vector2 _textureSize = Vector2.all(38);
-  final int _amount = 8;
-  final String _pathSaw = 'Traps/Saw/On (38x38).png';
-  final String _pathChain = 'Traps/Platforms/Chain.png';
+  static const double _stepTime = 0.03;
+  static final Vector2 _textureSize = Vector2.all(38);
+  static const int _amount = 8;
+  static const String _pathSaw = 'Traps/Saw/On (38x38).png';
+  static const String _pathChain = 'Traps/Platforms/Chain.png';
 
   // range
   late final double _rangeNeg;
@@ -39,13 +57,12 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     _loadSpriteAnimation();
     _setUpRange();
     _createChainPath();
-
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
-    isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
+    _isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
     super.update(dt);
   }
 
@@ -54,26 +71,26 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.topCenter;
-    add(hitbox);
+    add(_hitbox);
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);
 
   void _setUpRange() {
-    if (isVertical) {
-      _rangeNeg = position.y - offsetNeg * game.tileSize;
-      _rangePos = position.y + offsetPos * game.tileSize;
+    if (_isVertical) {
+      _rangeNeg = position.y - _offsetNeg * PixelAdventure.tileSize;
+      _rangePos = position.y + _offsetPos * PixelAdventure.tileSize;
       position.x += width / 2;
     } else {
-      _rangeNeg = position.x - offsetNeg * game.tileSize + width / 2;
-      _rangePos = position.x + offsetPos * game.tileSize + width / 2;
+      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width / 2;
+      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width / 2;
     }
   }
 
@@ -83,12 +100,12 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
 
     // calculate the startpoint of the chain
     final startPoint = Vector2(
-      isVertical ? position.x - chainSize / 2 : _rangeNeg - width / 2,
-      isVertical ? _rangeNeg : position.y + height / 2 - chainSize / 2,
+      _isVertical ? position.x - chainSize / 2 : _rangeNeg - width / 2,
+      _isVertical ? _rangeNeg : position.y + height / 2 - chainSize / 2,
     );
 
     // calculate the length of the chain
-    final length = ((_rangePos - _rangeNeg + width) / game.tileSize);
+    final length = ((_rangePos - _rangeNeg + width) / PixelAdventure.tileSize);
     double offset = chainSize * 2;
 
     // exactly two chain elements fit into a tile and a tile is left free at both ends
@@ -97,7 +114,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
           DebugSpriteComponent(
               sprite: chainSprite,
               size: Vector2.all(chainSize),
-              position: isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
+              position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
               priority: PixelAdventure.trapHintsLayerLevel,
             )
             ..debugMode = game.customDebug
@@ -136,4 +153,6 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     final newPositionX = position.x + _moveDirection * _moveSpeed * dt;
     position.x = newPositionX.clamp(_rangeNeg, _rangePos);
   }
+
+  void collidedWithPlayer() => _player.collidedWithEnemy();
 }

@@ -126,17 +126,17 @@ void addSpriteRow({
 }) {
   for (int i = 0; i < count; i++) {
     final component = animation != null
-        ? SpriteAnimationComponent(animation: animation, size: Vector2(game.tileSize, game.tileSize))
-        : SpriteComponent(sprite: sprite, size: Vector2(game.tileSize, game.tileSize));
+        ? SpriteAnimationComponent(animation: animation, size: Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize))
+        : SpriteComponent(sprite: sprite, size: Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize));
 
     component.debugColor = Colors.transparent;
 
     final angle = [0.0, 1.5708, 3.1416, 4.7124][side - 1];
     final position = switch (side) {
-      2 => Vector2(parent.size.x, i * game.tileSize),
-      3 => Vector2(parent.size.x - i * game.tileSize, parent.size.y),
-      4 => Vector2(0, i * game.tileSize + parent.size.x),
-      _ => Vector2(i * game.tileSize, 0),
+      2 => Vector2(parent.size.x, i * PixelAdventure.tileSize),
+      3 => Vector2(parent.size.x - i * PixelAdventure.tileSize, parent.size.y),
+      4 => Vector2(0, i * PixelAdventure.tileSize + parent.size.x),
+      _ => Vector2(i * PixelAdventure.tileSize, 0),
     };
 
     component

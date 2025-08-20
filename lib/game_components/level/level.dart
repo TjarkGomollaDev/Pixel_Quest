@@ -136,11 +136,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
           case 'Fruit':
             final fruitName = spawnPoint.name;
             final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
-            final fruit = Fruit(
-              name: safeName,
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-            );
+            final fruit = Fruit(name: safeName, player: _player, position: Vector2(spawnPoint.x, spawnPoint.y));
             add(fruit);
             break;
           case 'Saw':
@@ -151,6 +147,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               isVertical: isVertical,
+              player: _player,
               position: Vector2(spawnPoint.x, spawnPoint.y),
             );
             add(saw);
@@ -163,8 +160,9 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             final sawCircle = SawCircle(
               doubleSaw: doubleSaw,
               clockwise: clockwise,
+              player: _player,
               position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(circleWidth * game.tileSize, circleHeight * game.tileSize),
+              size: Vector2(circleWidth * PixelAdventure.tileSize, circleHeight * PixelAdventure.tileSize),
             );
             add(sawCircle);
             break;
@@ -183,11 +181,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(chicken);
             break;
           case 'Trampoline':
-            final trampoline = Trampoline(
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-              player: _player,
-            );
+            final trampoline = Trampoline(player: _player, position: Vector2(spawnPoint.x, spawnPoint.y));
             add(trampoline);
             break;
           case 'Fan':
@@ -195,15 +189,11 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             add(fan);
             break;
           case 'FireTrap':
-            final fireTrap = FireTrap(
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-              player: _player,
-            );
+            final fireTrap = FireTrap(player: _player, position: Vector2(spawnPoint.x, spawnPoint.y));
             add(fireTrap);
             final block = CollisionBlock(
-              position: Vector2(spawnPoint.x, spawnPoint.y + game.tileSize),
-              size: Vector2(spawnPoint.width, game.tileSize),
+              position: Vector2(spawnPoint.x, spawnPoint.y + PixelAdventure.tileSize),
+              size: Vector2(spawnPoint.width, PixelAdventure.tileSize),
             );
             _collisionBlocks.add(block);
             break;
@@ -211,6 +201,7 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
             final fire = Fire(
               side: side,
+              player: _player,
               position: Vector2(spawnPoint.x, spawnPoint.y),
               size: Vector2(spawnPoint.width, spawnPoint.height),
             );
@@ -220,32 +211,26 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
             final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-            final movingPlatform = MovingPlatform(
-              isVertical: isVertical,
-              offsetNeg: offsetNeg,
-              offsetPos: offsetPos,
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-              player: _player,
-            );
             final block = CollisionBlock(
               position: Vector2(spawnPoint.x - spawnPoint.width / 2, spawnPoint.y + 2),
               size: Vector2(spawnPoint.width, 5),
             );
+            final movingPlatform = MovingPlatform(
+              isVertical: isVertical,
+              offsetNeg: offsetNeg,
+              offsetPos: offsetPos,
+              player: _player,
+              block: block,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+            );
+
             _collisionBlocks.add(block);
-            movingPlatform.setCollisionBlock(block);
             add(movingPlatform);
             break;
           case 'Rock Head':
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
             final block = CollisionBlock(position: Vector2(spawnPoint.x, spawnPoint.y), size: Vector2(spawnPoint.width, spawnPoint.height));
-            final rockHead = RockHead(
-              offsetPos: offsetPos,
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-              player: _player,
-              block: block,
-            );
+            final rockHead = RockHead(offsetPos: offsetPos, position: Vector2(spawnPoint.x, spawnPoint.y), block: block);
             _collisionBlocks.add(block);
             add(rockHead);
             break;
@@ -311,8 +296,8 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               isLeft: isLeft,
-              position: Vector2(spawnPoint.x, spawnPoint.y),
               player: _player,
+              position: Vector2(spawnPoint.x, spawnPoint.y),
             );
             add(mushroom);
             break;
@@ -362,16 +347,14 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
             final spikes = Spikes(
               side: side,
+              player: _player,
               position: Vector2(spawnPoint.x, spawnPoint.y),
               size: Vector2(spawnPoint.width, spawnPoint.height),
             );
             add(spikes);
             break;
           case 'Checkpoint':
-            final checkpoint = Checkpoint(
-              position: Vector2(spawnPoint.x, spawnPoint.y),
-              size: Vector2(spawnPoint.width, spawnPoint.height),
-            );
+            final checkpoint = Checkpoint(player: _player, position: Vector2(spawnPoint.x, spawnPoint.y));
             add(checkpoint);
             break;
         }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -21,16 +22,22 @@ enum CheckpointState implements AnimationState {
 }
 
 class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Checkpoint({required super.position, required super.size});
+  // constructor parameters
+  final Player _player;
+
+  Checkpoint({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2.all(64);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(12, 46));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(12, 46));
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2.all(64);
-  final String _path = 'Items/Checkpoints/Checkpoint/Checkpoint (';
-  final String _pathEnd = ').png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2.all(64);
+  static const String _path = 'Items/Checkpoints/Checkpoint/Checkpoint (';
+  static const String _pathEnd = ').png';
 
   @override
   FutureOr<void> onLoad() {
@@ -44,19 +51,17 @@ class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<Pix
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<CheckpointState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in CheckpointState.values) state: loadAnimation(state)};
 
     // set current animation state
@@ -65,6 +70,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<Pix
 
   Future<void> collidedWithPlayer() async {
     current = CheckpointState.flagOut;
+    _player.reachedCheckpoint();
     await animationTickers![CheckpointState.flagOut]!.completed;
     current = CheckpointState.flagIdle;
   }

@@ -33,7 +33,7 @@
  </layer>
  <objectgroup id="2" name="Spawnpoints">
   <object id="1" name="Player" type="Player" x="144" y="288" width="32" height="32"/>
-  <object id="68" name="Fan" type="Fan" x="528" y="208" width="32" height="16"/>
+  <object id="68" name="Fan" type="Fan" x="496" y="304" width="32" height="16"/>
   <object id="70" name="Trampoline" type="Trampoline" x="64" y="288" width="32" height="32"/>
   <object id="71" name="Rock Head" type="Rock Head" x="352" y="0" width="48" height="48">
    <properties>

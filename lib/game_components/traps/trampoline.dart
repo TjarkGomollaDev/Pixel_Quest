@@ -20,20 +20,30 @@ enum TrampolineState implements AnimationState {
   const TrampolineState(this.name, this.amount, {this.loop = true});
 }
 
+/// A spring-loaded trampoline trap that launches the [Player] upwards on contact.
+///
+/// The trampoline is animated with two states: [TrampolineState.idle] and
+/// [TrampolineState.jump]. When the player collides with its hitbox, it triggers
+/// the jump animation, applies an upward bounce force to the player, and then
+/// automatically resets back to idle once the animation is complete.
+/// The trampoline acts as a passive collision object and does not move by itself.
 class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Trampoline({required super.position, required super.size, required Player player}) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(2, 19), size: Vector2(27, 13));
-
-  // player ref
+  // constructor parameters
   final Player _player;
 
+  Trampoline({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+
+  // size
+  static final Vector2 _fixedSize = Vector2.all(32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(2, 19), size: Vector2(27, 13));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(28, 28);
-  final String _path = 'Traps/Trampoline/';
-  final String _pathEnd = '.png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(28, 28);
+  static const String _path = 'Traps/Trampoline/';
+  static const String _pathEnd = '.png';
 
   // bounce
   final double _bounceHeight = 500;
@@ -51,19 +61,17 @@ class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<Pix
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
 
     // set current animation state

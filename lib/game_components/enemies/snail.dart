@@ -133,8 +133,8 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * game.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * game.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
