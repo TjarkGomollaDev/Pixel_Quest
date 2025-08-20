@@ -51,8 +51,8 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
   final String _pathEnd = ' (32x8).png';
 
   // range
-  late final double rangeNeg;
-  late final double rangePos;
+  late final double _rangeNeg;
+  late final double _rangePos;
 
   // movement
   final double _moveSpeed = 30;
@@ -64,7 +64,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     return super.onLoad();
   }
@@ -90,7 +90,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations
@@ -104,11 +104,11 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
 
   void _setUpRange() {
     if (isVertical) {
-      rangeNeg = position.y - offsetNeg * game.tileSize;
-      rangePos = position.y + offsetPos * game.tileSize;
+      _rangeNeg = position.y - offsetNeg * game.tileSize;
+      _rangePos = position.y + offsetPos * game.tileSize;
     } else {
-      rangeNeg = position.x - offsetNeg * game.tileSize + width / 2;
-      rangePos = position.x + offsetPos * game.tileSize + width / 2;
+      _rangeNeg = position.x - offsetNeg * game.tileSize + width / 2;
+      _rangePos = position.x + offsetPos * game.tileSize + width / 2;
     }
   }
 
@@ -118,10 +118,10 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
 
   // moves the saw vertically and changes direction if the end of the range is reached
   void _moveVertical(double dt) {
-    if (position.y > rangePos && _moveDirection != -1) {
+    if (position.y > _rangePos && _moveDirection != -1) {
       _moveDirection = -1;
       flipHorizontally();
-    } else if (position.y < rangeNeg && _moveDirection != 1) {
+    } else if (position.y < _rangeNeg && _moveDirection != 1) {
       _moveDirection = 1;
       flipHorizontally();
     }
@@ -132,10 +132,10 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
 
   // moves the saw horizontally and changes direction if the end of the range is reached
   void _moveHorizontal(double dt) {
-    if (position.x > rangePos && _moveDirection != -1) {
+    if (position.x > _rangePos && _moveDirection != -1) {
       _moveDirection = -1;
       flipHorizontally();
-    } else if (position.x < rangeNeg && _moveDirection != 1) {
+    } else if (position.x < _rangeNeg && _moveDirection != 1) {
       _moveDirection = 1;
       flipHorizontally();
     }

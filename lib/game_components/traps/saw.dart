@@ -36,7 +36,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAnimation();
+    _loadSpriteAnimation();
     _setUpRange();
     _createChainPath();
 
@@ -64,7 +64,7 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     add(hitbox);
   }
 
-  void _loadAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);
+  void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);
 
   void _setUpRange() {
     if (isVertical) {

@@ -47,7 +47,7 @@ class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     return super.onLoad();
   }
 
@@ -65,7 +65,7 @@ class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

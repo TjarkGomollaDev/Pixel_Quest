@@ -20,6 +20,7 @@ import 'package:pixel_adventure/game_components/custom_hitbox.dart';
 import 'package:pixel_adventure/game_components/enemies/plant.dart';
 import 'package:pixel_adventure/game_components/enemies/plant_bullet.dart';
 import 'package:pixel_adventure/game_components/traps/fan_air_stream.dart';
+import 'package:pixel_adventure/game_components/traps/fire.dart';
 import 'package:pixel_adventure/game_components/traps/fire_trap.dart';
 import 'package:pixel_adventure/game_components/traps/fruit.dart';
 import 'package:pixel_adventure/game_components/traps/moving_platform.dart';
@@ -123,7 +124,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   FutureOr<void> onLoad() {
     _initialSetup();
     _updateHitboxEdges();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
 
     return super.onLoad();
   }
@@ -161,6 +162,9 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
         _respawn();
         break;
       case Spikes():
+        _respawn();
+        break;
+      case Fire():
         _respawn();
         break;
       case Chicken():
@@ -304,7 +308,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     }
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<PlayerState>(game, '$_path${character.name}/', _pathEnd, _stepTime, _textureSize);
     final loadSpecialAnimation = spriteAnimationWrapper<PlayerState>(game, _path, _pathEndSpecial, _stepTime, _textureSizeSpecial);
 
@@ -385,6 +389,8 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   }
 
   void _checkVerticalCollisions() {
+    bool collidedTop = false;
+    bool collidedBottom = false;
     for (var block in collisionBlocks) {
       if (block.isPlattform && checkCollision(this, block)) {
         if (velocity.y > 0 && position.y + hitbox.height < block.y) {
@@ -392,6 +398,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
           position.y = block.y - hitbox.offsetY - hitbox.height;
           isOnGround = true;
           canDoubleJump = true;
+
           break;
         }
       } else if (checkCollision(this, block)) {
@@ -400,15 +407,20 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
           position.y = block.y - hitbox.offsetY - hitbox.height;
           isOnGround = true;
           canDoubleJump = true;
+          collidedBottom = true;
           break;
         } else if (velocity.y < 0) {
           velocity.y = 0;
           position.y = block.y + block.height - hitbox.offsetY;
           // double jump not possible if the player hits their head
           canDoubleJump = false;
+          collidedTop = true;
           break;
         }
       }
+    }
+    if (collidedTop && collidedBottom) {
+      _respawn();
     }
   }
 

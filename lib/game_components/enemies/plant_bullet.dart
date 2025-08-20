@@ -31,7 +31,7 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAnimation();
+    _loadSprite();
     return super.onLoad();
   }
 
@@ -63,7 +63,7 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
     _moveDirection = isLeft ? -1 : 1;
   }
 
-  void _loadAnimation() => sprite = loadSprite(game, _path);
+  void _loadSprite() => sprite = loadSprite(game, _path);
 
   void _move(double dt) => position.x += _moveDirection * _moveSpeed * dt;
 

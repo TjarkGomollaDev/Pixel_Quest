@@ -70,7 +70,7 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
     _updateHitboxEdges();
@@ -100,7 +100,7 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<ChickenState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

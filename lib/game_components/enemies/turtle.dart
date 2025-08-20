@@ -51,7 +51,7 @@ class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _startTimer();
     return super.onLoad();
   }
@@ -76,7 +76,7 @@ class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TurtleState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class Spikes extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final int side;
+  int side;
 
   Spikes({required this.side, required super.position, required super.size});
 
@@ -22,9 +21,10 @@ class Spikes extends PositionComponent with HasGameReference<PixelAdventure>, Co
 
   @override
   FutureOr<void> onLoad() {
+    _normalizeDimensions();
     _setupHitbox();
     _initialSetup();
-    _loadAnimation();
+    _loadSprite();
     return super.onLoad();
   }
 
@@ -37,10 +37,22 @@ class Spikes extends PositionComponent with HasGameReference<PixelAdventure>, Co
     }
 
     // general
-    _count = (side.isOdd ? width : height) / game.tileSize;
     priority = PixelAdventure.trapLayerLevel;
     hitbox.collisionType = CollisionType.passive;
     add(hitbox);
+  }
+
+  void _normalizeDimensions() {
+    if (side > 4 || side < 1) side = 1;
+    // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
+    if (side.isOdd) {
+      height = game.tileSize;
+      width = ((width / game.tileSize).round()) * game.tileSize;
+    } else {
+      width = game.tileSize;
+      height = ((height / game.tileSize).round()) * game.tileSize;
+    }
+    _count = (side.isOdd ? width : height) / game.tileSize;
   }
 
   void _setupHitbox() {
@@ -53,23 +65,8 @@ class Spikes extends PositionComponent with HasGameReference<PixelAdventure>, Co
     };
   }
 
-  void _loadAnimation() {
+  void _loadSprite() {
     final sprite = loadSprite(game, _path);
-
-    for (int i = 0; i < _count; i++) {
-      final spriteComponent = SpriteComponent(sprite: sprite, size: Vector2(game.tileSize, game.tileSize))..debugColor = Colors.transparent;
-      final angle = [0.0, 1.5708, 3.1416, 4.7124][side > 4 || side < 1 ? 0 : (side - 1)];
-      final position = switch (side) {
-        // right, bottom, left and default top
-        2 => Vector2(width, i * game.tileSize),
-        3 => Vector2(width - i * game.tileSize, height),
-        4 => Vector2(0, i * game.tileSize + width),
-        _ => Vector2(i * game.tileSize, 0),
-      };
-      spriteComponent
-        ..angle = angle
-        ..position = position;
-      add(spriteComponent);
-    }
+    addSpriteRow(game: game, side: side, count: _count, parent: this, sprite: sprite);
   }
 }

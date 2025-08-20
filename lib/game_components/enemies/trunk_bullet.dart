@@ -31,7 +31,7 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAnimation();
+    _loadSprite();
     return super.onLoad();
   }
 
@@ -69,7 +69,7 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
     add(hitbox);
   }
 
-  void _loadAnimation() {
+  void _loadSprite() {
     sprite = loadSprite(game, _path);
     _moveDirection = isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();

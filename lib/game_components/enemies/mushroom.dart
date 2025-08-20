@@ -27,29 +27,24 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   final double offsetPos;
   final bool isLeft;
 
-  Mushroom({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
+  Mushroom({required this.offsetNeg, required this.offsetPos, required this.isLeft, required super.position, required Player player})
+    : _player = player,
+      super(size: _textureSize);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
+  static final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
 
   // player ref
   final Player _player;
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(32, 32);
-  final String _path = 'Enemies/Mushroom/';
-  final String _pathEnd = ' (32x32).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(32, 32);
+  static const String _path = 'Enemies/Mushroom/';
+  static const String _pathEnd = ' (32x32).png';
 
   // range
-  late final double _rangeNeg;
+  static late final double _rangeNeg;
   late final double _rangePos;
 
   // actual borders that compensate for the hitbox and flip offset, depending on the moveDirection
@@ -75,7 +70,7 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
     return super.onLoad();
@@ -101,7 +96,7 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

@@ -75,7 +75,7 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
     _startParticleTimer();
@@ -105,7 +105,7 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<SlimeState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

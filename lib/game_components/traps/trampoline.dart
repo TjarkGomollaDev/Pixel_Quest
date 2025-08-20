@@ -24,7 +24,7 @@ class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<Pix
   Trampoline({required super.position, required super.size, required Player player}) : _player = player;
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(2, 20), size: Vector2(28, 12));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(2, 19), size: Vector2(27, 13));
 
   // player ref
   final Player _player;
@@ -42,7 +42,7 @@ class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<Pix
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     return super.onLoad();
   }
 
@@ -60,7 +60,7 @@ class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<Pix
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

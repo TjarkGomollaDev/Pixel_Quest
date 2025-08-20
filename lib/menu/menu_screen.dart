@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 

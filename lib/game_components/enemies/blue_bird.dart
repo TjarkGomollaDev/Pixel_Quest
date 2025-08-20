@@ -80,7 +80,7 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
     return super.onLoad();
@@ -107,7 +107,7 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

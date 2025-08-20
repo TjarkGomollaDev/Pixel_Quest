@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="71">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="84">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="54" height="23">
   <properties>
@@ -33,8 +33,58 @@
  </layer>
  <objectgroup id="2" name="Spawnpoints">
   <object id="1" name="Player" type="Player" x="144" y="288" width="32" height="32"/>
-  <object id="68" name="Fan" type="Fan" x="224" y="304" width="32" height="16"/>
+  <object id="68" name="Fan" type="Fan" x="528" y="208" width="32" height="16"/>
   <object id="70" name="Trampoline" type="Trampoline" x="64" y="288" width="32" height="32"/>
+  <object id="71" name="Rock Head" type="Rock Head" x="352" y="0" width="48" height="48">
+   <properties>
+    <property name="offsetPos" type="float" value="17"/>
+   </properties>
+  </object>
+  <object id="73" name="Rock Head" type="Rock Head" x="288" y="0" width="48" height="48">
+   <properties>
+    <property name="offsetPos" type="float" value="17"/>
+   </properties>
+  </object>
+  <object id="74" name="Fire" type="Fire" x="112" y="128" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="75" name="Fire" type="Fire" x="144" y="96" width="16" height="32">
+   <properties>
+    <property name="side" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="76" name="Fire" type="Fire" x="112" y="80" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="78" name="Fire" type="Fire" x="96" y="96" width="16" height="32">
+   <properties>
+    <property name="side" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="80" name="Spikes" type="Spikes" x="32" y="80" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="81" name="Spikes" type="Spikes" x="64" y="96" width="16" height="32">
+   <properties>
+    <property name="side" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="82" name="Spikes" type="Spikes" x="16" y="96" width="16" height="32">
+   <properties>
+    <property name="side" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="83" name="Spikes" type="Spikes" x="32" y="128" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="3" name="Collisions">
   <object id="5" x="0" y="320" width="864" height="48"/>

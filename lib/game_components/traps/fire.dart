@@ -5,11 +5,15 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class Fire extends SpriteAnimationComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  Fire({required super.position, required super.size});
+class Fire extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+  int side;
+  Fire({required this.side, required super.position, required super.size});
 
   // actual hitbox
   final RectangleHitbox hitbox = RectangleHitbox();
+
+  // count fires
+  late final double _count;
 
   // animation settings
   final double _stepTime = 0.05;
@@ -19,9 +23,23 @@ class Fire extends SpriteAnimationComponent with HasGameReference<PixelAdventure
 
   @override
   FutureOr<void> onLoad() {
+    _normalizeDimensions();
     _initialSetup();
-    _loadAnimation();
+    _loadSpriteAnimation();
     return super.onLoad();
+  }
+
+  void _normalizeDimensions() {
+    if (side > 4 || side < 1) side = 1;
+    // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
+    if (side.isOdd) {
+      height = game.tileSize;
+      width = ((width / game.tileSize).round()) * game.tileSize;
+    } else {
+      width = game.tileSize;
+      height = ((height / game.tileSize).round()) * game.tileSize;
+    }
+    _count = (side.isOdd ? width : height) / game.tileSize;
   }
 
   void _initialSetup() {
@@ -38,5 +56,8 @@ class Fire extends SpriteAnimationComponent with HasGameReference<PixelAdventure
     add(hitbox);
   }
 
-  void _loadAnimation() => animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
+  void _loadSpriteAnimation() {
+    final animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
+    addSpriteRow(game: game, side: side, count: _count, parent: this, animation: animation);
+  }
 }

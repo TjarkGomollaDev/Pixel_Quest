@@ -103,7 +103,7 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAllAnimations();
+    _loadAllSpriteAnimations();
     _setUpRange();
     _setUpAttackRange();
     _setUpMoveDirection();
@@ -112,16 +112,16 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     return super.onLoad();
   }
 
-  // The Trunk can be in one of three modes:
-  //
-  // 1. **Attack Mode**: The trunk attacks when the player is within its attack range
-  //    and positioned in front of the trunk (not behind).
-  // 2. **Combat Ready Mode**: After starting an attack, the trunk remains in place as long as
-  //    the player is still within an extended range above the default attack range
-  //    and positioned in front of the trunk. The trunk does NOT shoot again while in this mode;
-  //    shooting resumes only when the player re-enters the normal attack range.
-  // 3. **Idle Mode**: If the player is out of range, the trunk moves normally, patrolling
-  //    back and forth between its set borders.
+  /// The Trunk can be in one of three modes:
+  ///
+  /// 1. **Attack Mode**: The trunk attacks when the player is within its attack range
+  ///    and positioned in front of the trunk (not behind).
+  /// 2. **Combat Ready Mode**: After starting an attack, the trunk remains in place as long as
+  ///    the player is still within an extended range above the default attack range
+  ///    and positioned in front of the trunk. The trunk does NOT shoot again while in this mode;
+  ///    shooting resumes only when the player re-enters the normal attack range.
+  /// 3. **Idle Mode**: If the player is out of range, the trunk moves normally, patrolling
+  ///    back and forth between its set borders.
   @override
   Future<void> update(double dt) async {
     if (_gotStomped) return super.update(dt);
@@ -161,7 +161,7 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     add(hitbox);
   }
 
-  void _loadAllAnimations() {
+  void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, _stepTime, _textureSize);
 
     // list of all animations

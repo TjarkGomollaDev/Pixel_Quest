@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game_components/custom_hitbox.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -28,14 +28,28 @@ bool checkCollision(player, block) {
       fixedX + playerWidth > blockX);
 }
 
+/// Defines a contract for animation states used with [SpriteAnimationGroupComponent].
+///
+/// Each state has a [name] corresponding to the asset file, an [amount] of frames,
+/// and an optional [loop] flag (defaults to true). Implement this interface
+/// to provide animation metadata for a component.
 abstract interface class AnimationState {
   String get name;
   int get amount;
   bool get loop => true;
 }
 
+/// Loads a single [Sprite] from the given asset [path] in the [game]'s cache.
+///
+/// Use this for static images that do not need animation.
 Sprite loadSprite(PixelAdventure game, String path) => Sprite(game.images.fromCache(path));
 
+/// Loads a [SpriteAnimation] from a sprite sheet asset.
+///
+/// [path] is the asset path in the cache, [amount] is the number of frames,
+/// [stepTime] is the duration of a single frame, [textureSize] is the size of each frame,
+/// and [texturePosition] can be used to offset the first frame. The [loop] flag
+/// determines whether the animation repeats.
 SpriteAnimation loadSpriteAnimation(
   PixelAdventure game,
   String path,
@@ -57,6 +71,11 @@ SpriteAnimation loadSpriteAnimation(
   );
 }
 
+/// Returns a function that generates a [SpriteAnimation] for a given [AnimationState].
+///
+/// This allows you to dynamically create animations based on the state's [name], [amount],
+/// and [loop] properties, using a common path prefix and suffix ([path] and [pathEnd]).
+/// Useful for grouping all animations of a object or enemy in a [SpriteAnimationGroupComponent].
 SpriteAnimation Function(T) spriteAnimationWrapper<T extends AnimationState>(
   PixelAdventure game,
   String path,
@@ -69,16 +88,61 @@ SpriteAnimation Function(T) spriteAnimationWrapper<T extends AnimationState>(
   };
 }
 
+/// A [SpriteComponent] that only renders a debug outline of its bounds.
+///
+/// Unlike the default debug mode in Flame, this component does **not** render coordinates or other
+/// debug information—only the rectangular frame of the sprite's size is drawn.
+///
+/// You can customize the color of the outline via [debugColor], and it respects the component's
+/// [size], [position], and [priority].
 class DebugSpriteComponent extends SpriteComponent {
   DebugSpriteComponent({super.sprite, super.size, super.position, super.priority});
 
   @override
   void renderDebugMode(Canvas canvas) {
-    // Nur den Rahmen der Hitbox zeichnen, keine Koordinaten
+    // only draw the frame of the hitbox, no coordinates
     final paint = Paint()
       ..color = debugColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.5;
     canvas.drawRect(size.toRect(), paint);
+  }
+}
+
+/// Renders a row of sprites or sprite animations along the given side of a [PositionComponent].
+///
+/// The components are positioned in a straight line (horizontal or vertical) depending on [side],
+/// and rotated accordingly (0 = top, 1 = right, 2 = bottom, 3 = left).
+///
+/// You must provide either a [sprite] **or** a [spriteAnimation].
+/// If both are provided, [spriteAnimation] takes precedence.
+void addSpriteRow({
+  required PixelAdventure game,
+  required int side,
+  required double count,
+  required PositionComponent parent,
+  Sprite? sprite,
+  SpriteAnimation? animation,
+}) {
+  for (int i = 0; i < count; i++) {
+    final component = animation != null
+        ? SpriteAnimationComponent(animation: animation, size: Vector2(game.tileSize, game.tileSize))
+        : SpriteComponent(sprite: sprite, size: Vector2(game.tileSize, game.tileSize));
+
+    component.debugColor = Colors.transparent;
+
+    final angle = [0.0, 1.5708, 3.1416, 4.7124][side - 1];
+    final position = switch (side) {
+      2 => Vector2(parent.size.x, i * game.tileSize),
+      3 => Vector2(parent.size.x - i * game.tileSize, parent.size.y),
+      4 => Vector2(0, i * game.tileSize + parent.size.x),
+      _ => Vector2(i * game.tileSize, 0),
+    };
+
+    component
+      ..angle = angle
+      ..position = position;
+
+    parent.add(component);
   }
 }

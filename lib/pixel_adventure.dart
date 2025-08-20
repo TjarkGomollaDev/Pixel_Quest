@@ -96,10 +96,10 @@ class PixelAdventure extends FlameGame
   void _setUpRouter() {
     final levelRoutes = {
       'menu': Route(MenuScreen.new),
-      for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(levelName: level), maintainState: false),
+      for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(name: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: '1'));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: '2'));
   }
 
   void nextLevel() {

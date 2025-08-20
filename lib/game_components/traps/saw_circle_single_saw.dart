@@ -25,7 +25,7 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _loadAnimation();
+    _loadSpriteAnimation();
 
     return super.onLoad();
   }
@@ -45,5 +45,5 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<
     if (clockwise) flipHorizontally();
   }
 
-  void _loadAnimation() => animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
+  void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
 }
