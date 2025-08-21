@@ -23,22 +23,28 @@ enum TurtleState implements AnimationState {
   const TurtleState(this.name, this.amount, {this.loop = true});
 }
 
-class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final bool isLeft;
-
-  Turtle({required this.isLeft, required super.position, required super.size, required Player player}) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 9), size: Vector2(29, 23));
-
-  // player ref
+class Turtle extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final bool _isLeft;
   final Player _player;
 
+  Turtle({required bool isLeft, required Player player, required super.position})
+    : _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(48, 32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 13), size: Vector2(29, 19));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(44, 26);
-  final String _path = 'Enemies/Turtle/';
-  final String _pathEnd = ' (44x26).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(44, 26);
+  static const String _path = 'Enemies/Turtle/';
+  static const String _pathEnd = ' (44x26).png';
 
   // timer
   late Timer _spikeTimer;
@@ -67,25 +73,20 @@ class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TurtleState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in TurtleState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = TurtleState.idleSpikesOut;
-
-    if (!isLeft) flipHorizontallyAroundCenter();
+    final animations = {for (var state in TurtleState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TurtleState.idleSpikesOut);
+    if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
   void _startTimer() => _spikeTimer = Timer(_toggleDuration, onTick: _toggleSpikes, repeat: true);
@@ -94,24 +95,25 @@ class Turtle extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     ..whenComplete(() => _spikesAreOut = !_spikesAreOut);
 
   Future<void> _spikesOut() async {
-    current = TurtleState.spikesOut;
-    await animationTickers![TurtleState.spikesOut]!.completed;
-    current = TurtleState.idleSpikesOut;
+    animationGroupComponent.current = TurtleState.spikesOut;
+    await animationGroupComponent.animationTickers![TurtleState.spikesOut]!.completed;
+    animationGroupComponent.current = TurtleState.idleSpikesOut;
   }
 
   Future<void> _spikesIn() async {
-    current = TurtleState.spikesIn;
-    await animationTickers![TurtleState.spikesIn]!.completed;
-    current = TurtleState.idleSpikesIn;
+    animationGroupComponent.current = TurtleState.spikesIn;
+    await animationGroupComponent.animationTickers![TurtleState.spikesIn]!.completed;
+    animationGroupComponent.current = TurtleState.idleSpikesIn;
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (!_spikesAreOut && _player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (!_spikesAreOut && _player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
-      current = TurtleState.hit;
-      animationTickers![TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.current = TurtleState.hit;
+      animationGroupComponent.animationTickers![TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }

@@ -29,34 +29,34 @@ enum SnailState implements AnimationState {
   const SnailState(this.name, this.amount, {this.loop = true});
 }
 
-class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
-
-  Snail({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
-
-  // actual snail hitbox
-  final hitbox = RectangleHitbox(position: Vector2(8, 4), size: Vector2(36, 28));
-
-  // actual shell hitbox
-  final shellHitbox = RectangleHitbox(position: Vector2(12, 4), size: Vector2(28, 28));
-
-  // player ref
+class Snail extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
   final Player _player;
 
+  Snail({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _offsetNeg = offsetNeg,
+      _offsetPos = offsetPos,
+      _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(48, 32);
+
+  // actual snail hitbox
+  final _hitbox = RectangleHitbox(position: Vector2(11, 11), size: Vector2(28, 21));
+
+  // actual shell hitbox
+  final _shellHitbox = RectangleHitbox(position: Vector2(16, 13), size: Vector2(20, 19));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(38, 24);
-  final String _path = 'Enemies/Snail/';
-  final String _pathEnd = ' (38x24).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(38, 24);
+  static const String _path = 'Enemies/Snail/';
+  static const String _pathEnd = ' (38x24).png';
 
   // range
   late final double _rangeNeg;
@@ -113,43 +113,41 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _shellHitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    _shellHitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in SnailState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = SnailState.snailWalk;
+    final animations = {for (var state in SnailState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SnailState.snailWalk);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
     _leftBorder = (_snailGotStomped ? _shellMoveDirection == -1 : _moveDirection == -1)
-        ? _rangeNeg - hitbox.position.x
-        : _rangeNeg + hitbox.position.x + hitbox.width;
+        ? _rangeNeg - _hitbox.position.x
+        : _rangeNeg + _hitbox.position.x + _hitbox.width;
     _rightBorder = (_snailGotStomped ? _shellMoveDirection == 1 : _moveDirection == 1)
-        ? _rangePos + hitbox.position.x
-        : _rangePos - hitbox.position.x - hitbox.width;
+        ? _rangePos + _hitbox.position.x
+        : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _snailMovement(double dt) {
@@ -168,7 +166,7 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
       return;
     }
 
-    if (_accelProgress == 0) current = SnailState.snailWalk;
+    if (_accelProgress == 0) animationGroupComponent.current = SnailState.snailWalk;
 
     // movement
     final currentSpeed = _calculateCurrentSnailSpeed(dt);
@@ -177,7 +175,7 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   void _changeSnailDirection(double newDirection) {
-    current = SnailState.snailIdle;
+    animationGroupComponent.current = SnailState.snailIdle;
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();
 
@@ -220,7 +218,7 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _changeShellDirection(double newDirection) {
     _shellWallHit();
-    current = SnailState.shellWallHit;
+    animationGroupComponent.current = SnailState.shellWallHit;
     _shellMoveDirection = newDirection;
     flipHorizontallyAroundCenter();
 
@@ -230,42 +228,43 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   Future<void> _shellWallHit() async {
-    current = SnailState.shellWallHit;
-    await animationTickers![SnailState.shellWallHit]!.completed;
-    current = SnailState.shellSpin;
+    animationGroupComponent.current = SnailState.shellWallHit;
+    await animationGroupComponent.animationTickers![SnailState.shellWallHit]!.completed;
+    animationGroupComponent.current = SnailState.shellSpin;
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (!_snailGotStomped) {
-      _handleSnailStomp(collisionPoint);
+      _handleSnailStomp(intersectionPoint);
     } else if (!_shellGotKicked) {
       _handleShellKick();
     } else if (!_shellGotStomped) {
-      _handleShellStomp(collisionPoint);
+      _handleShellStomp(intersectionPoint);
     }
   }
 
-  Future<void> _handleSnailStomp(Vector2 collisionPoint) async {
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
-      current = SnailState.snailHit;
+  Future<void> _handleSnailStomp(Vector2 intersectionPoint) async {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+      animationGroupComponent.current = SnailState.snailHit;
       _snailGotStomped = true;
       _player.bounceUp();
-      await animationTickers![SnailState.snailHit]!.completed;
-      current = SnailState.shellIdle;
+      await animationGroupComponent.animationTickers![SnailState.snailHit]!.completed;
+      animationGroupComponent.current = SnailState.shellIdle;
 
       // change snail to shell and update hitbox
-      hitbox.position = shellHitbox.position;
-      hitbox.size = shellHitbox.size;
+      _hitbox.position = _shellHitbox.position;
+      _hitbox.size = _shellHitbox.size;
     } else {
       _player.collidedWithEnemy();
     }
   }
 
   void _handleShellKick() {
-    current = SnailState.shellSpin;
+    animationGroupComponent.current = SnailState.shellSpin;
     _shellGotKicked = true;
-    final shellPositionLeftX = (scale.x > 0) ? position.x + hitbox.position.x : position.x - hitbox.position.x - hitbox.width;
-    final shellPositionRightX = shellPositionLeftX + hitbox.width;
+    final shellPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
+    final shellPositionRightX = shellPositionLeftX + _hitbox.width;
     final shellCenter = (shellPositionLeftX + shellPositionRightX) / 2;
     final playerCenter = (_player.hitboxPositionLeftX + _player.hitboxPositionRightX) / 2;
     _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;
@@ -273,12 +272,12 @@ class Snail extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     _updateActualBorders();
   }
 
-  void _handleShellStomp(Vector2 collisionPoint) {
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
-      current = SnailState.shellTopHit;
+  void _handleShellStomp(Vector2 intersectionPoint) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+      animationGroupComponent.current = SnailState.shellTopHit;
       _shellGotStomped = true;
       _player.bounceUp();
-      animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }

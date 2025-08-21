@@ -5,16 +5,22 @@ import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
-  final Ghost owner;
-  final bool spawnOnLeftSide;
+  // constructor parameters
+  final Ghost owner; // has to be public
+  final bool _spawnOnLeftSide;
 
-  GhostParticle({required this.owner, required this.spawnOnLeftSide, required super.position}) : super(size: Vector2(16, 16));
+  GhostParticle({required this.owner, required bool spawnOnLeftSide, required super.position})
+    : _spawnOnLeftSide = spawnOnLeftSide,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2.all(16);
 
   // animation settings
-  final double _stepTime = 0.07;
-  final Vector2 _textureSize = Vector2(16, 16);
-  final int _amount = 4;
-  final String _path = 'Enemies/Ghost/Ghost Particles (16x16).png';
+  static const double _stepTime = 0.07;
+  static final Vector2 _textureSize = Vector2.all(16);
+  static const int _amount = 4;
+  static const String _path = 'Enemies/Ghost/Ghost Particles (16x16).png';
 
   @override
   Future<void> onLoad() async {
@@ -36,7 +42,7 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
 
   void _loadAndPlayAnimationOneTime() {
     animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize, loop: false);
-    if (spawnOnLeftSide) flipHorizontallyAroundCenter();
+    if (_spawnOnLeftSide) flipHorizontallyAroundCenter();
     animationTicker!.completed.then((_) => removeFromParent());
   }
 }

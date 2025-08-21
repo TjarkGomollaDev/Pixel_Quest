@@ -15,7 +15,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 ///
 /// The fire itself does not move, but acts as a passive collision area
 /// that can interact with the [Player].
-class Fire extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Fire extends PositionComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   int _side;
   final Player _player;
@@ -47,10 +47,10 @@ class Fire extends PositionComponent with HasGameReference<PixelAdventure>, Coll
     // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
     if (_side.isOdd) {
       height = PixelAdventure.tileSize;
-      width = ((width / PixelAdventure.tileSize).round()) * PixelAdventure.tileSize;
+      width = snapValueToGrid(width);
     } else {
       width = PixelAdventure.tileSize;
-      height = ((height / PixelAdventure.tileSize).round()) * PixelAdventure.tileSize;
+      height = snapValueToGrid(height);
     }
     _count = (_side.isOdd ? width : height) / PixelAdventure.tileSize;
   }
@@ -74,5 +74,6 @@ class Fire extends PositionComponent with HasGameReference<PixelAdventure>, Coll
     addSpriteRow(game: game, side: _side, count: _count, parent: this, animation: animation);
   }
 
-  void collidedWithPlayer() => _player.collidedWithEnemy();
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
 }

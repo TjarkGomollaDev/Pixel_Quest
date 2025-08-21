@@ -22,31 +22,32 @@ enum SlimeState implements AnimationState {
   const SlimeState(this.name, this.amount, {this.loop = true});
 }
 
-class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
-
-  Slime({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(6, 6), size: Vector2(36, 26));
-
-  // player ref
+class Slime extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
   final Player _player;
 
+  Slime({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _offsetNeg = offsetNeg,
+      _offsetPos = offsetPos,
+      _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(48, 32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(8, 8), size: Vector2(32, 24));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(44, 30);
-  final String _path = 'Enemies/Slime/';
-  final String _pathEnd = ' (44x30).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(44, 30);
+  static const String _path = 'Enemies/Slime/';
+  static const String _pathEnd = ' (44x30).png';
 
   // range
   late final double _rangeNeg;
@@ -96,39 +97,35 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<SlimeState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in SlimeState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = SlimeState.idle;
+    final animations = {for (var state in SlimeState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SlimeState.idle);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _movement(double dt) {
@@ -179,23 +176,24 @@ class Slime extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     final spawnOnLeftSide = _moveDirection == 1;
     final particleOffset = Vector2(
       spawnOnLeftSide
-          ? -hitbox.position.x - hitbox.width - 16 + _offsetCloserToSlime
-          : hitbox.position.x + hitbox.width - _offsetCloserToSlime,
+          ? -_hitbox.position.x - _hitbox.width - 16 + _offsetCloserToSlime
+          : _hitbox.position.x + _hitbox.width - _offsetCloserToSlime,
       height - _offsetAlignToGround,
     );
     final particlePosition = position + particleOffset;
 
-    final ghostParticle = SlimeParticle(spawnOnLeftSide: spawnOnLeftSide, position: particlePosition);
+    final ghostParticle = SlimeParticle(spawnOnLeftSide: spawnOnLeftSide, player: _player, position: particlePosition);
     game.world.add(ghostParticle);
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
-      current = SlimeState.hit;
-      animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.current = SlimeState.hit;
+      animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }

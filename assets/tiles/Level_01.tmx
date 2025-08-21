@@ -38,12 +38,12 @@
   <object id="26" name="Apple" type="Fruit" x="32" y="176" width="32" height="32"/>
   <object id="27" name="Cherries" type="Fruit" x="208" y="64" width="32" height="32"/>
   <object id="29" name="Melon" type="Fruit" x="432" y="16" width="32" height="32"/>
-  <object id="33" name="SawCircle" type="SawCircle" x="80" y="144" width="16" height="16">
+  <object id="33" name="SawCircle" type="SawCircle" x="96" y="160" width="16" height="16">
    <properties>
-    <property name="circleHeight" type="float" value="8"/>
-    <property name="circleWidth" type="float" value="10"/>
+    <property name="circleHeight" type="int" value="6"/>
+    <property name="circleWidth" type="int" value="8"/>
     <property name="clockwise" type="bool" value="true"/>
-    <property name="doubleSaw" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="false"/>
    </properties>
   </object>
   <object id="35" name="Kiwi" type="Fruit" x="336" y="32" width="32" height="32"/>

@@ -3,23 +3,32 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
+import 'package:pixel_adventure/game_components/enemies/turtle.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
+import 'package:pixel_adventure/game_components/traps/fire.dart';
 import 'package:pixel_adventure/game_components/traps/saw.dart';
+import 'package:pixel_adventure/game_components/traps/spikes.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final bool isLeft;
+class TrunkBullet extends SpriteComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final bool _isLeft;
+  final Player _player;
 
-  TrunkBullet({required this.isLeft, required super.position}) : super(size: fixedSize);
+  TrunkBullet({required bool isLeft, required Player player, required super.position})
+    : _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
 
   // size
-  static final Vector2 fixedSize = Vector2.all(16);
+  static final Vector2 gridSize = Vector2.all(16);
 
   // actual hitbox
-  final CircleHitbox hitbox = CircleHitbox(position: Vector2(4, 4), radius: 4);
+  final CircleHitbox _hitbox = CircleHitbox(position: Vector2(4, 4), radius: 4);
 
   // animation settings
-  final String _path = 'Enemies/Trunk/Bullet.png';
+  static const String _path = 'Enemies/Trunk/Bullet.png';
 
   // movement
   final double _moveSpeed = 260; // [Adjustable]
@@ -27,6 +36,9 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
 
   // spawn protection to prevent flickering if the bullet is spawned in a collision block
   int _spawnProtectionFrames = 2;
+
+  // list of objects that will destroy the projectile upon collision
+  static const List<Type> despawnTypes = [CollisionBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -50,8 +62,7 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is CollisionBlock && !other.isPlattform) _despawn();
-    if (other is Saw) _despawn();
+    if (despawnTypes.any((type) => other.runtimeType == type)) _despawn();
     super.onCollisionStart(intersectionPoints, other);
   }
 
@@ -60,18 +71,18 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieBulletLayerLevel;
     opacity = 0;
-    add(hitbox);
+    add(_hitbox);
   }
 
   void _loadSprite() {
     sprite = loadSprite(game, _path);
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
   }
 
@@ -79,5 +90,9 @@ class TrunkBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
 
   void _despawn() => removeFromParent();
 
-  void collidedWithPlayer(Vector2 collisionPoint) => _despawn();
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+    _despawn();
+    _player.collidedWithEnemy();
+  }
 }

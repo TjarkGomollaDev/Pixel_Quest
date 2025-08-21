@@ -15,7 +15,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// This component does not move by itself, but is positioned and updated
 /// by its parent [SawCircle]. It acts as a passive collision area
 /// that can interact with the [Player].
-class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
+class SawCircleSingleSaw extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
   // constructor parameters
   final bool _clockwise;
   final Player _player;
@@ -23,10 +23,10 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<
   SawCircleSingleSaw({required bool clockwise, required Player player, required super.position})
     : _clockwise = clockwise,
       _player = player,
-      super(size: _fixedSize);
+      super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
   final CircleHitbox _hitbox = CircleHitbox();
@@ -56,10 +56,13 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with HasGameReference<
     _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.center;
     add(_hitbox);
+  }
+
+  void _loadSpriteAnimation() {
+    animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
     if (_clockwise) flipHorizontally();
   }
 
-  void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
-
-  void collidedWithPlayer() => _player.collidedWithEnemy();
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
 }

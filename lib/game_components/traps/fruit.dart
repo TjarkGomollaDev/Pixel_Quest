@@ -29,15 +29,15 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// animation before disappearing from the level. Once collected, it increments
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
-class Fruit extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Fruit extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final String _name;
   final Player _player;
 
-  Fruit({required String name, required Player player, required super.position}) : _name = name, _player = player, super(size: _fixedSize);
+  Fruit({required String name, required Player player, required super.position}) : _name = name, _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 gridSize = Vector2.all(32);
 
   // hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
@@ -82,12 +82,11 @@ class Fruit extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
             ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, _stepTime, _textureSize)
             : loadAnimation(state),
     };
-
-    // set current animation state
     current = FruitState.idle;
   }
 
-  void collidedWithPlayer() {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (!_isCollected) {
       _isCollected = true;
       current = FruitState.collected;

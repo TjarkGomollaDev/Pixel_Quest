@@ -21,35 +21,36 @@ enum ChickenState implements AnimationState {
   const ChickenState(this.name, this.amount, {this.loop = true});
 }
 
-class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
+class Chicken extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
+  final Player _player;
 
-  Chicken({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
+  Chicken({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _offsetNeg = offsetNeg,
+      _offsetPos = offsetPos,
+      _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(32, 48);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 26));
-
-  // player ref
-  final Player _player;
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 22), size: Vector2(24, 26));
 
   // these are the correct x values for the chicken, one for the left side of the hitbox and one for the right side of the hitbox
   late double _hitboxPositionLeftX;
   late double _hitboxPositionRightX;
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(32, 34);
-  final String _path = 'Enemies/Chicken/';
-  final String _pathEnd = ' (32x34).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(32, 34);
+  static const String _path = 'Enemies/Chicken/';
+  static const String _pathEnd = ' (32x34).png';
 
   // range
   late final double _rangeNeg;
@@ -91,44 +92,40 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<ChickenState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in ChickenState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = ChickenState.idle;
+    final animations = {for (var state in ChickenState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ChickenState.idle);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _updateHitboxEdges() {
-    _hitboxPositionLeftX = (scale.x > 0) ? position.x + hitbox.position.x : position.x - hitbox.position.x - hitbox.width;
-    _hitboxPositionRightX = _hitboxPositionLeftX + hitbox.width;
+    _hitboxPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
+    _hitboxPositionRightX = _hitboxPositionLeftX + _hitbox.width;
   }
 
   void _movement(double dt) {
@@ -162,11 +159,11 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
     return playerPositionRightX >= _rangeNeg &&
         playerPositionLeftX <= _rangePos &&
         _player.y + _player.height <= position.y + height &&
-        _player.y + _player.height >= position.y + hitbox.position.y;
+        _player.y + _player.height >= position.y + _hitbox.position.y;
   }
 
   void _updateState() {
-    current = (_velocity.x != 0) ? ChickenState.run : ChickenState.idle;
+    animationGroupComponent.current = (_velocity.x != 0) ? ChickenState.run : ChickenState.idle;
 
     // detection of a change in direction
     if ((_moveDirection > 0 && scale.x > 0) || (_moveDirection < 0 && scale.x < 0)) {
@@ -176,13 +173,14 @@ class Chicken extends SpriteAnimationGroupComponent with HasGameReference<PixelA
     }
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
-      current = ChickenState.hit;
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+      animationGroupComponent.current = ChickenState.hit;
       _gotStomped = true;
       _player.bounceUp();
-      animationTickers![ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.animationTickers![ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }

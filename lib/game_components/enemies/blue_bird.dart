@@ -21,31 +21,31 @@ enum BlueBirdState implements AnimationState {
   const BlueBirdState(this.name, this.amount, {this.loop = true});
 }
 
-class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
-
-  BlueBird({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 19));
-
-  // player ref
+class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
   final Player _player;
 
+  BlueBird({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _offsetNeg = offsetNeg,
+      _offsetPos = offsetPos,
+      _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2.all(32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 19));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(32, 32);
-  final String _path = 'Enemies/BlueBird/';
-  final String _pathEnd = ' (32x32).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2.all(32);
+  static const String _path = 'Enemies/BlueBird/';
+  static const String _pathEnd = ' (32x32).png';
 
   // range
   late final double _rangeNeg;
@@ -97,40 +97,36 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = CollisionType.passive;
     _startY = position.y;
-    add(hitbox);
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in BlueBirdState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = BlueBirdState.fly;
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _movement(double dt) {
@@ -185,9 +181,10 @@ class BlueBird extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     return _moveSpeed * _speedFactor;
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = BlueBirdState.hit;

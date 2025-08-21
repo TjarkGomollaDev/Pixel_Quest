@@ -28,7 +28,7 @@ enum MushroomState implements AnimationState {
 /// pausing briefly and accelerating smoothly when changing direction.
 /// The mushroom can be stomped by the [Player], playing a hit animation before disappearing,
 /// or it will harm the player if touched from the side.
-class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -40,10 +40,10 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
       _offsetPos = offsetPos,
       _offsetNeg = offsetNeg,
       _player = player,
-      super(size: _fixedSize);
+      super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
@@ -110,8 +110,6 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, _stepTime, _textureSize);
     animations = {for (var state in MushroomState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = MushroomState.run;
   }
 
@@ -182,9 +180,10 @@ class Mushroom extends SpriteAnimationGroupComponent with HasGameReference<Pixel
     return _moveSpeed * _speedFactor;
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = MushroomState.hit;

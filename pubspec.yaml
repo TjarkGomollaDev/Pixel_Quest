@@ -72,6 +72,8 @@ flutter:
     - assets/images/Traps/Platforms/
     - assets/images/Traps/Spikes/
     - assets/images/Traps/Rock Head/
+    - assets/images/Traps/Spike Head/
+    - assets/images/Traps/Arrow/
     - assets/images/Main Characters/
     - assets/images/Main Characters/Mask Dude/
     - assets/images/Main Characters/Ninja Frog/

@@ -1,25 +1,28 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class SlimeParticle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
+class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
+  // constructor parameters
   final bool spawnOnLeftSide;
+  final Player player;
 
-  SlimeParticle({required this.spawnOnLeftSide, required super.position}) : super(size: fixedSize);
+  SlimeParticle({required this.spawnOnLeftSide, required this.player, required super.position}) : super(size: gridSize);
 
   // size
-  static final Vector2 fixedSize = Vector2.all(16);
+  static final Vector2 gridSize = Vector2.all(16);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
 
   // animation settings
-  final double _stepTime = 0.07;
-  final Vector2 _textureSize = Vector2(16, 16);
-  final int _amount = 4;
-  final String _path = 'Enemies/Slime/Particles (16x16).png';
+  static const double _stepTime = 0.07;
+  static final Vector2 _textureSize = Vector2.all(16);
+  static const int _amount = 4;
+  static const String _path = 'Enemies/Slime/Particles (16x16).png';
 
   @override
   Future<void> onLoad() async {
@@ -33,13 +36,13 @@ class SlimeParticle extends SpriteAnimationComponent with HasGameReference<Pixel
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieParticleLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   Future<void> _loadAndPlayAnimationOneTime() async {
@@ -55,4 +58,7 @@ class SlimeParticle extends SpriteAnimationComponent with HasGameReference<Pixel
     animationTicker?.paused = false;
     animationTicker!.completed.then((_) => removeFromParent());
   }
+
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) => player.collidedWithEnemy();
 }

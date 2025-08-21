@@ -29,7 +29,7 @@ enum MovingPlatformState implements AnimationState {
 ///
 /// The platform automatically reverses direction when reaching the end
 /// of its movement range.
-class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class MovingPlatform extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
@@ -48,10 +48,10 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
        _offsetNeg = offsetNeg,
        _player = player,
        _block = block,
-       super(size: _fixedSize);
+       super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2(32, 16);
+  static final Vector2 gridSize = Vector2(32, 16);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
@@ -87,6 +87,12 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     super.update(dt);
   }
 
+  @override
+  void onRemove() {
+    _player.respawnNotifier.removeListener(onPlayerCollisionEnd);
+    super.onRemove();
+  }
+
   void _initialSetup() {
     // debug
     if (game.customDebug) {
@@ -97,6 +103,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
 
     // general
     priority = PixelAdventure.trapLayerLevel;
+    _player.respawnNotifier.addListener(onPlayerCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.topCenter;
     add(_hitbox);
@@ -105,11 +112,8 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, _stepTime, _textureSize);
     animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = MovingPlatformState.on;
-
-    _moveDirection == -1 ? flipHorizontally() : null;
+    if (_moveDirection == -1) flipHorizontally();
   }
 
   void _setUpRange() {
@@ -151,8 +155,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     if (_playerOnTop) _player.position.x += moveX;
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
-    if (collisionPoint.y == position.y) {
+  @override
+  void onPlayerCollision(Vector2 intersectionPoint) {
+    if (intersectionPoint.y == position.y) {
       // once he is taken away, he no longer has to be on at least half of his hitbox
       if (_playerOnTop) return;
 
@@ -164,5 +169,6 @@ class MovingPlatform extends SpriteAnimationGroupComponent with HasGameReference
     }
   }
 
-  void collidedWithPlayerEnd() => _playerOnTop = false;
+  @override
+  void onPlayerCollisionEnd() => _playerOnTop = false;
 }

@@ -50,8 +50,8 @@ class PixelAdventure extends FlameGame
   static const double offsetPosDefault = 1.0;
   static const double extandNegAttackDefault = 0.0;
   static const double extandPosAttackDefault = 0.0;
-  static const double circleWidthDefault = 6.0;
-  static const double circleHeightDefault = 4.0;
+  static const int circleWidthDefault = 6;
+  static const int circleHeightDefault = 4;
 
   // tile size
   static const double tileSize = 16;

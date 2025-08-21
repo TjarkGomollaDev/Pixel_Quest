@@ -33,6 +33,9 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
   late final SawCircleSingleSaw _saw1;
   late final SawCircleSingleSaw? _saw2;
 
+  // saw radius
+  final double sawRadius = SawCircleSingleSaw.gridSize.x / 2;
+
   // path
   late final List<Vector2> _path;
   late final double _pathWidth;
@@ -47,6 +50,7 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
 
   @override
   FutureOr<void> onLoad() {
+    _adjustDimensions();
     _initialSetup();
     _setUpPath();
     _addSingleSaws();
@@ -57,6 +61,11 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
   void update(double dt) {
     _movement(dt);
     super.update(dt);
+  }
+
+  void _adjustDimensions() {
+    position -= Vector2.all(sawRadius);
+    size += Vector2.all(sawRadius * 2);
   }
 
   void _initialSetup() {
@@ -75,10 +84,10 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
 
   void _setUpPath() {
     _path = [
-      Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize), // top left
-      Vector2(PixelAdventure.tileSize, height - PixelAdventure.tileSize), // bottom left
-      Vector2(width - PixelAdventure.tileSize, height - PixelAdventure.tileSize), // bottom right
-      Vector2(width - PixelAdventure.tileSize, PixelAdventure.tileSize), // top right
+      Vector2.all(sawRadius), // top left
+      Vector2(sawRadius, height - sawRadius), // bottom left
+      Vector2(width - sawRadius, height - sawRadius), // bottom right
+      Vector2(width - sawRadius, sawRadius), // top right
     ];
     _pathWidth = _path[3].x - _path[0].x;
     _pathHeight = _path[1].y - _path[0].y;

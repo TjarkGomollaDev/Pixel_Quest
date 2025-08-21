@@ -16,7 +16,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// The saw continuously animates while moving and flips direction
 /// once reaching the end of its range. It acts as a passive collision area
 /// that can interact with the [Player].
-class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
+class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -28,10 +28,10 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
       _offsetPos = offsetPos,
       _offsetNeg = offsetNeg,
       _player = player,
-      super(size: _fixedSize);
+      super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
   final CircleHitbox _hitbox = CircleHitbox();
@@ -154,5 +154,6 @@ class Saw extends SpriteAnimationComponent with HasGameReference<PixelAdventure>
     position.x = newPositionX.clamp(_rangeNeg, _rangePos);
   }
 
-  void collidedWithPlayer() => _player.collidedWithEnemy();
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
 }

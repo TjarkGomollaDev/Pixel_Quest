@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_components/level/player.dart';
@@ -30,15 +31,17 @@ enum FanState implements AnimationState {
 ///
 /// The fan animation plays continuously while the trap is active.
 /// Damage is not applied; this trap only manipulates player movement.
-class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure> {
+class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure> {
   // constructor parameters
   final Player _player;
 
-  Fan({required Player player, required Vector2 position}) : _player = player, super(size: _fixedSize, position: position + _fixedOffset);
+  Fan({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2(28, 8);
-  static final Vector2 _fixedOffset = Vector2(2, 8);
+  static final Vector2 gridSize = Vector2(32, 16);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(5, 8), size: Vector2(23, 8));
 
   // animation settings
   static const double _stepTime = 0.05;
@@ -62,22 +65,27 @@ class Fan extends SpriteAnimationGroupComponent with HasGameReference<PixelAdven
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
+    add(_hitbox);
   }
 
   void _loadAllAnimation() {
     final loadAnimation = spriteAnimationWrapper<FanState>(game, _path, _pathEnd, _stepTime, _textureSize);
-    animations = {for (var state in FanState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = FanState.on;
+    final animations = {for (var state in FanState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: FanState.off);
   }
 
   void _loadFanAirStream() {
-    _airStream = FanAirStream(baseWidth: width, airStreamHeight: position.y, player: _player, position: Vector2(0, 0));
+    _airStream = FanAirStream(
+      baseWidth: width,
+      airStreamHeight: position.y + _hitbox.position.y,
+      player: _player,
+      position: Vector2(0, _hitbox.position.y),
+    );
     add(_airStream);
   }
 }

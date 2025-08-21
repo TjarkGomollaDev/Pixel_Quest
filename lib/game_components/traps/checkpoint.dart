@@ -21,14 +21,23 @@ enum CheckpointState implements AnimationState {
   const CheckpointState(this.name, this.amount, {this.loop = true});
 }
 
-class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+/// Represents a checkpoint in the level where the player can respawn.
+///
+/// The checkpoint has three animation states:
+/// - [CheckpointState.noFlag]: Default inactive state.
+/// - [CheckpointState.flagOut]: Flag is raised when the player reaches the checkpoint.
+/// - [CheckpointState.flagIdle]: Flag stays up after activation.
+///
+/// When the player collides with the checkpoint, the flag animation
+/// plays, and the player is registered as having reached the checkpoint.
+class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
-  Checkpoint({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+  Checkpoint({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(64);
+  static final Vector2 gridSize = Vector2.all(64);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(12, 46));
@@ -63,12 +72,11 @@ class Checkpoint extends SpriteAnimationGroupComponent with HasGameReference<Pix
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<CheckpointState>(game, _path, _pathEnd, _stepTime, _textureSize);
     animations = {for (var state in CheckpointState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = CheckpointState.noFlag;
   }
 
-  Future<void> collidedWithPlayer() async {
+  @override
+  Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
     current = CheckpointState.flagOut;
     _player.reachedCheckpoint();
     await animationTickers![CheckpointState.flagOut]!.completed;

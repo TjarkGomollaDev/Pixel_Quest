@@ -4,29 +4,40 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
 import 'package:pixel_adventure/game_components/enemies/turtle.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
+import 'package:pixel_adventure/game_components/traps/fire.dart';
 import 'package:pixel_adventure/game_components/traps/saw.dart';
+import 'package:pixel_adventure/game_components/traps/spikes.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final bool isLeft;
+class PlantBullet extends SpriteComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final bool _isLeft;
+  final Player _player;
 
-  PlantBullet({required this.isLeft, required super.position}) : super(size: fixedSize);
+  PlantBullet({required bool isLeft, required Player player, required super.position})
+    : _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
 
   // size
-  static final Vector2 fixedSize = Vector2.all(16);
+  static final Vector2 gridSize = Vector2.all(16);
   static final Vector2 hitboxOffset = Vector2(4, 4);
   static const double hitboxRadius = 4;
 
   // actual hitbox
-  final CircleHitbox hitbox = CircleHitbox(position: hitboxOffset, radius: hitboxRadius);
+  final CircleHitbox _hitbox = CircleHitbox(position: hitboxOffset, radius: hitboxRadius);
 
   // animation settings
-  final String _path = 'Enemies/Plant/Bullet.png';
+  static const String _path = 'Enemies/Plant/Bullet (16x16).png';
 
   // movement
   final double _moveSpeed = 100; // [Adjustable]
   late double _moveDirection;
+
+  // list of objects that will destroy the projectile upon collision
+  static const List<Type> despawnTypes = [CollisionBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -43,9 +54,7 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is CollisionBlock && !other.isPlattform) _despawn();
-    if (other is Saw) _despawn();
-    if (other is Turtle) _despawn();
+    if (despawnTypes.any((type) => other.runtimeType == type)) _despawn();
     super.onCollisionStart(intersectionPoints, other);
   }
 
@@ -54,13 +63,13 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieBulletLayerLevel;
-    add(hitbox);
-    _moveDirection = isLeft ? -1 : 1;
+    add(_hitbox);
+    _moveDirection = _isLeft ? -1 : 1;
   }
 
   void _loadSprite() => sprite = loadSprite(game, _path);
@@ -69,5 +78,9 @@ class PlantBullet extends SpriteComponent with HasGameReference<PixelAdventure>,
 
   void _despawn() => removeFromParent();
 
-  void collidedWithPlayer(Vector2 collisionPoint) => _despawn();
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+    _despawn();
+    _player.collidedWithEnemy();
+  }
 }

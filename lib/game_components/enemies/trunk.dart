@@ -24,39 +24,46 @@ enum TrunkState implements AnimationState {
   const TrunkState(this.name, this.amount, {this.loop = true});
 }
 
-class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final double extandNegAttack;
-  final double extandPosAttack;
-  final bool isLeft;
+class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final double _extandNegAttack;
+  final double _extandPosAttack;
+  final bool _isLeft;
+  final Player _player;
 
   Trunk({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.extandNegAttack,
-    required this.extandPosAttack,
-    required this.isLeft,
-    required super.position,
-    required super.size,
+    required double offsetNeg,
+    required double offsetPos,
+    required double extandNegAttack,
+    required double extandPosAttack,
+    required bool isLeft,
     required Player player,
-  }) : _player = player;
+    required super.position,
+  }) : _isLeft = isLeft,
+       _extandPosAttack = extandPosAttack,
+       _extandNegAttack = extandNegAttack,
+       _offsetPos = offsetPos,
+       _offsetNeg = offsetNeg,
+       _player = player,
+       super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(64, 32);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(22, 7), size: Vector2(21, 26));
-
-  // player ref
-  final Player _player;
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(22, 7), size: Vector2(21, 26));
 
   // these are the correct x values for the trunk, one for the left side of the hitbox and one for the right side of the hitbox
   late double _hitboxPositionLeftX;
   late double _hitboxPositionRightX;
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(64, 32);
-  final String _path = 'Enemies/Trunk/';
-  final String _pathEnd = ' (64x32).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(64, 32);
+  static const String _path = 'Enemies/Trunk/';
+  static const String _pathEnd = ' (64x32).png';
 
   // range in which the trunk moves
   late final double _rangeNeg;
@@ -152,49 +159,45 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
     animations = {for (var state in TrunkState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = TrunkState.run;
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpAttackRange() {
-    _attackRangeNeg = _rangeNeg - extandNegAttack * PixelAdventure.tileSize;
-    _attackRangePos = _rangePos + extandPosAttack * PixelAdventure.tileSize;
+    _attackRangeNeg = _rangeNeg - _extandNegAttack * PixelAdventure.tileSize;
+    _attackRangePos = _rangePos + _extandPosAttack * PixelAdventure.tileSize;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _updateHitboxEdges() {
-    _hitboxPositionLeftX = (scale.x > 0) ? position.x + hitbox.position.x : position.x - hitbox.position.x - hitbox.width;
-    _hitboxPositionRightX = _hitboxPositionLeftX + hitbox.width;
+    _hitboxPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
+    _hitboxPositionRightX = _hitboxPositionLeftX + _hitbox.width;
   }
 
   void _setUpTimer() => _shootTimer = Timer(_timeBetweenShots, onTick: _shoot, repeat: true, autoStart: false);
@@ -283,7 +286,7 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     return _player.hitboxPositionRightX >= _attackRangeNeg &&
         _player.hitboxPositionLeftX <= _attackRangePos &&
         _player.y + _player.height <= position.y + height &&
-        _player.y + _player.height >= position.y + hitbox.position.y + (extended ?? 0);
+        _player.y + _player.height >= position.y + _hitbox.position.y + (extended ?? 0);
   }
 
   bool _checkAttack() => (_checkIsPlayerBefore() && _checkIsPlayerInRange(extended: -_extendRangeDefault));
@@ -314,15 +317,16 @@ class Trunk extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _spawnBullet() {
     final isLeft = _moveDirection == -1;
-    final bulletOffset = Vector2(isLeft ? hitbox.position.x - TrunkBullet.fixedSize.x : -hitbox.position.x, hitbox.position.y + 3);
+    final bulletOffset = Vector2(isLeft ? _hitbox.position.x - TrunkBullet.gridSize.x : -_hitbox.position.x, _hitbox.position.y + 3);
     final bulletPosition = position + bulletOffset;
-    final bullet = TrunkBullet(position: bulletPosition, isLeft: isLeft);
+    final bullet = TrunkBullet(isLeft: isLeft, player: _player, position: bulletPosition);
     game.world.add(bullet);
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = TrunkState.hit;

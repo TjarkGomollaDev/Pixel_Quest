@@ -27,17 +27,18 @@ enum TrampolineState implements AnimationState {
 /// the jump animation, applies an upward bounce force to the player, and then
 /// automatically resets back to idle once the animation is complete.
 /// The trampoline acts as a passive collision object and does not move by itself.
-class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Trampoline extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
-  Trampoline({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+  Trampoline({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2.all(32);
+  static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(2, 19), size: Vector2(27, 13));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 21), size: Vector2(23, 11));
 
   // animation settings
   static const double _stepTime = 0.05;
@@ -72,19 +73,18 @@ class Trampoline extends SpriteAnimationGroupComponent with HasGameReference<Pix
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, _stepTime, _textureSize);
-    animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = TrampolineState.idle;
+    final animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TrampolineState.idle);
   }
 
-  Future<void> collidedWithPlayer(Vector2 collisionPoint) async {
+  @override
+  Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
     if (!_bounced) {
       _bounced = true;
       _player.bounceUp(jumpForce: _bounceHeight);
-      current = TrampolineState.jump;
-      await animationTickers![TrampolineState.jump]!.completed;
-      current = TrampolineState.idle;
+      animationGroupComponent.current = TrampolineState.jump;
+      await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
+      animationGroupComponent.current = TrampolineState.idle;
       _bounced = false;
     }
   }

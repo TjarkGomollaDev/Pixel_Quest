@@ -22,24 +22,30 @@ enum PlantState implements AnimationState {
   const PlantState(this.name, this.amount, {this.loop = true});
 }
 
-class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final bool isLeft;
-  final bool doubleShot;
-
-  Plant({required this.isLeft, required this.doubleShot, required super.position, required super.size, required Player player})
-    : _player = player;
-
-  // actual hitbox
-  final hitbox = RectangleHitbox(position: Vector2(10, 8), size: Vector2(17, 24));
-
-  // player ref
+class Plant extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final bool _isLeft;
+  final bool _doubleShot;
   final Player _player;
 
+  Plant({required bool isLeft, required bool doubleShot, required Player player, required super.position})
+    : _isLeft = isLeft,
+      _doubleShot = doubleShot,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2.all(48);
+
+  // actual hitbox
+  final _hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(20, 30));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(44, 42);
-  final String _path = 'Enemies/Plant/';
-  final String _pathEnd = ' (44x42).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(44, 42);
+  static const String _path = 'Enemies/Plant/';
+  static const String _pathEnd = ' (44x42).png';
 
   // attack
   double _timeSinceLastAttack = 0.0;
@@ -72,39 +78,34 @@ class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<PlantState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in PlantState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = PlantState.idle;
-
-    if (!isLeft) flipHorizontallyAroundCenter();
+    final animations = {for (var state in PlantState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: PlantState.idle);
+    if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
   void _startAttack() {
-    current = PlantState.attack;
+    animationGroupComponent.current = PlantState.attack;
     _isAttacking = true;
-    animationTickers![PlantState.attack]!.completed.whenComplete(() async {
+    animationGroupComponent.animationTickers![PlantState.attack]!.completed.whenComplete(() async {
       _spawnBullet();
-      current = PlantState.idle;
-      if (doubleShot) {
+      animationGroupComponent.current = PlantState.idle;
+      if (_doubleShot) {
         await Future.delayed(_delayBetweenDoubleShot);
-        current = PlantState.attack;
-        await animationTickers![PlantState.attack]!.completed;
+        animationGroupComponent.current = PlantState.attack;
+        await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
         _spawnBullet();
-        current = PlantState.idle;
+        animationGroupComponent.current = PlantState.idle;
       }
       _isAttacking = false;
       _timeSinceLastAttack = 0;
@@ -113,23 +114,24 @@ class Plant extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _spawnBullet() {
     final bulletOffset = Vector2(
-      isLeft
-          ? hitbox.position.x - PlantBullet.hitboxOffset.x - PlantBullet.hitboxRadius * 2
-          : -hitbox.position.x - PlantBullet.hitboxOffset.x,
-      hitbox.position.y - PlantBullet.hitboxOffset.y,
+      _isLeft
+          ? _hitbox.position.x - PlantBullet.hitboxOffset.x - PlantBullet.hitboxRadius * 2
+          : -_hitbox.position.x - PlantBullet.hitboxOffset.x,
+      _hitbox.position.y - PlantBullet.hitboxOffset.y,
     );
     final bulletPosition = position + bulletOffset;
-    final bullet = PlantBullet(position: bulletPosition, isLeft: isLeft);
+    final bullet = PlantBullet(isLeft: _isLeft, player: _player, position: bulletPosition);
     game.world.add(bullet);
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
-      current = PlantState.hit;
-      animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.current = PlantState.hit;
+      animationGroupComponent.animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
     }
   }
 }

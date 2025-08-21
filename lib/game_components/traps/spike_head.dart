@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game_components/collision_block.dart';
+import 'package:pixel_adventure/game_components/level/player.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-enum RockHeadState implements AnimationState {
+enum SpikeHeadState implements AnimationState {
   idle('Idle', 1),
   blink('Blink', 4, loop: false),
   topHit('Top Hit', 4, loop: false),
@@ -19,37 +19,31 @@ enum RockHeadState implements AnimationState {
   @override
   final bool loop;
 
-  const RockHeadState(this.name, this.amount, {this.loop = true});
+  const SpikeHeadState(this.name, this.amount, {this.loop = true});
 }
 
-/// A heavy stone trap that repeatedly slams down and retracts vertically
-/// within a defined range.
-///
-/// The RockHead starts at the top of its range and drops quickly with high
-/// downward speed, then retracts upward more slowly. At both the top and
-/// bottom borders it plays a hit animation before pausing for a short delay,
-/// creating a rhythmic crushing pattern.
-class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure> {
+class SpikeHead extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _offsetPos;
-  final CollisionBlock _block;
+  final Player _player;
 
-  RockHead({required double offsetPos, required CollisionBlock block, required super.position})
+  SpikeHead({required double offsetPos, required Player player, required super.position})
     : _offsetPos = offsetPos,
-      _block = block,
+      _player = player,
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(48);
+  static final Vector2 gridSize = Vector2.all(64);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(8, 8), size: Vector2(32, 32));
+  late final CompositeHitbox _hitbox;
 
   // animation settings
   static const double _stepTime = 0.05;
-  static final Vector2 _textureSize = Vector2(42, 42);
-  static const String _path = 'Traps/Rock Head/';
-  static const String _pathEnd = ' (42x42).png';
+  static final Vector2 _textureSize = Vector2(54, 52);
+  static const String _path = 'Traps/Spike Head/';
+  static const String _pathEnd = ' (54x52).png';
 
   // range
   late final double _rangeNeg;
@@ -73,12 +67,12 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
 
   @override
   FutureOr<void> onLoad() {
+    _setUpHitbox();
     _initialSetup();
     _loadAllSpriteAnimations();
     _setUpRange();
     _setUpActualBorders();
     _correctingStartPosition();
-    _setUpCollisionBlock();
     return super.onLoad();
   }
 
@@ -87,6 +81,22 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     if (!_directionChangePending) _movement(dt);
     super.update(dt);
   }
+
+  void _setUpHitbox() {
+    _hitbox = CompositeHitbox(
+      position: Vector2(10, 10),
+      size: Vector2(44, 44),
+      children: [
+        _makeHitbox(Vector2(8, 0), Vector2(28, 8)), // top
+        _makeHitbox(Vector2(36, 8), Vector2(8, 28)), // right
+        _makeHitbox(Vector2(8, 36), Vector2(28, 8)), // bottom
+        _makeHitbox(Vector2(0, 8), Vector2(8, 28)), // left
+      ],
+    );
+  }
+
+  RectangleHitbox _makeHitbox(Vector2 position, Vector2 size) =>
+      RectangleHitbox(position: position, size: size, collisionType: CollisionType.passive)..debugColor = AppTheme.debugColorTrapHitbox;
 
   void _initialSetup() {
     // debug
@@ -98,14 +108,13 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, _stepTime, _textureSize);
-    final animations = {for (var state in RockHeadState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: RockHeadState.idle, isBottomCenter: false);
+    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final animations = {for (var state in SpikeHeadState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SpikeHeadState.idle, isBottomCenter: false);
   }
 
   void _setUpRange() {
@@ -123,11 +132,6 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     _moveSpeed = _moveSpeedDown;
   }
 
-  void _setUpCollisionBlock() {
-    _block.size = _hitbox.size;
-    _block.position = position + _hitbox.position;
-  }
-
   void _movement(double dt) {
     // change move direction if we reached the borders
     if (position.y >= _bottomtBorder && _moveDirection != -1) {
@@ -138,28 +142,30 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
       // movement
       final newPositionY = position.y + _moveDirection * _moveSpeed * dt;
       position.y = newPositionY.clamp(_topBorder, _bottomtBorder);
-      _block.y = position.y + _hitbox.position.y;
     }
   }
 
   Future<void> _changeDirection(double newDirection) async {
     _directionChangePending = true;
-    final RockHeadState hitAnimation;
+    final SpikeHeadState hitAnimation;
     if (newDirection == 1) {
-      hitAnimation = RockHeadState.topHit;
+      hitAnimation = SpikeHeadState.topHit;
       _moveSpeed = _moveSpeedDown;
     } else {
-      hitAnimation = RockHeadState.bottomHit;
+      hitAnimation = SpikeHeadState.bottomHit;
       _moveSpeed = _moveSpeedUp;
     }
     _moveDirection = newDirection;
     animationGroupComponent.current = hitAnimation;
     await animationGroupComponent.animationTickers![hitAnimation]!.completed;
-    animationGroupComponent.current = RockHeadState.idle;
+    animationGroupComponent.current = SpikeHeadState.idle;
     await Future.delayed((newDirection == 1 ? _delayAtTop : _delayAtBottom) - _delayBlinkBeforeMove);
-    animationGroupComponent.current = RockHeadState.blink;
-    await animationGroupComponent.animationTickers![RockHeadState.blink]!.completed;
+    animationGroupComponent.current = SpikeHeadState.blink;
+    await animationGroupComponent.animationTickers![SpikeHeadState.blink]!.completed;
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }
+
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
 }

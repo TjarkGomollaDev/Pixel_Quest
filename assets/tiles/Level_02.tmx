@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="68">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="76">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="40" height="23">
   <properties>
@@ -33,22 +33,6 @@
  </layer>
  <objectgroup id="2" name="Spawnpoints">
   <object id="1" name="Player" type="Player" x="144" y="288" width="32" height="32"/>
-  <object id="17" name="SawCircle" type="SawCircle" x="320" y="112" width="16" height="16">
-   <properties>
-    <property name="circleHeight" type="float" value="4"/>
-    <property name="circleWidth" type="float" value="8"/>
-    <property name="clockwise" type="bool" value="true"/>
-    <property name="doubleSaw" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="18" name="SawCircle" type="SawCircle" x="448" y="112" width="16" height="16">
-   <properties>
-    <property name="circleHeight" type="float" value="4"/>
-    <property name="circleWidth" type="float" value="8"/>
-    <property name="clockwise" type="bool" value="true"/>
-    <property name="doubleSaw" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="20" name="Mushroom" type="Mushroom" x="224" y="96" width="32" height="32">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
@@ -56,7 +40,7 @@
     <property name="offsetPos" type="float" value="3"/>
    </properties>
   </object>
-  <object id="21" name="Plant" type="Plant" x="16" y="48" width="32" height="32">
+  <object id="21" name="Plant" type="Plant" x="16" y="32" width="48" height="48">
    <properties>
     <property name="doubleShot" type="bool" value="true"/>
     <property name="isLeft" type="bool" value="false"/>
@@ -127,7 +111,7 @@
   <object id="44" name="FireTrap" type="FireTrap" x="112" y="304" width="16" height="32"/>
   <object id="45" name="Apple" type="Fruit" x="576" y="112" width="32" height="32"/>
   <object id="46" name="Melon" type="Fruit" x="576" y="176" width="32" height="32"/>
-  <object id="61" name="Snail" type="Snail" x="304" y="256" width="48" height="32">
+  <object id="61" name="Snail" type="Snail" x="245.581" y="185.063" width="48" height="32">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
     <property name="offsetNeg" type="float" value="2"/>
@@ -135,8 +119,31 @@
    </properties>
   </object>
   <object id="62" name="Checkpoint" type="Checkpoint" x="560" y="16" width="64" height="64"/>
+  <object id="72" name="SawCircle" type="SawCircle" x="336" y="128" width="16" height="16">
+   <properties>
+    <property name="circleHeight" type="int" value="2"/>
+    <property name="circleWidth" type="int" value="6"/>
+    <property name="clockwise" type="bool" value="false"/>
+    <property name="doubleSaw" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="73" name="SawCircle" type="SawCircle" x="464" y="128" width="16" height="16">
+   <properties>
+    <property name="circleHeight" type="int" value="2"/>
+    <property name="circleWidth" type="int" value="6"/>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="75" name="Chicken" type="Chicken" x="320" y="240" width="32" height="48">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="3"/>
+    <property name="offsetPos" type="float" value="4"/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup id="3" name="Collisions">
+ <objectgroup id="3" name="Collisions" visible="0">
   <object id="5" x="272" y="288" width="352" height="64"/>
   <object id="6" x="0" y="0" width="16" height="368"/>
   <object id="7" x="624" y="0" width="16" height="368"/>

@@ -2,32 +2,11 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game_components/enemies/blue_bird.dart';
-import 'package:pixel_adventure/game_components/enemies/ghost.dart';
-import 'package:pixel_adventure/game_components/enemies/mushroom.dart';
-import 'package:pixel_adventure/game_components/enemies/slime.dart';
-import 'package:pixel_adventure/game_components/enemies/slime_particle.dart';
-import 'package:pixel_adventure/game_components/enemies/snail.dart';
-import 'package:pixel_adventure/game_components/enemies/trunk.dart';
-import 'package:pixel_adventure/game_components/enemies/trunk_bullet.dart';
-import 'package:pixel_adventure/game_components/enemies/turtle.dart';
-import 'package:pixel_adventure/game_components/traps/checkpoint.dart';
-import 'package:pixel_adventure/game_components/enemies/chicken.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
 import 'package:pixel_adventure/game_components/custom_hitbox.dart';
-import 'package:pixel_adventure/game_components/enemies/plant.dart';
-import 'package:pixel_adventure/game_components/enemies/plant_bullet.dart';
-import 'package:pixel_adventure/game_components/traps/fan_air_stream.dart';
-import 'package:pixel_adventure/game_components/traps/fire.dart';
-import 'package:pixel_adventure/game_components/traps/fire_trap.dart';
-import 'package:pixel_adventure/game_components/traps/fruit.dart';
-import 'package:pixel_adventure/game_components/traps/moving_platform.dart';
-import 'package:pixel_adventure/game_components/traps/saw.dart';
-import 'package:pixel_adventure/game_components/traps/saw_circle_single_saw.dart';
-import 'package:pixel_adventure/game_components/traps/spikes.dart';
-import 'package:pixel_adventure/game_components/traps/trampoline.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -123,6 +102,9 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   // count fruits
   int _fruitCounter = 0;
 
+  // notifier
+  final PlayerRespawnNotifier respawnNotifier = PlayerRespawnNotifier();
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
@@ -152,109 +134,27 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (_hasReachedCheckpoint || _gotHit) return super.onCollisionStart(intersectionPoints, other);
-    final intersectionPoint = intersectionPoints.first;
-    switch (other) {
-      case Fruit():
-        other.collidedWithPlayer();
-        break;
-      case Saw():
-        other.collidedWithPlayer();
-        break;
-      case SawCircleSingleSaw():
-        other.collidedWithPlayer();
-        break;
-      case Spikes():
-        other.collidedWithPlayer();
-        break;
-      case Fire():
-        other.collidedWithPlayer();
-        break;
-      case Chicken():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case BlueBird():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Mushroom():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Slime():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case SlimeParticle():
-        _respawn();
-        break;
-      case Snail():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Turtle():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Trampoline():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Plant():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case PlantBullet():
-        other.collidedWithPlayer(intersectionPoint);
-        _respawn();
-        break;
-      case Trunk():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case TrunkBullet():
-        other.collidedWithPlayer(intersectionPoint);
-        _respawn();
-        break;
-      case Checkpoint():
-        other.collidedWithPlayer();
-        break;
-      case FanAirStream():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-    }
-
+    if (_checkIsCollisionInactive()) return super.onCollisionStart(intersectionPoints, other);
+    if (other is PlayerCollision) other.onPlayerCollisionStart(intersectionPoints.first);
     super.onCollisionStart(intersectionPoints, other);
   }
 
   @override
   void onCollisionEnd(PositionComponent other) {
-    if (_hasReachedCheckpoint || _gotHit) super.onCollisionEnd(other);
-    switch (other) {
-      case MovingPlatform():
-        other.collidedWithPlayerEnd();
-        break;
-      case FanAirStream():
-        other.collidedWithPlayerEnd();
-        break;
-    }
-
+    if (_checkIsCollisionInactive()) return super.onCollisionEnd(other);
+    if (other is PlayerCollision) other.onPlayerCollisionEnd();
     super.onCollisionEnd(other);
   }
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (_hasReachedCheckpoint || _gotHit) super.onCollision(intersectionPoints, other);
-    final intersectionPoint = intersectionPoints.first;
-    switch (other) {
-      // Fire uses onCollision because it only triggers when the player touches its bottom edge, check in Fire
-      case FireTrap():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case Ghost():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-      case MovingPlatform():
-        other.collidedWithPlayer(intersectionPoint);
-        break;
-    }
-
+    if (_checkIsCollisionInactive()) return super.onCollision(intersectionPoints, other);
+    if (other is PlayerCollision) other.onPlayerCollision(intersectionPoints.first);
     super.onCollision(intersectionPoints, other);
   }
 
-  // use keyboard for input
+  bool _checkIsCollisionInactive() => _hasReachedCheckpoint || _gotHit;
+
   @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     _horizontalMovement = 0;
@@ -313,11 +213,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<PlayerState>(game, '$_path${character.name}/', _pathEnd, _stepTime, _textureSize);
     final loadSpecialAnimation = spriteAnimationWrapper<PlayerState>(game, _path, _pathEndSpecial, _stepTime, _textureSizeSpecial);
-
-    // list of all animations
     animations = {for (var state in PlayerState.values) state: state.special ? loadSpecialAnimation(state) : loadAnimation(state)};
-
-    // set current animation state
     current = PlayerState.idle;
   }
 
@@ -426,26 +322,6 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     }
   }
 
-  void _respawn() {
-    velocity.y = 0;
-    _gotHit = true;
-    current = PlayerState.hit;
-    final hitAnimation = animationTickers![PlayerState.hit]!;
-    hitAnimation.completed.whenComplete(() {
-      current = PlayerState.appearing;
-      scale.x = 1;
-      position = _startPosition - Vector2.all(32);
-      hitAnimation.reset();
-      final appearingAnimation = animationTickers![PlayerState.appearing]!;
-      appearingAnimation.completed.whenComplete(() {
-        position = _startPosition;
-        current = PlayerState.idle;
-        _gotHit = false;
-        appearingAnimation.reset();
-      });
-    });
-  }
-
   void reachedCheckpoint() {
     _hasReachedCheckpoint = true;
     current = PlayerState.disappearing;
@@ -461,6 +337,27 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
         current = PlayerState.idle;
         _hasReachedCheckpoint = false;
         game.nextLevel();
+      });
+    });
+  }
+
+  void _respawn() {
+    velocity.y = 0;
+    _gotHit = true;
+    current = PlayerState.hit;
+    respawnNotifier.notifyRespawn();
+    final hitAnimation = animationTickers![PlayerState.hit]!;
+    hitAnimation.completed.whenComplete(() {
+      current = PlayerState.appearing;
+      scale.x = 1;
+      position = _startPosition - Vector2.all(32);
+      hitAnimation.reset();
+      final appearingAnimation = animationTickers![PlayerState.appearing]!;
+      appearingAnimation.completed.whenComplete(() {
+        position = _startPosition;
+        current = PlayerState.idle;
+        _gotHit = false;
+        appearingAnimation.reset();
       });
     });
   }
@@ -497,4 +394,8 @@ class PlayerHitboxPositionProvider extends PositionProvider {
 
   @override
   set position(Vector2 value) {}
+}
+
+class PlayerRespawnNotifier extends ChangeNotifier {
+  void notifyRespawn() => notifyListeners();
 }

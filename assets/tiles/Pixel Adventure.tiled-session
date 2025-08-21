@@ -16,8 +16,8 @@
             "scale": 1.2847,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 136.99696427181445,
-                "y": 190.7060014011053
+                "x": 234.29594457850084,
+                "y": 235.0743364209543
             }
         },
         "Level_02.tmx": {
@@ -28,8 +28,8 @@
             "scale": 1.4379,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 575.839766325892,
-                "y": 157.8691146811322
+                "x": 229.5013561443772,
+                "y": 162.04186661102995
             }
         },
         "Level_03.tmx": {
@@ -40,8 +40,8 @@
             "scale": 1.46,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 367.12328767123284,
-                "y": 176.02739726027391
+                "x": 241.78082191780817,
+                "y": 179.45205479452056
             }
         }
     },
@@ -54,8 +54,9 @@
     "openFiles": [
     ],
     "project": "Pixel Adventure.tiled-project",
-    "property.type": "float",
+    "property.type": "int",
     "recentFiles": [
+        "Level_02.tmx",
         "Level_01.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",

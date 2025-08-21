@@ -23,31 +23,32 @@ enum GhostState implements AnimationState {
   const GhostState(this.name, this.amount, {this.loop = true});
 }
 
-class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
-  final double offsetNeg;
-  final double offsetPos;
-  final bool isLeft;
-
-  Ghost({
-    required this.offsetNeg,
-    required this.offsetPos,
-    required this.isLeft,
-    required super.position,
-    required super.size,
-    required Player player,
-  }) : _player = player;
-
-  // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(12, 6), size: Vector2(25, 26));
-
-  // player ref
+class Ghost extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+  // constructor parameters
+  final double _offsetNeg;
+  final double _offsetPos;
+  final bool _isLeft;
   final Player _player;
 
+  Ghost({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
+    : _offsetNeg = offsetNeg,
+      _offsetPos = offsetPos,
+      _isLeft = isLeft,
+      _player = player,
+      super(size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2(48, 32);
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(13, 7), size: Vector2(21, 25));
+
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(44, 30);
-  final String _path = 'Enemies/Ghost/';
-  final String _pathEnd = ' (44x30).png';
+  static const double _stepTime = 0.05;
+  static final Vector2 _textureSize = Vector2(44, 30);
+  static const String _path = 'Enemies/Ghost/';
+  static const String _pathEnd = ' (44x30).png';
 
   // range
   late final double _rangeNeg;
@@ -105,39 +106,35 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
-      hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
     priority = PixelAdventure.enemieLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, _stepTime, _textureSize);
-
-    // list of all animations
-    animations = {for (var state in GhostState.values) state: loadAnimation(state)};
-
-    // set current animation state
-    current = GhostState.idle;
+    final animations = {for (var state in GhostState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: GhostState.idle);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
   }
 
   void _setUpMoveDirection() {
-    _moveDirection = isLeft ? -1 : 1;
+    _moveDirection = _isLeft ? -1 : 1;
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }
 
   void _updateActualBorders() {
-    _leftBorder = (_moveDirection == -1) ? _rangeNeg - hitbox.position.x : _rangeNeg + hitbox.position.x + hitbox.width;
-    _rightBorder = (_moveDirection == 1) ? _rangePos + hitbox.position.x : _rangePos - hitbox.position.x - hitbox.width;
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg - _hitbox.position.x : _rangeNeg + _hitbox.position.x + _hitbox.width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
   void _startParticleTimer() => _particleTimer = Timer(_particleDelayBetweenBurst, repeat: true, onTick: _spawnGhostParticles);
@@ -145,11 +142,11 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   void _startGhostTimer() => _ghostTimer = Timer(_durationVisible, onTick: _triggerDisappear);
 
   Future<void> _triggerDisappear() async {
-    current = GhostState.disappear;
+    animationGroupComponent.current = GhostState.disappear;
     _particleTimer.stop();
     _ghostTimer.stop();
-    await animationTickers![GhostState.disappear]!.completed;
-    opacity = 0;
+    await animationGroupComponent.animationTickers![GhostState.disappear]!.completed;
+    animationGroupComponent.opacity = 0;
     _isVisible = false;
     _ghostTimer
       ..limit = _durationInVisible
@@ -158,11 +155,11 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   Future<void> _triggerAppear() async {
-    current = GhostState.appear;
+    animationGroupComponent.current = GhostState.appear;
     _ghostTimer.stop();
-    opacity = 1;
-    await animationTickers![GhostState.appear]!.completed;
-    current = GhostState.idle;
+    animationGroupComponent.opacity = 1;
+    await animationGroupComponent.animationTickers![GhostState.appear]!.completed;
+    animationGroupComponent.current = GhostState.idle;
     _isVisible = true;
     _spawnGhostParticles();
     _ghostTimer
@@ -204,9 +201,9 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     final spawnOnLeftSide = _moveDirection == 1;
     final particleBaseOffset = Vector2(
       spawnOnLeftSide
-          ? -hitbox.position.x - hitbox.width - 16 + _offsetCloserToGhost
-          : hitbox.position.x + hitbox.width - _offsetCloserToGhost,
-      hitbox.position.y,
+          ? -_hitbox.position.x - _hitbox.width - 16 + _offsetCloserToGhost
+          : _hitbox.position.x + _hitbox.width - _offsetCloserToGhost,
+      _hitbox.position.y,
     );
     final particleBasePosition = position + particleBaseOffset;
 
@@ -221,13 +218,14 @@ class Ghost extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     }
   }
 
-  void collidedWithPlayer(Vector2 collisionPoint) {
+  @override
+  void onPlayerCollision(Vector2 intersectionPoint) {
     if (_gotStomped || !_isVisible) return;
-    if (_player.velocity.y > 0 && collisionPoint.y < position.y + hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
-      current = GhostState.hit;
-      animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.current = GhostState.hit;
+      animationGroupComponent.animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }

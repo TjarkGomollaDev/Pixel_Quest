@@ -31,14 +31,14 @@ enum FireTrapState implements AnimationState {
 /// Damage is only applied while the fire is burning. Triggering and timing
 /// are fully animation-driven, allowing the trap to synchronize visuals with
 /// its collision behavior for fair player feedback.
-class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
-  FireTrap({required Player player, required super.position}) : _player = player, super(size: _fixedSize);
+  FireTrap({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 _fixedSize = Vector2(16, 32);
+  static final Vector2 gridSize = Vector2(16, 32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
@@ -81,13 +81,12 @@ class FireTrap extends SpriteAnimationGroupComponent with HasGameReference<Pixel
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, _stepTime, _textureSize);
     animations = {for (var state in FireTrapState.values) state: loadAnimation(state)};
-
-    // set current animation state
     current = FireTrapState.off;
   }
 
-  Future<void> collidedWithPlayer(Vector2 collisionPoint) async {
-    if (!_isFireActivated && collisionPoint.y == position.y + _hitbox.height) {
+  @override
+  Future<void> onPlayerCollision(Vector2 intersectionPoint) async {
+    if (!_isFireActivated && intersectionPoint.y == position.y + _hitbox.height) {
       current = FireTrapState.hit;
       _isFireActivated = true;
       await animationTickers![FireTrapState.hit]!.completed;
