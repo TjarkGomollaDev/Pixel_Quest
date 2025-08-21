@@ -60,7 +60,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   late final double _bottomtBorder;
 
   // movement
-  double _moveDirection = 1;
+  double _moveDirection = -1;
   late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]

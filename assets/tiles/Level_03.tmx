@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="86">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="90">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="54" height="23">
   <properties>
@@ -32,7 +32,6 @@
 </data>
  </layer>
  <objectgroup id="2" name="Spawnpoints">
-  <object id="1" name="Player" type="Player" x="144" y="288" width="32" height="32"/>
   <object id="68" name="Fan" type="Fan" x="496" y="304" width="32" height="16"/>
   <object id="70" name="Trampoline" type="Trampoline" x="0" y="288" width="32" height="32"/>
   <object id="71" name="Rock Head" type="Rock Head" x="352" y="0" width="48" height="48">
@@ -85,14 +84,18 @@
     <property name="side" type="int" value="3"/>
    </properties>
   </object>
-  <object id="84" name="ArrowUp" type="ArrowUp" x="240" y="288" width="32" height="32"/>
+  <object id="84" name="ArrowUp" type="ArrowUp" x="256" y="128" width="32" height="32"/>
   <object id="85" name="Spike Head" type="Spike Head" x="416" y="0" width="64" height="64">
    <properties>
     <property name="offsetPos" type="float" value="16"/>
    </properties>
   </object>
+  <object id="86" name="Finish" type="Finish" x="192" y="256" width="64" height="64"/>
+  <object id="88" name="ArrowUp" type="ArrowUp" x="256" y="224" width="32" height="32"/>
+  <object id="89" name="Start" type="Start" x="48" y="256" width="64" height="64"/>
  </objectgroup>
  <objectgroup id="3" name="Collisions">
   <object id="5" x="0" y="320" width="864" height="48"/>
+  <object id="87" x="207.723" y="281.257" width="31.7551" height="38.2622"/>
  </objectgroup>
 </map>

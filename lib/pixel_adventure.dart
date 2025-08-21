@@ -38,6 +38,7 @@ class PixelAdventure extends FlameGame
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
   static const int playerLayerLevel = 20;
+  static const int spotlightAnimationLayer = 19;
 
   // default spawn values
   static const bool isLeftDefault = true;
@@ -82,7 +83,7 @@ class PixelAdventure extends FlameGame
     final aspectRatio = size.x / size.y;
     final dynamicWidth = fixedHeight * aspectRatio;
 
-    camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight, world: world);
+    camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight);
     camera.viewfinder.anchor = Anchor(0.25, 0);
     add(camera);
   }
@@ -107,7 +108,9 @@ class PixelAdventure extends FlameGame
     if (index < MyLevels.values.length) {
       router.pushReplacementNamed((index + 1).toString());
     } else {
-      debugPrint('no more level');
+      debugPrint('end');
+      router.pushReplacementNamed('2');
+      router.pushReplacementNamed('3');
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/game_components/checkpoints/start.dart';
 import 'package:pixel_adventure/game_components/enemies/blue_bird.dart';
 import 'package:pixel_adventure/game_components/enemies/chicken.dart';
 import 'package:pixel_adventure/game_components/enemies/ghost.dart';
@@ -15,8 +16,9 @@ import 'package:pixel_adventure/game_components/enemies/turtle.dart';
 import 'package:pixel_adventure/game_components/jump_btn.dart';
 import 'package:pixel_adventure/game_components/level/level_background.dart';
 import 'package:pixel_adventure/game_components/traps/arrow_up.dart';
+import 'package:pixel_adventure/game_components/checkpoints/finish.dart';
 import 'package:pixel_adventure/game_components/traps/rock_head.dart';
-import 'package:pixel_adventure/game_components/traps/checkpoint.dart';
+import 'package:pixel_adventure/game_components/checkpoints/checkpoint.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
 import 'package:pixel_adventure/game_components/traps/fan.dart';
 import 'package:pixel_adventure/game_components/traps/fire.dart';
@@ -119,15 +121,16 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
     }
   }
 
-  void _addSpawningObjects() {
+  Future<void> _addSpawningObjects() async {
     final spawnPointsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Spawnpoints');
     if (spawnPointsLayer != null) {
-      // the player is always created first in the level, as many other objects require a reference to the player
+      // the start with player is always created first in the level, as many other objects require a reference to the player
       for (var spawnPoint in spawnPointsLayer.objects) {
-        if (spawnPoint.class_ == 'Player') {
-          _player = Player(character: game.characters[game.yourCharacterIndex]);
-          _player.position = Vector2(spawnPoint.x, spawnPoint.y);
-          _player.scale.x = 1;
+        if (spawnPoint.class_ == 'Start') {
+          final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
+          final start = Start(position: gridPosition);
+          add(start);
+          _player = Player(character: game.characters[game.yourCharacterIndex], startPosition: start.playerPosition);
           add(_player);
           break;
         }
@@ -309,6 +312,10 @@ class Level extends World with HasGameReference<PixelAdventure>, TapCallbacks {
             case 'Checkpoint':
               final checkpoint = Checkpoint(player: _player, position: gridPosition);
               add(checkpoint);
+              break;
+            case 'Finish':
+              final finish = Finish(player: _player, position: gridPosition);
+              add(finish);
               break;
           }
         } catch (e, stack) {

@@ -5,6 +5,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game_components/animations/spotlight.dart';
 import 'package:pixel_adventure/game_components/collision_block.dart';
 import 'package:pixel_adventure/game_components/custom_hitbox.dart';
 import 'package:pixel_adventure/game_components/utils.dart';
@@ -42,8 +43,17 @@ enum PlayerCharacter {
 }
 
 class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, KeyboardHandler, CollisionCallbacks {
-  final PlayerCharacter character;
-  Player({this.character = PlayerCharacter.maskDude, super.position});
+  // constructor parameters
+  final PlayerCharacter _character;
+  final Vector2 _startPosition;
+
+  Player({PlayerCharacter character = PlayerCharacter.maskDude, required Vector2 startPosition})
+    : _character = character,
+      _startPosition = startPosition,
+      super(position: startPosition, size: gridSize);
+
+  // size
+  static final Vector2 gridSize = Vector2.all(32);
 
   // these are the correct x values for the player, one for the left side of the hitbox and one for the right side of the hitbox
   late double hitboxPositionLeftX;
@@ -83,11 +93,9 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   // hit by trap
   bool _gotHit = false;
 
-  // finish checkpoint
-  bool _hasReachedCheckpoint = false;
-
-  // startposition in a level
-  Vector2 _startPosition = Vector2.zero();
+  // finish level
+  bool _hasReachedFinish = false;
+  bool _finishAnimation = false;
 
   // actual hitbox
   CustomHitbox hitbox = CustomHitbox(offsetX: 10, offsetY: 4, width: 14, height: 28);
@@ -118,12 +126,16 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   void update(double dt) {
     accumulatedTime += dt;
     while (accumulatedTime >= fixedDT) {
-      _updateHitboxEdges();
-      if (!_gotHit && !_hasReachedCheckpoint) {
+      if (!_gotHit && !_hasReachedFinish) {
+        _updateHitboxEdges();
         _updatePlayerState();
         _updatePlayerMovement(fixedDT);
         if (_joystick != null) updateJoystick();
         _checkHorizontalCollisions();
+        _applyGravity(fixedDT);
+        _checkVerticalCollisions();
+      } else if (_finishAnimation) {
+        _updatePlayerState();
         _applyGravity(fixedDT);
         _checkVerticalCollisions();
       }
@@ -153,7 +165,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     super.onCollision(intersectionPoints, other);
   }
 
-  bool _checkIsCollisionInactive() => _hasReachedCheckpoint || _gotHit;
+  bool _checkIsCollisionInactive() => _hasReachedFinish || _gotHit;
 
   @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
@@ -183,7 +195,6 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     }
 
     // general
-    _startPosition = Vector2(position.x, position.y);
     priority = PixelAdventure.playerLayerLevel;
     add(hitbox2);
   }
@@ -211,7 +222,7 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlayerState>(game, '$_path${character.name}/', _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<PlayerState>(game, '$_path${_character.name}/', _pathEnd, _stepTime, _textureSize);
     final loadSpecialAnimation = spriteAnimationWrapper<PlayerState>(game, _path, _pathEndSpecial, _stepTime, _textureSizeSpecial);
     animations = {for (var state in PlayerState.values) state: state.special ? loadSpecialAnimation(state) : loadAnimation(state)};
     current = PlayerState.idle;
@@ -322,27 +333,55 @@ class Player extends SpriteAnimationGroupComponent with HasGameReference<PixelAd
     }
   }
 
-  void reachedCheckpoint() {
-    _hasReachedCheckpoint = true;
+  void reachedCheckpoint() {}
+
+  Future<void> whileNotOnGround() async {
+    while (!isOnGround) {
+      await Future.delayed(const Duration(milliseconds: 16));
+    }
+  }
+
+  Future<void> reachedFinish() async {
+    velocity = Vector2.zero();
+    _hasReachedFinish = true;
+    _finishAnimation = true;
+
+    // spotlight animation
+    final playerCenter = Vector2((hitboxPositionLeftX + hitboxPositionRightX) / 2, position.y + height / 2);
+    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: 60)..priority = PixelAdventure.spotlightAnimationLayer;
+    game.world.add(spotlight);
+    await spotlight.startAnimation(2.0);
+    await Future.delayed(Duration(milliseconds: 200));
+
+    // jump animation
+    bounceUp(jumpForce: 320);
+    await Future.delayed(Duration(milliseconds: 120));
+    current = PlayerState.doubleJump;
+    await animationTickers![PlayerState.doubleJump]!.completed;
+    await whileNotOnGround();
+    await Future.delayed(Duration(milliseconds: 600));
+    _finishAnimation = false;
+
+    // player disapperaing animation
     current = PlayerState.disappearing;
     if (scale.x > 0) {
       position = position - Vector2.all(32);
     } else if (scale.x < 0) {
       position = position + Vector2(32, -32);
     }
-    final disappearingAnimation = animationTickers![PlayerState.disappearing]!;
-    disappearingAnimation.completed.whenComplete(() {
-      position = Vector2(position.x, -200);
-      Future.delayed(Duration(seconds: 3), () async {
-        current = PlayerState.idle;
-        _hasReachedCheckpoint = false;
-        game.nextLevel();
-      });
-    });
+    await animationTickers![PlayerState.disappearing]!.completed;
+    position = Vector2(position.x, -200);
+    await Future.delayed(Duration(milliseconds: 200));
+
+    // shrink light circle to zero
+    await spotlight.shrinkToBlack(0.4);
+
+    // level official finished
+    game.nextLevel();
   }
 
   void _respawn() {
-    velocity.y = 0;
+    velocity = Vector2.zero();
     _gotHit = true;
     current = PlayerState.hit;
     respawnNotifier.notifyRespawn();
