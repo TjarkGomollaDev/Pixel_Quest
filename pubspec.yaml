@@ -65,6 +65,8 @@ flutter:
     - assets/images/Terrain/
     - assets/images/Background/
     - assets/images/HUD/
+    - assets/images/Menu/Buttons/
+    - assets/images/Menu/Levels/
     - assets/images/Traps/Saw/
     - assets/images/Traps/Trampoline/
     - assets/images/Traps/Fan/

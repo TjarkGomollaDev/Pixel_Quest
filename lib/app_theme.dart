@@ -59,6 +59,7 @@ abstract class AppTheme {
   static const debugColorCollectibles = brownLight;
   static const debugColorcollectiblesHitbox = redLight;
   static const debugColorPlayerHitbox = orangeDark;
+  static const debugMenu = purpleDark;
 
   // background color
   static const backgroundColor = Color(0xFF211F30);

@@ -5,9 +5,10 @@ import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game_components/level/level.dart';
-import 'package:pixel_adventure/game_components/level/player.dart';
-import 'package:pixel_adventure/menu/menu_screen.dart';
+import 'package:pixel_adventure/game/hud/pause_route.dart';
+import 'package:pixel_adventure/game/level/level.dart';
+import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/menu/menu_page.dart';
 
 class PixelAdventure extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
@@ -37,8 +38,9 @@ class PixelAdventure extends FlameGame
   static const int trapHintsLayerLevel = 1;
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
-  static const int playerLayerLevel = 20;
   static const int spotlightAnimationLayer = 19;
+  static const int playerLayerLevel = 20;
+  static const int hudElementsLayer = 30;
 
   // default spawn values
   static const bool isLeftDefault = true;
@@ -54,8 +56,13 @@ class PixelAdventure extends FlameGame
   static const int circleWidthDefault = 6;
   static const int circleHeightDefault = 4;
 
-  // tile size
+  // tiled map dimensions
   static const double tileSize = 16;
+  static const double mapHeight = 368;
+  static const double mapBorder = tileSize / 2;
+
+  // the next checkpoint is only activated if it is further to the right in the level than the current one plus a buffer
+  static const double checkpointBufferZone = 40;
 
   // margin HUD elements
   final double hudMargin = 32;
@@ -79,7 +86,7 @@ class PixelAdventure extends FlameGame
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
 
   void _setUpCam() {
-    final fixedHeight = 368.0;
+    final fixedHeight = mapHeight - mapBorder * 2;
     final aspectRatio = size.x / size.y;
     final dynamicWidth = fixedHeight * aspectRatio;
 
@@ -88,29 +95,28 @@ class PixelAdventure extends FlameGame
     add(camera);
   }
 
-  void setCameraBounds(double mapWidth) {
-    final leftBound = size.x * camera.viewfinder.anchor.x;
-    final rightBound = size.x * (1 - camera.viewfinder.anchor.x);
-    camera.setBounds(Rectangle.fromLTRB(leftBound, 0, mapWidth - rightBound, 0));
+  void setUpCameraForLevel(double mapWidth, Player player) {
+    // camera bounds
+    final leftBound = size.x * camera.viewfinder.anchor.x + mapBorder;
+    final rightBound = size.x * (1 - camera.viewfinder.anchor.x) + mapBorder;
+    camera.setBounds(Rectangle.fromLTRB(leftBound, mapBorder, mapWidth - rightBound, mapBorder));
+
+    // viewfinder follows player
+    camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
 
   void _setUpRouter() {
     final levelRoutes = {
-      'menu': Route(MenuScreen.new),
-      for (final level in MyLevels.values) level.levelIndex.toString(): WorldRoute(() => Level(name: level), maintainState: false),
+      RouteNames.menu: Route(MenuPage.new),
+      RouteNames.pause: PauseRoute(),
+      for (final level in MyLevel.values) level.name: WorldRoute(() => Level(myLvel: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: '3'));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_3.name));
   }
+}
 
-  void nextLevel() {
-    final index = int.parse(router.currentRoute.name!);
-    if (index < MyLevels.values.length) {
-      router.pushReplacementNamed((index + 1).toString());
-    } else {
-      debugPrint('end');
-      router.pushReplacementNamed('2');
-      router.pushReplacementNamed('3');
-    }
-  }
+abstract class RouteNames {
+  static const String menu = 'menu';
+  static const String pause = 'pause';
 }
