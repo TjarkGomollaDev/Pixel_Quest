@@ -31,6 +31,8 @@ import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/saw_circle.dart';
 import 'package:pixel_adventure/game/traps/spike_head.dart';
+import 'package:pixel_adventure/game/traps/spiked_ball.dart';
+import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils.dart';
@@ -82,7 +84,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   late final GameHud _gameHud;
   late final JoystickComponent? _joystick;
   late final JumpBtn? _jumpBtn;
-  late final FpsTextComponent _fpsText;
+  late final FpsTextComponent? _fpsText;
 
   @override
   Future<void> onLoad() async {
@@ -98,7 +100,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void onMount() {
     _setUpCamera();
     _addGameHud();
-    if (game.showMobileControls) _addMobileControls();
+    _addMobileControls();
     _player.spawnInLevel();
     super.onMount();
   }
@@ -117,7 +119,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
         position: Vector2(game.size.x, 0) + Vector2(-game.hudMargin, game.hudMargin / 2),
         anchor: Anchor.topRight,
       );
-      game.camera.viewport.add(_fpsText);
+      game.camera.viewport.add(_fpsText!);
+    } else {
+      _fpsText = null;
     }
 
     // general
@@ -193,6 +197,26 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
               );
               add(sawCircle);
               break;
+            case 'Spiked Ball':
+              final radius =
+                  (spawnPoint.properties.getValue<int?>('radius') ?? PixelAdventure.spikedBallRadiusDefault) * PixelAdventure.tileSize +
+                  PixelAdventure.tileSize / 2;
+              final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? PixelAdventure.clockwiseDefault;
+              final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? PixelAdventure.spikedBallSwingArcDec;
+              final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? PixelAdventure.spikedBallSwingSpeed;
+              final spikedBall = SpikedBall(
+                radius: radius,
+                player: _player,
+                swingArcDeg: swingArcDec,
+                swingSpeed: swingSpeed,
+                startLeft: startLeft,
+                position:
+                    gridPosition -
+                    Vector2(radius - PixelAdventure.tileSize / 2, SpikedBallBall.gridSize.x / 2 - PixelAdventure.tileSize / 2),
+                size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
+              );
+              add(spikedBall);
+              break;
             case 'Chicken':
               final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
               final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
@@ -205,7 +229,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
               add(trampoline);
               break;
             case 'Fan':
-              final fan = Fan(player: _player, position: gridPosition);
+              final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? PixelAdventure.fanAlwaysOnDefault;
+              final fan = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
               add(fan);
               break;
             case 'FireTrap':
@@ -387,6 +412,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
 
   void _addMobileControls() {
+    if (!game.showMobileControls) {
+      _joystick = null;
+      _jumpBtn = null;
+      return;
+    }
     _joystick = JoystickComponent(
       knob: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Knob.png'))),
       background: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Joystick.png'))),
@@ -397,7 +427,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     game.camera.viewport.addAll([_joystick, _jumpBtn!]);
   }
 
-  void _removeMobileControls() => game.camera.viewport.removeAll([_joystick!, _jumpBtn!]);
+  void _removeMobileControls() {
+    if (_joystick != null) game.camera.viewport.remove(_joystick);
+    if (_jumpBtn != null) game.camera.viewport.remove(_jumpBtn);
+  }
 
   void _addGameHud() {
     _gameHud = GameHud(position: Vector2(PixelAdventure.tileSize * 3, PixelAdventure.tileSize));
@@ -406,7 +439,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
   void _removeGameHud() {
     if (_gameHud.isMounted) game.camera.viewport.remove(_gameHud);
-    if (_fpsText.isMounted) game.camera.viewport.remove(_fpsText);
+    if (_fpsText != null && _fpsText.isMounted) game.camera.viewport.remove(_fpsText);
   }
 
   void removeGameHudOnFinish() => _removeGameHud();

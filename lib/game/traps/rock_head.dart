@@ -159,6 +159,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     await Future.delayed((newDirection == 1 ? _delayAtTop : _delayAtBottom) - _delayBlinkBeforeMove);
     animationGroupComponent.current = RockHeadState.blink;
     await animationGroupComponent.animationTickers![RockHeadState.blink]!.completed;
+    animationGroupComponent.current = RockHeadState.idle;
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }

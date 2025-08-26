@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -15,7 +14,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// A single saw moves around the full loop, while a double-saw configuration
 /// places a second saw on the opposite side of the path, keeping both in sync.
 /// The saws act as passive collision areas that can interact with the [Player].
-class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
+class SawCircle extends PositionComponent with HasGameReference<PixelAdventure> {
   // constructor parameters
   final bool _doubleSaw;
   final bool _clockwise;
@@ -25,9 +24,6 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
     : _clockwise = clockwise,
       _doubleSaw = doubleSaw,
       _player = player;
-
-  // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox();
 
   // single saws
   late final SawCircleSingleSaw _saw1;
@@ -73,13 +69,10 @@ class SawCircle extends SpriteAnimationComponent with HasGameReference<PixelAdve
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapBehindLayerLevel;
-    _hitbox.collisionType = CollisionType.inactive;
-    add(_hitbox);
   }
 
   void _setUpPath() {

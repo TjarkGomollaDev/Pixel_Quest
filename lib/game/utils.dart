@@ -148,6 +148,67 @@ void addSpriteRow({
   }
 }
 
+/// Mixin to add a `SpriteComponent` in its original size
+/// while keeping the parent `PositionComponent` aligned to a fixed grid size
+/// (e.g. 16x16 for Tiled maps).
+///
+/// This prevents sprites (e.g. 28x28 sprites) from being stretched
+/// to the parent's size. The animation is positioned relative to the
+/// parent (default: bottom center).
+mixin FixedGridOriginalSizeSprite on PositionComponent {
+  /// Holds the reference to the added sprite component.
+  late final SpriteComponent spriteComponent;
+
+  /// Adds a `SpriteComponent` in its original [textureSize]
+  /// without scaling it to the parent's grid size.
+  ///
+  /// The sprite is positioned either at the bottom center (default)
+  /// or at the center of the parent, and starts with the given [current] state.
+  void addSpriteComponent({required Vector2 textureSize, required Sprite sprite, bool isBottomCenter = true}) {
+    spriteComponent =
+        SpriteComponent(
+            size: textureSize,
+            position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
+            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
+            sprite: sprite,
+          )
+          ..debugColor = Colors.transparent
+          ..priority = -1;
+    add(spriteComponent);
+  }
+}
+
+/// Mixin to add a `SpriteAnimationComponent` in its original size
+/// while keeping the parent `PositionComponent` aligned to a fixed grid size
+/// (e.g. 16x16 for Tiled maps).
+///
+/// This prevents animations (e.g. 28x28 sprites) from being stretched
+/// to the parent's size. The animation is positioned relative to the
+/// parent (default: bottom center) and plays with the given [animation].
+mixin FixedGridOriginalSizeAnimation on PositionComponent {
+  /// Holds the reference to the added single animation component.
+  late final SpriteAnimationComponent animationComponent;
+
+  /// Adds a `SpriteAnimationComponent` in its original [textureSize]
+  /// without scaling it to the parent's grid size.
+  ///
+  /// The animation is positioned either at the bottom center (default)
+  /// or at the center of the parent.
+  void addAnimationComponent({required Vector2 textureSize, required SpriteAnimation animation, bool isBottomCenter = true}) {
+    animationComponent =
+        SpriteAnimationComponent(
+            size: textureSize,
+            position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
+            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
+            animation: animation,
+          )
+          ..debugColor = Colors.transparent
+          ..priority = -1;
+
+    add(animationComponent);
+  }
+}
+
 /// Mixin to add a `SpriteAnimationGroupComponent` in its original size
 /// while keeping the parent `PositionComponent` aligned to a fixed grid size
 /// (e.g. 16x16 for Tiled maps).
@@ -181,37 +242,6 @@ mixin FixedGridOriginalSizeGroupAnimation on PositionComponent {
           ..debugColor = Colors.transparent
           ..priority = -1;
     add(animationGroupComponent);
-  }
-}
-
-/// Mixin to add a `SpriteAnimationComponent` in its original size
-/// while keeping the parent `PositionComponent` aligned to a fixed grid size
-/// (e.g. 16x16 for Tiled maps).
-///
-/// This prevents animations (e.g. 28x28 sprites) from being stretched
-/// to the parent's size. The animation is positioned relative to the
-/// parent (default: bottom center) and plays with the given [animation].
-mixin FixedGridOriginalSizeAnimation on PositionComponent {
-  /// Holds the reference to the added single animation component.
-  late final SpriteAnimationComponent animationComponent;
-
-  /// Adds a `SpriteAnimationComponent` in its original [textureSize]
-  /// without scaling it to the parent's grid size.
-  ///
-  /// The animation is positioned either at the bottom center (default)
-  /// or at the center of the parent.
-  void addAnimationComponent({required Vector2 textureSize, required SpriteAnimation animation, bool isBottomCenter = true}) {
-    animationComponent =
-        SpriteAnimationComponent(
-            size: textureSize,
-            position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
-            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
-            animation: animation,
-          )
-          ..debugColor = Colors.transparent
-          ..priority = -1;
-
-    add(animationComponent);
   }
 }
 

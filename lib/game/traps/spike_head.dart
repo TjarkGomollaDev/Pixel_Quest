@@ -162,6 +162,7 @@ class SpikeHead extends PositionComponent
     await Future.delayed((newDirection == 1 ? _delayAtTop : _delayAtBottom) - _delayBlinkBeforeMove);
     animationGroupComponent.current = SpikeHeadState.blink;
     await animationGroupComponent.animationTickers![SpikeHeadState.blink]!.completed;
+    animationGroupComponent.current = SpikeHeadState.idle;
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }

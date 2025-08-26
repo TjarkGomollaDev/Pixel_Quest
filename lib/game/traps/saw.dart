@@ -49,7 +49,7 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
 
   // movement
   double _moveDirection = -1;
-  final double _moveSpeed = 50;
+  final double _moveSpeed = 50; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -76,8 +76,8 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.topCenter;
+    _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
@@ -115,7 +115,7 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
               sprite: chainSprite,
               size: Vector2.all(chainSize),
               position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
-              priority: PixelAdventure.trapHintsLayerLevel,
+              priority: PixelAdventure.trapParticlesLayerLevel,
             )
             ..debugMode = game.customDebug
             ..debugColor = AppTheme.debugColorTrapHitbox;

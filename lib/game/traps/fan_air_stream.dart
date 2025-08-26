@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -19,12 +21,22 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
   // constructor parameters
   final double _baseWidth;
   final double _airStreamHeight;
+  final bool _alwaysOn;
+  final Fan _fan;
   final Player _player;
 
-  FanAirStream({required double baseWidth, required double airStreamHeight, required Player player, required super.position})
-    : _baseWidth = baseWidth,
-      _airStreamHeight = airStreamHeight,
-      _player = player {
+  FanAirStream({
+    required double baseWidth,
+    required double airStreamHeight,
+    required bool alwaysOn,
+    required Fan fan,
+    required Player player,
+    required super.position,
+  }) : _baseWidth = baseWidth,
+       _airStreamHeight = airStreamHeight,
+       _alwaysOn = alwaysOn,
+       _fan = fan,
+       _player = player {
     final airStreamWidth = _baseWidth * _widenFactor;
     final airStreamOffset = Vector2(-(airStreamWidth - _baseWidth) / 2, -_airStreamHeight);
     size = Vector2(airStreamWidth, _airStreamHeight);
@@ -35,21 +47,37 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
   final RectangleHitbox _hitbox = RectangleHitbox(isSolid: true); // important to set the isSolid parameter
 
   // widen factor that multiplies the width of the fan
-  final double _widenFactor = 2.7; // [Adjustable]
+  final double _widenFactor = 2.2; // [Adjustable]
 
   // push player when in stream
   bool _playerInStream = false;
   final _pushStrength = 150.0; // [Adjustable]
 
+  // particle
+  late Timer _particleTimer;
+  final double _delayParticleSpawn = 0.04;
+  late final Vector2 _particleBasePosition;
+
+  // fan state
+  late Timer? _fanTimer;
+  final double _durationFanOff = 4; // [Adjustable]
+  final double _durationFanOn = 5; // [Adjustable]
+  bool _isFanOn = true;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
+    _setUpParticle();
+    _startParticleTimer();
+    if (!_alwaysOn) _startSwitchMode();
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
-    if (_playerInStream) _player.bounceUp(jumpForce: _pushStrength, resetDoubleJump: false);
+    if (_playerInStream && _isFanOn) _player.bounceUp(jumpForce: _pushStrength, resetDoubleJump: false);
+    _particleTimer.update(dt);
+    if (!_alwaysOn) _fanTimer!.update(dt);
     super.update(dt);
   }
 
@@ -58,6 +86,15 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
     _player.respawnNotifier.removeListener(onPlayerCollisionEnd);
     super.onRemove();
   }
+
+  @override
+  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+    _playerInStream = true;
+    _player.canDoubleJump = true;
+  }
+
+  @override
+  void onPlayerCollisionEnd() => _playerInStream = false;
 
   void _initialSetup() {
     // debug
@@ -74,12 +111,40 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
     add(_hitbox);
   }
 
-  @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
-    _playerInStream = true;
-    _player.canDoubleJump = true;
+  void _setUpParticle() => _particleBasePosition = Vector2((size.x - _baseWidth) / 2, size.y);
+
+  void _startParticleTimer() => _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true);
+
+  void _spawnParticle() {
+    final particle = FanAirParticle(
+      streamTop: 0,
+      streamLeft: 0,
+      streamRight: size.x,
+      basePosition: _particleBasePosition,
+      baseWidth: _baseWidth,
+    );
+    add(particle);
   }
 
-  @override
-  void onPlayerCollisionEnd() => _playerInStream = false;
+  void _startSwitchMode() => _fanTimer = Timer(_durationFanOff, onTick: _switchOff);
+
+  void _switchOn() {
+    _particleTimer.start();
+    _isFanOn = true;
+    _fan.activateFan();
+    _fanTimer!
+      ..limit = _durationFanOff
+      ..onTick = _switchOff
+      ..start();
+  }
+
+  void _switchOff() {
+    _particleTimer.pause();
+    _isFanOn = false;
+    _fan.deactivateFan();
+    _fanTimer!
+      ..limit = _durationFanOn
+      ..onTick = _switchOn
+      ..start();
+  }
 }

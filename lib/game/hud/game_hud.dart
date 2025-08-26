@@ -31,7 +31,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
     // debug
     if (game.customDebug) {
       debugMode = true;
-      debugColor = AppTheme.debugMenu;
+      debugColor = AppTheme.debugColorMenu;
     }
     // general
   }

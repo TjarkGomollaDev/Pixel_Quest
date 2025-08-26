@@ -26,7 +26,7 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  final bool customDebug = true;
+  final bool customDebug = false;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -35,7 +35,7 @@ class PixelAdventure extends FlameGame
   static const int enemieBulletLayerLevel = 9;
   static const int enemieParticleLayerLevel = 8;
   static const int trapLayerLevel = 2;
-  static const int trapHintsLayerLevel = 1;
+  static const int trapParticlesLayerLevel = 1;
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
   static const int spotlightAnimationLayer = 19;
@@ -48,6 +48,7 @@ class PixelAdventure extends FlameGame
   static const bool doubleShotDefault = false;
   static const bool doubleSawDefault = false;
   static const bool clockwiseDefault = false;
+  static const bool fanAlwaysOnDefault = true;
   static const int sideDefault = 1;
   static const double offsetNegDefault = 1.0;
   static const double offsetPosDefault = 1.0;
@@ -55,6 +56,11 @@ class PixelAdventure extends FlameGame
   static const double extandPosAttackDefault = 0.0;
   static const int circleWidthDefault = 6;
   static const int circleHeightDefault = 4;
+
+  static const int spikedBallRadiusDefault = 3;
+  static const bool spikedBallStartLeft = false;
+  static const int spikedBallSwingArcDec = 170;
+  static const int spikedBallSwingSpeed = 320;
 
   // tiled map dimensions
   static const double tileSize = 16;

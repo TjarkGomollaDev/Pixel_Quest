@@ -67,6 +67,7 @@ flutter:
     - assets/images/HUD/
     - assets/images/Menu/Buttons/
     - assets/images/Menu/Levels/
+    - assets/images/Other/
     - assets/images/Traps/Saw/
     - assets/images/Traps/Trampoline/
     - assets/images/Traps/Fan/
@@ -76,6 +77,7 @@ flutter:
     - assets/images/Traps/Rock Head/
     - assets/images/Traps/Spike Head/
     - assets/images/Traps/Arrow/
+    - assets/images/Traps/Spiked Ball/
     - assets/images/Main Characters/
     - assets/images/Main Characters/Mask Dude/
     - assets/images/Main Characters/Ninja Frog/

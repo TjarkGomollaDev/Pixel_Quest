@@ -62,8 +62,8 @@ class PlantBullet extends SpriteComponent with PlayerCollision, HasGameReference
     // debug
     if (game.customDebug) {
       debugMode = true;
-      debugColor = AppTheme.debugColorEnemie;
-      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      debugColor = AppTheme.debugColorParticle;
+      _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
     }
 
     // general

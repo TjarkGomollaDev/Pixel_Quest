@@ -33,9 +33,13 @@ enum FanState implements AnimationState {
 /// Damage is not applied; this trap only manipulates player movement.
 class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure> {
   // constructor parameters
+  final bool _alwaysOn;
   final Player _player;
 
-  Fan({required Player player, required super.position}) : _player = player, super(size: gridSize);
+  Fan({required bool alwaysOn, required Player player, required super.position})
+    : _alwaysOn = alwaysOn,
+      _player = player,
+      super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2(32, 16);
@@ -83,9 +87,15 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
     _airStream = FanAirStream(
       baseWidth: width,
       airStreamHeight: position.y + _hitbox.position.y - PixelAdventure.mapBorder * 2,
+      alwaysOn: _alwaysOn,
+      fan: this,
       player: _player,
       position: Vector2(0, _hitbox.position.y),
     );
     add(_airStream);
   }
+
+  void activateFan() => animationGroupComponent.current = FanState.on;
+
+  void deactivateFan() => animationGroupComponent.current = FanState.off;
 }
