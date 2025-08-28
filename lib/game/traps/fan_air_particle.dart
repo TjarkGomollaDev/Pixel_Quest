@@ -38,7 +38,7 @@ class FanAirParticle extends SpriteComponent with PlayerCollision, HasGameRefere
   late final Vector3 _borders;
 
   // movement
-  final double _moveSpeed = 280; // [Adjustable] //220
+  final double _moveSpeed = 280; // [Adjustable]
   late Vector2 _velocity;
 
   // random

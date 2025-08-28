@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="94">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="96">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="54" height="23">
   <properties>
-   <property name="BackgroundColor" value="Green"/>
+   <property name="BackgroundColor" value="Gray"/>
   </properties>
   <data encoding="csv">
 4,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,5,
@@ -11,15 +11,15 @@
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,212,213,0,0,0,106,108,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,212,213,0,0,0,106,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,234,235,0,0,0,150,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
@@ -32,7 +32,7 @@
 </data>
  </layer>
  <objectgroup id="2" name="Spawnpoints">
-  <object id="68" name="Fan" type="Fan" x="544" y="304" width="32" height="16">
+  <object id="68" name="Fan" type="Fan" x="288" y="304" width="32" height="16">
    <properties>
     <property name="alwaysOn" type="bool" value="false"/>
    </properties>
@@ -43,7 +43,7 @@
     <property name="offsetPos" type="float" value="16"/>
    </properties>
   </object>
-  <object id="73" name="Rock Head" type="Rock Head" x="432" y="16" width="48" height="48">
+  <object id="73" name="Rock Head" type="Rock Head" x="560" y="16" width="48" height="48">
    <properties>
     <property name="offsetPos" type="float" value="16"/>
    </properties>
@@ -88,17 +88,17 @@
     <property name="side" type="int" value="3"/>
    </properties>
   </object>
-  <object id="84" name="ArrowUp" type="ArrowUp" x="240" y="32" width="32" height="32"/>
-  <object id="85" name="Spike Head" type="Spike Head" x="560" y="16" width="64" height="64">
+  <object id="84" name="ArrowUp" type="ArrowUp" x="240" y="144" width="32" height="32"/>
+  <object id="85" name="Spike Head" type="Spike Head" x="624" y="16" width="64" height="64">
    <properties>
     <property name="offsetPos" type="float" value="15"/>
    </properties>
   </object>
   <object id="86" name="Finish" type="Finish" x="176" y="256" width="64" height="64"/>
-  <object id="88" name="ArrowUp" type="ArrowUp" x="192" y="32" width="32" height="32"/>
+  <object id="88" name="ArrowUp" type="ArrowUp" x="240" y="64" width="32" height="32"/>
   <object id="89" name="Start" type="Start" x="80" y="256" width="64" height="64"/>
-  <object id="90" name="Checkpoint" type="Checkpoint" x="640" y="256" width="64" height="64"/>
-  <object id="92" name="Spiked Ball" type="Spiked Ball" x="336" y="96" width="16" height="16">
+  <object id="90" name="Checkpoint" type="Checkpoint" x="768" y="256" width="64" height="64"/>
+  <object id="92" name="Spiked Ball" type="Spiked Ball" x="368" y="80" width="16" height="16">
    <properties>
     <property name="radius" type="int" value="4"/>
     <property name="startLeft" type="bool" value="true"/>
@@ -106,7 +106,7 @@
     <property name="swingSpeed" type="int" value="320"/>
    </properties>
   </object>
-  <object id="93" name="Spiked Ball" type="Spiked Ball" x="336" y="208" width="16" height="16">
+  <object id="93" name="Spiked Ball" type="Spiked Ball" x="416" y="208" width="16" height="16">
    <properties>
     <property name="radius" type="int" value="6"/>
     <property name="startLeft" type="bool" value="false"/>
@@ -114,6 +114,8 @@
     <property name="swingSpeed" type="int" value="360"/>
    </properties>
   </object>
+  <object id="94" name="Kiwi" type="Fruit" x="48" y="208" width="32" height="32"/>
+  <object id="95" name="Apple" type="Fruit" x="48" y="176" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="3" name="Collisions">
   <object id="5" x="0" y="320" width="864" height="48"/>

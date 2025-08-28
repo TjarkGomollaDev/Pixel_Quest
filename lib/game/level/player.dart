@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
+import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/custom_hitbox.dart';
 import 'package:pixel_adventure/game/level/level.dart';
@@ -116,9 +117,6 @@ class Player extends SpriteAnimationGroupComponent
   // joystick for mobile
   JoystickComponent? _joystick;
   JoystickDirection _lastJoystickDirection = JoystickDirection.idle;
-
-  // count fruits
-  int _fruitCounter = 0;
 
   // notifier
   final PlayerRespawnNotifier respawnNotifier = PlayerRespawnNotifier();
@@ -379,37 +377,88 @@ class Player extends SpriteAnimationGroupComponent
     if (checkpointPosition.x > _startPosition.x + PixelAdventure.checkpointBufferZone) _startPosition = checkpointPosition;
   }
 
+  Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
+
+  int _earnedStars() {
+    final collected = world.playerFruitsCount;
+    final total = world.totalFruitsCount;
+
+    if (collected >= total) return 3;
+    if (collected >= total ~/ 2) return 2;
+    return 1;
+  }
+
   Future<void> reachedFinish() async {
     velocity = Vector2.zero();
     _hasReachedFinish = true;
     _isCinematic = true;
 
     // delays are not functional, but purely for a more visually appealing result
-    final delays = [200, 120, 600, 400];
+    final delays = [200, 800, 80, 620, 120, 600, 400, 200];
+    int delayIndex = 0;
 
     // spotlight animation
     world.removeGameHudOnFinish();
     final playerCenter = Vector2((hitboxPositionLeftX + hitboxPositionRightX) / 2, position.y + height / 2);
-    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: 60)..priority = PixelAdventure.spotlightAnimationLayer;
+    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: PixelAdventure.finishSpotlightAnimationRadius);
     game.world.add(spotlight);
     await spotlight.startAnimation(2.0);
-    await Future.delayed(Duration(milliseconds: delays[0]));
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
+
+    // star positions
+    final starRadius = PixelAdventure.finishSpotlightAnimationRadius * 1.5;
+    final starPositions = calculateStarPositions(playerCenter, starRadius);
+    final List<OutlineStar> outlineStars = [];
+    final stars = [];
+
+    // outline stars
+    for (final position in starPositions) {
+      final outlineStar = OutlineStar(position: position);
+      outlineStars.add(outlineStar);
+    }
+    game.world.addAll(outlineStars);
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
+
+    // earned Stars
+    for (var i = 0; i < _earnedStars(); i++) {
+      final star = Star(position: playerCenter);
+      game.world.add(star);
+      stars.add(star);
+
+      // flies to the outline star position
+      await star.flyTo(starPositions[i]);
+      await _delayAnimation(delays[delayIndex]);
+    }
+    delayIndex++;
+    // delete all outline stars that are behind
+    for (var i = 0; i < stars.length; i++) {
+      game.world.remove(outlineStars[0]);
+      outlineStars.removeAt(0);
+    }
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // jump animation
     bounceUp(jumpForce: 320);
-    await Future.delayed(Duration(milliseconds: delays[1]));
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
     current = PlayerState.doubleJump;
     await animationTickers![PlayerState.doubleJump]!.completed;
     await waitUntilPlayerIsOnGround();
-    await Future.delayed(Duration(milliseconds: delays[2]));
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // player disapperaing animation
     isVisible = false;
     await _effect.playDisappearing(position, scale.x);
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
-    // shrink light circle to zero
-    await Future.delayed(Duration(milliseconds: delays[3]));
+    // fade stars out and shrink light circle to zero
+    for (var e in outlineStars) {
+      e.fadeOut();
+    }
+    for (var e in stars) {
+      e.fadeOut();
+    }
     await spotlight.shrinkToBlack(0.4);
+    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // level official finished, go back to menu
     game.router.pushReplacementNamed(RouteNames.menu);
@@ -444,8 +493,6 @@ class Player extends SpriteAnimationGroupComponent
     isOnGround = false;
     if (resetDoubleJump) canDoubleJump = true;
   }
-
-  void increaseFruitCounter() => _fruitCounter++;
 
   void _updateHitboxEdges() {
     hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.offsetX : x - hitbox.offsetX - hitbox.width;

@@ -18,6 +18,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelAdventure> 
   @override
   FutureOr<void> onLoad() {
     radius = game.size.x;
+    priority = PixelAdventure.spotlightAnimationLayer;
     return super.onLoad();
   }
 
@@ -54,9 +55,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelAdventure> 
           radius = game.size.length - (game.size.length - targetRadius) * progress;
         },
         controller,
-        onComplete: () {
-          completer.complete();
-        },
+        onComplete: () => completer.complete(),
       ),
     );
 

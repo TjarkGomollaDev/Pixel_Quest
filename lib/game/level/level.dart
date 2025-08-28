@@ -86,6 +86,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   late final JumpBtn? _jumpBtn;
   late final FpsTextComponent? _fpsText;
 
+  // count fruits
+  int totalFruitsCount = 0;
+  int playerFruitsCount = 0;
+
   @override
   Future<void> onLoad() async {
     _initialSetup();
@@ -169,7 +173,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             case 'Fruit':
               final fruitName = spawnPoint.name;
               final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
-              final fruit = Fruit(name: safeName, player: _player, position: gridPosition);
+              final fruit = Fruit(name: safeName, position: gridPosition);
+              totalFruitsCount++;
               add(fruit);
               break;
             case 'ArrowUp':
@@ -433,7 +438,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   void _addGameHud() {
-    _gameHud = GameHud(position: Vector2(PixelAdventure.tileSize * 3, PixelAdventure.tileSize));
+    _gameHud = GameHud(totalFruitsCount: totalFruitsCount);
     game.camera.viewport.add(_gameHud);
   }
 
@@ -443,4 +448,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   void removeGameHudOnFinish() => _removeGameHud();
+
+  void increaseFruitsCount() {
+    playerFruitsCount++;
+    _gameHud.updateFruitCounter(playerFruitsCount);
+  }
 }

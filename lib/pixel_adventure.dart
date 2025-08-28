@@ -38,7 +38,8 @@ class PixelAdventure extends FlameGame
   static const int trapParticlesLayerLevel = 1;
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
-  static const int spotlightAnimationLayer = 19;
+  static const int spotlightAnimationLayer = 18;
+  static const int spotlightAnimationStarsLayer = 18;
   static const int playerLayerLevel = 20;
   static const int hudElementsLayer = 30;
 
@@ -66,6 +67,8 @@ class PixelAdventure extends FlameGame
   static const double tileSize = 16;
   static const double mapHeight = 368;
   static const double mapBorder = tileSize / 2;
+
+  static const double finishSpotlightAnimationRadius = 60;
 
   // the next checkpoint is only activated if it is further to the right in the level than the current one plus a buffer
   static const double checkpointBufferZone = 40;

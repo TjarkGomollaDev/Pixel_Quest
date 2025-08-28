@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
+import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
-  GameHud({required super.position}) {
-    size = Vector2(InGameActionBtn.btnSize.x * 3 + _btnSpacing * 2, InGameActionBtn.btnSize.y);
+  final int _totalFruitsCount;
+
+  GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
+    size = Vector2(160, Fruit.gridSize.y);
+    position = Vector2(PixelAdventure.tileSize * 3, 10);
   }
 
   // btns
@@ -20,10 +25,15 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   // spacing
   final double _btnSpacing = 4;
 
+  // fruits count
+  late final TextComponent _fruitsCounter;
+  late final Fruit _fruitItem;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
     _setUpBtns();
+    _setUpFruitsCounter();
     return super.onLoad();
   }
 
@@ -38,7 +48,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = InGameActionBtn.btnSize / 2;
+    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, size.y / 2);
     final btnOffset = Vector2(InGameActionBtn.btnSize.x + _btnSpacing, 0);
 
     // menu btn
@@ -85,4 +95,23 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
     addAll([_menuBtn, _playBtn, _restartBtn]);
   }
+
+  void _setUpFruitsCounter() {
+    // fruit item
+    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(90, size.y / 2), collectible: false);
+
+    // counter
+    _fruitsCounter = TextComponent(
+      text: '0/$_totalFruitsCount',
+      anchor: Anchor.centerLeft,
+      position: Vector2(116, size.y / 2),
+      textRenderer: TextPaint(
+        style: const TextStyle(fontSize: 14, color: AppTheme.ingameText, fontWeight: FontWeight.w400),
+      ),
+    );
+
+    addAll([_fruitItem, _fruitsCounter]);
+  }
+
+  void updateFruitCounter(int collected) => _fruitsCounter.text = '$collected/$_totalFruitsCount';
 }

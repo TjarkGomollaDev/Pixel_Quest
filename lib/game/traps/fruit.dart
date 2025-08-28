@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -29,18 +30,22 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// animation before disappearing from the level. Once collected, it increments
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
-class Fruit extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Fruit extends SpriteAnimationGroupComponent
+    with PlayerCollision, HasGameReference<PixelAdventure>, HasWorldReference<Level>, CollisionCallbacks {
   // constructor parameters
   final String _name;
-  final Player _player;
+  final bool _collectible;
 
-  Fruit({required String name, required Player player, required super.position}) : _name = name, _player = player, super(size: gridSize);
+  Fruit({required String name, required super.position, bool collectible = true})
+    : _name = name,
+      _collectible = collectible,
+      super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(32);
 
   // hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
+  late final RectangleHitbox _hitbox;
 
   // animation settings
   static const double _stepTime = 0.05;
@@ -55,22 +60,28 @@ class Fruit extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
-
     return super.onLoad();
   }
 
   void _initialSetup() {
+    // hitbox
+    if (_collectible) _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
+
     // debug
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
-      _hitbox.debugColor = AppTheme.debugColorcollectiblesHitbox;
+      if (_collectible) _hitbox.debugColor = AppTheme.debugColorcollectiblesHitbox;
     }
 
     // general
     priority = PixelAdventure.collectiblesLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
-    add(_hitbox);
+    if (_collectible) {
+      _hitbox.collisionType = CollisionType.passive;
+      add(_hitbox);
+    } else {
+      anchor = Anchor.centerLeft;
+    }
   }
 
   void _loadAllSpriteAnimations() {
@@ -83,6 +94,10 @@ class Fruit extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
             : loadAnimation(state),
     };
     current = FruitState.idle;
+    if (!_collectible) {
+      animationTicker?.currentIndex = 0;
+      animationTicker?.paused = true;
+    }
   }
 
   @override
@@ -90,7 +105,7 @@ class Fruit extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
     if (!_isCollected) {
       _isCollected = true;
       current = FruitState.collected;
-      _player.increaseFruitCounter();
+      world.increaseFruitsCount();
       animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
     }
   }

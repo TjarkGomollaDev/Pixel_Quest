@@ -65,4 +65,7 @@ abstract class AppTheme {
 
   // background color
   static const backgroundColor = Color(0xFF211F30);
+
+  // ingame text
+  static const ingameText = white;
 }
