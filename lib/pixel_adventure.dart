@@ -26,7 +26,7 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  final bool customDebug = false;
+  final bool customDebug = true;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;

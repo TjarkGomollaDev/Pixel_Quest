@@ -86,7 +86,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
   }
 
   void _setUpRespawn() => _playerRespawn = Vector2(
-    position.x + _hitbox.position.x + _hitbox.width - _player.hitbox.offsetX + _offset,
+    position.x + _hitbox.position.x + _hitbox.width - _player.hitbox.position.x + _offset,
     position.y + height - _player.height,
   );
 

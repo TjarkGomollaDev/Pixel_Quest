@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="96">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="23" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="98">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="54" height="23">
   <properties>
@@ -19,20 +19,20 @@
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
-25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,106,107,108,0,0,0,0,106,107,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,128,129,130,0,0,0,0,128,129,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,150,151,152,0,0,0,0,150,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
 25,7,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9,23,
 25,51,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,53,23,
 26,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,27
 </data>
  </layer>
  <objectgroup id="2" name="Spawnpoints">
-  <object id="68" name="Fan" type="Fan" x="288" y="304" width="32" height="16">
+  <object id="68" name="Fan" type="Fan" x="720" y="96" width="32" height="16">
    <properties>
     <property name="alwaysOn" type="bool" value="false"/>
    </properties>
@@ -94,19 +94,11 @@
     <property name="offsetPos" type="float" value="15"/>
    </properties>
   </object>
-  <object id="86" name="Finish" type="Finish" x="176" y="256" width="64" height="64"/>
+  <object id="86" name="Finish" type="Finish" x="768" y="64" width="64" height="64"/>
   <object id="88" name="ArrowUp" type="ArrowUp" x="240" y="64" width="32" height="32"/>
   <object id="89" name="Start" type="Start" x="80" y="256" width="64" height="64"/>
   <object id="90" name="Checkpoint" type="Checkpoint" x="768" y="256" width="64" height="64"/>
-  <object id="92" name="Spiked Ball" type="Spiked Ball" x="368" y="80" width="16" height="16">
-   <properties>
-    <property name="radius" type="int" value="4"/>
-    <property name="startLeft" type="bool" value="true"/>
-    <property name="swingArcDec" type="int" value="120"/>
-    <property name="swingSpeed" type="int" value="320"/>
-   </properties>
-  </object>
-  <object id="93" name="Spiked Ball" type="Spiked Ball" x="416" y="208" width="16" height="16">
+  <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="80" width="16" height="16">
    <properties>
     <property name="radius" type="int" value="6"/>
     <property name="startLeft" type="bool" value="false"/>
@@ -119,6 +111,8 @@
  </objectgroup>
  <objectgroup id="3" name="Collisions">
   <object id="5" x="0" y="320" width="864" height="48"/>
-  <object id="87" x="191.723" y="281.257" width="31.7551" height="38.2622"/>
+  <object id="87" x="783.723" y="89.2568" width="31.7551" height="38.2622"/>
+  <object id="96" x="192" y="272" width="48" height="48"/>
+  <object id="97" x="304" y="272" width="48" height="48"/>
  </objectgroup>
 </map>

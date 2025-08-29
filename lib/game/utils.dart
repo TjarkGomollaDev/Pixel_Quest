@@ -1,18 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/game/custom_hitbox.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 bool checkCollision(player, block) {
-  // hitbox
-  final CustomHitbox hitbox = player.hitbox;
-
   // actual dimensions of the player
-  final double playerX = player.position.x + hitbox.offsetX;
-  final double playerY = player.position.y + hitbox.offsetY;
-  final double playerWidth = hitbox.width;
-  final double playerHeight = hitbox.height;
+  final double playerX = player.position.x + player.hitbox.position.x;
+  final double playerY = player.position.y + player.hitbox.position.y;
+  final double playerWidth = player.hitbox.width;
+  final double playerHeight = player.hitbox.height;
 
   final double blockX = block.x;
   final double blockY = block.y;
@@ -20,7 +16,7 @@ bool checkCollision(player, block) {
   final double blockHeight = block.height;
 
   // fixed player x and y
-  final fixedX = player.scale.x < 0 ? playerX - (hitbox.offsetX * 2) - playerWidth : playerX;
+  final fixedX = player.scale.x < 0 ? playerX - (player.hitbox.x * 2) - playerWidth : playerX;
   final fixedY = block.isPlattform ? playerY + playerHeight : playerY;
 
   return (fixedY < blockY + blockHeight &&

@@ -9,7 +9,6 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
-import 'package:pixel_adventure/game/custom_hitbox.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
 import 'package:pixel_adventure/game/utils.dart';
@@ -58,6 +57,9 @@ class Player extends SpriteAnimationGroupComponent
   // size
   static final Vector2 gridSize = Vector2.all(32);
 
+  // actual hitbox
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 4), size: Vector2(14, 28));
+
   // these are the correct x values for the player, one for the left side of the hitbox and one for the right side of the hitbox
   late double hitboxPositionLeftX;
   late double hitboxPositionRightX;
@@ -72,7 +74,7 @@ class Player extends SpriteAnimationGroupComponent
   final double _gravity = 9.8;
   final double _jumpForce = 310;
   final double _doubleJumpForce = 250;
-  final double _terminalVelocity = 300;
+  final double _terminalVelocity = 400;
 
   // delta time
   double fixedDT = 1 / 60;
@@ -104,12 +106,9 @@ class Player extends SpriteAnimationGroupComponent
   // special effect
   late final PlayerSpecialEffect _effect;
 
-  // spawn protection
+  // spawn position
   late final Vector2 _spawnPosition;
   final double _spawnDropFall = 80;
-
-  // actual hitbox
-  CustomHitbox hitbox = CustomHitbox(offsetX: 10, offsetY: 4, width: 14, height: 28);
 
   // list of all collision elements
   List<CollisionBlock> collisionBlocks = [];
@@ -118,7 +117,7 @@ class Player extends SpriteAnimationGroupComponent
   JoystickComponent? _joystick;
   JoystickDirection _lastJoystickDirection = JoystickDirection.idle;
 
-  // notifier
+  // respawn notifier
   final PlayerRespawnNotifier respawnNotifier = PlayerRespawnNotifier();
 
   @override
@@ -201,17 +200,15 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _initialSetup() {
-    final hitbox2 = RectangleHitbox(position: Vector2(hitbox.offsetX, hitbox.offsetY), size: Vector2(hitbox.width, hitbox.height));
-
     // debug
     if (game.customDebug) {
-      hitbox2.debugMode = true;
-      hitbox2.debugColor = AppTheme.debugColorPlayerHitbox;
+      hitbox.debugMode = true;
+      hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }
 
     // general
     priority = PixelAdventure.playerLayerLevel;
-    add(hitbox2);
+    add(hitbox);
   }
 
   void setJoystick(JoystickComponent joystick) => _joystick = joystick;
@@ -299,11 +296,11 @@ class Player extends SpriteAnimationGroupComponent
       if (!block.isPlattform && checkCollision(this, block)) {
         if (velocity.x > 0) {
           velocity.x = 0;
-          position.x = block.x - hitbox.offsetX - hitbox.width;
+          position.x = block.x - hitbox.position.x - hitbox.width;
           break;
         } else if (velocity.x < 0) {
           velocity.x = 0;
-          position.x = block.x + block.width + hitbox.offsetX + hitbox.width;
+          position.x = block.x + block.width + hitbox.position.x + hitbox.width;
           break;
         }
       }
@@ -317,13 +314,11 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _checkVerticalCollisions() {
-    bool collidedTop = false;
-    bool collidedBottom = false;
     for (var block in collisionBlocks) {
       if (block.isPlattform && checkCollision(this, block)) {
         if (velocity.y > 0 && position.y + hitbox.height < block.y) {
           velocity.y = 0;
-          position.y = block.y - hitbox.offsetY - hitbox.height;
+          position.y = block.y - hitbox.position.y - hitbox.height;
           isOnGround = true;
           canDoubleJump = true;
 
@@ -332,23 +327,18 @@ class Player extends SpriteAnimationGroupComponent
       } else if (checkCollision(this, block)) {
         if (velocity.y > 0) {
           velocity.y = 0;
-          position.y = block.y - hitbox.offsetY - hitbox.height;
+          position.y = block.y - hitbox.position.y - hitbox.height;
           isOnGround = true;
           canDoubleJump = true;
-          collidedBottom = true;
           break;
         } else if (velocity.y < 0) {
           velocity.y = 0;
-          position.y = block.y + block.height - hitbox.offsetY;
+          position.y = block.y + block.height - hitbox.position.y;
           // double jump not possible if the player hits their head
           canDoubleJump = false;
-          collidedTop = true;
           break;
         }
       }
-    }
-    if (collidedTop && collidedBottom) {
-      _respawn();
     }
   }
 
@@ -495,7 +485,7 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updateHitboxEdges() {
-    hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.offsetX : x - hitbox.offsetX - hitbox.width;
+    hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.position.x : x - hitbox.position.x - hitbox.width;
     hitboxPositionRightX = hitboxPositionLeftX + hitbox.width;
   }
 }

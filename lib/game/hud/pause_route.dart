@@ -40,7 +40,7 @@ class PausePage extends Component with HasGameReference<PixelAdventure> {
         position: game.canvasSize / 2,
         anchor: Anchor.center,
         textRenderer: TextPaint(
-          style: const TextStyle(fontSize: 36, color: Color(0xFFC8FFF5), fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 36, color: AppTheme.ingameText, fontWeight: FontWeight.w600),
         ),
       )..priority = 30,
     ]);
