@@ -98,13 +98,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
   void _setUpFruitsCounter() {
     // fruit item
-    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(90, size.y / 2), collectible: false);
+    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(80, size.y / 2), collectible: false);
 
     // counter
     _fruitsCounter = TextComponent(
       text: '0/$_totalFruitsCount',
       anchor: Anchor.centerLeft,
-      position: Vector2(116, size.y / 2),
+      position: Vector2(106, size.y / 2),
       textRenderer: TextPaint(
         style: const TextStyle(fontSize: 14, color: AppTheme.ingameText, fontWeight: FontWeight.w400),
       ),

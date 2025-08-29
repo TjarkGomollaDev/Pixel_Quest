@@ -188,6 +188,7 @@ class Player extends SpriteAnimationGroupComponent
     final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD) || keysPressed.contains(LogicalKeyboardKey.arrowRight);
     _horizontalMovement += isLeftKeyPressed ? -1 : 0;
     _horizontalMovement += isRightKeyPressed ? 1 : 0;
+
     // only set to true once when the space bar is actually pressed again
     if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space && isOnGround) {
       hasJumped = true;
@@ -258,11 +259,9 @@ class Player extends SpriteAnimationGroupComponent
     } else if (velocity.x > 0 && scale.x < 0) {
       flipHorizontallyAroundCenter();
     }
-    // check running
+
     if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.run;
-    // check falling
     if (velocity.y > 0) playerState = PlayerState.fall;
-    // check jumping
     if (velocity.y < 0) playerState = PlayerState.jump;
 
     current = playerState;
@@ -419,7 +418,7 @@ class Player extends SpriteAnimationGroupComponent
     game.world.addAll(outlineStars);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
-    // earned Stars
+    // earned stars
     for (var i = 0; i < _earnedStars(); i++) {
       final star = Star(position: playerCenter);
       game.world.add(star);
@@ -430,6 +429,7 @@ class Player extends SpriteAnimationGroupComponent
       await _delayAnimation(delays[delayIndex]);
     }
     delayIndex++;
+
     // delete all outline stars that are behind
     for (var i = 0; i < stars.length; i++) {
       game.world.remove(outlineStars[0]);
