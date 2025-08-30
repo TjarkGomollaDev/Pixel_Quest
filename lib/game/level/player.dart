@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
-import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
@@ -63,8 +62,10 @@ class Player extends SpriteAnimationGroupComponent
   final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 4), size: Vector2(14, 28));
 
   // these are the correct x values for the player, one for the left side of the hitbox and one for the right side of the hitbox
-  late double hitboxPositionLeftX;
-  late double hitboxPositionRightX;
+  late double hitboxLeft;
+  late double hitboxRight;
+  late double hitboxTop;
+  late double hitboxBottom;
 
   // animation settings
   final double _stepTime = 0.05;
@@ -109,7 +110,7 @@ class Player extends SpriteAnimationGroupComponent
   final double _spawnDropFall = 80;
 
   // list of all collision elements
-  List<CollisionBlock> collisionBlocks = [];
+  List<WorldBlock> collisionBlocks = [];
 
   // joystick for mobile
   JoystickComponent? _joystick;
@@ -133,8 +134,8 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void update(double dt) {
+    _updateHitboxEdges();
     if (!_spawnProtection && !_hasReachedFinish) {
-      _updateHitboxEdges();
       _updatePlayerState();
       _updatePlayerMovement(dt);
       _applyGravity(dt);
@@ -166,44 +167,46 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (_checkIsCollisionInactive()) return super.onCollision(intersectionPoints, other);
+    // if (_checkIsCollisionInactive()) return super.onCollision(intersectionPoints, other);
 
-    final playerTop = position.y + hitbox.position.y;
-    final playerBottom = playerTop + hitbox.height;
+    _updateHitboxEdges();
+    if (other is CollisionBlock) {
+      final rect = (other as CollisionBlock).solidHitbox.toAbsoluteRect();
+      final blockTop = rect.top;
+      final blockBottom = rect.bottom;
+      final blockLeft = rect.left;
+      final blockRight = rect.right;
 
-    if (other is SolidBlock) {
-      if (playerBottom >= other.y &&
-          absoluteCenter.y < other.y &&
-          !((hitboxPositionRightX <= other.x && absoluteCenter.x < other.x) ||
-              (hitboxPositionLeftX >= other.x + other.width && absoluteCenter.x > other.x + other.width)) &&
-          !(velocity.y < 0)) {
+      const double epsilon = 0.5;
+
+      if (hitboxRight >= blockLeft && absoluteCenter.x < blockLeft && (hitboxBottom - blockTop).abs() > epsilon) {
+        debugPrint('right');
+        velocity.x = 0;
+        position.x = (scale.x < 0) ? blockLeft + hitbox.position.x : blockLeft - hitbox.position.x - hitbox.width;
+      } else if (hitboxLeft <= blockRight && absoluteCenter.x > blockRight && (hitboxBottom - blockTop).abs() > epsilon) {
+        debugPrint('left');
+        velocity.x = 0;
+        position.x = (scale.x < 0) ? blockRight + hitbox.position.x + hitbox.width : blockRight - hitbox.position.x;
+      } else if (hitboxBottom >= blockTop && absoluteCenter.y < blockTop && !(velocity.y < 0)) {
         debugPrint('up');
-        position.y = other.y - hitbox.position.y - hitbox.height;
+        position.y = blockTop - hitbox.position.y - hitbox.height;
         velocity.y = 0;
         isOnGround = true;
         canDoubleJump = true;
-      } else if (playerTop <= other.y + other.height &&
-          absoluteCenter.y > other.y + other.height &&
-          !((hitboxPositionRightX == other.x || hitboxPositionLeftX == other.x + other.width))) {
+      } else if (hitboxTop <= blockBottom && absoluteCenter.y > blockBottom) {
         debugPrint('down');
         if (isOnGround) {
           debugPrint('dead');
           _respawn();
+          return;
         }
-        position.y = other.y + other.height - hitbox.position.y;
+        position.y = blockBottom - hitbox.position.y;
         velocity.y = 0;
         // reset can double jump if the player hits their head
         canDoubleJump = false;
-      } else if (hitboxPositionRightX >= other.x && absoluteCenter.x < other.x) {
-        debugPrint('right');
-        velocity.x = 0;
-        position.x = (scale.x < 0) ? other.x + hitbox.position.x : other.x - hitbox.position.x - hitbox.width;
-      } else if (hitboxPositionLeftX <= other.x + other.width && absoluteCenter.x > other.x + other.width) {
-        debugPrint('left');
-        velocity.x = 0;
-        position.x = (scale.x < 0) ? other.x + other.width + hitbox.position.x + hitbox.width : other.x + other.width - hitbox.position.x;
       } else {
-        debugPrint('wtf');
+        debugPrint('WTF');
+        // debugPrint(hitboxLeft.toString());
       }
     }
 
@@ -375,7 +378,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // spotlight animation
     world.removeGameHudOnFinish();
-    final playerCenter = Vector2((hitboxPositionLeftX + hitboxPositionRightX) / 2, position.y + height / 2);
+    final playerCenter = Vector2((hitboxLeft + hitboxRight) / 2, position.y + height / 2);
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: PixelAdventure.finishSpotlightAnimationRadius);
     world.add(spotlight);
     await spotlight.startAnimation(2.0);
@@ -472,8 +475,10 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updateHitboxEdges() {
-    hitboxPositionLeftX = (scale.x > 0) ? x + hitbox.position.x : x - hitbox.position.x - hitbox.width;
-    hitboxPositionRightX = hitboxPositionLeftX + hitbox.width;
+    hitboxLeft = (scale.x > 0) ? x + hitbox.position.x : x - hitbox.position.x - hitbox.width;
+    hitboxRight = hitboxLeft + hitbox.width;
+    hitboxTop = position.y + hitbox.position.y;
+    hitboxBottom = hitboxTop + hitbox.height;
   }
 }
 
@@ -484,7 +489,7 @@ class PlayerHitboxPositionProvider extends PositionProvider {
 
   @override
   Vector2 get position {
-    return Vector2(player.hitboxPositionLeftX, player.position.y);
+    return Vector2(player.hitboxLeft, player.position.y);
   }
 
   @override

@@ -132,8 +132,8 @@ class Chicken extends PositionComponent
     _velocity.x = 0;
 
     // get player hitbox positions
-    final playerHitboxPositionLeftX = _player.hitboxPositionLeftX;
-    final playerHitboxPositionRightX = _player.hitboxPositionRightX;
+    final playerHitboxPositionLeftX = _player.hitboxLeft;
+    final playerHitboxPositionRightX = _player.hitboxRight;
 
     // first, we check whether the player is within the range in which the chicken can move
     if (!_playerInRange(playerHitboxPositionLeftX, playerHitboxPositionRightX)) return;

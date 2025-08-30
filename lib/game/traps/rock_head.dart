@@ -29,15 +29,11 @@ enum RockHeadState implements AnimationState {
 /// downward speed, then retracts upward more slowly. At both the top and
 /// bottom borders it plays a hit animation before pausing for a short delay,
 /// creating a rhythmic crushing pattern.
-class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure> {
+class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure>, CollisionBlock {
   // constructor parameters
   final double _offsetPos;
-  final CollisionBlock _block;
 
-  RockHead({required double offsetPos, required CollisionBlock block, required super.position})
-    : _offsetPos = offsetPos,
-      _block = block,
-      super(size: gridSize);
+  RockHead({required double offsetPos, required super.position}) : _offsetPos = offsetPos, super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(48);
@@ -78,7 +74,6 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     _setUpRange();
     _setUpActualBorders();
     _correctingStartPosition();
-    _setUpCollisionBlock();
     return super.onLoad();
   }
 
@@ -123,11 +118,6 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     _moveSpeed = _moveSpeedDown;
   }
 
-  void _setUpCollisionBlock() {
-    _block.size = _hitbox.size;
-    _block.position = position + _hitbox.position;
-  }
-
   void _movement(double dt) {
     // change move direction if we reached the borders
     if (position.y >= _bottomtBorder && _moveDirection != -1) {
@@ -138,7 +128,6 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
       // movement
       final newPositionY = position.y + _moveDirection * _moveSpeed * dt;
       position.y = newPositionY.clamp(_topBorder, _bottomtBorder);
-      _block.y = position.y + _hitbox.position.y;
     }
   }
 
@@ -163,4 +152,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }
+
+  @override
+  ShapeHitbox get solidHitbox => _hitbox;
 }

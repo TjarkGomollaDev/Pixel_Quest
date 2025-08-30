@@ -21,14 +21,14 @@ enum StartState implements AnimationState {
   const StartState(this.name, this.amount, {this.loop = true});
 }
 
-class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
   Start({required super.position}) : super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(64);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
 
   // animation settings
   static const double _stepTime = 0.05;
@@ -55,13 +55,13 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    hitbox.collisionType = CollisionType.passive;
-    add(hitbox);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
@@ -72,8 +72,11 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _setUpPlayerPosition() {
     playerPosition = Vector2(
-      position.x + hitbox.x + (hitbox.width - Player.gridSize.x) / 2,
-      position.y + height - hitbox.height - Player.gridSize.y,
+      position.x + _hitbox.x + (_hitbox.width - Player.gridSize.x) / 2,
+      position.y + height - _hitbox.height - Player.gridSize.y,
     );
   }
+
+  @override
+  ShapeHitbox get solidHitbox => _hitbox;
 }

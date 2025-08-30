@@ -37,7 +37,7 @@ class PlantBullet extends SpriteComponent with PlayerCollision, HasGameReference
   late double _moveDirection;
 
   // list of objects that will destroy the projectile upon collision
-  static const List<Type> despawnTypes = [CollisionBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
+  static const List<Type> despawnTypes = [WorldBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {

@@ -266,7 +266,7 @@ class Snail extends PositionComponent
     final shellPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
     final shellPositionRightX = shellPositionLeftX + _hitbox.width;
     final shellCenter = (shellPositionLeftX + shellPositionRightX) / 2;
-    final playerCenter = (_player.hitboxPositionLeftX + _player.hitboxPositionRightX) / 2;
+    final playerCenter = (_player.hitboxLeft + _player.hitboxRight) / 2;
     _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;
     if (_shellMoveDirection != _moveDirection) flipHorizontallyAroundCenter();
     _updateActualBorders();

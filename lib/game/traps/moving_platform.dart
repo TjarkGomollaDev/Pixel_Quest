@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
+import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -29,25 +29,23 @@ enum MovingPlatformState implements AnimationState {
 ///
 /// The platform automatically reverses direction when reaching the end
 /// of its movement range.
-class MovingPlatform extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class MovingPlatform extends SpriteAnimationGroupComponent
+    with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
   final Player _player;
-  final CollisionBlock _block;
 
   MovingPlatform({
     required bool isVertical,
     required double offsetNeg,
     required double offsetPos,
     required Player player,
-    required CollisionBlock block,
     required super.position,
   }) : _isVertical = isVertical,
        _offsetPos = offsetPos,
        _offsetNeg = offsetNeg,
        _player = player,
-       _block = block,
        super(size: gridSize);
 
   // size
@@ -137,7 +135,6 @@ class MovingPlatform extends SpriteAnimationGroupComponent with PlayerCollision,
     }
     final moveY = _moveDirection * _moveSpeed * dt;
     position.y += moveY;
-    _block.position.y += moveY;
   }
 
   // moves the saw horizontally and changes direction if the end of the range is reached
@@ -151,7 +148,6 @@ class MovingPlatform extends SpriteAnimationGroupComponent with PlayerCollision,
     }
     final moveX = _moveDirection * _moveSpeed * dt;
     position.x += moveX;
-    _block.position.x += moveX;
     if (_playerOnTop) _player.position.x += moveX;
   }
 
@@ -162,13 +158,12 @@ class MovingPlatform extends SpriteAnimationGroupComponent with PlayerCollision,
       if (_playerOnTop) return;
 
       // when entering the platform, at least half of the player's hitbox must be on the platform in order to be carried along
-      final playerCenter = (_player.hitboxPositionLeftX + _player.hitboxPositionRightX) / 2;
-      if (playerCenter >= _block.position.x && playerCenter <= _block.position.x + width) {
-        _playerOnTop = true;
-      }
     }
   }
 
   @override
   void onPlayerCollisionEnd() => _playerOnTop = false;
+
+  @override
+  ShapeHitbox get solidHitbox => _hitbox;
 }

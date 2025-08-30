@@ -277,14 +277,14 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
 
   bool _checkIsPlayerBefore() {
     // checks whether the player is positioned in front of the trunk, relative to its current move direction
-    return (_moveDirection == -1 && _hitboxPositionLeftX > _player.hitboxPositionRightX) ||
-        (_moveDirection == 1 && _player.hitboxPositionLeftX > _hitboxPositionRightX);
+    return (_moveDirection == -1 && _hitboxPositionLeftX > _player.hitboxRight) ||
+        (_moveDirection == 1 && _player.hitboxLeft > _hitboxPositionRightX);
   }
 
   bool _checkIsPlayerInRange({double? extended}) {
     // checks whether the player is within the range in which the trunk moves, optionally with a y extension to the top
-    return _player.hitboxPositionRightX >= _attackRangeNeg &&
-        _player.hitboxPositionLeftX <= _attackRangePos &&
+    return _player.hitboxRight >= _attackRangeNeg &&
+        _player.hitboxLeft <= _attackRangePos &&
         _player.y + _player.height <= position.y + height &&
         _player.y + _player.height >= position.y + _hitbox.position.y + (extended ?? 0);
   }

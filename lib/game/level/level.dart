@@ -75,7 +75,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   late final LevelBackground _levelBackground;
 
   // all collision blocks
-  final List<CollisionBlock> _collisionBlocks = [];
+  final List<WorldBlock> _collisionBlocks = [];
 
   // player
   late final Player _player;
@@ -241,7 +241,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             case 'FireTrap':
               final fireTrap = FireTrap(player: _player, position: gridPosition);
               add(fireTrap);
-              final block = CollisionBlock(
+              final block = WorldBlock(
                 position: Vector2(spawnPoint.x, spawnPoint.y + PixelAdventure.tileSize),
                 size: Vector2(spawnPoint.width, PixelAdventure.tileSize),
               );
@@ -256,29 +256,18 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
               final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
               final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
               final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-              final block = CollisionBlock(
-                position: Vector2(spawnPoint.x - spawnPoint.width / 2, spawnPoint.y + 2),
-                size: Vector2(spawnPoint.width, 5),
-              );
               final movingPlatform = MovingPlatform(
                 isVertical: isVertical,
                 offsetNeg: offsetNeg,
                 offsetPos: offsetPos,
                 player: _player,
-                block: block,
                 position: gridPosition,
               );
-              _collisionBlocks.add(block);
               add(movingPlatform);
               break;
             case 'Rock Head':
               final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final block = CollisionBlock(
-                position: Vector2(spawnPoint.x, spawnPoint.y),
-                size: Vector2(spawnPoint.width, spawnPoint.height),
-              );
-              final rockHead = RockHead(offsetPos: offsetPos, position: gridPosition, block: block);
-              _collisionBlocks.add(block);
+              final rockHead = RockHead(offsetPos: offsetPos, position: gridPosition);
               add(rockHead);
               break;
             case 'Spike Head':
@@ -383,7 +372,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
       for (var collision in collisionsLayer.objects) {
         switch (collision.class_) {
           case 'Plattform':
-            final platform = CollisionBlock(
+            final platform = WorldBlock(
               isPlattform: true,
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
@@ -391,7 +380,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             _collisionBlocks.add(platform);
             break;
           default:
-            final block = CollisionBlock(position: Vector2(collision.x, collision.y), size: Vector2(collision.width, collision.height));
+            final block = WorldBlock(position: Vector2(collision.x, collision.y), size: Vector2(collision.width, collision.height));
             _collisionBlocks.add(block);
         }
       }
@@ -402,16 +391,28 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   void _addWorldBorders() {
-    const borderWidth = 16.0;
-    final borders = [
-      // position, size
-      [Vector2(-borderWidth, -borderWidth), Vector2(borderWidth, _levelMap.height + borderWidth * 2)], // left
-      [Vector2(_levelMap.width, -borderWidth), Vector2(borderWidth, _levelMap.height + borderWidth * 2)], // right
-      [Vector2(0, -borderWidth), Vector2(_levelMap.width, borderWidth)], // top
-      [Vector2(0, _levelMap.height), Vector2(_levelMap.width, borderWidth)], // bottom
+    const borderWidth = PixelAdventure.tileSize;
+    final hasInnerBorder = PixelAdventure.mapBorder != 0;
+    final verticalSize = Vector2(borderWidth, hasInnerBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
+    final horizontalSize = Vector2(hasInnerBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
+    final borders = <WorldBlock>[
+      // left
+      WorldBlock(position: Vector2(hasInnerBorder ? 0 : -borderWidth, hasInnerBorder ? 0 : -borderWidth), size: verticalSize),
+      // top
+      WorldBlock(position: Vector2(hasInnerBorder ? borderWidth : 0, hasInnerBorder ? 0 : -borderWidth), size: horizontalSize),
+      // right
+      WorldBlock(
+        position: Vector2(hasInnerBorder ? _levelMap.width - borderWidth : _levelMap.width, hasInnerBorder ? 0 : -borderWidth),
+        size: verticalSize,
+      ),
+      // bottom
+      WorldBlock(
+        position: Vector2(hasInnerBorder ? borderWidth : 0, hasInnerBorder ? _levelMap.height - borderWidth : _levelMap.height),
+        size: horizontalSize,
+      ),
     ];
 
-    _collisionBlocks.addAll(borders.map((b) => CollisionBlock(position: b[0], size: b[1])));
+    _collisionBlocks.addAll(borders);
   }
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);

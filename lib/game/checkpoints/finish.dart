@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -20,7 +21,8 @@ enum FinishState implements AnimationState {
   const FinishState(this.name, this.amount, {this.loop = true});
 }
 
-class Finish extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Finish extends SpriteAnimationGroupComponent
+    with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
   // constructor parameters
   final Player _player;
 
@@ -79,4 +81,7 @@ class Finish extends SpriteAnimationGroupComponent with PlayerCollision, HasGame
       current = FinishState.idle;
     }
   }
+
+  @override
+  ShapeHitbox get solidHitbox => _hitbox;
 }

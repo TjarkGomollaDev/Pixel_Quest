@@ -38,7 +38,7 @@ class TrunkBullet extends SpriteComponent with PlayerCollision, HasGameReference
   int _spawnProtectionFrames = 2;
 
   // list of objects that will destroy the projectile upon collision
-  static const List<Type> despawnTypes = [CollisionBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
+  static const List<Type> despawnTypes = [WorldBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
