@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -27,7 +28,7 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   static final Vector2 gridSize = Vector2.all(64);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
+  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
 
   // animation settings
   static const double _stepTime = 0.05;
@@ -54,13 +55,13 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
-    add(_hitbox);
+    hitbox.collisionType = CollisionType.passive;
+    add(hitbox);
   }
 
   void _loadAllSpriteAnimations() {
@@ -71,8 +72,8 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _setUpPlayerPosition() {
     playerPosition = Vector2(
-      position.x + _hitbox.x + (_hitbox.width - Player.gridSize.x) / 2,
-      position.y + height - _hitbox.height - Player.gridSize.y,
+      position.x + hitbox.x + (hitbox.width - Player.gridSize.x) / 2,
+      position.y + height - hitbox.height - Player.gridSize.y,
     );
   }
 }

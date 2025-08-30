@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
+import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
@@ -76,10 +78,6 @@ class Player extends SpriteAnimationGroupComponent
   final double _doubleJumpForce = 250;
   final double _terminalVelocity = 400;
 
-  // delta time
-  double fixedDT = 1 / 60;
-  double accumulatedTime = 0;
-
   // movement
   double _horizontalMovement = 0;
   final double _moveSpeed = 100;
@@ -95,7 +93,7 @@ class Player extends SpriteAnimationGroupComponent
 
   // when activated, all collisions and movement (in update) are deactivated
   // this is used when the level starts and when the player dies and respawns
-  bool _spawnProtection = true;
+  bool _spawnProtection = false;
 
   // finish level
   bool _hasReachedFinish = false;
@@ -131,28 +129,23 @@ class Player extends SpriteAnimationGroupComponent
 
   Completer<void>? _isOnGroundCompleter;
 
+  bool start = true;
+
   @override
   void update(double dt) {
-    accumulatedTime += dt;
-    while (accumulatedTime >= fixedDT) {
-      if (!_spawnProtection && !_hasReachedFinish) {
-        _updateHitboxEdges();
-        _updatePlayerState();
-        _updatePlayerMovement(fixedDT);
-        _checkHorizontalCollisions();
-        _applyGravity(fixedDT);
-        _checkVerticalCollisions();
-        if (_joystick != null) updateJoystick();
-      } else if (_isCinematic) {
-        _updateHitboxEdges();
-        _updatePlayerState();
-        _applyGravity(fixedDT);
-        _checkVerticalCollisions();
-      }
-      if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) {
-        _isOnGroundCompleter!.complete();
-      }
-      accumulatedTime -= fixedDT;
+    if (!_spawnProtection && !_hasReachedFinish) {
+      _updateHitboxEdges();
+      _updatePlayerState();
+      _updatePlayerMovement(dt);
+      _applyGravity(dt);
+      if (_joystick != null) updateJoystick();
+    } else if (_isCinematic) {
+      _updateHitboxEdges();
+      _updatePlayerState();
+      _applyGravity(dt);
+    }
+    if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) {
+      _isOnGroundCompleter!.complete();
     }
     super.update(dt);
   }
@@ -174,6 +167,46 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (_checkIsCollisionInactive()) return super.onCollision(intersectionPoints, other);
+
+    final playerTop = position.y + hitbox.position.y;
+    final playerBottom = playerTop + hitbox.height;
+
+    if (other is SolidBlock) {
+      if (playerBottom >= other.y &&
+          absoluteCenter.y < other.y &&
+          !((hitboxPositionRightX <= other.x && absoluteCenter.x < other.x) ||
+              (hitboxPositionLeftX >= other.x + other.width && absoluteCenter.x > other.x + other.width)) &&
+          !(velocity.y < 0)) {
+        debugPrint('up');
+        position.y = other.y - hitbox.position.y - hitbox.height;
+        velocity.y = 0;
+        isOnGround = true;
+        canDoubleJump = true;
+      } else if (playerTop <= other.y + other.height &&
+          absoluteCenter.y > other.y + other.height &&
+          !((hitboxPositionRightX == other.x || hitboxPositionLeftX == other.x + other.width))) {
+        debugPrint('down');
+        if (isOnGround) {
+          debugPrint('dead');
+          _respawn();
+        }
+        position.y = other.y + other.height - hitbox.position.y;
+        velocity.y = 0;
+        // reset can double jump if the player hits their head
+        canDoubleJump = false;
+      } else if (hitboxPositionRightX >= other.x && absoluteCenter.x < other.x) {
+        debugPrint('right');
+        velocity.x = 0;
+        position.x = (scale.x < 0) ? other.x + hitbox.position.x : other.x - hitbox.position.x - hitbox.width;
+      } else if (hitboxPositionLeftX <= other.x + other.width && absoluteCenter.x > other.x + other.width) {
+        debugPrint('left');
+        velocity.x = 0;
+        position.x = (scale.x < 0) ? other.x + other.width + hitbox.position.x + hitbox.width : other.x + other.width - hitbox.position.x;
+      } else {
+        debugPrint('wtf');
+      }
+    }
+
     if (other is PlayerCollision) other.onPlayerCollision(intersectionPoints.first);
     super.onCollision(intersectionPoints, other);
   }
@@ -243,7 +276,7 @@ class Player extends SpriteAnimationGroupComponent
     isVisible = false;
     _spawnPosition = _startPosition - Vector2(0, _spawnDropFall);
     _effect = PlayerSpecialEffect();
-    game.world.add(_effect);
+    world.add(_effect);
   }
 
   Future<void> _updatePlayerState() async {
@@ -258,8 +291,8 @@ class Player extends SpriteAnimationGroupComponent
     }
 
     if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.run;
-    if (velocity.y > 0) playerState = PlayerState.fall;
-    if (velocity.y < 0) playerState = PlayerState.jump;
+    if (velocity.y > 0 && !isOnGround) playerState = PlayerState.fall;
+    if (velocity.y < 0 && !isOnGround) playerState = PlayerState.jump;
 
     current = playerState;
   }
@@ -291,61 +324,15 @@ class Player extends SpriteAnimationGroupComponent
     current = PlayerState.doubleJump;
   }
 
-  void _checkHorizontalCollisions() {
-    for (var block in collisionBlocks) {
-      if (!block.isPlattform && checkCollision(this, block)) {
-        if (velocity.x > 0) {
-          velocity.x = 0;
-          position.x = block.x - hitbox.position.x - hitbox.width;
-          break;
-        } else if (velocity.x < 0) {
-          velocity.x = 0;
-          position.x = block.x + block.width + hitbox.position.x + hitbox.width;
-          break;
-        }
-      }
-    }
-  }
-
   void _applyGravity(double dt) {
     velocity.y += _gravity;
     velocity.y = velocity.y.clamp(double.negativeInfinity, _terminalVelocity);
     position.y += velocity.y * dt;
   }
 
-  void _checkVerticalCollisions() {
-    for (var block in collisionBlocks) {
-      if (block.isPlattform && checkCollision(this, block)) {
-        if (velocity.y > 0 && position.y + hitbox.height < block.y) {
-          velocity.y = 0;
-          position.y = block.y - hitbox.position.y - hitbox.height;
-          isOnGround = true;
-          canDoubleJump = true;
-
-          break;
-        }
-      } else if (checkCollision(this, block)) {
-        if (velocity.y > 0) {
-          velocity.y = 0;
-          position.y = block.y - hitbox.position.y - hitbox.height;
-          isOnGround = true;
-          canDoubleJump = true;
-          break;
-        } else if (velocity.y < 0) {
-          velocity.y = 0;
-          position.y = block.y + block.height - hitbox.position.y;
-          // double jump not possible if the player hits their head
-          canDoubleJump = false;
-          break;
-        }
-      }
-    }
-  }
-
   Future<void> spawnInLevel() async {
     // play appearing animation
     await _effect.playAppearing(_spawnPosition);
-    position = _spawnPosition;
 
     // spawn modus
     isVisible = true;
@@ -390,7 +377,7 @@ class Player extends SpriteAnimationGroupComponent
     world.removeGameHudOnFinish();
     final playerCenter = Vector2((hitboxPositionLeftX + hitboxPositionRightX) / 2, position.y + height / 2);
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: PixelAdventure.finishSpotlightAnimationRadius);
-    game.world.add(spotlight);
+    world.add(spotlight);
     await spotlight.startAnimation(2.0);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
@@ -405,13 +392,13 @@ class Player extends SpriteAnimationGroupComponent
       final outlineStar = OutlineStar(position: position);
       outlineStars.add(outlineStar);
     }
-    game.world.addAll(outlineStars);
+    world.addAll(outlineStars);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // earned stars
     for (var i = 0; i < _earnedStars(); i++) {
       final star = Star(position: playerCenter);
-      game.world.add(star);
+      world.add(star);
       stars.add(star);
 
       // flies to the outline star position
@@ -422,7 +409,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // delete all outline stars that are behind
     for (var i = 0; i < stars.length; i++) {
-      game.world.remove(outlineStars[0]);
+      world.remove(outlineStars[0]);
       outlineStars.removeAt(0);
     }
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);

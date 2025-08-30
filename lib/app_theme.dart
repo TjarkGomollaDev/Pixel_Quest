@@ -58,7 +58,7 @@ abstract class AppTheme {
   static const debugColorTrapHitbox = white;
   static const debugColorCollectibles = brownLight;
   static const debugColorcollectiblesHitbox = redLight;
-  static const debugColorPlayerHitbox = orangeDark;
+  static const debugColorPlayerHitbox = black;
   static const debugColorMenu = purpleDark;
   static const debugColorParticle = grayDark2;
   static const debugColorParticleHitbox = grayLight1;
