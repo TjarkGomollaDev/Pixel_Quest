@@ -62,7 +62,7 @@ class ArrowUp extends PositionComponent
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
-      _hitbox.debugColor = AppTheme.debugColorcollectiblesHitbox;
+      _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
     }
 
     // general

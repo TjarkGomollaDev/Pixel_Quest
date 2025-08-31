@@ -372,11 +372,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
       for (var collision in collisionsLayer.objects) {
         switch (collision.class_) {
           case 'Plattform':
-            final platform = WorldBlock(
-              isPlattform: true,
-              position: Vector2(collision.x, collision.y),
-              size: Vector2(collision.width, collision.height),
-            );
+            final platform = WorldBlock(isPlattform: true, position: Vector2(collision.x, collision.y), size: Vector2(collision.width, 5));
             _collisionBlocks.add(platform);
             break;
           default:
@@ -387,7 +383,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
       addAll(_collisionBlocks);
     }
-    _player.collisionBlocks = _collisionBlocks;
   }
 
   void _addWorldBorders() {

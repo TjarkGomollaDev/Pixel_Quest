@@ -71,7 +71,7 @@ class Fruit extends SpriteAnimationGroupComponent
     if (game.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
-      if (_collectible) _hitbox.debugColor = AppTheme.debugColorcollectiblesHitbox;
+      if (_collectible) _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
     }
 
     // general

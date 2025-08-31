@@ -118,6 +118,8 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     _moveSpeed = _moveSpeedDown;
   }
 
+  late double previousY;
+
   void _movement(double dt) {
     // change move direction if we reached the borders
     if (position.y >= _bottomtBorder && _moveDirection != -1) {
@@ -126,6 +128,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
       _changeDirection(1);
     } else {
       // movement
+      previousY = position.y;
       final newPositionY = position.y + _moveDirection * _moveSpeed * dt;
       position.y = newPositionY.clamp(_topBorder, _bottomtBorder);
     }
