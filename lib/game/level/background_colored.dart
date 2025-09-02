@@ -11,13 +11,15 @@ class BackgroundColored extends ParallaxComponent {
 
   BackgroundColored({required BackgroundTileColor color, required super.position, required super.size}) : _color = color;
 
-  // velocity
+  // animation settings
+  static const String _path = 'Background/';
+  static const String _pathEnd = '.png';
   static final Vector2 _baseVelocity = Vector2(0, 40);
 
   @override
   Future<void> onLoad() async {
     parallax = await game.loadParallax(
-      [ParallaxImageData('Background/${_color.name}.png')],
+      [ParallaxImageData('$_path${_color.name}$_pathEnd')],
       baseVelocity: _baseVelocity,
       repeat: ImageRepeat.repeat,
       fill: LayerFill.none,

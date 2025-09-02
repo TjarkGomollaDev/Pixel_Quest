@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
+import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
@@ -26,8 +28,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   final double _btnSpacing = 4;
 
   // fruits count
-  late final TextComponent _fruitsCounter;
+  late final RoundedComponent _fruitBg;
   late final Fruit _fruitItem;
+  late final TextComponent _fruitsCounter;
 
   @override
   FutureOr<void> onLoad() {
@@ -77,6 +80,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {
           final myLevel = (currentRoute.world as Level).myLvel;
+
           // at this point, we need to create a new instance of the route, because otherwise the router will assume
           // that the route already exists and will not even create a new one, which is explicitly what we want to do here
           game.router.pushReplacement(WorldRoute(() => Level(myLvel: myLevel), maintainState: false), name: myLevel.name);
@@ -85,6 +89,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
           if (previousRoute is WorldRoute) {
             final myLevel = (previousRoute.world as Level).myLvel;
             game.router.pop();
+
             // same as above
             game.router.pushReplacement(WorldRoute(() => Level(myLvel: myLevel), maintainState: false), name: myLevel.name);
           }
@@ -97,20 +102,29 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   }
 
   void _setUpFruitsCounter() {
+    // fruit background
+    _fruitBg = RoundedComponent(
+      color: AppTheme.black.withAlpha(56),
+      borderRadius: 2,
+      position: Vector2(96, size.y / 2),
+      size: Vector2(19, 19),
+      anchor: Anchor.center,
+    );
+
     // fruit item
-    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(80, size.y / 2), collectible: false);
+    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(80, size.y / 2 + 1), collectible: false);
 
     // counter
     _fruitsCounter = TextComponent(
       text: '0/$_totalFruitsCount',
-      anchor: Anchor.centerLeft,
-      position: Vector2(106, size.y / 2),
+      anchor: Anchor(0, 0.32),
+      position: Vector2(109, size.y / 2),
       textRenderer: TextPaint(
-        style: const TextStyle(fontSize: 14, color: AppTheme.ingameText, fontWeight: FontWeight.w400),
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
       ),
     );
 
-    addAll([_fruitItem, _fruitsCounter]);
+    addAll([_fruitBg, _fruitItem, _fruitsCounter]);
   }
 
   void updateFruitCounter(int collected) => _fruitsCounter.text = '$collected/$_totalFruitsCount';

@@ -12,12 +12,12 @@ import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
-import 'package:pixel_adventure/game/collision_block.dart';
+import 'package:pixel_adventure/game/level/collision_block.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum PlayerState implements AnimationState {
@@ -113,7 +113,7 @@ class Player extends SpriteAnimationGroupComponent
 
   // spawn position
   late final Vector2 _spawnPosition;
-  final double _spawnDropFall = 120;
+  final double _spawnDropFall = 60;
 
   // joystick for mobile
   JoystickComponent? _joystick;
@@ -218,7 +218,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // special cases
     bool forceVertical = false;
-    if (other is WorldBlock && other.isPlattform) {
+    if (other is WorldBlock && other.isPlatform) {
       // plattform collision
       _resolveOneWayTopCollision(playerRect.bottom, rect.top, hasHorizontalIntersection, other);
       return;
@@ -580,7 +580,7 @@ class PlayerHitboxPositionProvider extends PositionProvider {
 
   @override
   Vector2 get position {
-    return Vector2(player.hitboxLeft, player.position.y);
+    return Vector2(player.hitboxLeft, player.hitboxTop);
   }
 
   @override

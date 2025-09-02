@@ -26,7 +26,7 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  final bool customDebug = true;
+  final bool customDebug = false;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -65,7 +65,7 @@ class PixelAdventure extends FlameGame
 
   // tiled map dimensions
   static const double tileSize = 16;
-  static const double mapHeight = 368;
+  static const double mapHeight = 320;
   static const double mapBorder = tileSize / 2;
 
   // animation settings
@@ -123,7 +123,7 @@ class PixelAdventure extends FlameGame
       for (final level in MyLevel.values) level.name: WorldRoute(() => Level(myLvel: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_3.name));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_4.name));
   }
 }
 

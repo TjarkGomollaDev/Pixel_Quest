@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/collision_block.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/level/collision_block.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum RockHeadState implements AnimationState {

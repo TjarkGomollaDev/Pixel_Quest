@@ -37,7 +37,7 @@
     <property name="alwaysOn" type="bool" value="false"/>
    </properties>
   </object>
-  <object id="70" name="Trampoline" type="Trampoline" x="432" y="128" width="32" height="32"/>
+  <object id="70" name="Trampoline" type="Trampoline" x="128" y="288" width="32" height="32"/>
   <object id="71" name="Rock Head" type="Rock Head" x="496" y="16" width="48" height="48">
    <properties>
     <property name="offsetPos" type="float" value="16"/>
@@ -96,7 +96,7 @@
   </object>
   <object id="86" name="Finish" type="Finish" x="432" y="256" width="64" height="64"/>
   <object id="88" name="ArrowUp" type="ArrowUp" x="240" y="64" width="32" height="32"/>
-  <object id="89" name="Start" type="Start" x="80" y="256" width="64" height="64"/>
+  <object id="89" name="Start" type="Start" x="48" y="256" width="64" height="64"/>
   <object id="90" name="Checkpoint" type="Checkpoint" x="720" y="128" width="64" height="64"/>
   <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="80" width="16" height="16">
    <properties>
@@ -113,18 +113,19 @@
     <property name="side" type="int" value="1"/>
    </properties>
   </object>
-  <object id="104" name="Moving Platform" type="Moving Platform" x="160" y="176" width="32" height="16">
+  <object id="104" name="Moving Platform" type="Moving Platform" x="240" y="176" width="32" height="16">
    <properties>
     <property name="isVertical" type="bool" value="true"/>
     <property name="offsetNeg" type="float" value="0"/>
     <property name="offsetPos" type="float" value="8"/>
    </properties>
   </object>
-  <object id="106" name="Moving Platform" type="Moving Platform" x="160" y="272" width="32" height="16">
+  <object id="106" name="Moving Platform" type="Moving Platform" x="128" y="48" width="32" height="16">
    <properties>
+    <property name="isLeft" type="bool" value="true"/>
     <property name="isVertical" type="bool" value="false"/>
-    <property name="offsetNeg" type="float" value="9"/>
-    <property name="offsetPos" type="float" value="0"/>
+    <property name="offsetNeg" type="float" value="7"/>
+    <property name="offsetPos" type="float" value="2"/>
    </properties>
   </object>
  </objectgroup>

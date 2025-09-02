@@ -3,7 +3,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum TrampolineState implements AnimationState {
@@ -80,6 +80,10 @@ class Trampoline extends PositionComponent
   Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
     if (!_bounced) {
       _bounced = true;
+
+      // is needed, because otherwise the ground collision may reset the y velocity directly back to 0 before the player can even jump off
+      _player.position.y -= 1;
+
       _player.bounceUp(jumpForce: _bounceHeight);
       animationGroupComponent.current = TrampolineState.jump;
       await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;

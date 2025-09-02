@@ -22,7 +22,7 @@ import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
 import 'package:pixel_adventure/game/checkpoints/checkpoint.dart';
-import 'package:pixel_adventure/game/collision_block.dart';
+import 'package:pixel_adventure/game/level/collision_block.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/fire_trap.dart';
@@ -36,13 +36,14 @@ import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum MyLevel {
   level_1('Level_01', '01', 1),
   level_2('Level_02', '02', 2),
-  level_3('Level_03', '03', 3);
+  level_3('Level_03', '03', 3),
+  level_4('Level_04', '04', 4);
 
   final String name;
   final String btnName;
@@ -149,8 +150,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   void _checkBackgroundType(String? backgroundType) {
-    final size = Vector2(_levelMap.width, _levelMap.height);
-    final position = Vector2.zero();
+    final size = Vector2(
+      _levelMap.width - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
+      _levelMap.height - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
+    );
+    final position = Vector2.all(PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize : 0);
     BackgroundTileColor? color;
     if (backgroundType != null) {
       for (var szene in Szene.values) {
@@ -275,10 +279,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
               final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
               final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
               final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
+              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
               final movingPlatform = MovingPlatform(
-                isVertical: isVertical,
                 offsetNeg: offsetNeg,
                 offsetPos: offsetPos,
+                isVertical: isVertical,
+                isLeft: isLeft,
                 player: _player,
                 position: gridPosition,
               );
@@ -389,13 +395,14 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     final collisionsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Collisions');
     if (collisionsLayer != null) {
       for (var collision in collisionsLayer.objects) {
+        final gridPosition = snapVectorToGrid(Vector2(collision.x, collision.y));
         switch (collision.class_) {
-          case 'Plattform':
-            final platform = WorldBlock(isPlattform: true, position: Vector2(collision.x, collision.y), size: Vector2(collision.width, 5));
+          case 'Platform':
+            final platform = WorldBlock(isPlatform: true, position: gridPosition, size: Vector2(collision.width, 5));
             _collisionBlocks.add(platform);
             break;
           default:
-            final block = WorldBlock(position: Vector2(collision.x, collision.y), size: Vector2(collision.width, collision.height));
+            final block = WorldBlock(position: gridPosition, size: collision.size);
             _collisionBlocks.add(block);
         }
       }

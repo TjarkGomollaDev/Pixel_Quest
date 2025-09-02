@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/fan_air_stream.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum FanState implements AnimationState {

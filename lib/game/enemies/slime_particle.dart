@@ -2,7 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {

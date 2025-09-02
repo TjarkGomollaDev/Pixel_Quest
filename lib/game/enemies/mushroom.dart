@@ -4,7 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum MushroomState implements AnimationState {
@@ -36,9 +36,9 @@ class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   final Player _player;
 
   Mushroom({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
-    : _isLeft = isLeft,
-      _offsetPos = offsetPos,
+    : _offsetPos = offsetPos,
       _offsetNeg = offsetNeg,
+      _isLeft = isLeft,
       _player = player,
       super(size: gridSize);
 

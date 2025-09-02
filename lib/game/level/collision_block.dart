@@ -5,9 +5,9 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
-  final bool isPlattform;
+  final bool isPlatform;
 
-  WorldBlock({this.isPlattform = false, super.position, super.size});
+  WorldBlock({this.isPlatform = false, super.position, super.size});
 
   // actual hitbox
   late final RectangleHitbox _hitbox;

@@ -5,7 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/enemies/ghost_particle.dart';
 import 'package:pixel_adventure/game/enemies/slime_particle.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum SlimeState implements AnimationState {

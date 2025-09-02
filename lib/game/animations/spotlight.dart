@@ -28,7 +28,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelAdventure> 
 
     // create a new layer to safely apply the blend mode
     final layerPaint = Paint();
-    canvas.saveLayer(Rect.fromLTWH(0, 0, game.size.x, game.size.y), layerPaint);
+    canvas.saveLayer(Rect.fromLTWH(game.camera.viewfinder.position.x, 0, game.size.x, game.size.y), layerPaint);
 
     // draw a full black rectangle covering the entire screen
     final paint = Paint()..color = Colors.black;

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/collision_block.dart';
+import 'package:pixel_adventure/game/level/collision_block.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum MovingPlatformState implements AnimationState {
@@ -34,17 +34,20 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
+  final bool _isLeft;
   final Player _player;
 
   MovingPlatform({
     required double offsetNeg,
     required double offsetPos,
     required bool isVertical,
+    required bool isLeft,
     required Player player,
     required super.position,
   }) : _offsetNeg = offsetNeg,
        _offsetPos = offsetPos,
        _isVertical = isVertical,
+       _isLeft = isLeft,
        _player = player,
        super(size: gridSize);
 
@@ -63,9 +66,13 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   late final double _rangeNeg;
   late final double _rangePos;
 
+  // actual borders that compensate for the hitbox and flip offset, depending on the moveDirection
+  late double _leftBorder;
+  late double _rightBorder;
+
   // movement
-  final double _moveSpeed = 30;
   int _moveDirection = 1;
+  final double _moveSpeed = 24;
 
   // player on top
   bool _playerOnTop = false;
@@ -76,6 +83,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     _loadAllSpriteAnimations();
     _correctingPosition();
     _setUpRange();
+    _setUpMoveDirection();
     return super.onLoad();
   }
 
@@ -110,7 +118,6 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
     current = MovingPlatformState.on;
-    if (_moveDirection == -1) flipHorizontally();
   }
 
   void _correctingPosition() => position.y -= _hitbox.position.y;
@@ -125,32 +132,56 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     }
   }
 
+  void _setUpMoveDirection() {
+    _moveDirection = _isLeft ? -1 : 1;
+    if (_moveDirection == -1) flipHorizontallyAroundCenter();
+    if (!_isVertical) _updateActualBorders();
+  }
+
+  void _updateActualBorders() {
+    _leftBorder = (_moveDirection == -1) ? _rangeNeg : _rangeNeg - width;
+    _rightBorder = (_moveDirection == 1) ? _rangePos : _rangePos + width;
+  }
+
   // moves the saw vertically and changes direction if the end of the range is reached
   void _moveVertical(double dt) {
     if (position.y >= _rangePos && _moveDirection != -1) {
-      _moveDirection = -1;
-      flipHorizontallyAroundCenter();
+      _changeDirection(-1);
+      return;
     } else if (position.y <= _rangeNeg && _moveDirection != 1) {
-      _moveDirection = 1;
-      flipHorizontallyAroundCenter();
+      _changeDirection(1);
+      return;
     }
-    final moveY = _moveDirection * _moveSpeed * dt;
+
+    // movement
+    final moveY = (position.y + _moveDirection * _moveSpeed * dt).clamp(_rangeNeg, _rangePos) - position.y;
     position.y += moveY;
     if (_playerOnTop) _player.position.y += moveY;
   }
 
   // moves the saw horizontally and changes direction if the end of the range is reached
   void _moveHorizontal(double dt) {
-    if (position.x >= _rangePos && _moveDirection != -1) {
-      _moveDirection = -1;
-      flipHorizontallyAroundCenter();
-    } else if (position.x <= _rangeNeg && _moveDirection != 1) {
-      _moveDirection = 1;
-      flipHorizontallyAroundCenter();
+    if (position.x >= _rightBorder && _moveDirection != -1) {
+      _changeDirection(-1);
+      return;
+    } else if (position.x <= _leftBorder && _moveDirection != 1) {
+      _changeDirection(1);
+      return;
     }
-    final moveX = _moveDirection * _moveSpeed * dt;
+
+    // movement
+    final moveX = (position.x + _moveDirection * _moveSpeed * dt).clamp(_leftBorder, _rightBorder) - position.x;
     position.x += moveX;
     if (_playerOnTop) _player.position.x += moveX;
+  }
+
+  void _changeDirection(int newDirection) {
+    _moveDirection = newDirection;
+    if (!_isVertical) {
+      flipHorizontallyAroundCenter();
+      _updateActualBorders();
+      position.x = _moveDirection == 1 ? _leftBorder : _rightBorder;
+    }
   }
 
   @override
