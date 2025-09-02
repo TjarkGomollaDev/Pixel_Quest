@@ -13,7 +13,7 @@ class PauseRoute extends Route with HasGameReference<PixelAdventure> {
   @override
   void onPush(Route? previousRoute) {
     if (previousRoute is WorldRoute && previousRoute.world is DecoratedWorld) {
-      (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.white.withAlpha(10))..addBlur(4.0);
+      (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.black.withAlpha(50))..addBlur(5.0);
       (previousRoute.world as DecoratedWorld).timeScale = 0;
     }
   }

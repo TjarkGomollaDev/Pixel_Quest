@@ -48,7 +48,7 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
   late final double _rangePos;
 
   // movement
-  double _moveDirection = -1;
+  int _moveDirection = -1;
   final double _moveSpeed = 50; // [Adjustable]
 
   @override

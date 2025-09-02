@@ -6,18 +6,19 @@ import 'package:flutter/rendering.dart';
 // ignore: constant_identifier_names
 enum BackgroundTileColor { Blue, Brown, Gray, Green, Pink, Purple, Yellow }
 
-class LevelBackground extends ParallaxComponent {
-  final String color;
+class BackgroundColored extends ParallaxComponent {
+  final BackgroundTileColor _color;
 
-  LevelBackground({required this.color, required super.position, required super.size});
+  BackgroundColored({required BackgroundTileColor color, required super.position, required super.size}) : _color = color;
 
-  final double scrollSpeed = 40;
+  // velocity
+  static final Vector2 _baseVelocity = Vector2(0, 40);
 
   @override
   Future<void> onLoad() async {
     parallax = await game.loadParallax(
-      [ParallaxImageData('Background/$color.png')],
-      baseVelocity: Vector2(0, -scrollSpeed),
+      [ParallaxImageData('Background/${_color.name}.png')],
+      baseVelocity: _baseVelocity,
       repeat: ImageRepeat.repeat,
       fill: LayerFill.none,
     );

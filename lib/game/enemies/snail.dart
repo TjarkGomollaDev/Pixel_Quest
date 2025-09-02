@@ -53,7 +53,6 @@ class Snail extends PositionComponent
   final _shellHitbox = RectangleHitbox(position: Vector2(16, 13), size: Vector2(20, 19));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(38, 24);
   static const String _path = 'Enemies/Snail/';
   static const String _pathEnd = ' (38x24).png';
@@ -67,7 +66,7 @@ class Snail extends PositionComponent
   late double _rightBorder;
 
   // snail movement
-  late double _moveDirection;
+  late int _moveDirection;
   final double _moveSpeed = 28; // [Adjustable]
   double _speedFactor = 1;
 
@@ -125,7 +124,7 @@ class Snail extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in SnailState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SnailState.snailWalk);
   }
@@ -174,7 +173,7 @@ class Snail extends PositionComponent
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
-  void _changeSnailDirection(double newDirection) {
+  void _changeSnailDirection(int newDirection) {
     animationGroupComponent.current = SnailState.snailIdle;
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();

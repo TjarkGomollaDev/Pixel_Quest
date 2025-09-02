@@ -31,7 +31,6 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(64);
   static const String _path = 'Items/Checkpoints/Start/';
   static const String _pathEnd = ' (64x64).png';
@@ -65,7 +64,7 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<StartState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<StartState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in StartState.values) state: loadAnimation(state)};
     current = StartState.idle;
   }

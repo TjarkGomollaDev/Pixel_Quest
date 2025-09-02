@@ -41,7 +41,6 @@ class Turtle extends PositionComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 13), size: Vector2(29, 19));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(44, 26);
   static const String _path = 'Enemies/Turtle/';
   static const String _pathEnd = ' (44x26).png';
@@ -83,7 +82,7 @@ class Turtle extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TurtleState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<TurtleState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in TurtleState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TurtleState.idleSpikesOut);
     if (!_isLeft) flipHorizontallyAroundCenter();

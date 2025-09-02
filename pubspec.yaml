@@ -64,6 +64,9 @@ flutter:
     - assets/tiles/
     - assets/images/Terrain/
     - assets/images/Background/
+    - assets/images/Background/Szene 1/
+    - assets/images/Background/Szene 2/
+    - assets/images/Background/Szene 3/
     - assets/images/HUD/
     - assets/images/Menu/Buttons/
     - assets/images/Menu/Levels/

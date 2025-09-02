@@ -29,7 +29,6 @@ class Fire extends PositionComponent with PlayerCollision, HasGameReference<Pixe
   late final double _count;
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(16, 16);
   static const String _path = 'Traps/Fire/On (16x32).png';
   static const int _amount = 3;
@@ -70,7 +69,7 @@ class Fire extends PositionComponent with PlayerCollision, HasGameReference<Pixe
   }
 
   void _loadSpriteAnimation() {
-    final animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
+    final animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize);
     addSpriteRow(game: game, side: _side, count: _count, parent: this, animation: animation);
   }
 

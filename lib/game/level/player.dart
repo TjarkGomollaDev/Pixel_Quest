@@ -10,9 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
+import 'package:pixel_adventure/game/checkpoints/finish.dart';
+import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/collision_block.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
+import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
 import 'package:pixel_adventure/game/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -61,7 +64,7 @@ class Player extends SpriteAnimationGroupComponent
   static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
-  final RectangleHitbox hitbox = RectangleHitbox(position: Vector2(10, 4), size: Vector2(14, 28));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(9, 4), size: Vector2(14, 28));
 
   // these are the correct x and y values for the player hitbox, the x values are cleaned up from the horizontal flip
   late double hitboxLeft;
@@ -70,16 +73,15 @@ class Player extends SpriteAnimationGroupComponent
   late double hitboxBottom;
 
   // animation settings
-  final double _stepTime = 0.05;
-  final Vector2 _textureSize = Vector2(32, 32);
-  final String _path = 'Main Characters/';
-  final String _pathEnd = ' (32x32).png';
+  static final Vector2 _textureSize = Vector2(32, 32);
+  static const String _path = 'Main Characters/';
+  static const String _pathEnd = ' (32x32).png';
 
   // gravity
   final double _gravity = 9.8;
   final double _jumpForce = 310;
   final double _doubleJumpForce = 250;
-  final double _terminalVelocity = 400;
+  final double _terminalVelocity = 300;
 
   // movement
   double _horizontalMovement = 0;
@@ -94,21 +96,24 @@ class Player extends SpriteAnimationGroupComponent
   bool canDoubleJump = true;
   bool hasDoubleJumped = false;
 
-  // when activated, all collisions and movement (in update) are deactivated
-  // this is used when the level starts and when the player dies and respawns
+  // if true all collisions are deactivated, only the world collision is always on
   bool _spawnProtection = true;
 
-  // finish level
-  bool _hasReachedFinish = false;
+  // if true the world collision is deactivated (special case, e.g. for the spawn sequence at the start of the level)
+  bool isWorldCollisionInactive = true;
 
-  // counterpart to spawn protection, when activated, certain things should still be active in the update method
+  // if the true the player state is not automatically updated
+  bool _isPlayerStateActive = false;
+
+  // if true gravity is active
+  bool _isGravityActive = false;
 
   // special effect
   late final PlayerSpecialEffect _effect;
 
   // spawn position
   late final Vector2 _spawnPosition;
-  final double _spawnDropFall = 80;
+  final double _spawnDropFall = 120;
 
   // joystick for mobile
   JoystickComponent? _joystick;
@@ -116,6 +121,13 @@ class Player extends SpriteAnimationGroupComponent
 
   // respawn notifier
   final PlayerRespawnNotifier respawnNotifier = PlayerRespawnNotifier();
+
+  // completer to detect when the player is back on the ground
+  Completer<void>? _isOnGroundCompleter;
+
+  // completer to detect when the player has reached a target x position
+  Completer<void>? _isAtXCompleter;
+  double? _targetX;
 
   @override
   FutureOr<void> onLoad() {
@@ -126,132 +138,23 @@ class Player extends SpriteAnimationGroupComponent
     return super.onLoad();
   }
 
-  Completer<void>? _isOnGroundCompleter;
-
   @override
   void update(double dt) {
-    if (!_spawnProtection && !_hasReachedFinish) {
-      _updateHitboxEdges();
-      _updatePlayerState();
-      _updatePlayerMovement(dt);
-      _applyGravity(dt);
-      if (_joystick != null) updateJoystick();
-    }
-    if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) {
-      _isOnGroundCompleter!.complete();
-    }
+    _updateHitboxEdges(); // must be done before updatePlayerMovement, important for world collision
+    _updatePlayerMovement(dt);
+    if (_isGravityActive) _applyGravity(dt);
+    if (_isPlayerStateActive) _updatePlayerState();
+    if (!_spawnProtection && _joystick != null) updateJoystick();
+    if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) _isOnGroundCompleter!.complete();
+    if (_isAtXCompleter != null && !_isAtXCompleter!.isCompleted && _targetX == null) _isAtXCompleter!.complete();
+
     super.update(dt);
   }
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (_checkIsCollisionInactive()) return super.onCollisionStart(intersectionPoints, other);
-    if (other is PlayerCollision) other.onPlayerCollisionStart(intersectionPoints.first);
-    super.onCollisionStart(intersectionPoints, other);
-  }
-
-  @override
-  void onCollisionEnd(PositionComponent other) {
-    if (_checkIsCollisionInactive()) return super.onCollisionEnd(other);
-    if (other is PlayerCollision) other.onPlayerCollisionEnd();
-    super.onCollisionEnd(other);
-  }
-
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is CollisionBlock) onWorldCollision(other as CollisionBlock);
-    if (_checkIsCollisionInactive()) return super.onCollision(intersectionPoints, other);
-    if (other is PlayerCollision) other.onPlayerCollision(intersectionPoints.first);
-    super.onCollision(intersectionPoints, other);
-  }
-
-  void onWorldCollision(CollisionBlock other) {
-    // positions of the two hitboxes
-    final rect = other.solidHitbox.toAbsoluteRect();
-    final playerRect = Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
-
-    // overlap calculation
-    final overlapX = (playerRect.center.dx < rect.center.dx) ? (playerRect.right - rect.left) : (rect.right - playerRect.left);
-    final overlapY = (playerRect.center.dy < rect.center.dy) ? (playerRect.bottom - rect.top) : (rect.bottom - playerRect.top);
-
-    // check whether the y ranges overlap → otherwise no horizontal collision
-    final hasVerticalIntersection = playerRect.top < rect.bottom && playerRect.bottom > rect.top;
-
-    // check whether the x ranges overlap → otherwise no vertical collision
-    final hasHorizontalIntersection = playerRect.left < rect.right && playerRect.right > rect.left;
-
-    // special cases
-    bool forceVertical = false;
-    if (other is WorldBlock && other.isPlattform) {
-      // plattform collision
-      _resolveOneWayTopCollision(playerRect.bottom, rect.top, hasHorizontalIntersection);
-      return;
-    } else if (other is RockHead) {
-      // the rapid movement of the rockhead can cause the collision direction to be misinterpreted
-      forceVertical = _verticalSweptCheck(other, playerRect, hasHorizontalIntersection);
-    }
-
-    if (overlapX < overlapY && hasVerticalIntersection && !forceVertical) {
-      // horizontal collision
-      if (playerRect.center.dx < rect.center.dx) {
-        _resolveLeftCollision(rect.left);
-      } else {
-        _resolveRightCollision(rect.right);
-      }
-    } else if (hasHorizontalIntersection) {
-      // vertical collision
-      if (playerRect.center.dy < rect.center.dy) {
-        _resolveTopCollision(rect.top);
-      } else {
-        _resolveBottomCollision(rect.bottom);
-      }
-    }
-  }
-
-  bool _verticalSweptCheck(RockHead block, Rect playerRect, bool hasHorizontalIntersection) {
-    final oldTop = block.previousY;
-    final newBottom = block.position.y + block.height;
-
-    // check whether the block intersected the player hitbox in the last frame, only the y values are checked
-    return hasHorizontalIntersection && playerRect.bottom > oldTop && playerRect.top < newBottom;
-  }
-
-  void _resolveOneWayTopCollision(double playerBottom, double top, bool hasHorizontalIntersection) {
-    if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopCollision(top);
-  }
-
-  void _resolveTopCollision(double blockTop) {
-    position.y = blockTop - hitbox.position.y - hitbox.height;
-    velocity.y = 0;
-    isOnGround = true;
-    canDoubleJump = true;
-  }
-
-  void _resolveBottomCollision(double blockBottom) {
-    if (isOnGround) {
-      _respawn();
-    } else {
-      position.y = blockBottom - hitbox.position.y;
-      velocity.y = 0;
-      // reset can double jump if the player hits their head
-      canDoubleJump = false;
-    }
-  }
-
-  void _resolveLeftCollision(double blockLeft) {
-    position.x = (scale.x < 0) ? blockLeft + hitbox.position.x : blockLeft - hitbox.position.x - hitbox.width;
-    velocity.x = 0;
-  }
-
-  void _resolveRightCollision(double blockRight) {
-    position.x = (scale.x < 0) ? blockRight + hitbox.position.x + hitbox.width : blockRight - hitbox.position.x;
-    velocity.x = 0;
-  }
-
-  bool _checkIsCollisionInactive() => _hasReachedFinish || _spawnProtection;
-
-  @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (_spawnProtection) return false;
+
     _horizontalMovement = 0;
     final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA) || keysPressed.contains(LogicalKeyboardKey.arrowLeft);
     final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD) || keysPressed.contains(LogicalKeyboardKey.arrowRight);
@@ -269,16 +172,131 @@ class Player extends SpriteAnimationGroupComponent
     return super.onKeyEvent(event, keysPressed);
   }
 
+  @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (_spawnProtection) return super.onCollisionStart(intersectionPoints, other);
+    if (other is PlayerCollision) other.onPlayerCollisionStart(intersectionPoints.first);
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    if (_spawnProtection) return super.onCollisionEnd(other);
+    if (other is PlayerCollision) other.onPlayerCollisionEnd();
+    super.onCollisionEnd(other);
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (isWorldCollisionInactive && other is Start) {
+      isWorldCollisionInactive = false;
+      _spawnProtection = false;
+      onWorldCollision(other as CollisionBlock);
+    } else if (!isWorldCollisionInactive) {
+      if (other is CollisionBlock) onWorldCollision(other as CollisionBlock);
+      if (_spawnProtection) return super.onCollision(intersectionPoints, other);
+      if (other is PlayerCollision) other.onPlayerCollision(intersectionPoints.first);
+    }
+
+    super.onCollision(intersectionPoints, other);
+  }
+
+  void onWorldCollision(CollisionBlock other) {
+    // positions of the two hitboxes
+    final rect = other.solidHitbox.toAbsoluteRect();
+    final playerRect = hitbox;
+
+    // overlap calculation
+    final overlapX = (playerRect.center.dx < rect.center.dx) ? (playerRect.right - rect.left) : (rect.right - playerRect.left);
+    final overlapY = (playerRect.center.dy < rect.center.dy) ? (playerRect.bottom - rect.top) : (rect.bottom - playerRect.top);
+
+    // check whether the y ranges overlap → otherwise no horizontal collision
+    final hasVerticalIntersection = playerRect.top < rect.bottom && playerRect.bottom > rect.top;
+
+    // check whether the x ranges overlap → otherwise no vertical collision
+    final hasHorizontalIntersection = playerRect.left < rect.right && playerRect.right > rect.left;
+
+    // special cases
+    bool forceVertical = false;
+    if (other is WorldBlock && other.isPlattform) {
+      // plattform collision
+      _resolveOneWayTopCollision(playerRect.bottom, rect.top, hasHorizontalIntersection, other);
+      return;
+    } else if (other is RockHead) {
+      // the rapid movement of the rockhead can cause the collision direction to be misinterpreted
+      forceVertical = _verticalSweptCheck(other, playerRect, hasHorizontalIntersection);
+    }
+
+    if (overlapX < overlapY && hasVerticalIntersection && !forceVertical) {
+      // horizontal collision
+      if (playerRect.center.dx < rect.center.dx) {
+        _resolveLeftCollision(rect.left);
+      } else {
+        _resolveRightCollision(rect.right);
+      }
+    } else if (hasHorizontalIntersection) {
+      // vertical collision
+      if (playerRect.center.dy < rect.center.dy) {
+        _resolveTopCollision(rect.top, other);
+      } else {
+        _resolveBottomCollision(rect.bottom, other);
+      }
+    }
+  }
+
+  bool _verticalSweptCheck(RockHead rect, Rect playerRect, bool hasHorizontalIntersection) {
+    final oldTop = rect.previousY;
+    final newBottom = rect.position.y + rect.height;
+
+    // check whether the block intersected the player hitbox in the last frame, only the y values are checked
+    return hasHorizontalIntersection && playerRect.bottom > oldTop && playerRect.top < newBottom;
+  }
+
+  void _resolveOneWayTopCollision(double playerBottom, double top, bool hasHorizontalIntersection, CollisionBlock other) {
+    if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopCollision(top, other);
+  }
+
+  void _resolveTopCollision(double blockTop, CollisionBlock other) {
+    position.y = blockTop - _hitbox.position.y - _hitbox.height;
+    velocity.y = 0;
+    isOnGround = true;
+    canDoubleJump = true;
+    if (other is MovingPlatform && other.moveDirection == 1) other.onPlayerCollision(Vector2.zero());
+    if (other is Finish) other.reachedFinish();
+  }
+
+  void _resolveBottomCollision(double blockBottom, CollisionBlock other) {
+    if (isOnGround) {
+      _respawn();
+    } else {
+      position.y = blockBottom - _hitbox.position.y;
+      velocity.y = 0;
+      // reset can double jump if the player hits their head
+      canDoubleJump = false;
+      if (other is MovingPlatform && other.isVertical && other.moveDirection == 1) position.y += 1;
+    }
+  }
+
+  void _resolveLeftCollision(double blockLeft) {
+    position.x = (scale.x < 0) ? blockLeft + _hitbox.position.x : blockLeft - _hitbox.position.x - _hitbox.width;
+    velocity.x = 0;
+  }
+
+  void _resolveRightCollision(double blockRight) {
+    position.x = (scale.x < 0) ? blockRight + _hitbox.position.x + _hitbox.width : blockRight - _hitbox.position.x;
+    velocity.x = 0;
+  }
+
   void _initialSetup() {
     // debug
     if (game.customDebug) {
-      hitbox.debugMode = true;
-      hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
+      _hitbox.debugMode = true;
+      _hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }
 
     // general
     priority = PixelAdventure.playerLayerLevel;
-    add(hitbox);
+    add(_hitbox);
   }
 
   void setJoystick(JoystickComponent joystick) => _joystick = joystick;
@@ -304,7 +322,13 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlayerState>(game, '$_path${_character.name}/', _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<PlayerState>(
+      game,
+      '$_path${_character.name}/',
+      _pathEnd,
+      PixelAdventure.stepTime,
+      _textureSize,
+    );
     animations = {for (var state in PlayerState.values) state: loadAnimation(state)};
     current = PlayerState.idle;
   }
@@ -312,6 +336,7 @@ class Player extends SpriteAnimationGroupComponent
   void _setUpSpawnPosition() {
     isVisible = false;
     _spawnPosition = _startPosition - Vector2(0, _spawnDropFall);
+    position = _spawnPosition;
     _effect = PlayerSpecialEffect();
     world.add(_effect);
   }
@@ -343,7 +368,19 @@ class Player extends SpriteAnimationGroupComponent
     if (velocity.y > _gravity) isOnGround = false;
 
     velocity.x = _horizontalMovement * _moveSpeed;
-    position.x += velocity.x * dt;
+    if (_isAtXCompleter != null && _targetX != null) {
+      if (_horizontalMovement == 1) {
+        position.x = (position.x + velocity.x * dt).clamp(double.negativeInfinity, _targetX!);
+      } else if (_horizontalMovement == -1) {
+        position.x = (position.x + velocity.x * dt).clamp(_targetX!, double.infinity);
+      }
+      if (position.x == _targetX) {
+        _horizontalMovement = 0;
+        _targetX = null;
+      }
+    } else {
+      position.x += velocity.x * dt;
+    }
   }
 
   void _playerJump(double dt) {
@@ -370,19 +407,32 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> spawnInLevel() async {
     // play appearing animation
     await _effect.playAppearing(_spawnPosition);
-
-    // spawn modus
+    _isPlayerStateActive = true;
+    _isGravityActive = true;
     isVisible = true;
-    position = _spawnPosition;
 
-    // deactivate spawn modus when player is on ground
-    await waitUntilPlayerIsOnGround();
-    _spawnProtection = false;
+    // spawn protection is deactivated as soon as the player lands on the starting platform, take a look at onCollision
   }
 
-  Future<void> waitUntilPlayerIsOnGround() {
+  Future<void> _waitUntilPlayerIsOnGround() {
     _isOnGroundCompleter = Completer<void>();
     return _isOnGroundCompleter!.future;
+  }
+
+  Future<void> _waitUntilPlayerIsAtFinishCenter(double newTargetX) {
+    if (hitbox.center.dx < newTargetX) {
+      if (scale.x < 0) flipHorizontallyAroundCenter();
+      _horizontalMovement = 1;
+      _targetX = newTargetX - _hitbox.position.x - _hitbox.width / 2;
+    } else if (hitbox.center.dx > newTargetX) {
+      if (scale.x > 0) flipHorizontallyAroundCenter();
+      _horizontalMovement = -1;
+      _targetX = newTargetX + width - _hitbox.position.x - _hitbox.width / 2;
+    } else {
+      return Future.value();
+    }
+    _isAtXCompleter = Completer<void>();
+    return _isAtXCompleter!.future;
   }
 
   void reachedCheckpoint(Vector2 checkpointPosition) {
@@ -400,17 +450,20 @@ class Player extends SpriteAnimationGroupComponent
     return 1;
   }
 
-  Future<void> reachedFinish() async {
-    velocity = Vector2.zero();
-    _hasReachedFinish = true;
+  Future<void> reachedFinish(ShapeHitbox finish) async {
+    _horizontalMovement = 0;
+    _spawnProtection = true;
 
     // delays are not functional, but purely for a more visually appealing result
     final delays = [200, 800, 80, 620, 120, 600, 400, 200];
     int delayIndex = 0;
 
+    // player moves to the horizontal center of the finish
+    await _waitUntilPlayerIsAtFinishCenter(finish.toAbsoluteRect().center.dx);
+
     // spotlight animation
     world.removeGameHudOnFinish();
-    final playerCenter = Vector2((hitboxLeft + hitboxRight) / 2, position.y + height / 2);
+    final playerCenter = hitbox.center.toVector2();
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: PixelAdventure.finishSpotlightAnimationRadius);
     world.add(spotlight);
     await spotlight.startAnimation(2.0);
@@ -442,7 +495,7 @@ class Player extends SpriteAnimationGroupComponent
     }
     delayIndex++;
 
-    // delete all outline stars that are behind
+    // delete all outline stars that are behind the earned stars
     for (var i = 0; i < stars.length; i++) {
       world.remove(outlineStars[0]);
       outlineStars.removeAt(0);
@@ -454,12 +507,12 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
     current = PlayerState.doubleJump;
     await animationTickers![PlayerState.doubleJump]!.completed;
-    await waitUntilPlayerIsOnGround();
+    await _waitUntilPlayerIsOnGround();
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // player disapperaing animation
     isVisible = false;
-    await _effect.playDisappearing(position, scale.x);
+    await _effect.playDisappearing(scale.x > 0 ? position : position - Vector2(width, 0));
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // fade stars out and shrink light circle to zero
@@ -479,6 +532,9 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> _respawn() async {
     // hit
     _spawnProtection = true;
+    _isPlayerStateActive = false;
+    _isGravityActive = false;
+    _horizontalMovement = 0;
     respawnNotifier.notifyRespawn();
     current = PlayerState.hit;
     await animationTickers![PlayerState.hit]!.completed;
@@ -488,6 +544,8 @@ class Player extends SpriteAnimationGroupComponent
     scale.x = 1;
     velocity = Vector2.zero();
     position = _startPosition;
+    _isPlayerStateActive = true;
+    _isGravityActive = true;
 
     // a frame must be maintained, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -505,11 +563,14 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updateHitboxEdges() {
-    hitboxLeft = (scale.x > 0) ? x + hitbox.position.x : x - hitbox.position.x - hitbox.width;
-    hitboxRight = hitboxLeft + hitbox.width;
-    hitboxTop = position.y + hitbox.position.y;
-    hitboxBottom = hitboxTop + hitbox.height;
+    hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
+    hitboxRight = hitboxLeft + _hitbox.width;
+    hitboxTop = position.y + _hitbox.position.y;
+    hitboxBottom = hitboxTop + _hitbox.height;
   }
+
+  Rect get hitbox => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
+  Vector2 get hitboxPosition => _hitbox.position;
 }
 
 class PlayerHitboxPositionProvider extends PositionProvider {

@@ -16,7 +16,8 @@ import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/hud/jump_btn.dart';
-import 'package:pixel_adventure/game/level/level_background.dart';
+import 'package:pixel_adventure/game/level/background_colored.dart';
+import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
@@ -72,7 +73,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   late final TiledComponent _levelMap;
 
   // level background
-  late final LevelBackground _levelBackground;
+  late final ParallaxComponent _levelBackground;
 
   // all collision blocks
   final List<WorldBlock> _collisionBlocks = [];
@@ -140,14 +141,32 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void _addLevelBackground() {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
-      final backgroundColor = backgroundLayer.properties.getValue<String?>('BackgroundColor');
-      final safeColor = BackgroundTileColor.values.map((e) => e.name).contains(backgroundColor)
-          ? backgroundColor
-          : BackgroundTileColor.Gray.name;
-      _levelBackground = LevelBackground(color: safeColor!, position: Vector2.zero(), size: Vector2(_levelMap.width, _levelMap.height))
-        ..priority = PixelAdventure.backgroundLayerLevel;
+      final backgroundType = backgroundLayer.properties.getValue<String?>('BackgroundType');
+      _checkBackgroundType(backgroundType);
+      _levelBackground.priority = PixelAdventure.backgroundLayerLevel;
       add(_levelBackground);
     }
+  }
+
+  void _checkBackgroundType(String? backgroundType) {
+    final size = Vector2(_levelMap.width, _levelMap.height);
+    final position = Vector2.zero();
+    BackgroundTileColor? color;
+    if (backgroundType != null) {
+      for (var szene in Szene.values) {
+        if (szene.name == backgroundType) {
+          _levelBackground = BackgroundSzene(szene: szene, position: position, size: size);
+          return;
+        }
+      }
+      for (var tileColor in BackgroundTileColor.values) {
+        if (tileColor.name == backgroundType) {
+          color = tileColor;
+          break;
+        }
+      }
+    }
+    _levelBackground = BackgroundColored(color: color ?? BackgroundTileColor.Gray, position: position, size: size);
   }
 
   void _addSpawningObjects() {

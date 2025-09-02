@@ -37,14 +37,14 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   final Player _player;
 
   MovingPlatform({
-    required bool isVertical,
     required double offsetNeg,
     required double offsetPos,
+    required bool isVertical,
     required Player player,
     required super.position,
-  }) : _isVertical = isVertical,
+  }) : _offsetNeg = offsetNeg,
        _offsetPos = offsetPos,
-       _offsetNeg = offsetNeg,
+       _isVertical = isVertical,
        _player = player,
        super(size: gridSize);
 
@@ -52,10 +52,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   static final Vector2 gridSize = Vector2(32, 16);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(32, 8));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 2), size: Vector2(32, 5));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(32, 16);
   static const String _path = 'Traps/Platforms/Grey ';
   static const String _pathEnd = ' (32x8).png';
@@ -66,7 +65,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   // movement
   final double _moveSpeed = 30;
-  double _moveDirection = 1;
+  int _moveDirection = 1;
 
   // player on top
   bool _playerOnTop = false;
@@ -75,6 +74,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
+    _correctingPosition();
     _setUpRange();
     return super.onLoad();
   }
@@ -94,7 +94,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   void _initialSetup() {
     // debug
     if (game.customDebug) {
-      // debugMode = true;
+      debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
@@ -103,48 +103,50 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     priority = PixelAdventure.trapLayerLevel;
     _player.respawnNotifier.addListener(onPlayerCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
-    anchor = Anchor.topCenter;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
     current = MovingPlatformState.on;
     if (_moveDirection == -1) flipHorizontally();
   }
+
+  void _correctingPosition() => position.y -= _hitbox.position.y;
 
   void _setUpRange() {
     if (_isVertical) {
       _rangeNeg = position.y - _offsetNeg * PixelAdventure.tileSize;
       _rangePos = position.y + _offsetPos * PixelAdventure.tileSize;
     } else {
-      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width / 2;
-      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width / 2;
+      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width;
+      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize;
     }
   }
 
   // moves the saw vertically and changes direction if the end of the range is reached
   void _moveVertical(double dt) {
-    if (position.y > _rangePos && _moveDirection != -1) {
+    if (position.y >= _rangePos && _moveDirection != -1) {
       _moveDirection = -1;
-      flipHorizontally();
-    } else if (position.y < _rangeNeg && _moveDirection != 1) {
+      flipHorizontallyAroundCenter();
+    } else if (position.y <= _rangeNeg && _moveDirection != 1) {
       _moveDirection = 1;
-      flipHorizontally();
+      flipHorizontallyAroundCenter();
     }
     final moveY = _moveDirection * _moveSpeed * dt;
     position.y += moveY;
+    if (_playerOnTop) _player.position.y += moveY;
   }
 
   // moves the saw horizontally and changes direction if the end of the range is reached
   void _moveHorizontal(double dt) {
-    if (position.x > _rangePos && _moveDirection != -1) {
+    if (position.x >= _rangePos && _moveDirection != -1) {
       _moveDirection = -1;
-      flipHorizontally();
-    } else if (position.x < _rangeNeg && _moveDirection != 1) {
+      flipHorizontallyAroundCenter();
+    } else if (position.x <= _rangeNeg && _moveDirection != 1) {
       _moveDirection = 1;
-      flipHorizontally();
+      flipHorizontallyAroundCenter();
     }
     final moveX = _moveDirection * _moveSpeed * dt;
     position.x += moveX;
@@ -152,18 +154,15 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   }
 
   @override
-  void onPlayerCollision(Vector2 intersectionPoint) {
-    if (intersectionPoint.y == position.y) {
-      // once he is taken away, he no longer has to be on at least half of his hitbox
-      if (_playerOnTop) return;
-
-      // when entering the platform, at least half of the player's hitbox must be on the platform in order to be carried along
-    }
-  }
+  void onPlayerCollision(Vector2 intersectionPoint) => _playerOnTop = true;
 
   @override
   void onPlayerCollisionEnd() => _playerOnTop = false;
 
   @override
   ShapeHitbox get solidHitbox => _hitbox;
+
+  int get moveDirection => _moveDirection;
+
+  bool get isVertical => _isVertical;
 }

@@ -41,7 +41,6 @@ class Trampoline extends PositionComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 21), size: Vector2(23, 11));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(28, 28);
   static const String _path = 'Traps/Trampoline/';
   static const String _pathEnd = '.png';
@@ -72,7 +71,7 @@ class Trampoline extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TrampolineState.idle);
   }

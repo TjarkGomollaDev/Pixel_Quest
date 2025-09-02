@@ -45,7 +45,6 @@ class Ghost extends PositionComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(13, 7), size: Vector2(21, 25));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(44, 30);
   static const String _path = 'Enemies/Ghost/';
   static const String _pathEnd = ' (44x30).png';
@@ -59,7 +58,7 @@ class Ghost extends PositionComponent
   late double _rightBorder;
 
   // movement
-  late double _moveDirection;
+  late int _moveDirection;
   final double _moveSpeed = 24; // [Adjustable]
 
   // ghost timer
@@ -116,7 +115,7 @@ class Ghost extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in GhostState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: GhostState.idle);
   }
@@ -184,7 +183,7 @@ class Ghost extends PositionComponent
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
-  void _changeDirection(double newDirection) {
+  void _changeDirection(int newDirection) {
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();
 

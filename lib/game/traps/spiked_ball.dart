@@ -56,7 +56,7 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure>
   late final double _halfArcRadEnd;
 
   // movement
-  late double _moveDirection;
+  late int _moveDirection;
   late final double _scaledSpeed;
   late double _angle;
   late double _time;

@@ -47,7 +47,6 @@ class Chicken extends PositionComponent
   late double _hitboxPositionRightX;
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(32, 34);
   static const String _path = 'Enemies/Chicken/';
   static const String _pathEnd = ' (32x34).png';
@@ -62,7 +61,7 @@ class Chicken extends PositionComponent
 
   // movement
   final Vector2 _velocity = Vector2.zero();
-  late double _moveDirection;
+  late int _moveDirection;
   final double _runSpeed = 80; // [Adjustable]
 
   // got stomped
@@ -102,7 +101,7 @@ class Chicken extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<ChickenState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<ChickenState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in ChickenState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ChickenState.idle);
   }

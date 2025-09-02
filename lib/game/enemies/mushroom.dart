@@ -49,7 +49,6 @@ class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(32);
   static const String _path = 'Enemies/Mushroom/';
   static const String _pathEnd = ' (32x32).png';
@@ -63,7 +62,7 @@ class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   late double _rightBorder;
 
   // movement
-  late double _moveDirection;
+  late int _moveDirection;
   final double _moveSpeed = 48; // [Adjustable]
   double _speedFactor = 1;
 
@@ -108,7 +107,7 @@ class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<MushroomState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in MushroomState.values) state: loadAnimation(state)};
     current = MushroomState.run;
   }
@@ -153,7 +152,7 @@ class Mushroom extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
-  void _changeDirection(double newDirection) {
+  void _changeDirection(int newDirection) {
     current = MushroomState.idle;
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();

@@ -60,7 +60,6 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   late double _hitboxPositionRightX;
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(64, 32);
   static const String _path = 'Enemies/Trunk/';
   static const String _pathEnd = ' (64x32).png';
@@ -78,8 +77,8 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   late final double _attackRangePos;
 
   // movement
-  late double _moveDirection;
-  double? _pendingDirection;
+  late int _moveDirection;
+  int? _pendingDirection;
   final double _moveSpeed = 40; // [Adjustable]
   double _speedFactor = 1;
 
@@ -169,7 +168,7 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in TrunkState.values) state: loadAnimation(state)};
     current = TrunkState.run;
   }
@@ -240,7 +239,7 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
     _updateHitboxEdges();
   }
 
-  void _startDirectionChange(double newDirection) {
+  void _startDirectionChange(int newDirection) {
     // change of direction recognized, but still pending
     current = TrunkState.idle;
     _pendingDirection = newDirection;

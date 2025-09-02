@@ -19,7 +19,6 @@ class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGa
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
 
   // animation settings
-  static const double _stepTime = 0.07;
   static final Vector2 _textureSize = Vector2.all(16);
   static const int _amount = 4;
   static const String _path = 'Enemies/Slime/Particles (16x16).png';
@@ -46,7 +45,7 @@ class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGa
   }
 
   Future<void> _loadAndPlayAnimationOneTime() async {
-    animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize, loop: false);
+    animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize, loop: false);
     if (!spawnOnLeftSide) flipHorizontallyAroundCenter();
 
     // stop animation at first frame

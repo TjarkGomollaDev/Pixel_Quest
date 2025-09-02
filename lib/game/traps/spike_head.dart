@@ -40,7 +40,6 @@ class SpikeHead extends PositionComponent
   late final CompositeHitbox _hitbox;
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(54, 52);
   static const String _path = 'Traps/Spike Head/';
   static const String _pathEnd = ' (54x52).png';
@@ -54,7 +53,7 @@ class SpikeHead extends PositionComponent
   late final double _bottomtBorder;
 
   // movement
-  double _moveDirection = -1;
+  int _moveDirection = -1;
   late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]
@@ -112,7 +111,7 @@ class SpikeHead extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in SpikeHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SpikeHeadState.idle, isBottomCenter: false);
   }
@@ -145,7 +144,7 @@ class SpikeHead extends PositionComponent
     }
   }
 
-  Future<void> _changeDirection(double newDirection) async {
+  Future<void> _changeDirection(int newDirection) async {
     _directionChangePending = true;
     final SpikeHeadState hitAnimation;
     if (newDirection == 1) {

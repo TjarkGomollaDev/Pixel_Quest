@@ -32,7 +32,7 @@ class TrunkBullet extends SpriteComponent with PlayerCollision, HasGameReference
 
   // movement
   final double _moveSpeed = 260; // [Adjustable]
-  late double _moveDirection;
+  late int _moveDirection;
 
   // spawn protection to prevent flickering if the bullet is spawned in a collision block
   int _spawnProtectionFrames = 2;

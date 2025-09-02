@@ -42,7 +42,6 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 6), size: Vector2(24, 19));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(32);
   static const String _path = 'Enemies/BlueBird/';
   static const String _pathEnd = ' (32x32).png';
@@ -56,7 +55,7 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   late double _rightBorder;
 
   // movement
-  late double _moveDirection;
+  late int _moveDirection;
   final double _moveSpeed = 24; // [Adjustable]
   double _speedFactor = 1;
 
@@ -108,7 +107,7 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in BlueBirdState.values) state: loadAnimation(state)};
     current = BlueBirdState.fly;
   }
@@ -155,7 +154,7 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
     position.x = newPositionX.clamp(_leftBorder, _rightBorder);
   }
 
-  void _changeDirection(double newDirection) {
+  void _changeDirection(int newDirection) {
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();
 

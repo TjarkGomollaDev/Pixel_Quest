@@ -35,7 +35,6 @@ class Finish extends SpriteAnimationGroupComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(15, 20), size: Vector2(34, 44));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(64);
   static const String _path = 'Items/Checkpoints/End/';
   static const String _pathEnd = ' (64x64).png';
@@ -65,21 +64,18 @@ class Finish extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FinishState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FinishState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in FinishState.values) state: loadAnimation(state)};
     current = FinishState.idle;
   }
 
-  @override
-  Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
+  Future<void> reachedFinish() async {
     if (reached) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
-      reached = true;
-      current = FinishState.pressed;
-      _player.reachedFinish();
-      await animationTickers![FinishState.pressed]!.completed;
-      current = FinishState.idle;
-    }
+    reached = true;
+    current = FinishState.pressed;
+    _player.reachedFinish(_hitbox);
+    await animationTickers![FinishState.pressed]!.completed;
+    current = FinishState.idle;
   }
 
   @override

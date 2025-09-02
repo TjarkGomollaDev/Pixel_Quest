@@ -17,7 +17,6 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
   static final Vector2 gridSize = Vector2.all(16);
 
   // animation settings
-  static const double _stepTime = 0.07;
   static final Vector2 _textureSize = Vector2.all(16);
   static const int _amount = 4;
   static const String _path = 'Enemies/Ghost/Ghost Particles (16x16).png';
@@ -41,7 +40,7 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
   }
 
   void _loadAndPlayAnimationOneTime() {
-    animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize, loop: false);
+    animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize, loop: false);
     if (_spawnOnLeftSide) flipHorizontallyAroundCenter();
     animationTicker!.completed.then((_) => removeFromParent());
   }

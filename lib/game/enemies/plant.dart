@@ -42,7 +42,6 @@ class Plant extends PositionComponent
   final _hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(20, 30));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(44, 42);
   static const String _path = 'Enemies/Plant/';
   static const String _pathEnd = ' (44x42).png';
@@ -88,7 +87,7 @@ class Plant extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlantState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<PlantState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in PlantState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: PlantState.idle);
     if (!_isLeft) flipHorizontallyAroundCenter();

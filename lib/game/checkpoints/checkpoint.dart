@@ -43,7 +43,6 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(19, 18), size: Vector2(9, 46));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(64);
   static const String _path = 'Items/Checkpoints/Checkpoint/Checkpoint (';
   static const String _pathEnd = ').png';
@@ -80,13 +79,13 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<CheckpointState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<CheckpointState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in CheckpointState.values) state: loadAnimation(state)};
     current = CheckpointState.noFlag;
   }
 
   void _setUpRespawn() => _playerRespawn = Vector2(
-    position.x + _hitbox.position.x + _hitbox.width - _player.hitbox.position.x + _offset,
+    position.x + _hitbox.position.x + _hitbox.width - _player.hitboxPosition.x + _offset,
     position.y + height - _player.height,
   );
 

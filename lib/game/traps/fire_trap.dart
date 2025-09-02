@@ -44,7 +44,6 @@ class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(16, 32);
   static const String _path = 'Traps/Fire/';
   static const String _pathEnd = ' (16x32).png';
@@ -79,14 +78,15 @@ class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {for (var state in FireTrapState.values) state: loadAnimation(state)};
     current = FireTrapState.off;
   }
 
   @override
   Future<void> onPlayerCollision(Vector2 intersectionPoint) async {
-    if (!_isFireActivated && intersectionPoint.y == position.y + _hitbox.height) {
+    if (!ckeckHorizontalIntersection(_player.hitbox, _hitbox.toAbsoluteRect())) return;
+    if (!_isFireActivated && intersectionPoint.y >= position.y + _hitbox.height) {
       current = FireTrapState.hit;
       _isFireActivated = true;
       await animationTickers![FireTrapState.hit]!.completed;

@@ -40,7 +40,6 @@ class ArrowUp extends PositionComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(11, 11), size: Vector2(10, 10));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(18);
   static const String _path = 'Traps/Arrow/';
   static const String _pathEnd = ' (18x18).png';
@@ -72,7 +71,7 @@ class ArrowUp extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<ArrowUpState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<ArrowUpState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in ArrowUpState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ArrowUpState.idle, isBottomCenter: false);
   }

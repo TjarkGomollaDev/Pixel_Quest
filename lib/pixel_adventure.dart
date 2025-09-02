@@ -68,6 +68,8 @@ class PixelAdventure extends FlameGame
   static const double mapHeight = 368;
   static const double mapBorder = tileSize / 2;
 
+  // animation settings
+  static const double stepTime = 0.05;
   static const double finishSpotlightAnimationRadius = 60;
 
   // the next checkpoint is only activated if it is further to the right in the level than the current one plus a buffer

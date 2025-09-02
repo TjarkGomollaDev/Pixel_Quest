@@ -38,11 +38,13 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   // size
   static final Vector2 gridSize = Vector2.all(48);
 
+  // only relevant for world collision in the player
+  late double previousY;
+
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(8, 8), size: Vector2(32, 32));
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2(42, 42);
   static const String _path = 'Traps/Rock Head/';
   static const String _pathEnd = ' (42x42).png';
@@ -56,7 +58,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   late final double _bottomtBorder;
 
   // movement
-  double _moveDirection = -1;
+  int _moveDirection = -1;
   late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]
@@ -98,7 +100,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     final animations = {for (var state in RockHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: RockHeadState.idle, isBottomCenter: false);
   }
@@ -115,10 +117,9 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
 
   void _correctingStartPosition() {
     position.y = _topBorder;
+    previousY = position.y;
     _moveSpeed = _moveSpeedDown;
   }
-
-  late double previousY;
 
   void _movement(double dt) {
     // change move direction if we reached the borders
@@ -134,7 +135,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
     }
   }
 
-  Future<void> _changeDirection(double newDirection) async {
+  Future<void> _changeDirection(int newDirection) async {
     _directionChangePending = true;
     final RockHeadState hitAnimation;
     if (newDirection == 1) {

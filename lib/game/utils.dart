@@ -263,3 +263,11 @@ mixin PlayerCollision on PositionComponent {
   void onPlayerCollision(Vector2 intersectionPoint) {}
   void onPlayerCollisionEnd() {}
 }
+
+bool checkVerticalIntersection(Rect object_1, Rect object_2) {
+  return object_1.top < object_2.bottom && object_1.bottom > object_2.top;
+}
+
+bool ckeckHorizontalIntersection(Rect object_1, Rect object_2) {
+  return object_1.left < object_2.right && object_1.right > object_2.left;
+}

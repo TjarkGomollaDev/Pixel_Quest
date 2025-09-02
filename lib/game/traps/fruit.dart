@@ -48,7 +48,6 @@ class Fruit extends SpriteAnimationGroupComponent
   late final RectangleHitbox _hitbox;
 
   // animation settings
-  static const double _stepTime = 0.05;
   static final Vector2 _textureSize = Vector2.all(32);
   static const String _path = 'Items/Fruits/';
   static const String _pathEnd = '.png';
@@ -85,12 +84,12 @@ class Fruit extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FruitState>(game, _path, _pathEnd, _stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FruitState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
     animations = {
       for (var state in FruitState.values)
         // small adjustment here, as we are not using the enum name for the fruit but the name from the class
         state: state == FruitState.idle
-            ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, _stepTime, _textureSize)
+            ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, PixelAdventure.stepTime, _textureSize)
             : loadAnimation(state),
     };
     current = FruitState.idle;
