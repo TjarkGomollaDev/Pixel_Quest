@@ -102,7 +102,7 @@ class Ghost extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -220,7 +220,7 @@ class Ghost extends PositionComponent
   @override
   void onPlayerCollision(Vector2 intersectionPoint) {
     if (_gotStomped || !_isVisible) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       animationGroupComponent.current = GhostState.hit;

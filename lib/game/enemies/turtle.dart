@@ -69,7 +69,7 @@ class Turtle extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -108,7 +108,9 @@ class Turtle extends PositionComponent
   @override
   void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (!_spikesAreOut && _player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (!_spikesAreOut &&
+        _player.velocity.y > 0 &&
+        intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       animationGroupComponent.current = TurtleState.hit;

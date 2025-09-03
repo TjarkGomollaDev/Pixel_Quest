@@ -32,7 +32,7 @@ class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGa
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;

@@ -30,7 +30,7 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
     }

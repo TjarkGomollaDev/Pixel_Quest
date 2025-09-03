@@ -68,7 +68,7 @@ class TrunkBullet extends SpriteComponent with PlayerCollision, HasGameReference
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;

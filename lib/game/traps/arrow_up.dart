@@ -58,7 +58,7 @@ class ArrowUp extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;

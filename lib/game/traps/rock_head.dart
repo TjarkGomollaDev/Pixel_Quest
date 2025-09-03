@@ -87,7 +87,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;

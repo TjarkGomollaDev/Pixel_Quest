@@ -43,8 +43,8 @@ class Chicken extends PositionComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 22), size: Vector2(24, 26));
 
   // these are the correct x values for the chicken, one for the left side of the hitbox and one for the right side of the hitbox
-  late double _hitboxPositionLeftX;
-  late double _hitboxPositionRightX;
+  late double _hitboxLeft;
+  late double _hitboxRight;
 
   // animation settings
   static final Vector2 _textureSize = Vector2(32, 34);
@@ -88,7 +88,7 @@ class Chicken extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -123,24 +123,24 @@ class Chicken extends PositionComponent
   }
 
   void _updateHitboxEdges() {
-    _hitboxPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
-    _hitboxPositionRightX = _hitboxPositionLeftX + _hitbox.width;
+    _hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
+    _hitboxRight = _hitboxLeft + _hitbox.width;
   }
 
   void _movement(double dt) {
     _velocity.x = 0;
 
     // get player hitbox positions
-    final playerHitboxPositionLeftX = _player.hitboxLeft;
-    final playerHitboxPositionRightX = _player.hitboxRight;
+    final playerHitboxLeft = _player.hitboxLeft;
+    final playerHitboxRight = _player.hitboxRight;
 
     // first, we check whether the player is within the range in which the chicken can move
-    if (!_playerInRange(playerHitboxPositionLeftX, playerHitboxPositionRightX)) return;
+    if (!_playerInRange(playerHitboxLeft, playerHitboxRight)) return;
 
     // secondly, now that we know the player is in range, we check whether he is to the left or right of the chicken
-    if (playerHitboxPositionRightX < _hitboxPositionLeftX) {
+    if (playerHitboxRight < _hitboxLeft) {
       _moveDirection = -1;
-    } else if (playerHitboxPositionLeftX > _hitboxPositionRightX) {
+    } else if (playerHitboxLeft > _hitboxRight) {
       _moveDirection = 1;
     } else {
       // this only occurs when we disable collisions with the player, it ensures that the chicken does not constantly change direction because we are standing in the chicken
@@ -175,7 +175,7 @@ class Chicken extends PositionComponent
   @override
   void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       animationGroupComponent.current = ChickenState.hit;
       _gotStomped = true;
       _player.bounceUp();

@@ -22,7 +22,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
@@ -56,7 +56,7 @@ class Star extends SpriteComponent with HasGameReference<PixelAdventure> {
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }

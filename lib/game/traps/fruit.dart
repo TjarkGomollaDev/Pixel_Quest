@@ -67,7 +67,7 @@ class Fruit extends SpriteAnimationGroupComponent
     if (_collectible) _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
 
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug && _collectible) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       if (_collectible) _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;

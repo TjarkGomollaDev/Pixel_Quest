@@ -95,10 +95,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   @override
   Future<void> onLoad() async {
     _initialSetup();
-    await _addLevelMap();
-    _addLevelBackground();
-    _addSpawningObjects();
-    _addCollisions();
+    await _loadLevelMap();
+    _addBackgroundLayer();
+    _addSpawningLayer();
+    // _addCollisions();
     return super.onLoad();
   }
 
@@ -120,9 +120,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       _fpsText = FpsTextComponent(
-        position: Vector2(game.size.x, 0) + Vector2(-game.hudMargin, game.hudMargin / 2),
+        position: Vector2(game.size.x, 0) + Vector2(-PixelAdventure.hudMargin, PixelAdventure.hudMargin / 2),
         anchor: Anchor.topRight,
       );
       game.camera.viewport.add(_fpsText!);
@@ -133,307 +133,405 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     // general
   }
 
-  Future<void> _addLevelMap() async {
+  Future<void> _loadLevelMap() async {
     _levelMap = await TiledComponent.load('${myLvel.name}.tmx', Vector2.all(PixelAdventure.tileSize))
       ..priority = PixelAdventure.mapLayerLevel;
     add(_levelMap);
   }
 
-  void _addLevelBackground() {
+  void _addBackgroundLayer() {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
-      final backgroundType = backgroundLayer.properties.getValue<String?>('BackgroundType');
-      _checkBackgroundType(backgroundType);
-      _levelBackground.priority = PixelAdventure.backgroundLayerLevel;
-      add(_levelBackground);
+      _addBackground(backgroundLayer);
+      _addWorldCollisions(backgroundLayer);
     }
   }
 
-  void _checkBackgroundType(String? backgroundType) {
+  void _addBackground(TileLayer backgroundLayer) {
+    final backgroundType = backgroundLayer.properties.getValue<String?>('BackgroundType');
     final size = Vector2(
       _levelMap.width - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
       _levelMap.height - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
     );
     final position = Vector2.all(PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize : 0);
+    bool isInitialized = false;
     BackgroundTileColor? color;
     if (backgroundType != null) {
       for (var szene in Szene.values) {
         if (szene.name == backgroundType) {
           _levelBackground = BackgroundSzene(szene: szene, position: position, size: size);
-          return;
-        }
-      }
-      for (var tileColor in BackgroundTileColor.values) {
-        if (tileColor.name == backgroundType) {
-          color = tileColor;
+          isInitialized = true;
           break;
         }
       }
-    }
-    _levelBackground = BackgroundColored(color: color ?? BackgroundTileColor.Gray, position: position, size: size);
-  }
-
-  void _addSpawningObjects() {
-    final spawnPointsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Spawnpoints');
-    if (spawnPointsLayer != null) {
-      // the start with player is always created first in the level, as many other objects require a reference to the player
-      for (var spawnPoint in spawnPointsLayer.objects) {
-        if (spawnPoint.class_ == 'Start') {
-          final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
-          final start = Start(position: gridPosition);
-          add(start);
-          _player = Player(character: game.characters[game.yourCharacterIndex], startPosition: start.playerPosition);
-          add(_player);
-          break;
-        }
-      }
-
-      // all other objects are created
-      for (var spawnPoint in spawnPointsLayer.objects) {
-        try {
-          final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
-          switch (spawnPoint.class_) {
-            case 'Fruit':
-              final fruitName = spawnPoint.name;
-              final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
-              final fruit = Fruit(name: safeName, position: gridPosition);
-              totalFruitsCount++;
-              add(fruit);
-              break;
-            case 'ArrowUp':
-              final arrowUp = ArrowUp(player: _player, position: gridPosition);
-              add(arrowUp);
-              break;
-            case 'Saw':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-              final saw = Saw(offsetNeg: offsetNeg, offsetPos: offsetPos, isVertical: isVertical, player: _player, position: gridPosition);
-              add(saw);
-              break;
-            case 'SawCircle':
-              final circleWidth = spawnPoint.properties.getValue<int?>('circleWidth') ?? PixelAdventure.circleWidthDefault;
-              final circleHeight = spawnPoint.properties.getValue<int?>('circleHeight') ?? PixelAdventure.circleHeightDefault;
-              final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? PixelAdventure.doubleSawDefault;
-              final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? PixelAdventure.clockwiseDefault;
-              final sawCircle = SawCircle(
-                doubleSaw: doubleSaw,
-                clockwise: clockwise,
-                player: _player,
-                position: gridPosition,
-                size: Vector2(circleWidth * PixelAdventure.tileSize, circleHeight * PixelAdventure.tileSize),
-              );
-              add(sawCircle);
-              break;
-            case 'Spiked Ball':
-              final radius =
-                  (spawnPoint.properties.getValue<int?>('radius') ?? PixelAdventure.spikedBallRadiusDefault) * PixelAdventure.tileSize +
-                  PixelAdventure.tileSize / 2;
-              final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? PixelAdventure.clockwiseDefault;
-              final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? PixelAdventure.spikedBallSwingArcDec;
-              final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? PixelAdventure.spikedBallSwingSpeed;
-              final spikedBall = SpikedBall(
-                radius: radius,
-                player: _player,
-                swingArcDeg: swingArcDec,
-                swingSpeed: swingSpeed,
-                startLeft: startLeft,
-                position:
-                    gridPosition -
-                    Vector2(radius - PixelAdventure.tileSize / 2, SpikedBallBall.gridSize.x / 2 - PixelAdventure.tileSize / 2),
-                size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
-              );
-              add(spikedBall);
-              break;
-            case 'Chicken':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final chicken = Chicken(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-              add(chicken);
-              break;
-            case 'Trampoline':
-              final trampoline = Trampoline(player: _player, position: gridPosition);
-              add(trampoline);
-              break;
-            case 'Fan':
-              final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? PixelAdventure.fanAlwaysOnDefault;
-              final fan = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
-              add(fan);
-              break;
-            case 'FireTrap':
-              final fireTrap = FireTrap(player: _player, position: gridPosition);
-              add(fireTrap);
-              final block = WorldBlock(
-                position: Vector2(spawnPoint.x, spawnPoint.y + PixelAdventure.tileSize),
-                size: Vector2(spawnPoint.width, PixelAdventure.tileSize),
-              );
-              _collisionBlocks.add(block);
-              break;
-            case 'Fire':
-              final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
-              final fire = Fire(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
-              add(fire);
-              break;
-            case 'Moving Platform':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final movingPlatform = MovingPlatform(
-                offsetNeg: offsetNeg,
-                offsetPos: offsetPos,
-                isVertical: isVertical,
-                isLeft: isLeft,
-                player: _player,
-                position: gridPosition,
-              );
-              add(movingPlatform);
-              break;
-            case 'Rock Head':
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final rockHead = RockHead(offsetPos: offsetPos, position: gridPosition);
-              add(rockHead);
-              break;
-            case 'Spike Head':
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final spikeHead = SpikeHead(offsetPos: offsetPos, player: _player, position: gridPosition);
-              add(spikeHead);
-              break;
-            case 'Plant':
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? PixelAdventure.doubleShotDefault;
-              final plant = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
-              add(plant);
-              break;
-            case 'Blue Bird':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final bird = BlueBird(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-              add(bird);
-              break;
-            case 'Snail':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final snail = Snail(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-              add(snail);
-              break;
-            case 'Ghost':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final ghost = Ghost(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-              add(ghost);
-              break;
-            case 'Mushroom':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final mushroom = Mushroom(
-                offsetNeg: offsetNeg,
-                offsetPos: offsetPos,
-                isLeft: isLeft,
-                player: _player,
-                position: gridPosition,
-              );
-              add(mushroom);
-              break;
-            case 'Trunk':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? PixelAdventure.extandNegAttackDefault;
-              final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? PixelAdventure.extandPosAttackDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final trunk = Trunk(
-                offsetNeg: offsetNeg,
-                offsetPos: offsetPos,
-                extandNegAttack: extandNegAttack,
-                extandPosAttack: extandPosAttack,
-                isLeft: isLeft,
-                player: _player,
-                position: gridPosition,
-              );
-              add(trunk);
-              break;
-            case 'Slime':
-              final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-              final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final slime = Slime(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-              add(slime);
-              break;
-            case 'Turtle':
-              final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-              final turtle = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
-              add(turtle);
-              break;
-            case 'Spikes':
-              final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
-              final spikes = Spikes(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
-              add(spikes);
-              break;
-            case 'Checkpoint':
-              final checkpoint = Checkpoint(player: _player, position: gridPosition);
-              add(checkpoint);
-              break;
-            case 'Finish':
-              final finish = Finish(player: _player, position: gridPosition);
-              add(finish);
-              break;
-          }
-        } catch (e, stack) {
-          debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
-        }
-      }
-    }
-  }
-
-  void _addCollisions() {
-    _addWorldBorders();
-    final collisionsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Collisions');
-    if (collisionsLayer != null) {
-      for (var collision in collisionsLayer.objects) {
-        final gridPosition = snapVectorToGrid(Vector2(collision.x, collision.y));
-        switch (collision.class_) {
-          case 'Platform':
-            final platform = WorldBlock(isPlatform: true, position: gridPosition, size: Vector2(collision.width, 5));
-            _collisionBlocks.add(platform);
+      if (!isInitialized) {
+        for (var tileColor in BackgroundTileColor.values) {
+          if (tileColor.name == backgroundType) {
+            color = tileColor;
             break;
-          default:
-            final block = WorldBlock(position: gridPosition, size: collision.size);
-            _collisionBlocks.add(block);
+          }
         }
       }
-
-      addAll(_collisionBlocks);
     }
+    if (!isInitialized) {
+      _levelBackground = BackgroundColored(color: color ?? BackgroundTileColor.Gray, position: position, size: size);
+    }
+    _levelBackground.priority = PixelAdventure.backgroundLayerLevel;
+    add(_levelBackground);
+  }
+
+  /// Builds collision blocks from a tile layer by merging adjacent tiles.
+  ///
+  /// Algorithm:
+  /// - Iterates over every tile in the given [backgroundLayer].
+  /// - Skips empty tiles (id == 0) and already processed tiles.
+  /// - Distinguishes between "platform" tiles (IDs in [platformValues]) and solid tiles.
+  /// - For platforms:
+  ///   - Merges horizontally as long as consecutive tiles are valid platforms.
+  ///   - Creates a thin horizontal [WorldBlock] with fixed height.
+  /// - For solid tiles:
+  ///   - First merges horizontally to find maximum width.
+  ///   - Then attempts to expand vertically downwards while every row of that width
+  ///     is filled with solid tiles.
+  ///   - Creates one larger rectangular [WorldBlock].
+  /// - Marks all merged tiles as visited so they are not processed again.
+  ///
+  /// This reduces the number of collision blocks significantly:
+  /// instead of creating one 16x16 block per tile, larger rectangles
+  /// are created, improving performance in collision checks.
+  ///
+  /// Example (16x16 tiles → merged WorldBlocks):
+  ///
+  /// Input tile map (S = solid, P = platform, . = empty):
+  ///
+  ///   S S S S . . P P P
+  ///   S S S S . . . . .
+  ///   S S S S . . . . .
+  ///
+  ///
+  /// Naive collision blocks (one per tile):
+  ///   {S}{S}{S}{S} .. {P}{P}{P}
+  ///   {S}{S}{S}{S} .. ...
+  ///   {S}{S}{S}{S} .. ...
+  ///
+  /// Optimized merged blocks:
+  ///   {████████} .. {PPP}
+  ///   {████████} .. ...
+  ///   {████████} .. ...
+  ///
+  /// Result:
+  /// - 12 small solid blocks → 1 big rectangle (64x48).
+  /// - 3 platform tiles → 1 merged platform (48x5).
+  ///
+  /// This reduces the number of collision checks
+  /// and improves runtime performance significantly.
+  void _addWorldCollisions(TileLayer backgroundLayer) {
+    _addWorldBorders();
+    final hasBorder = PixelAdventure.mapBorder != 0;
+
+    // y axis range of map
+    final yStart = hasBorder ? 1 : 0;
+    final yEnd = hasBorder ? _levelMap.tileMap.map.height - 1 : _levelMap.tileMap.map.height;
+
+    // x axis range of map
+    final xStart = hasBorder ? 1 : 0;
+    final xEnd = hasBorder ? _levelMap.tileMap.map.width - 1 : _levelMap.tileMap.map.width;
+
+    // platform ids
+    final platformValues = {18, 19, 20, 40, 41, 42, 62, 63, 64};
+
+    final visited = List.generate(_levelMap.tileMap.map.height, (_) => List.filled(_levelMap.tileMap.map.width, false));
+
+    for (var y = yStart; y < yEnd; y++) {
+      for (var x = xStart; x < xEnd; x++) {
+        // skip already processed tiles
+        if (visited[y][x]) continue;
+
+        // skip empty tiles
+        final tile = backgroundLayer.tileData![y][x].tile;
+        if (tile == 0) continue;
+
+        // check if current tile is a platform
+        final isPlatform = platformValues.contains(tile);
+
+        // find width to the right
+        int w = 1;
+        while (x + w < xEnd &&
+            !visited[y][x + w] &&
+            backgroundLayer.tileData![y][x + w].tile != 0 &&
+            (isPlatform
+                ? platformValues.contains(backgroundLayer.tileData![y][x + w].tile)
+                : !platformValues.contains(backgroundLayer.tileData![y][x + w].tile))) {
+          w++;
+        }
+
+        // find height downwards
+        int h = 1;
+        if (!isPlatform) {
+          bool done = false;
+          while (y + h < yEnd && !done) {
+            for (var dx = 0; dx < w; dx++) {
+              final t = backgroundLayer.tileData![y + h][x + dx].tile;
+              if (t == 0 || platformValues.contains(t) || visited[y + h][x + dx]) {
+                done = true;
+                break;
+              }
+            }
+            if (!done) h++;
+          }
+        }
+
+        // mark all merged tiles as visited
+        for (var dy = 0; dy < h; dy++) {
+          for (var dx = 0; dx < w; dx++) {
+            visited[y + dy][x + dx] = true;
+          }
+        }
+
+        // create merged WorldBlock
+        _collisionBlocks.add(
+          WorldBlock(
+            isPlatform: isPlatform,
+            position: Vector2(x * PixelAdventure.tileSize, y * PixelAdventure.tileSize),
+            size: isPlatform ? Vector2(w * PixelAdventure.tileSize, 5) : Vector2(w * PixelAdventure.tileSize, h * PixelAdventure.tileSize),
+          ),
+        );
+      }
+    }
+    addAll(_collisionBlocks);
   }
 
   void _addWorldBorders() {
     const borderWidth = PixelAdventure.tileSize;
-    final hasInnerBorder = PixelAdventure.mapBorder != 0;
-    final verticalSize = Vector2(borderWidth, hasInnerBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
-    final horizontalSize = Vector2(hasInnerBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
+    final hasBorder = PixelAdventure.mapBorder != 0;
+    final verticalSize = Vector2(borderWidth, hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
+    final horizontalSize = Vector2(hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
     final borders = <WorldBlock>[
       // left
-      WorldBlock(position: Vector2(hasInnerBorder ? 0 : -borderWidth, hasInnerBorder ? 0 : -borderWidth), size: verticalSize),
+      WorldBlock(position: Vector2(hasBorder ? 0 : -borderWidth, hasBorder ? 0 : -borderWidth), size: verticalSize),
       // top
-      WorldBlock(position: Vector2(hasInnerBorder ? borderWidth : 0, hasInnerBorder ? 0 : -borderWidth), size: horizontalSize),
+      WorldBlock(position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? 0 : -borderWidth), size: horizontalSize),
       // right
       WorldBlock(
-        position: Vector2(hasInnerBorder ? _levelMap.width - borderWidth : _levelMap.width, hasInnerBorder ? 0 : -borderWidth),
+        position: Vector2(hasBorder ? _levelMap.width - borderWidth : _levelMap.width, hasBorder ? 0 : -borderWidth),
         size: verticalSize,
       ),
       // bottom
       WorldBlock(
-        position: Vector2(hasInnerBorder ? borderWidth : 0, hasInnerBorder ? _levelMap.height - borderWidth : _levelMap.height),
+        position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
         size: horizontalSize,
       ),
     ];
 
     _collisionBlocks.addAll(borders);
+  }
+
+  void _addSpawningLayer() {
+    final spawnPointsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Spawning');
+    if (spawnPointsLayer == null) return;
+
+    // the start with player is always created first in the level, as many other objects require a reference to the player
+    for (var spawnPoint in spawnPointsLayer.objects) {
+      if (spawnPoint.class_ == 'Start') {
+        final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
+        final start = Start(position: gridPosition);
+        add(start);
+        _player = Player(character: game.characters[game.yourCharacterIndex], startPosition: start.playerPosition);
+        add(_player);
+        break;
+      }
+    }
+
+    // all other objects are created
+    for (var spawnPoint in spawnPointsLayer.objects) {
+      try {
+        final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
+        switch (spawnPoint.class_) {
+          case 'Fruit':
+            final fruitName = spawnPoint.name;
+            final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
+            final fruit = Fruit(name: safeName, position: gridPosition);
+            totalFruitsCount++;
+            add(fruit);
+            break;
+          case 'ArrowUp':
+            final arrowUp = ArrowUp(player: _player, position: gridPosition);
+            add(arrowUp);
+            break;
+          case 'Saw':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
+            final saw = Saw(offsetNeg: offsetNeg, offsetPos: offsetPos, isVertical: isVertical, player: _player, position: gridPosition);
+            add(saw);
+            break;
+          case 'SawCircle':
+            final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? PixelAdventure.doubleSawDefault;
+            final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? PixelAdventure.clockwiseDefault;
+            final sawCircle = SawCircle(
+              doubleSaw: doubleSaw,
+              clockwise: clockwise,
+              player: _player,
+              position: gridPosition,
+              size: spawnPoint.size,
+            );
+            add(sawCircle);
+            break;
+          case 'Spiked Ball':
+            final radius =
+                (spawnPoint.properties.getValue<int?>('radius') ?? PixelAdventure.spikedBallRadiusDefault) * PixelAdventure.tileSize +
+                PixelAdventure.tileSize / 2;
+            final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? PixelAdventure.clockwiseDefault;
+            final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? PixelAdventure.spikedBallSwingArcDec;
+            final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? PixelAdventure.spikedBallSwingSpeed;
+            final spikedBall = SpikedBall(
+              radius: radius,
+              player: _player,
+              swingArcDeg: swingArcDec,
+              swingSpeed: swingSpeed,
+              startLeft: startLeft,
+              position:
+                  gridPosition - Vector2(radius - PixelAdventure.tileSize / 2, SpikedBallBall.gridSize.x / 2 - PixelAdventure.tileSize / 2),
+              size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
+            );
+            add(spikedBall);
+            break;
+          case 'Chicken':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final chicken = Chicken(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(chicken);
+            break;
+          case 'Trampoline':
+            final trampoline = Trampoline(player: _player, position: gridPosition);
+            add(trampoline);
+            break;
+          case 'Fan':
+            final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? PixelAdventure.fanAlwaysOnDefault;
+            final fan = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
+            add(fan);
+            break;
+          case 'FireTrap':
+            final fireTrap = FireTrap(player: _player, position: gridPosition);
+            add(fireTrap);
+            final block = WorldBlock(
+              position: Vector2(spawnPoint.x, spawnPoint.y + PixelAdventure.tileSize),
+              size: Vector2(spawnPoint.width, PixelAdventure.tileSize),
+            );
+            _collisionBlocks.add(block);
+            break;
+          case 'Fire':
+            final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
+            final fire = Fire(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
+            add(fire);
+            break;
+          case 'Moving Platform':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final movingPlatform = MovingPlatform(
+              offsetNeg: offsetNeg,
+              offsetPos: offsetPos,
+              isVertical: isVertical,
+              isLeft: isLeft,
+              player: _player,
+              position: gridPosition,
+            );
+            add(movingPlatform);
+            break;
+          case 'Rock Head':
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final rockHead = RockHead(offsetPos: offsetPos, position: gridPosition);
+            add(rockHead);
+            break;
+          case 'Spike Head':
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final spikeHead = SpikeHead(offsetPos: offsetPos, player: _player, position: gridPosition);
+            add(spikeHead);
+            break;
+          case 'Plant':
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? PixelAdventure.doubleShotDefault;
+            final plant = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
+            add(plant);
+            break;
+          case 'Blue Bird':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final bird = BlueBird(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(bird);
+            break;
+          case 'Snail':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final snail = Snail(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(snail);
+            break;
+          case 'Ghost':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final ghost = Ghost(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(ghost);
+            break;
+          case 'Mushroom':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final mushroom = Mushroom(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(mushroom);
+            break;
+          case 'Trunk':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? PixelAdventure.extandNegAttackDefault;
+            final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? PixelAdventure.extandPosAttackDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final trunk = Trunk(
+              offsetNeg: offsetNeg,
+              offsetPos: offsetPos,
+              extandNegAttack: extandNegAttack,
+              extandPosAttack: extandPosAttack,
+              isLeft: isLeft,
+              player: _player,
+              position: gridPosition,
+            );
+            add(trunk);
+            break;
+          case 'Slime':
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final slime = Slime(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            add(slime);
+            break;
+          case 'Turtle':
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final turtle = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
+            add(turtle);
+            break;
+          case 'Spikes':
+            final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
+            final spikes = Spikes(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
+            add(spikes);
+            break;
+          case 'Checkpoint':
+            final checkpoint = Checkpoint(player: _player, position: gridPosition);
+            add(checkpoint);
+            break;
+          case 'Finish':
+            final finish = Finish(player: _player, position: gridPosition);
+            add(finish);
+            break;
+        }
+      } catch (e, stack) {
+        debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
+      }
+    }
   }
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
@@ -447,7 +545,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     _joystick = JoystickComponent(
       knob: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Knob.png'))),
       background: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Joystick.png'))),
-      margin: EdgeInsets.only(left: game.hudMargin, bottom: game.hudMargin),
+      margin: EdgeInsets.only(left: PixelAdventure.hudMargin, bottom: PixelAdventure.hudMargin),
     );
     _player.setJoystick(_joystick!);
     _jumpBtn = JumpBtn(_player);

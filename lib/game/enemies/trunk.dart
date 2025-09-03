@@ -56,8 +56,8 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(22, 7), size: Vector2(21, 26));
 
   // these are the correct x values for the trunk, one for the left side of the hitbox and one for the right side of the hitbox
-  late double _hitboxPositionLeftX;
-  late double _hitboxPositionRightX;
+  late double _hitboxLeft;
+  late double _hitboxRight;
 
   // animation settings
   static final Vector2 _textureSize = Vector2(64, 32);
@@ -155,7 +155,7 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -195,8 +195,8 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   }
 
   void _updateHitboxEdges() {
-    _hitboxPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
-    _hitboxPositionRightX = _hitboxPositionLeftX + _hitbox.width;
+    _hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
+    _hitboxRight = _hitboxLeft + _hitbox.width;
   }
 
   void _setUpTimer() => _shootTimer = Timer(_timeBetweenShots, onTick: _shoot, repeat: true, autoStart: false);
@@ -276,8 +276,7 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
 
   bool _checkIsPlayerBefore() {
     // checks whether the player is positioned in front of the trunk, relative to its current move direction
-    return (_moveDirection == -1 && _hitboxPositionLeftX > _player.hitboxRight) ||
-        (_moveDirection == 1 && _player.hitboxLeft > _hitboxPositionRightX);
+    return (_moveDirection == -1 && _hitboxLeft > _player.hitboxRight) || (_moveDirection == 1 && _player.hitboxLeft > _hitboxRight);
   }
 
   bool _checkIsPlayerInRange({double? extended}) {
@@ -325,7 +324,7 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   @override
   void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = TrunkState.hit;

@@ -66,7 +66,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -91,7 +91,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
 
   @override
   Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
-    if (reached) return;
+    if (reached || _playerRespawn.x < _player.startPosition.x) return;
     reached = true;
     current = CheckpointState.flagOut;
     _player.reachedCheckpoint(_playerRespawn);

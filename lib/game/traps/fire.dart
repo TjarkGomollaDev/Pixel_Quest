@@ -56,7 +56,7 @@ class Fire extends PositionComponent with PlayerCollision, HasGameReference<Pixe
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;

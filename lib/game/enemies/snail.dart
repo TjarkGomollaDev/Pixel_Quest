@@ -109,7 +109,7 @@ class Snail extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -244,7 +244,7 @@ class Snail extends PositionComponent
   }
 
   Future<void> _handleSnailStomp(Vector2 intersectionPoint) async {
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       animationGroupComponent.current = SnailState.snailHit;
       _snailGotStomped = true;
       _player.bounceUp();
@@ -272,7 +272,7 @@ class Snail extends PositionComponent
   }
 
   void _handleShellStomp(Vector2 intersectionPoint) {
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       animationGroupComponent.current = SnailState.shellTopHit;
       _shellGotStomped = true;
       _player.bounceUp();

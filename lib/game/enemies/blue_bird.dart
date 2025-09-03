@@ -93,7 +93,7 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -183,7 +183,7 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   @override
   void onPlayerCollisionStart(Vector2 intersectionPoint) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + game.toleranceEnemieCollision) {
+    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
       _gotStomped = true;
       _player.bounceUp();
       current = BlueBirdState.hit;

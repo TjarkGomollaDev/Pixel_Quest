@@ -26,7 +26,7 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  final bool customDebug = false;
+  static const bool customDebug = true;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -55,8 +55,8 @@ class PixelAdventure extends FlameGame
   static const double offsetPosDefault = 1.0;
   static const double extandNegAttackDefault = 0.0;
   static const double extandPosAttackDefault = 0.0;
-  static const int circleWidthDefault = 6;
-  static const int circleHeightDefault = 4;
+  static const double circleWidthDefault = 6;
+  static const double circleHeightDefault = 4;
 
   static const int spikedBallRadiusDefault = 3;
   static const bool spikedBallStartLeft = false;
@@ -72,15 +72,12 @@ class PixelAdventure extends FlameGame
   static const double stepTime = 0.05;
   static const double finishSpotlightAnimationRadius = 60;
 
-  // the next checkpoint is only activated if it is further to the right in the level than the current one plus a buffer
-  static const double checkpointBufferZone = 40;
-
   // margin HUD elements
-  final double hudMargin = 32;
-  final double hudMobileControlsSize = 64;
+  static const double hudMargin = 32;
+  static const double hudMobileControlsSize = 64;
 
   // collision
-  final double toleranceEnemieCollision = 5;
+  static const double toleranceEnemieCollision = 5;
 
   // offset for all objects with a range, allowing the player to stand at the exact border of the range without causing a collision
   // that's a matter of taste and can of course simply be set to 0
@@ -123,7 +120,7 @@ class PixelAdventure extends FlameGame
       for (final level in MyLevel.values) level.name: WorldRoute(() => Level(myLvel: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_4.name));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_1.name));
   }
 }
 

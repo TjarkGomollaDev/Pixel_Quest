@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A circular saw trap that moves one or two saws along the edges of a rectangular path.
@@ -20,17 +22,24 @@ class SawCircle extends PositionComponent with HasGameReference<PixelAdventure> 
   final bool _clockwise;
   final Player _player;
 
-  SawCircle({required bool doubleSaw, required bool clockwise, required Player player, required super.position, required super.size})
+  SawCircle({required bool doubleSaw, required bool clockwise, required Player player, required Vector2 position, required Vector2 size})
     : _clockwise = clockwise,
       _doubleSaw = doubleSaw,
-      _player = player;
+      _player = player,
+      super(size: _adjustedSize(size), position: position - Vector2.all(sawRadius));
+
+  static Vector2 _adjustedSize(Vector2 input) {
+    final gridSize = snapVectorToGrid(input);
+    return Vector2(max(gridSize.x, PixelAdventure.circleWidthDefault), max(gridSize.y, PixelAdventure.circleHeightDefault)) +
+        Vector2.all(sawRadius * 2);
+  }
+
+  // saw radius for the size
+  static double sawRadius = SawCircleSingleSaw.gridSize.x / 2;
 
   // single saws
   late final SawCircleSingleSaw _saw1;
   late final SawCircleSingleSaw? _saw2;
-
-  // saw radius
-  final double sawRadius = SawCircleSingleSaw.gridSize.x / 2;
 
   // path
   late final List<Vector2> _path;
@@ -46,7 +55,6 @@ class SawCircle extends PositionComponent with HasGameReference<PixelAdventure> 
 
   @override
   FutureOr<void> onLoad() {
-    _adjustDimensions();
     _initialSetup();
     _setUpPath();
     _addSingleSaws();
@@ -59,14 +67,9 @@ class SawCircle extends PositionComponent with HasGameReference<PixelAdventure> 
     super.update(dt);
   }
 
-  void _adjustDimensions() {
-    position -= Vector2.all(sawRadius);
-    size += Vector2.all(sawRadius * 2);
-  }
-
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }

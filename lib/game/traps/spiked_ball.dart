@@ -79,7 +79,7 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure>
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
@@ -118,7 +118,7 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure>
     for (var i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
         ..anchor = Anchor.center
-        ..debugMode = game.customDebug
+        ..debugMode = PixelAdventure.customDebug
         ..debugColor = AppTheme.debugColorTrapHitbox;
 
       final chainItem = ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);

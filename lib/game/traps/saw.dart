@@ -68,7 +68,7 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -117,7 +117,7 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
               position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
               priority: PixelAdventure.trapParticlesLayerLevel,
             )
-            ..debugMode = game.customDebug
+            ..debugMode = PixelAdventure.customDebug
             ..debugColor = AppTheme.debugColorTrapHitbox;
       game.world.add(chain);
       offset += chainSize;

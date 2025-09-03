@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
-import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
@@ -34,19 +33,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _setUpBtns();
     _setUpFruitsCounter();
     return super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (game.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-    // general
   }
 
   void _setUpBtns() {

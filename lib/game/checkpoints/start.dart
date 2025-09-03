@@ -51,10 +51,10 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdv
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
-      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitbox.debugColor = AppTheme.debugColorWorldBlock;
     }
 
     // general

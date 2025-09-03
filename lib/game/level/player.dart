@@ -153,7 +153,7 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (_spawnProtection) return false;
+    if (_spawnProtection || (game.world as DecoratedWorld).timeScale == 0) return false;
 
     _horizontalMovement = 0;
     final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA) || keysPressed.contains(LogicalKeyboardKey.arrowLeft);
@@ -289,7 +289,7 @@ class Player extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (game.customDebug) {
+    if (PixelAdventure.customDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }
@@ -342,20 +342,26 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   Future<void> _updatePlayerState() async {
+    // wait if double jump animation is currently running
     if (current == PlayerState.doubleJump) {
       await animationTickers![PlayerState.doubleJump]!.completed;
+
+      // prevents race condition during respawn
+      if (!_isPlayerStateActive) return;
     }
-    PlayerState playerState = PlayerState.idle;
+
+    // flip when facing another direction
     if (velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
     } else if (velocity.x > 0 && scale.x < 0) {
       flipHorizontallyAroundCenter();
     }
 
-    if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.run;
+    // update state
+    PlayerState playerState = PlayerState.idle;
+    if (velocity.x > 0 || velocity.x < 0 && isOnGround) playerState = PlayerState.run;
     if (velocity.y > 0 && !isOnGround) playerState = PlayerState.fall;
     if (velocity.y < 0 && !isOnGround) playerState = PlayerState.jump;
-
     current = playerState;
   }
 
@@ -435,9 +441,9 @@ class Player extends SpriteAnimationGroupComponent
     return _isAtXCompleter!.future;
   }
 
-  void reachedCheckpoint(Vector2 checkpointPosition) {
-    if (checkpointPosition.x > _startPosition.x + PixelAdventure.checkpointBufferZone) _startPosition = checkpointPosition;
-  }
+  void reachedCheckpoint(Vector2 checkpointPosition) => _startPosition = checkpointPosition;
+
+  // TODO checkpoint!, arrow up, circle saw!, respawn bug!, chicken!, enemy hit mit enum, debug auf static umbauen!
 
   Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
 
@@ -532,10 +538,11 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> _respawn() async {
     // hit
     _spawnProtection = true;
-    _isPlayerStateActive = false;
     _isGravityActive = false;
+    _isPlayerStateActive = false;
     _horizontalMovement = 0;
     respawnNotifier.notifyRespawn();
+    animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
     current = PlayerState.hit;
     await animationTickers![PlayerState.hit]!.completed;
     isVisible = false;
@@ -571,6 +578,7 @@ class Player extends SpriteAnimationGroupComponent
 
   Rect get hitbox => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
   Vector2 get hitboxPosition => _hitbox.position;
+  Vector2 get startPosition => _startPosition;
 }
 
 class PlayerHitboxPositionProvider extends PositionProvider {
