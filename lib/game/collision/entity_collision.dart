@@ -14,13 +14,3 @@ mixin EntityCollision on PositionComponent {
 mixin EntityCollisionEnd on PositionComponent {
   void onEntityCollisionEnd();
 }
-
-// snail ... check
-// turtle ... check
-// fire trap -> 2 hitboxen ... check
-// moving platform ... check
-// spike head ... check
-
-// saw, single saw, spiked ball ... check
-
-// collision check type überall einbauen ..check

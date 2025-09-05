@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum BlueBirdState implements AnimationState {
@@ -133,7 +134,7 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, HasGa
   void _movement(double dt) {
     // vertical wave movement
     _waveTime += dt * _waveSpeed;
-    position.y = _startY + math.sin(_waveTime) * _waveAmplitude;
+    position.y = _startY + sin(_waveTime) * _waveAmplitude;
 
     // short break after direction change
     if (_pauseTimer > 0) {
@@ -176,7 +177,7 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, HasGa
 
     // calculate speed factor
     _accelProgress = (_accelProgress + dt / _accelDuration).clamp(0.0, 1.0);
-    _speedFactor = 1 - math.pow(1 - _accelProgress, 3).toDouble();
+    _speedFactor = 1 - pow(1 - _accelProgress, 3).toDouble();
 
     // calculate current speed
     return _moveSpeed * _speedFactor;

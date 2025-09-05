@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum PlayerSpecialEffectState implements AnimationState {

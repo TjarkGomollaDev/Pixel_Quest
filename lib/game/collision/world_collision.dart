@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-/// A block in the game world that can act as a solid tile or platform for collision detection.
-///
-/// This component contains a dedicated hitbox (`_WorldBlockHitbox`) that handles
-/// collisions with the player and other entities. The hitbox is rendered for debugging
-/// purposes only when it overlaps the camera's visible viewport to improve performance
-/// on large levels.
-///
-/// The block can be either a full solid block or a thin platform depending on `isPlatform`.
+mixin WorldCollision on PositionComponent {
+  ShapeHitbox get worldHitbox;
+}
+
+mixin WorldCollisionEnd on PositionComponent {
+  void onWorldCollisionEnd();
+}
+
 class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
   final bool isPlatform;
 
@@ -34,21 +34,7 @@ class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>
   }
 
   @override
-  void renderDebugMode(Canvas canvas) {
-    if (!_hitbox.toAbsoluteRect().overlaps(game.camera.visibleWorldRect)) return;
-    super.renderDebugMode(canvas);
-  }
-
-  @override
   ShapeHitbox get worldHitbox => _hitbox;
-}
-
-mixin WorldCollision on PositionComponent {
-  ShapeHitbox get worldHitbox;
-}
-
-mixin WorldCollisionEnd on PositionComponent {
-  void onWorldCollisionEnd();
 }
 
 /// A custom rectangle hitbox for WorldBlock that supports debug rendering with viewport culling.

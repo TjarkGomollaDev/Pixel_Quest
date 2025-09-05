@@ -69,7 +69,7 @@
   </object>
   <object id="94" name="Kiwi" type="Fruit" x="16" y="160" width="32" height="32"/>
   <object id="95" name="Apple" type="Fruit" x="16" y="128" width="32" height="32"/>
-  <object id="106" name="Moving Platform" type="Moving Platform" x="64" y="32" width="32" height="16">
+  <object id="106" name="Moving Platform" type="Moving Platform" x="96" y="32" width="32" height="16">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
     <property name="isVertical" type="bool" value="false"/>
@@ -90,6 +90,5 @@
     <property name="offsetPos" type="float" value="1"/>
    </properties>
   </object>
-  <object id="120" name="FireTrap" type="FireTrap" x="128" y="240" width="16" height="32"/>
  </objectgroup>
 </map>

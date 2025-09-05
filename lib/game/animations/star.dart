@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> {

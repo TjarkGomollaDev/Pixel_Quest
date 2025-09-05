@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A circular saw trap that moves one or two saws along the edges of a rectangular path.

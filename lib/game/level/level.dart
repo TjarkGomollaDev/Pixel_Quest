@@ -36,6 +36,7 @@ import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
+import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 

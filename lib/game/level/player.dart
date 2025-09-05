@@ -18,7 +18,8 @@ import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum PlayerState implements AnimationState {
