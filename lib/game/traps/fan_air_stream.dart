@@ -2,10 +2,11 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// Invisible component representing the fan's air stream.
@@ -17,7 +18,8 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 ///
 /// Collision handling is used to detect when the player enters or
 /// leaves the stream, setting [_playerInStream] accordingly.
-class FanAirStream extends PositionComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FanAirStream extends PositionComponent
+    with EntityCollision, EntityCollisionEnd, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _baseWidth;
   final double _airStreamHeight;
@@ -83,18 +85,9 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
 
   @override
   void onRemove() {
-    _player.respawnNotifier.removeListener(onPlayerCollisionEnd);
+    _player.respawnNotifier.removeListener(onEntityCollisionEnd);
     super.onRemove();
   }
-
-  @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
-    _playerInStream = true;
-    _player.canDoubleJump = true;
-  }
-
-  @override
-  void onPlayerCollisionEnd() => _playerInStream = false;
 
   void _initialSetup() {
     // debug
@@ -106,7 +99,7 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    _player.respawnNotifier.addListener(onPlayerCollisionEnd);
+    _player.respawnNotifier.addListener(onEntityCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
@@ -147,4 +140,19 @@ class FanAirStream extends PositionComponent with PlayerCollision, HasGameRefere
       ..onTick = _switchOn
       ..start();
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    _playerInStream = true;
+    _player.canDoubleJump = true;
+  }
+
+  @override
+  void onEntityCollisionEnd() => _playerInStream = false;
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

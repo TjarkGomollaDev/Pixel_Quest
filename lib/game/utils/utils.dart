@@ -1,29 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
-
-bool checkCollision(player, block) {
-  // actual dimensions of the player
-  final double playerX = player.position.x + player.hitbox.position.x;
-  final double playerY = player.position.y + player.hitbox.position.y;
-  final double playerWidth = player.hitbox.width;
-  final double playerHeight = player.hitbox.height;
-
-  final double blockX = block.x;
-  final double blockY = block.y;
-  final double blockWidth = block.width;
-  final double blockHeight = block.height;
-
-  // fixed player x and y
-  final fixedX = player.scale.x < 0 ? playerX - (player.hitbox.x * 2) - playerWidth : playerX;
-  final fixedY = block.isPlattform ? playerY + playerHeight : playerY;
-
-  return (fixedY < blockY + blockHeight &&
-      playerY + playerHeight > blockY &&
-      fixedX < blockX + blockWidth &&
-      fixedX + playerWidth > blockX);
-}
 
 /// Defines a contract for animation states used with [SpriteAnimationGroupComponent].
 ///
@@ -100,8 +77,7 @@ class DebugSpriteComponent extends SpriteComponent {
     // only draw the frame of the hitbox, no coordinates
     final paint = Paint()
       ..color = debugColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5;
+      ..style = PaintingStyle.stroke;
     canvas.drawRect(size.toRect(), paint);
   }
 }
@@ -247,27 +223,6 @@ double snapValueToGrid(double value) => ((value / PixelAdventure.tileSize).round
 /// Snaps a 2D vector to the nearest multiple of the global tile size.
 Vector2 snapVectorToGrid(Vector2 vector) => Vector2(snapValueToGrid(vector.x), snapValueToGrid(vector.y));
 
-/// A mixin that adds hooks for handling collisions with the [Player].
-///
-/// Classes that include this mixin can override the following methods
-/// to define custom behavior when a [Player] interacts with them:
-///
-/// - [onPlayerCollisionStart]: Called when the collision with the player begins.
-/// - [onPlayerCollision]: Called while the player is colliding with the object.
-/// - [onPlayerCollisionEnd]: Called when the collision with the player ends.
-///
-/// This allows different game objects to react differently to the player
-/// without having to modify the player class itself.
-mixin PlayerCollision on PositionComponent {
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {}
-  void onPlayerCollision(Vector2 intersectionPoint) {}
-  void onPlayerCollisionEnd() {}
-}
-
-bool checkVerticalIntersection(Rect object_1, Rect object_2) {
-  return object_1.top < object_2.bottom && object_1.bottom > object_2.top;
-}
-
-bool ckeckHorizontalIntersection(Rect object_1, Rect object_2) {
-  return object_1.left < object_2.right && object_1.right > object_2.left;
+mixin Respawnable on PositionComponent {
+  void onRespawn();
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/plant_bullet.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
@@ -23,7 +25,7 @@ enum PlantState implements AnimationState {
 }
 
 class Plant extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final bool _isLeft;
   final bool _doubleShot;
@@ -93,22 +95,31 @@ class Plant extends PositionComponent
     if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
-  void _startAttack() {
-    animationGroupComponent.current = PlantState.attack;
+  Future<void> _startAttack() async {
+    // start attack modus
     _isAttacking = true;
-    animationGroupComponent.animationTickers![PlantState.attack]!.completed.whenComplete(() async {
+
+    // first attack
+    animationGroupComponent.current = PlantState.attack;
+    await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
+    if (_gotStomped) return;
+    _spawnBullet();
+    animationGroupComponent.current = PlantState.idle;
+
+    // second attack
+    if (_doubleShot) {
+      await Future.delayed(_delayBetweenDoubleShot);
+      if (_gotStomped) return;
+      animationGroupComponent.current = PlantState.attack;
+      await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
+      if (_gotStomped) return;
       _spawnBullet();
       animationGroupComponent.current = PlantState.idle;
-      if (_doubleShot) {
-        await Future.delayed(_delayBetweenDoubleShot);
-        animationGroupComponent.current = PlantState.attack;
-        await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
-        _spawnBullet();
-        animationGroupComponent.current = PlantState.idle;
-      }
-      _isAttacking = false;
-      _timeSinceLastAttack = 0;
-    });
+    }
+
+    // end attack modus
+    _isAttacking = false;
+    _timeSinceLastAttack = 0;
   }
 
   void _spawnBullet() {
@@ -124,13 +135,22 @@ class Plant extends PositionComponent
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
+    if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      animationGroupComponent.animationTickers![PlantState.attack]?.onComplete?.call();
       animationGroupComponent.current = PlantState.hit;
       animationGroupComponent.animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
     }
+
+    // the plant itself cannot kill the player, only its bullet
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/collision_block.dart';
+import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -30,7 +30,7 @@ enum MovingPlatformState implements AnimationState {
 /// The platform automatically reverses direction when reaching the end
 /// of its movement range.
 class MovingPlatform extends SpriteAnimationGroupComponent
-    with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
+    with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision, WorldCollisionEnd {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
@@ -95,7 +95,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   @override
   void onRemove() {
-    _player.respawnNotifier.removeListener(onPlayerCollisionEnd);
+    _player.respawnNotifier.removeListener(onWorldCollisionEnd);
     super.onRemove();
   }
 
@@ -109,7 +109,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
     // general
     priority = PixelAdventure.trapLayerLevel;
-    _player.respawnNotifier.addListener(onPlayerCollisionEnd);
+    _player.respawnNotifier.addListener(onWorldCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
@@ -184,14 +184,16 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     }
   }
 
-  @override
-  void onPlayerCollision(Vector2 intersectionPoint) => _playerOnTop = true;
+  void playerOnTop() {
+    if (_playerOnTop) return;
+    _playerOnTop = true;
+  }
 
   @override
-  void onPlayerCollisionEnd() => _playerOnTop = false;
+  void onWorldCollisionEnd() => _playerOnTop = false;
 
   @override
-  ShapeHitbox get solidHitbox => _hitbox;
+  ShapeHitbox get worldHitbox => _hitbox;
 
   int get moveDirection => _moveDirection;
 

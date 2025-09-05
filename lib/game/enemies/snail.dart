@@ -1,8 +1,10 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -30,7 +32,7 @@ enum SnailState implements AnimationState {
 }
 
 class Snail extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isLeft;
@@ -130,8 +132,8 @@ class Snail extends PositionComponent
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
   }
 
   void _setUpMoveDirection() {
@@ -194,7 +196,7 @@ class Snail extends PositionComponent
 
     // calculate speed factor
     _accelProgress = (_accelProgress + dt / _accelDuration).clamp(0.0, 1.0);
-    _speedFactor = 1 - math.pow(1 - _accelProgress, 3).toDouble();
+    _speedFactor = 1 - pow(1 - _accelProgress, 3).toDouble();
 
     // calculate current speed
     return _moveSpeed * _speedFactor;
@@ -233,22 +235,23 @@ class Snail extends PositionComponent
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (!_snailGotStomped) {
-      _handleSnailStomp(intersectionPoint);
+      _handleSnailStomp(collisionSide);
     } else if (!_shellGotKicked) {
       _handleShellKick();
     } else if (!_shellGotStomped) {
-      _handleShellStomp(intersectionPoint);
+      _handleShellStomp(collisionSide);
     }
   }
 
-  Future<void> _handleSnailStomp(Vector2 intersectionPoint) async {
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
-      animationGroupComponent.current = SnailState.snailHit;
+  Future<void> _handleSnailStomp(CollisionSide collisionSide) async {
+    if (collisionSide == CollisionSide.Top) {
       _snailGotStomped = true;
       _player.bounceUp();
+      animationGroupComponent.current = SnailState.snailHit;
       await animationGroupComponent.animationTickers![SnailState.snailHit]!.completed;
+      if (_shellGotStomped) return;
       animationGroupComponent.current = SnailState.shellIdle;
 
       // change snail to shell and update hitbox
@@ -271,14 +274,21 @@ class Snail extends PositionComponent
     _updateActualBorders();
   }
 
-  void _handleShellStomp(Vector2 intersectionPoint) {
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
-      animationGroupComponent.current = SnailState.shellTopHit;
+  void _handleShellStomp(CollisionSide collisionSide) {
+    if (collisionSide == CollisionSide.Top) {
       _shellGotStomped = true;
       _player.bounceUp();
+      animationGroupComponent.animationTickers![SnailState.snailHit]?.onComplete?.call();
+      animationGroupComponent.current = SnailState.shellTopHit;
       animationGroupComponent.animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

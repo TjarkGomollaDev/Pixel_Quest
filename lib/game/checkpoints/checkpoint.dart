@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -30,7 +32,7 @@ enum CheckpointState implements AnimationState {
 ///
 /// When the player collides with the checkpoint, the flag animation
 /// plays, and the player is registered as having reached the checkpoint.
-class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
@@ -90,7 +92,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
   );
 
   @override
-  Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
+  Future<void> onEntityCollision(CollisionSide collisionSide) async {
     if (reached || _playerRespawn.x < _player.startPosition.x) return;
     reached = true;
     current = CheckpointState.flagOut;
@@ -98,4 +100,10 @@ class Checkpoint extends SpriteAnimationGroupComponent with PlayerCollision, Has
     await animationTickers![CheckpointState.flagOut]!.completed;
     current = CheckpointState.flagIdle;
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

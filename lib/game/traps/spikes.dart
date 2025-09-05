@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -15,7 +17,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 ///
 /// The spikes themselves do not move, but act as a passive collision area
 /// that can interact with the [Player].
-class Spikes extends PositionComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Spikes extends PositionComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   int _side;
   final Player _player;
@@ -83,5 +85,11 @@ class Spikes extends PositionComponent with PlayerCollision, HasGameReference<Pi
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy();
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

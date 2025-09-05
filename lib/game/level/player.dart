@@ -8,15 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
-import 'package:pixel_adventure/game/level/collision_block.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
-import 'package:pixel_adventure/game/traps/rock_head.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -99,8 +100,8 @@ class Player extends SpriteAnimationGroupComponent
   // if true all collisions are deactivated, only the world collision is always on
   bool _spawnProtection = true;
 
-  // if true the world collision is deactivated (special case, e.g. for the spawn sequence at the start of the level)
-  bool isWorldCollisionInactive = true;
+  // if true the world collision is also deactivated
+  bool isWorldCollisionActive = false;
 
   // if the true the player state is not automatically updated
   bool _isPlayerStateActive = false;
@@ -147,7 +148,6 @@ class Player extends SpriteAnimationGroupComponent
     if (!_spawnProtection && _joystick != null) updateJoystick();
     if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) _isOnGroundCompleter!.complete();
     if (_isAtXCompleter != null && !_isAtXCompleter!.isCompleted && _targetX == null) _isAtXCompleter!.complete();
-
     super.update(dt);
   }
 
@@ -173,99 +173,120 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (_spawnProtection) return super.onCollisionStart(intersectionPoints, other);
-    if (other is PlayerCollision) other.onPlayerCollisionStart(intersectionPoints.first);
-    super.onCollisionStart(intersectionPoints, other);
-  }
-
-  @override
   void onCollisionEnd(PositionComponent other) {
     if (_spawnProtection) return super.onCollisionEnd(other);
-    if (other is PlayerCollision) other.onPlayerCollisionEnd();
+    if (other is WorldCollisionEnd) other.onWorldCollisionEnd();
+    if (other is EntityCollisionEnd) other.onEntityCollisionEnd();
     super.onCollisionEnd(other);
   }
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (isWorldCollisionInactive && other is Start) {
-      isWorldCollisionInactive = false;
+    if (!isWorldCollisionActive && other is Start) {
+      isWorldCollisionActive = true;
       _spawnProtection = false;
-      onWorldCollision(other as CollisionBlock);
-    } else if (!isWorldCollisionInactive) {
-      if (other is CollisionBlock) onWorldCollision(other as CollisionBlock);
+      onWorldCollision(other);
+    } else if (isWorldCollisionActive) {
+      if (other is WorldCollision) onWorldCollision(other);
       if (_spawnProtection) return super.onCollision(intersectionPoints, other);
-      if (other is PlayerCollision) other.onPlayerCollision(intersectionPoints.first);
+      if (other is EntityCollision) onEntityCollision(other);
     }
-
     super.onCollision(intersectionPoints, other);
   }
 
-  void onWorldCollision(CollisionBlock other) {
-    // positions of the two hitboxes
-    final rect = other.solidHitbox.toAbsoluteRect();
+  void onEntityCollision(EntityCollision other) {
+    // two rects
+    final otherRect = other.entityHitbox.toAbsoluteRect();
     final playerRect = hitbox;
 
+    // intersection check
+    final hasVerticalIntersection = checkVerticalIntersection(playerRect, otherRect);
+    final hasHorizontalIntersection = checkHorizontalIntersection(playerRect, otherRect);
+
+    // different from world collision, there must always be a horizontal and a vertical intersection
+    if (!(hasVerticalIntersection && hasHorizontalIntersection)) return;
+
+    // if the exact side is not required, we can simply pass "Any" as the collision side and save ourselves computing costs
+    if (other.collisionType == EntityCollisionType.Any) return other.onEntityCollision(CollisionSide.Any);
+
     // overlap calculation
-    final overlapX = (playerRect.center.dx < rect.center.dx) ? (playerRect.right - rect.left) : (rect.right - playerRect.left);
-    final overlapY = (playerRect.center.dy < rect.center.dy) ? (playerRect.bottom - rect.top) : (rect.bottom - playerRect.top);
+    final overlapX = calculateOverlapX(playerRect, otherRect);
+    final overlapY = calculateOverlapY(playerRect, otherRect);
 
-    // check whether the y ranges overlap → otherwise no horizontal collision
-    final hasVerticalIntersection = playerRect.top < rect.bottom && playerRect.bottom > rect.top;
+    // resolve AABB collsion
+    final result = resolveAABBCollision(
+      playerRect,
+      otherRect,
+      overlapX,
+      overlapY,
+      hasVerticalIntersection,
+      hasHorizontalIntersection,
+      false,
+    );
+    if (result == CollisionSide.None) return;
+    other.onEntityCollision(result);
+  }
 
-    // check whether the x ranges overlap → otherwise no vertical collision
-    final hasHorizontalIntersection = playerRect.left < rect.right && playerRect.right > rect.left;
+  void onWorldCollision(WorldCollision other) {
+    // two rects
+    final worldBlockRect = other.worldHitbox.toAbsoluteRect();
+    final playerRect = hitbox;
+
+    // intersection check
+    final hasVerticalIntersection = checkVerticalIntersection(playerRect, worldBlockRect);
+    final hasHorizontalIntersection = checkHorizontalIntersection(playerRect, worldBlockRect);
+
+    // overlap calculation
+    final overlapX = calculateOverlapX(playerRect, worldBlockRect);
+    final overlapY = calculateOverlapY(playerRect, worldBlockRect);
 
     // special cases
     bool forceVertical = false;
     if (other is WorldBlock && other.isPlatform) {
       // plattform collision
-      _resolveOneWayTopCollision(playerRect.bottom, rect.top, hasHorizontalIntersection, other);
-      return;
-    } else if (other is RockHead) {
+      return _resolveOneWayTopCollision(playerRect.bottom, worldBlockRect.top, hasHorizontalIntersection, other);
+    } else if (other is FastCollision) {
       // the rapid movement of the rockhead can cause the collision direction to be misinterpreted
-      forceVertical = _verticalSweptCheck(other, playerRect, hasHorizontalIntersection);
+      forceVertical = verticalSweptCheck(playerRect, other as FastCollision, hasHorizontalIntersection);
     }
 
-    if (overlapX < overlapY && hasVerticalIntersection && !forceVertical) {
-      // horizontal collision
-      if (playerRect.center.dx < rect.center.dx) {
-        _resolveLeftCollision(rect.left);
-      } else {
-        _resolveRightCollision(rect.right);
-      }
-    } else if (hasHorizontalIntersection) {
-      // vertical collision
-      if (playerRect.center.dy < rect.center.dy) {
-        _resolveTopCollision(rect.top, other);
-      } else {
-        _resolveBottomCollision(rect.bottom, other);
-      }
+    // resolve AABB collsion
+    switch (resolveAABBCollision(
+      playerRect,
+      worldBlockRect,
+      overlapX,
+      overlapY,
+      hasVerticalIntersection,
+      hasHorizontalIntersection,
+      forceVertical,
+    )) {
+      case CollisionSide.Top:
+        _resolveTopWorldCollision(worldBlockRect.top, other);
+        break;
+      case CollisionSide.Bottom:
+        _resolveBottomWorldCollision(worldBlockRect.bottom, other);
+        break;
+      case CollisionSide.Left:
+        _resolveLeftWorldCollision(worldBlockRect.left);
+        break;
+      case CollisionSide.Right:
+        _resolveRightWorldCollision(worldBlockRect.right);
+        break;
+      default:
+        break;
     }
   }
 
-  bool _verticalSweptCheck(RockHead rect, Rect playerRect, bool hasHorizontalIntersection) {
-    final oldTop = rect.previousY;
-    final newBottom = rect.position.y + rect.height;
-
-    // check whether the block intersected the player hitbox in the last frame, only the y values are checked
-    return hasHorizontalIntersection && playerRect.bottom > oldTop && playerRect.top < newBottom;
-  }
-
-  void _resolveOneWayTopCollision(double playerBottom, double top, bool hasHorizontalIntersection, CollisionBlock other) {
-    if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopCollision(top, other);
-  }
-
-  void _resolveTopCollision(double blockTop, CollisionBlock other) {
+  void _resolveTopWorldCollision(double blockTop, WorldCollision other) {
     position.y = blockTop - _hitbox.position.y - _hitbox.height;
     velocity.y = 0;
     isOnGround = true;
     canDoubleJump = true;
-    if (other is MovingPlatform && other.moveDirection == 1) other.onPlayerCollision(Vector2.zero());
+    if (other is MovingPlatform) other.playerOnTop();
     if (other is Finish) other.reachedFinish();
   }
 
-  void _resolveBottomCollision(double blockBottom, CollisionBlock other) {
+  void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
     if (isOnGround) {
       _respawn();
     } else {
@@ -277,14 +298,18 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
-  void _resolveLeftCollision(double blockLeft) {
+  void _resolveLeftWorldCollision(double blockLeft) {
     position.x = (scale.x < 0) ? blockLeft + _hitbox.position.x : blockLeft - _hitbox.position.x - _hitbox.width;
     velocity.x = 0;
   }
 
-  void _resolveRightCollision(double blockRight) {
+  void _resolveRightWorldCollision(double blockRight) {
     position.x = (scale.x < 0) ? blockRight + _hitbox.position.x + _hitbox.width : blockRight - _hitbox.position.x;
     velocity.x = 0;
+  }
+
+  void _resolveOneWayTopCollision(double playerBottom, double top, bool hasHorizontalIntersection, WorldCollision other) {
+    if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopWorldCollision(top, other);
   }
 
   void _initialSetup() {
@@ -443,8 +468,6 @@ class Player extends SpriteAnimationGroupComponent
 
   void reachedCheckpoint(Vector2 checkpointPosition) => _startPosition = checkpointPosition;
 
-  // TODO checkpoint!, arrow up, circle saw!, respawn bug!, chicken!, enemy hit mit enum, debug auf static umbauen!
-
   Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
 
   int _earnedStars() {
@@ -540,6 +563,7 @@ class Player extends SpriteAnimationGroupComponent
     _spawnProtection = true;
     _isGravityActive = false;
     _isPlayerStateActive = false;
+    isWorldCollisionActive = false;
     _horizontalMovement = 0;
     respawnNotifier.notifyRespawn();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
@@ -553,6 +577,8 @@ class Player extends SpriteAnimationGroupComponent
     position = _startPosition;
     _isPlayerStateActive = true;
     _isGravityActive = true;
+    isWorldCollisionActive = true;
+    world.processRespawns();
 
     // a frame must be maintained, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {

@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/collision_block.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -29,7 +30,8 @@ enum RockHeadState implements AnimationState {
 /// downward speed, then retracts upward more slowly. At both the top and
 /// bottom borders it plays a hit animation before pausing for a short delay,
 /// creating a rhythmic crushing pattern.
-class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure>, CollisionBlock {
+class RockHead extends PositionComponent
+    with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure>, WorldCollision, FastCollision {
   // constructor parameters
   final double _offsetPos;
 
@@ -39,7 +41,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   static final Vector2 gridSize = Vector2.all(48);
 
   // only relevant for world collision in the player
-  late double previousY;
+  late double _previousY;
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(8, 8), size: Vector2(32, 32));
@@ -117,7 +119,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
 
   void _correctingStartPosition() {
     position.y = _topBorder;
-    previousY = position.y;
+    _previousY = position.y;
     _moveSpeed = _moveSpeedDown;
   }
 
@@ -129,7 +131,7 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
       _changeDirection(1);
     } else {
       // movement
-      previousY = position.y;
+      _previousY = position.y;
       final newPositionY = position.y + _moveDirection * _moveSpeed * dt;
       position.y = newPositionY.clamp(_topBorder, _bottomtBorder);
     }
@@ -158,5 +160,8 @@ class RockHead extends PositionComponent with FixedGridOriginalSizeGroupAnimatio
   }
 
   @override
-  ShapeHitbox get solidHitbox => _hitbox;
+  ShapeHitbox get worldHitbox => _hitbox;
+
+  @override
+  double get previousY => _previousY;
 }

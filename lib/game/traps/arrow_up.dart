@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -27,7 +30,13 @@ enum ArrowUpState implements AnimationState {
 /// from the world once the animation has finished. Before being collected,
 /// the arrow remains in its idle state and passively waits for interaction.
 class ArrowUp extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with
+        FixedGridOriginalSizeGroupAnimation,
+        HasGameReference<PixelAdventure>,
+        HasWorldReference<Level>,
+        Respawnable,
+        EntityCollision,
+        CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
@@ -52,7 +61,6 @@ class ArrowUp extends PositionComponent
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
-
     return super.onLoad();
   }
 
@@ -77,12 +85,27 @@ class ArrowUp extends PositionComponent
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onRespawn() {
+    animationGroupComponent.current = ArrowUpState.idle;
+    _isCollected = false;
+  }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
     if (!_isCollected) {
       _isCollected = true;
-      animationGroupComponent.current = ArrowUpState.hit;
       _player.bounceUp(jumpForce: _bounceHeight);
-      animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.current = ArrowUpState.hit;
+      animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() {
+        world.queueForRespawn(this);
+        removeFromParent();
+      });
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

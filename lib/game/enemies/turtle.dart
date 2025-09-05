@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -24,7 +26,7 @@ enum TurtleState implements AnimationState {
 }
 
 class Turtle extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final bool _isLeft;
   final Player _player;
@@ -44,6 +46,10 @@ class Turtle extends PositionComponent
   static final Vector2 _textureSize = Vector2(44, 26);
   static const String _path = 'Enemies/Turtle/';
   static const String _pathEnd = ' (44x26).png';
+
+  // activation frame
+  static const int spikesOutActivationFrame = 5;
+  static const int spikesInActivationFrame = 6;
 
   // timer
   late Timer _spikeTimer;
@@ -90,33 +96,56 @@ class Turtle extends PositionComponent
 
   void _startTimer() => _spikeTimer = Timer(_toggleDuration, onTick: _toggleSpikes, repeat: true);
 
-  void _toggleSpikes() => _spikesAreOut ? _spikesIn() : _spikesOut()
-    ..whenComplete(() => _spikesAreOut = !_spikesAreOut);
+  void _toggleSpikes() => _spikesAreOut ? _spikesIn() : _spikesOut();
 
   Future<void> _spikesOut() async {
     animationGroupComponent.current = TurtleState.spikesOut;
-    await animationGroupComponent.animationTickers![TurtleState.spikesOut]!.completed;
+    final ticker = animationGroupComponent.animationTickers![TurtleState.spikesOut]!;
+    ticker.onFrame = (frame) {
+      if (frame >= spikesOutActivationFrame) {
+        _spikesAreOut = true;
+        ticker.onFrame = null;
+      }
+    };
+    if (_gotStomped) return;
+    await ticker.completed;
+    if (_gotStomped) return;
     animationGroupComponent.current = TurtleState.idleSpikesOut;
   }
 
   Future<void> _spikesIn() async {
     animationGroupComponent.current = TurtleState.spikesIn;
-    await animationGroupComponent.animationTickers![TurtleState.spikesIn]!.completed;
+    final ticker = animationGroupComponent.animationTickers![TurtleState.spikesIn]!;
+    ticker.onFrame = (frame) {
+      if (frame >= spikesInActivationFrame) {
+        _spikesAreOut = false;
+        ticker.onFrame = null;
+      }
+    };
+    if (_gotStomped) return;
+    await ticker.completed;
+    if (_gotStomped) return;
     animationGroupComponent.current = TurtleState.idleSpikesIn;
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (!_spikesAreOut &&
-        _player.velocity.y > 0 &&
-        intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
+    if (!_spikesAreOut && collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      animationGroupComponent.animationTickers![TurtleState.spikesOut]?.onComplete?.call();
+      animationGroupComponent.animationTickers![TurtleState.spikesIn]?.onComplete?.call();
       animationGroupComponent.current = TurtleState.hit;
       animationGroupComponent.animationTickers![TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

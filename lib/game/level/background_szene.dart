@@ -6,7 +6,8 @@ import 'package:flutter/rendering.dart';
 enum Szene {
   szene1('Szene 1', 4),
   szene2('Szene 2', 5),
-  szene3('Szene 3', 4);
+  szene3('Szene 3', 4),
+  szene4('Szene 4', 5);
 
   final String name;
   final int amount;

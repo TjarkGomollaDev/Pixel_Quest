@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/trunk_bullet.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
@@ -24,7 +26,7 @@ enum TrunkState implements AnimationState {
   const TrunkState(this.name, this.amount, {this.loop = true});
 }
 
-class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -174,8 +176,8 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
   }
 
   void _setUpAttackRange() {
@@ -307,10 +309,10 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
 
   Future<void> _shoot() async {
     current = TrunkState.attack;
-    animationTickers![TrunkState.attack]!.completed.whenComplete(() {
-      _spawnBullet();
-      current = TrunkState.idle;
-    });
+    await animationTickers![TrunkState.attack]!.completed;
+    if (_gotStomped) return;
+    _spawnBullet();
+    current = TrunkState.idle;
   }
 
   void _spawnBullet() {
@@ -322,15 +324,22 @@ class Trunk extends SpriteAnimationGroupComponent with PlayerCollision, HasGameR
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
+    if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      animationTickers![TrunkState.attack]?.onComplete?.call();
       current = TrunkState.hit;
       animationTickers![TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy();
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

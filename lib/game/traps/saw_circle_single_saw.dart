@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -15,7 +17,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// This component does not move by itself, but is positioned and updated
 /// by its parent [SawCircle]. It acts as a passive collision area
 /// that can interact with the [Player].
-class SawCircleSingleSaw extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
+class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
   // constructor parameters
   final bool _clockwise;
   final Player _player;
@@ -64,5 +66,11 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with PlayerCollision, 
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy();
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

@@ -1,11 +1,13 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
+class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
   // constructor parameters
   final bool spawnOnLeftSide;
   final Player player;
@@ -59,5 +61,11 @@ class SlimeParticle extends SpriteAnimationComponent with PlayerCollision, HasGa
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) => player.collidedWithEnemy();
+  void onEntityCollision(CollisionSide collisionSide) => player.collidedWithEnemy();
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

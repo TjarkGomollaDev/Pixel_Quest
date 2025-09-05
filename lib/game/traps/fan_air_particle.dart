@@ -6,7 +6,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
-class FanAirParticle extends SpriteComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FanAirParticle extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _streamTop;
   final double _streamLeft;

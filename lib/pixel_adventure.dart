@@ -76,13 +76,6 @@ class PixelAdventure extends FlameGame
   static const double hudMargin = 32;
   static const double hudMobileControlsSize = 64;
 
-  // collision
-  static const double toleranceEnemieCollision = 5;
-
-  // offset for all objects with a range, allowing the player to stand at the exact border of the range without causing a collision
-  // that's a matter of taste and can of course simply be set to 0
-  final double rangeOffset = 1;
-
   @override
   Future<void> onLoad() async {
     await _loadAllImagesIntoCache();
@@ -120,7 +113,7 @@ class PixelAdventure extends FlameGame
       for (final level in MyLevel.values) level.name: WorldRoute(() => Level(myLvel: level), maintainState: false),
     };
 
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_1.name));
+    add(router = RouterComponent(routes: levelRoutes, initialRoute: MyLevel.level_3.name));
   }
 }
 

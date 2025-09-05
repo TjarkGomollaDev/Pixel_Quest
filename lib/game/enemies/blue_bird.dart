@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -21,7 +23,7 @@ enum BlueBirdState implements AnimationState {
   const BlueBirdState(this.name, this.amount, {this.loop = true});
 }
 
-class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -113,8 +115,8 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + game.rangeOffset;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width - game.rangeOffset;
+    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
+    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
   }
 
   void _setUpMoveDirection() {
@@ -181,9 +183,9 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (_player.velocity.y > 0 && intersectionPoint.y < position.y + _hitbox.position.y + PixelAdventure.toleranceEnemieCollision) {
+    if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
       current = BlueBirdState.hit;
@@ -192,4 +194,10 @@ class BlueBird extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
       _player.collidedWithEnemy();
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

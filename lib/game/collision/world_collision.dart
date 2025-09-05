@@ -13,7 +13,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// on large levels.
 ///
 /// The block can be either a full solid block or a thin platform depending on `isPlatform`.
-class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, CollisionBlock {
+class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
   final bool isPlatform;
 
   WorldBlock({this.isPlatform = false, required super.position, required super.size});
@@ -40,16 +40,15 @@ class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>
   }
 
   @override
-  ShapeHitbox get solidHitbox => _hitbox;
+  ShapeHitbox get worldHitbox => _hitbox;
 }
 
-/// A mixin used to mark components as having a collision hitbox.
-///
-/// Any component implementing `CollisionBlock` provides a `solidHitbox`
-/// that the world collision system can query. This allows for easy integration
-/// of blocks, platforms, traps or other interactive objects into the same collision detection system.
-mixin CollisionBlock {
-  ShapeHitbox get solidHitbox;
+mixin WorldCollision on PositionComponent {
+  ShapeHitbox get worldHitbox;
+}
+
+mixin WorldCollisionEnd on PositionComponent {
+  void onWorldCollisionEnd();
 }
 
 /// A custom rectangle hitbox for WorldBlock that supports debug rendering with viewport culling.

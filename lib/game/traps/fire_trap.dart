@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -31,7 +34,8 @@ enum FireTrapState implements AnimationState {
 /// Damage is only applied while the fire is burning. Triggering and timing
 /// are fully animation-driven, allowing the trap to synchronize visuals with
 /// its collision behavior for fair player feedback.
-class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FireTrap extends SpriteAnimationGroupComponent
+    with WorldCollision, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
@@ -41,7 +45,8 @@ class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   static final Vector2 gridSize = Vector2(16, 32);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2(16, 16));
+  final RectangleHitbox _hitboxEntity = RectangleHitbox(position: Vector2(0, 0), size: Vector2.all(16));
+  final RectangleHitbox _hitboxWorld = RectangleHitbox(position: Vector2(0, 16), size: Vector2.all(16));
 
   // animation settings
   static final Vector2 _textureSize = Vector2(16, 32);
@@ -66,15 +71,17 @@ class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   void _initialSetup() {
     // debug
     if (PixelAdventure.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorTrap;
-      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitboxEntity.debugMode = true;
+      _hitboxWorld.debugMode = true;
+      _hitboxEntity.debugColor = AppTheme.debugColorTrapHitbox;
+      _hitboxWorld.debugColor = AppTheme.debugColorWorldBlock;
     }
 
     // general
     priority = PixelAdventure.trapBehindLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
-    add(_hitbox);
+    _hitboxEntity.collisionType = CollisionType.passive;
+    _hitboxWorld.collisionType = CollisionType.passive;
+    addAll([_hitboxEntity, _hitboxWorld]);
   }
 
   void _loadAllSpriteAnimations() {
@@ -84,21 +91,29 @@ class FireTrap extends SpriteAnimationGroupComponent with PlayerCollision, HasGa
   }
 
   @override
-  Future<void> onPlayerCollision(Vector2 intersectionPoint) async {
-    if (!ckeckHorizontalIntersection(_player.hitbox, _hitbox.toAbsoluteRect())) return;
-    if (!_isFireActivated && intersectionPoint.y >= position.y + _hitbox.height) {
-      current = FireTrapState.hit;
+  Future<void> onEntityCollision(CollisionSide collisionSide) async {
+    if (!_isFireActivated && true) {
       _isFireActivated = true;
+      current = FireTrapState.hit;
       await animationTickers![FireTrapState.hit]!.completed;
       await Future.delayed(_fireDelayAfterHit);
-      current = FireTrapState.on;
       _isDamageOn = true;
+      current = FireTrapState.on;
       await Future.delayed(_fireDuration);
-      current = FireTrapState.off;
-      _isFireActivated = false;
       _isDamageOn = false;
+      _isFireActivated = false;
+      current = FireTrapState.off;
     } else if (_isDamageOn) {
       _player.collidedWithEnemy();
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitboxEntity;
+
+  @override
+  ShapeHitbox get worldHitbox => _hitboxWorld;
 }

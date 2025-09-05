@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -28,7 +30,7 @@ enum TrampolineState implements AnimationState {
 /// automatically resets back to idle once the animation is complete.
 /// The trampoline acts as a passive collision object and does not move by itself.
 class Trampoline extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, PlayerCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
@@ -77,7 +79,7 @@ class Trampoline extends PositionComponent
   }
 
   @override
-  Future<void> onPlayerCollisionStart(Vector2 intersectionPoint) async {
+  Future<void> onEntityCollision(CollisionSide collisionSide) async {
     if (!_bounced) {
       _bounced = true;
 
@@ -91,4 +93,10 @@ class Trampoline extends PositionComponent
       _bounced = false;
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

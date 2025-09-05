@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
@@ -16,7 +18,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// The saw continuously animates while moving and flips direction
 /// once reaching the end of its range. It acts as a passive collision area
 /// that can interact with the [Player].
-class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReference<PixelAdventure> {
+class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -155,5 +157,11 @@ class Saw extends SpriteAnimationComponent with PlayerCollision, HasGameReferenc
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) => _player.collidedWithEnemy();
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy();
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
@@ -31,7 +33,7 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
 class Fruit extends SpriteAnimationGroupComponent
-    with PlayerCollision, HasGameReference<PixelAdventure>, HasWorldReference<Level>, CollisionCallbacks {
+    with EntityCollision, HasGameReference<PixelAdventure>, HasWorldReference<Level>, CollisionCallbacks {
   // constructor parameters
   final String _name;
   final bool _collectible;
@@ -100,12 +102,18 @@ class Fruit extends SpriteAnimationGroupComponent
   }
 
   @override
-  void onPlayerCollisionStart(Vector2 intersectionPoint) {
+  void onEntityCollision(CollisionSide collisionSide) {
     if (!_isCollected) {
       _isCollected = true;
-      current = FruitState.collected;
       world.increaseFruitsCount();
+      current = FruitState.collected;
       animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
     }
   }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.Any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 }

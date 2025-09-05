@@ -10,14 +10,13 @@
     "fileStates": {
         "Level_01.tmx": {
             "expandedObjectLayers": [
-                3,
-                4
+                3
             ],
             "scale": 1.4068,
-            "selectedLayer": -1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 169.88911003696336,
-                "y": 199.74410008529998
+                "x": 396.6448677850441,
+                "y": 200.45493318168894
             }
         },
         "Level_02.tmx": {
@@ -25,7 +24,7 @@
                 2
             ],
             "scale": 1.2792,
-            "selectedLayer": -1,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 300.187617260788,
                 "y": 164.16510318949344
@@ -36,21 +35,21 @@
                 2
             ],
             "scale": 1.2476,
-            "selectedLayer": -1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 565.0849631292081,
-                "y": 177.941647964091
+                "x": 262.9047771721705,
+                "y": 99.39083039435718
             }
         },
         "Level_04.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.2405,
-            "selectedLayer": -1,
+            "scale": 1.5345,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1546.15074566707,
-                "y": 192.6642482869811
+                "x": 1741.9354838709678,
+                "y": 231.99739328771585
             }
         }
     },

@@ -4,6 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/enemies/blue_bird.dart';
 import 'package:pixel_adventure/game/enemies/chicken.dart';
@@ -22,7 +23,6 @@ import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
 import 'package:pixel_adventure/game/checkpoints/checkpoint.dart';
-import 'package:pixel_adventure/game/level/collision_block.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/fire_trap.dart';
@@ -91,6 +91,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   // count fruits
   int totalFruitsCount = 0;
   int playerFruitsCount = 0;
+
+  // respawnables
+  final List<Respawnable> _pendingRespawnables = [];
 
   @override
   Future<void> onLoad() async {
@@ -415,11 +418,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
           case 'FireTrap':
             final fireTrap = FireTrap(player: _player, position: gridPosition);
             add(fireTrap);
-            final block = WorldBlock(
-              position: Vector2(spawnPoint.x, spawnPoint.y + PixelAdventure.tileSize),
-              size: Vector2(spawnPoint.width, PixelAdventure.tileSize),
-            );
-            _collisionBlocks.add(block);
             break;
           case 'Fire':
             final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
@@ -572,5 +570,19 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void increaseFruitsCount() {
     playerFruitsCount++;
     _gameHud.updateFruitCounter(playerFruitsCount);
+  }
+
+  void queueForRespawn(Respawnable item) {
+    _pendingRespawnables.add(item);
+  }
+
+  void processRespawns() {
+    for (var item in _pendingRespawnables) {
+      if (!item.isMounted) {
+        item.onRespawn();
+        add(item);
+      }
+    }
+    _pendingRespawnables.clear();
   }
 }
