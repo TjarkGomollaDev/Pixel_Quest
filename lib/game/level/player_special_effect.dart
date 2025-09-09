@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/geometry.dart';
@@ -55,7 +53,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   }
 
   Future<void> playAppearing(Vector2 effectPosition) async {
-    position = effectPosition - _offsetControlPoint;
+    position = effectPosition - _offset;
     isVisible = true;
     current = PlayerSpecialEffectState.appearing;
     await animationTickers![PlayerSpecialEffectState.appearing]!.completed;
@@ -63,7 +61,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   }
 
   Future<void> playDisappearing(Vector2 effectPosition) async {
-    position = effectPosition - _offsetControlPoint;
+    position = effectPosition - _offset;
     isVisible = true;
     current = PlayerSpecialEffectState.disappearing;
     await animationTickers![PlayerSpecialEffectState.disappearing]!.completed;
@@ -128,6 +126,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
       onComplete: () => completer.complete(),
     );
 
+    // rotate player while moving
     final rotateEffect = RotateEffect.by(tau / 4, EffectController(duration: durationMs, curve: FastStartAccelerateCurve()));
 
     // add effects
