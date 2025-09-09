@@ -14,6 +14,7 @@ mixin WorldCollisionEnd on PositionComponent {
 }
 
 class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
+  // constructor parameters
   final bool isPlatform;
 
   WorldBlock({this.isPlatform = false, required super.position, required super.size});

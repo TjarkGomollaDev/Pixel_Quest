@@ -212,7 +212,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   ///   S S S S . . . . .
   ///   S S S S . . . . .
   ///
-  ///
   /// Naive collision blocks (one per tile):
   ///   {S}{S}{S}{S} .. {P}{P}{P}
   ///   {S}{S}{S}{S} .. ...

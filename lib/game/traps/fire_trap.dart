@@ -35,8 +35,7 @@ enum FireTrapState implements AnimationState {
 /// Damage is only applied while the fire is burning. Triggering and timing
 /// are fully animation-driven, allowing the trap to synchronize visuals with
 /// its collision behavior for fair player feedback.
-class FireTrap extends SpriteAnimationGroupComponent
-    with WorldCollision, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 
@@ -46,8 +45,7 @@ class FireTrap extends SpriteAnimationGroupComponent
   static final Vector2 gridSize = Vector2(16, 32);
 
   // actual hitbox
-  final RectangleHitbox _hitboxEntity = RectangleHitbox(position: Vector2(0, 0), size: Vector2.all(16));
-  final RectangleHitbox _hitboxWorld = RectangleHitbox(position: Vector2(0, 16), size: Vector2.all(16));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 16), size: Vector2.all(16));
 
   // animation settings
   static final Vector2 _textureSize = Vector2(16, 32);
@@ -72,17 +70,24 @@ class FireTrap extends SpriteAnimationGroupComponent
   void _initialSetup() {
     // debug
     if (PixelAdventure.customDebug) {
-      _hitboxEntity.debugMode = true;
-      _hitboxWorld.debugMode = true;
-      _hitboxEntity.debugColor = AppTheme.debugColorTrapHitbox;
-      _hitboxWorld.debugColor = AppTheme.debugColorWorldBlock;
+      _hitbox.debugMode = true;
+      _hitbox.debugColor = AppTheme.debugColorWorldBlock;
     }
 
     // general
     priority = PixelAdventure.trapBehindLayerLevel;
-    _hitboxEntity.collisionType = CollisionType.passive;
-    _hitboxWorld.collisionType = CollisionType.passive;
-    addAll([_hitboxEntity, _hitboxWorld]);
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
+
+    // entity collider
+    add(
+      _FireTrapEntityCollider(
+        onCollide: (side) {
+          if (!_isDamageOn) return;
+          _player.collidedWithEnemy();
+        },
+      ),
+    );
   }
 
   void _loadAllSpriteAnimations() {
@@ -91,30 +96,51 @@ class FireTrap extends SpriteAnimationGroupComponent
     current = FireTrapState.off;
   }
 
+  Future<void> hitTrap() async {
+    if (_isFireActivated) return;
+    _isFireActivated = true;
+    current = FireTrapState.hit;
+    await animationTickers![FireTrapState.hit]!.completed;
+    await Future.delayed(_fireDelayAfterHit);
+    _isDamageOn = true;
+    current = FireTrapState.on;
+    await Future.delayed(_fireDuration);
+    current = FireTrapState.off;
+    _isDamageOn = false;
+    _isFireActivated = false;
+  }
+
   @override
-  Future<void> onEntityCollision(CollisionSide collisionSide) async {
-    if (!_isFireActivated && true) {
-      _isFireActivated = true;
-      current = FireTrapState.hit;
-      await animationTickers![FireTrapState.hit]!.completed;
-      await Future.delayed(_fireDelayAfterHit);
-      _isDamageOn = true;
-      current = FireTrapState.on;
-      await Future.delayed(_fireDuration);
-      _isDamageOn = false;
-      _isFireActivated = false;
-      current = FireTrapState.off;
-    } else if (_isDamageOn) {
-      _player.collidedWithEnemy();
+  ShapeHitbox get worldHitbox => _hitbox;
+}
+
+class _FireTrapEntityCollider extends PositionComponent with EntityCollision, CollisionCallbacks {
+  // constructor parameters
+  final void Function(CollisionSide side) onCollide;
+
+  _FireTrapEntityCollider({required this.onCollide}) : super(position: Vector2.zero(), size: Vector2.all(16));
+
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2.all(16));
+
+  @override
+  FutureOr<void> onLoad() {
+    // debug
+    if (PixelAdventure.customDebug) {
+      _hitbox.debugMode = true;
+      _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
+    return super.onLoad();
   }
 
   @override
   EntityCollisionType get collisionType => EntityCollisionType.Any;
 
   @override
-  ShapeHitbox get entityHitbox => _hitboxEntity;
+  ShapeHitbox get entityHitbox => _hitbox;
 
   @override
-  ShapeHitbox get worldHitbox => _hitboxWorld;
+  void onEntityCollision(CollisionSide collisionSide) => onCollide(collisionSide);
 }

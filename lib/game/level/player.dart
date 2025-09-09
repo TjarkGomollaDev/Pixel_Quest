@@ -17,6 +17,7 @@ import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player_special_effect.dart';
+import 'package:pixel_adventure/game/traps/fire_trap.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -84,6 +85,7 @@ class Player extends SpriteAnimationGroupComponent
   final double _jumpForce = 310;
   final double _doubleJumpForce = 250;
   final double _terminalVelocity = 300;
+  bool isOnGround = false;
 
   // movement
   double _horizontalMovement = 0;
@@ -91,7 +93,6 @@ class Player extends SpriteAnimationGroupComponent
   Vector2 velocity = Vector2.zero();
 
   // jump
-  bool isOnGround = false;
   bool hasJumped = false;
 
   // double jump
@@ -130,6 +131,8 @@ class Player extends SpriteAnimationGroupComponent
   // completer to detect when the player has reached a target x position
   Completer<void>? _isAtXCompleter;
   double? _targetX;
+
+  bool _levelStart = true;
 
   @override
   FutureOr<void> onLoad() {
@@ -183,14 +186,15 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (!isWorldCollisionActive && other is Start) {
-      isWorldCollisionActive = true;
-      _spawnProtection = false;
-      onWorldCollision(other);
-    } else if (isWorldCollisionActive) {
+    if (isWorldCollisionActive) {
       if (other is WorldCollision) onWorldCollision(other);
       if (_spawnProtection) return super.onCollision(intersectionPoints, other);
       if (other is EntityCollision) onEntityCollision(other);
+    } else if (_levelStart && other is Start) {
+      _levelStart = false;
+      isWorldCollisionActive = true;
+      _spawnProtection = false;
+      onWorldCollision(other);
     }
     super.onCollision(intersectionPoints, other);
   }
@@ -285,6 +289,7 @@ class Player extends SpriteAnimationGroupComponent
     canDoubleJump = true;
     if (other is MovingPlatform) other.playerOnTop();
     if (other is Finish) other.reachedFinish();
+    if (other is FireTrap) other.hitTrap();
   }
 
   void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
@@ -363,7 +368,7 @@ class Player extends SpriteAnimationGroupComponent
     isVisible = false;
     _spawnPosition = _startPosition - Vector2(0, _spawnDropFall);
     position = _spawnPosition;
-    _effect = PlayerSpecialEffect();
+    _effect = PlayerSpecialEffect(player: this);
     world.add(_effect);
   }
 
@@ -566,25 +571,28 @@ class Player extends SpriteAnimationGroupComponent
     _isPlayerStateActive = false;
     isWorldCollisionActive = false;
     _horizontalMovement = 0;
-    respawnNotifier.notifyRespawn();
+    velocity = Vector2.zero();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
-    current = PlayerState.hit;
-    await animationTickers![PlayerState.hit]!.completed;
+    respawnNotifier.notifyRespawn();
+
+    // play death effects
+    _effect.playFlashScreen();
+    _effect.shakeCamera();
+    await _effect.playDeathTrajectory();
     isVisible = false;
 
     // respawn
-    scale.x = 1;
-    velocity = Vector2.zero();
     position = _startPosition;
-    _isPlayerStateActive = true;
-    _isGravityActive = true;
-    isWorldCollisionActive = true;
+    scale.x = 1;
     world.processRespawns();
 
-    // a frame must be maintained, otherwise flickering will occur
+    // a frame must be maintained before visible again, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {
       isVisible = true;
       _spawnProtection = false;
+      _isPlayerStateActive = true;
+      _isGravityActive = true;
+      isWorldCollisionActive = true;
     });
   }
 

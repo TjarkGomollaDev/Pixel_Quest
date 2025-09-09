@@ -26,11 +26,12 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  static const bool customDebug = true;
+  static const bool customDebug = false;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
   static const int backgroundLayerLevel = -5;
+  static const int flashEffectLayerLevel = -4;
   static const int enemieLayerLevel = 10;
   static const int enemieBulletLayerLevel = 9;
   static const int enemieParticleLayerLevel = 8;
