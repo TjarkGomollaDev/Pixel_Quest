@@ -198,12 +198,9 @@ class Slime extends PositionComponent
       animationGroupComponent.current = SlimeState.hit;
       animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

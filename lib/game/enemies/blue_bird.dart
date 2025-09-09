@@ -192,12 +192,9 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, HasGa
       current = BlueBirdState.hit;
       animationTickers![BlueBirdState.hit]!.completed.then((_) => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

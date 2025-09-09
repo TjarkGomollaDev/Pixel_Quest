@@ -141,12 +141,9 @@ class Turtle extends PositionComponent
       animationGroupComponent.current = TurtleState.hit;
       animationGroupComponent.animationTickers![TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

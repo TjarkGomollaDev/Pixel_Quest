@@ -87,10 +87,7 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
   }
 
   @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy();
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

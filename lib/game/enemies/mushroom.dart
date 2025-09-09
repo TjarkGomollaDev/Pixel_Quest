@@ -191,12 +191,9 @@ class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, HasGa
       current = MushroomState.hit;
       animationTickers![MushroomState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

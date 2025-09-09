@@ -294,7 +294,7 @@ class Player extends SpriteAnimationGroupComponent
 
   void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
     if (isOnGround) {
-      _respawn();
+      _respawn(CollisionSide.Bottom);
     } else {
       position.y = blockBottom - _hitbox.position.y;
       velocity.y = 0;
@@ -564,7 +564,7 @@ class Player extends SpriteAnimationGroupComponent
     game.router.pushReplacementNamed(RouteNames.menu);
   }
 
-  Future<void> _respawn() async {
+  void _respawn(CollisionSide collisionSide) async {
     // hit
     _spawnProtection = true;
     _isGravityActive = false;
@@ -578,7 +578,7 @@ class Player extends SpriteAnimationGroupComponent
     // play death effects
     _effect.playFlashScreen();
     _effect.shakeCamera();
-    await _effect.playDeathTrajectory();
+    await _effect.playDeathTrajectory(collisionSide);
     isVisible = false;
 
     // respawn
@@ -596,7 +596,7 @@ class Player extends SpriteAnimationGroupComponent
     });
   }
 
-  void collidedWithEnemy() => _respawn();
+  void collidedWithEnemy(CollisionSide collisionSide) => _respawn(collisionSide);
 
   void bounceUp({double jumpForce = 260, bool resetDoubleJump = true}) {
     velocity.y = -jumpForce;

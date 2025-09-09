@@ -151,8 +151,5 @@ class Plant extends PositionComponent
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
-
-  @override
   ShapeHitbox get entityHitbox => _hitbox;
 }

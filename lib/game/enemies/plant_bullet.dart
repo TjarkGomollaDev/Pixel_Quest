@@ -83,11 +83,8 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     _despawn();
-    _player.collidedWithEnemy();
+    _player.collidedWithEnemy(collisionSide);
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

@@ -260,7 +260,7 @@ class Snail extends PositionComponent
       _hitbox.position = _shellHitbox.position;
       _hitbox.size = _shellHitbox.size;
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
 
@@ -284,12 +284,9 @@ class Snail extends PositionComponent
       animationGroupComponent.current = SnailState.shellTopHit;
       animationGroupComponent.animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

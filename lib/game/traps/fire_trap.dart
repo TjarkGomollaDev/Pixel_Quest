@@ -82,9 +82,9 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
     // entity collider
     add(
       _FireTrapEntityCollider(
-        onCollide: (side) {
+        onCollide: (collisonSide) {
           if (!_isDamageOn) return;
-          _player.collidedWithEnemy();
+          _player.collidedWithEnemy(collisonSide);
         },
       ),
     );
@@ -116,7 +116,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
 class _FireTrapEntityCollider extends PositionComponent with EntityCollision, CollisionCallbacks {
   // constructor parameters
-  final void Function(CollisionSide side) onCollide;
+  final void Function(CollisionSide collisonSide) onCollide;
 
   _FireTrapEntityCollider({required this.onCollide}) : super(position: Vector2.zero(), size: Vector2.all(16));
 
@@ -134,9 +134,6 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
     add(_hitbox);
     return super.onLoad();
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

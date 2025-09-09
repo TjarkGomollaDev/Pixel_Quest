@@ -5,6 +5,7 @@ import 'package:flame/geometry.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -98,7 +99,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   static const _buffer = 20.0;
   static const _msPerPixel = 2.8;
 
-  Future<void> playDeathTrajectory() async {
+  Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
     final completer = Completer<void>();
 
     // control point
@@ -135,7 +136,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
 
     await completer.future;
     player.angle = 0;
-    game.camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true); // zurückdrehen
+    game.camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
 }
 

@@ -7,7 +7,7 @@ enum EntityCollisionType { Side, Any }
 
 mixin EntityCollision on PositionComponent {
   void onEntityCollision(CollisionSide collisionSide);
-  EntityCollisionType get collisionType;
+  EntityCollisionType get collisionType => EntityCollisionType.Side;
   ShapeHitbox get entityHitbox;
 }
 

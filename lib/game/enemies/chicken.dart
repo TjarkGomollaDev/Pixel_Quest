@@ -185,12 +185,9 @@ class Chicken extends PositionComponent
       animationGroupComponent.current = ChickenState.hit;
       animationGroupComponent.animationTickers![ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
-      _player.collidedWithEnemy();
+      _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Side;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

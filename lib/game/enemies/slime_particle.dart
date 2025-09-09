@@ -61,10 +61,7 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
   }
 
   @override
-  void onEntityCollision(CollisionSide collisionSide) => player.collidedWithEnemy();
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
+  void onEntityCollision(CollisionSide collisionSide) => player.collidedWithEnemy(collisionSide);
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
