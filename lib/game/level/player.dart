@@ -578,7 +578,9 @@ class Player extends SpriteAnimationGroupComponent
     // play death effects
     _effect.playFlashScreen();
     _effect.shakeCamera();
+    current = PlayerState.hit;
     await _effect.playDeathTrajectory(collisionSide);
+    game.setRefollowForCam(this);
     isVisible = false;
 
     // respawn

@@ -26,7 +26,7 @@ class PixelAdventure extends FlameGame
   final bool showMobileControls = false;
 
   // custom debug mode
-  static const bool customDebug = false;
+  static const bool customDebug = true;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -106,6 +106,8 @@ class PixelAdventure extends FlameGame
     // viewfinder follows player
     camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
+
+  void setRefollowForCam(Player player) => camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
 
   void _setUpRouter() {
     final levelRoutes = {

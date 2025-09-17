@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="450" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="462">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="450" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="463">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="450" height="20">
   <properties>
@@ -236,7 +236,7 @@
    <properties>
     <property name="radius" type="int" value="6"/>
     <property name="startLeft" type="bool" value="false"/>
-    <property name="swingArcDec" type="int" value="170"/>
+    <property name="swingArcDec" type="int" value="180"/>
     <property name="swingSpeed" type="int" value="360"/>
    </properties>
   </object>

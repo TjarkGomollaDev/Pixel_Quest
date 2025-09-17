@@ -78,8 +78,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
     );
 
     game.world.add(flash);
-
-    flash.add(OpacityEffect.to(0, EffectController(duration: 0.2, curve: Curves.easeOut), onComplete: () => removeFromParent()));
+    flash.add(OpacityEffect.to(0, EffectController(duration: 0.2, curve: Curves.easeOut), onComplete: () => game.world.remove(flash)));
   }
 
   Future<void> shakeCamera({int shakes = 3, double intensity = 10, double duration = 0.04}) async {
@@ -96,23 +95,32 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   }
 
   static final _offsetControlPoint = Vector2(40, 120);
-  static const _buffer = 20.0;
-  static const _msPerPixel = 2.8;
+  static final _hopHeight = 40;
+  static const _hopDuration = 0.3;
+  static const _buffer = 20;
+  static const _msPerPixelHorizontal = 2.6;
+  static const _msPerPixelVertical = 3.4;
 
-  Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
+  EffectController _deathController(double duration) => EffectController(duration: duration, curve: FastStartAccelerateCurve());
+
+  double _calculateDuration(double verticalDistance, double msPerPixel) => (verticalDistance * msPerPixel) / 1000;
+
+  Future<void> _deathOnHorizontalCollision(CollisionSide collisionSide) async {
     final completer = Completer<void>();
 
     // control point
-    final controlPointX = player.x - _offsetControlPoint.x;
+    final controlPointX = collisionSide == CollisionSide.Left ? player.x - _offsetControlPoint.x : player.x + _offsetControlPoint.x;
     final controlPointY = player.y - _offsetControlPoint.y;
 
     // end point
     final endPointY = game.camera.visibleWorldRect.bottom + _buffer;
     final verticalDistance = endPointY - controlPointY;
-    final endPointX = controlPointX - (verticalDistance * 0.02);
+    final endPointX = collisionSide == CollisionSide.Left
+        ? controlPointX - (verticalDistance * 0.02)
+        : controlPointX + (verticalDistance * 0.02);
 
     // duration depends on distance
-    final durationMs = (verticalDistance * _msPerPixel) / 1000;
+    final durationMs = _calculateDuration(verticalDistance, _msPerPixelHorizontal);
 
     // path for the move effect
     final path = Path()
@@ -120,23 +128,53 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
       ..quadraticBezierTo(controlPointX, controlPointY, endPointX, endPointY);
 
     // move the player outside the screen
-    final moveEffect = MoveAlongPathEffect(
-      path,
-      EffectController(duration: durationMs, curve: FastStartAccelerateCurve()),
-      absolute: true,
-      onComplete: () => completer.complete(),
-    );
+    final moveEffect = MoveAlongPathEffect(path, _deathController(durationMs), absolute: true, onComplete: () => completer.complete());
 
     // rotate player while moving
-    final rotateEffect = RotateEffect.by(tau / 4, EffectController(duration: durationMs, curve: FastStartAccelerateCurve()));
+    final rotateEffect = RotateEffect.by((collisionSide == CollisionSide.Right) ? -tau / 4 : tau / 4, _deathController(durationMs));
 
     // add effects
     player.add(moveEffect);
     player.add(rotateEffect);
 
-    await completer.future;
+    return completer.future;
+  }
+
+  Future<void> _deathOnVerticalCollision(CollisionSide collisionSide) async {
+    final completer = Completer<void>();
+
+    // end point
+    final endPointY = game.camera.visibleWorldRect.bottom + _buffer;
+    final verticalDistance = collisionSide == CollisionSide.Top ? endPointY - player.y + _hopHeight : endPointY - player.y;
+
+    // duration depends on distance
+    final durationMs = _calculateDuration(verticalDistance, _msPerPixelVertical);
+
+    // move the player outside the screen
+    final moveEffect = MoveEffect.to(Vector2(player.x, endPointY), _deathController(durationMs), onComplete: () => completer.complete());
+
+    // possibly add a small hop effect before the move effect
+    if (collisionSide == CollisionSide.Top) {
+      final hopEffect = MoveEffect.to(
+        Vector2(player.x, player.y - _hopHeight),
+        EffectController(duration: _hopDuration, curve: Curves.easeOut),
+      );
+      hopEffect.onComplete = () => player.add(moveEffect);
+      player.add(hopEffect);
+    } else {
+      player.add(moveEffect);
+    }
+
+    return completer.future;
+  }
+
+  Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
+    if (collisionSide == CollisionSide.Left || collisionSide == CollisionSide.Right) {
+      await _deathOnHorizontalCollision(collisionSide);
+    } else {
+      await _deathOnVerticalCollision(collisionSide);
+    }
     player.angle = 0;
-    game.camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
 }
 
