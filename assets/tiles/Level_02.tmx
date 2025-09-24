@@ -102,19 +102,4 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="3" name="Collisions">
-  <object id="47" x="192" y="128" width="112" height="32"/>
-  <object id="50" x="96" y="176" width="64" height="16"/>
-  <object id="51" x="352" y="80" width="64" height="16"/>
-  <object id="53" x="144" y="16" width="32" height="32"/>
-  <object id="54" x="16" y="80" width="80" height="32"/>
-  <object id="55" x="16" y="112" width="64" height="16"/>
-  <object id="56" x="16" y="128" width="48" height="16"/>
-  <object id="57" x="16" y="144" width="16" height="16"/>
-  <object id="63" x="576" y="80" width="48" height="16"/>
-  <object id="66" type="Platform" x="576" y="144" width="48" height="16"/>
-  <object id="67" type="Platform" x="576" y="208" width="48" height="16"/>
-  <object id="77" x="240" y="288" width="16" height="16"/>
-  <object id="78" x="448" y="288" width="16" height="16"/>
- </objectgroup>
 </map>

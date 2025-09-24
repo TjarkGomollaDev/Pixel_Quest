@@ -67,7 +67,7 @@ class PixelAdventure extends FlameGame
   // tiled map dimensions
   static const double tileSize = 16;
   static const double mapHeight = 320;
-  static const double mapBorder = tileSize / 2;
+  static const double mapBorderWidth = tileSize / 2;
 
   // animation settings
   static const double stepTime = 0.05;
@@ -88,7 +88,7 @@ class PixelAdventure extends FlameGame
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
 
   void _setUpCam() {
-    final fixedHeight = mapHeight - mapBorder * 2;
+    final fixedHeight = mapHeight - mapBorderWidth * 2;
     final aspectRatio = size.x / size.y;
     final dynamicWidth = fixedHeight * aspectRatio;
 
@@ -99,9 +99,9 @@ class PixelAdventure extends FlameGame
 
   void setUpCameraForLevel(double mapWidth, Player player) {
     // camera bounds
-    final leftBound = size.x * camera.viewfinder.anchor.x + mapBorder;
-    final rightBound = size.x * (1 - camera.viewfinder.anchor.x) + mapBorder;
-    camera.setBounds(Rectangle.fromLTRB(leftBound, mapBorder, mapWidth - rightBound, mapBorder));
+    final leftBound = size.x * camera.viewfinder.anchor.x + mapBorderWidth;
+    final rightBound = size.x * (1 - camera.viewfinder.anchor.x) + mapBorderWidth;
+    camera.setBounds(Rectangle.fromLTRB(leftBound, mapBorderWidth, mapWidth - rightBound, mapBorderWidth));
 
     // viewfinder follows player
     camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);

@@ -89,9 +89,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   late final JumpBtn? _jumpBtn;
   late final FpsTextComponent? _fpsText;
 
-  // count fruits
+  // fruits count
   int totalFruitsCount = 0;
   int playerFruitsCount = 0;
+
+  // death count
+  int deathCount = 0;
 
   // respawnables
   final List<Respawnable> _pendingRespawnables = [];
@@ -154,10 +157,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void _addBackground(TileLayer backgroundLayer) {
     final backgroundType = backgroundLayer.properties.getValue<String?>('BackgroundType');
     final size = Vector2(
-      _levelMap.width - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
-      _levelMap.height - (PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize * 2 : 0),
+      _levelMap.width - (PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize * 2 : 0),
+      _levelMap.height - (PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize * 2 : 0),
     );
-    final position = Vector2.all(PixelAdventure.mapBorder != 0 ? PixelAdventure.tileSize : 0);
+    final position = Vector2.all(PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize : 0);
     bool isInitialized = false;
     BackgroundTileColor? color;
     if (backgroundType != null) {
@@ -230,7 +233,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   /// and improves runtime performance significantly.
   void _addWorldCollisions(TileLayer backgroundLayer) {
     _addWorldBorders();
-    final hasBorder = PixelAdventure.mapBorder != 0;
+    final hasBorder = PixelAdventure.mapBorderWidth != 0;
 
     // y axis range of map
     final yStart = hasBorder ? 1 : 0;
@@ -306,7 +309,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
   void _addWorldBorders() {
     const borderWidth = PixelAdventure.tileSize;
-    final hasBorder = PixelAdventure.mapBorder != 0;
+    final hasBorder = PixelAdventure.mapBorderWidth != 0;
     final verticalSize = Vector2(borderWidth, hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
     final horizontalSize = Vector2(hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
     final borders = <WorldBlock>[
@@ -567,16 +570,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
   void removeGameHudOnFinish() => _removeGameHud();
 
-  void increaseFruitsCount() {
-    playerFruitsCount++;
-    _gameHud.updateFruitCounter(playerFruitsCount);
-  }
+  void increaseFruitsCount() => _gameHud.updateFruitCount(++playerFruitsCount);
+
+  void _increaseDeathCount() => _gameHud.updateDeathCount(++deathCount);
 
   void queueForRespawn(Respawnable item) {
     _pendingRespawnables.add(item);
   }
 
-  void processRespawns() {
+  void _processRespawns() {
     for (var item in _pendingRespawnables) {
       if (!item.isMounted) {
         item.onRespawn();
@@ -584,5 +586,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
       }
     }
     _pendingRespawnables.clear();
+  }
+
+  void playerRespawn() {
+    _processRespawns();
+    _increaseDeathCount();
   }
 }

@@ -82,7 +82,7 @@ class Fruit extends SpriteAnimationGroupComponent
       _hitbox.collisionType = CollisionType.passive;
       add(_hitbox);
     } else {
-      anchor = Anchor.centerLeft;
+      anchor = Anchor.center;
     }
   }
 

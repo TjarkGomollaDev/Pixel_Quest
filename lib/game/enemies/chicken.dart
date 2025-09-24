@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -139,20 +138,14 @@ class Chicken extends PositionComponent
     final playerHitboxLeft = _player.hitboxLeft;
     final playerHitboxRight = _player.hitboxRight;
 
-    // debugPrint(_hitboxRight.toString());
-
     // first, we check whether the player is within the range in which the chicken can move
     if (!_playerInRange(playerHitboxLeft, playerHitboxRight, _player.hitboxBottom)) return;
-    debugPrint('in range');
 
     // secondly, now that we know the player is in range, we check whether he is to the left or right of the chicken
     if (playerHitboxRight < _hitboxLeft) {
       _moveDirection = -1;
     } else if (playerHitboxLeft > _hitboxRight) {
       _moveDirection = 1;
-    } else {
-      // this only occurs when we disable collisions with the player, it ensures that the chicken does not constantly change direction because we are standing in the chicken
-      return;
     }
 
     // movement towards the player

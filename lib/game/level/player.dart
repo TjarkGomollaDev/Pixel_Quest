@@ -586,7 +586,7 @@ class Player extends SpriteAnimationGroupComponent
     // respawn
     position = _startPosition;
     scale.x = 1;
-    world.processRespawns();
+    world.playerRespawn();
 
     // a frame must be maintained before visible again, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {

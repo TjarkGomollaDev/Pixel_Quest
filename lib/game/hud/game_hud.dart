@@ -7,6 +7,7 @@ import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
@@ -15,7 +16,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
   GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
     size = Vector2(160, Fruit.gridSize.y);
-    position = Vector2(PixelAdventure.tileSize * 3, 10);
+    position = Vector2(PixelAdventure.tileSize * 3, 20);
+    anchor = Anchor.centerLeft;
   }
 
   // btns
@@ -29,18 +31,29 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   // fruits count
   late final RoundedComponent _fruitBg;
   late final Fruit _fruitItem;
-  late final TextComponent _fruitsCounter;
+  late final TextComponent _fruitsCount;
+
+  // death count
+  late final RoundedComponent _deathBg;
+  late final SpriteComponent _deathItem;
+  late final TextComponent _deathCount;
+
+  // count settings
+  static const double _bgSize = 19;
+  static const double _spacingBetweenElements = 20;
+  static const double _counterTextMarginLeft = 4;
 
   @override
   FutureOr<void> onLoad() {
     _setUpBtns();
-    _setUpFruitsCounter();
+    _setUpFruitsCount();
+    _setUpDeathCount();
     return super.onLoad();
   }
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, size.y / 2);
+    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, position.y);
     final btnOffset = Vector2(InGameActionBtn.btnSize.x + _btnSpacing, 0);
 
     // menu btn
@@ -90,31 +103,64 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
     addAll([_menuBtn, _playBtn, _restartBtn]);
   }
 
-  void _setUpFruitsCounter() {
+  void _setUpFruitsCount() {
     // fruit background
     _fruitBg = RoundedComponent(
       color: AppTheme.black.withAlpha(56),
       borderRadius: 2,
-      position: Vector2(96, size.y / 2),
-      size: Vector2(19, 19),
+      position: Vector2(_restartBtn.position.x + _bgSize + _spacingBetweenElements, position.y),
+      size: Vector2.all(_bgSize),
       anchor: Anchor.center,
     );
 
     // fruit item
-    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(80, size.y / 2 + 1), collectible: false);
+    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(_fruitBg.position.x, position.y + 1), collectible: false);
 
-    // counter
-    _fruitsCounter = TextComponent(
+    // count text
+    _fruitsCount = TextComponent(
       text: '0/$_totalFruitsCount',
       anchor: Anchor(0, 0.32),
-      position: Vector2(109, size.y / 2),
+      position: Vector2(_fruitBg.position.x + _fruitBg.size.x / 2 + _counterTextMarginLeft, position.y),
       textRenderer: TextPaint(
         style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
       ),
     );
 
-    addAll([_fruitBg, _fruitItem, _fruitsCounter]);
+    addAll([_fruitBg, _fruitItem, _fruitsCount]);
   }
 
-  void updateFruitCounter(int collected) => _fruitsCounter.text = '$collected/$_totalFruitsCount';
+  void _setUpDeathCount() {
+    // death background
+    _deathBg = RoundedComponent(
+      color: AppTheme.black.withAlpha(56),
+      borderRadius: 2,
+      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _bgSize / 2 + _spacingBetweenElements * 4 / 5, position.y),
+      size: Vector2.all(_bgSize),
+      anchor: Anchor.center,
+    );
+
+    // death item
+    _deathItem = SpriteComponent(
+      sprite: loadSprite(game, 'Other/Bone.png'),
+      position: _deathBg.position,
+      size: Vector2.all(32),
+      anchor: Anchor.center,
+    );
+
+    // count text
+    _deathCount = TextComponent(
+      text: '0',
+      anchor: Anchor(0, 0.32),
+      position: Vector2(_deathBg.position.x + _deathBg.size.x / 2 + _counterTextMarginLeft, position.y),
+      textRenderer: TextPaint(
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
+      ),
+    );
+
+    addAll([_deathBg, _deathItem, _deathCount]);
+  }
+
+  void updateFruitCount(int collected) => _fruitsCount.text = '$collected/$_totalFruitsCount';
+
+  void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
 }

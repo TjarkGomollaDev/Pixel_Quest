@@ -78,8 +78,8 @@
   <object id="126" name="Chicken" type="Chicken" x="240" y="224" width="32" height="48">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
-    <property name="offsetNeg" type="float" value="2"/>
-    <property name="offsetPos" type="float" value="6"/>
+    <property name="offsetNeg" type="float" value="6"/>
+    <property name="offsetPos" type="float" value="2"/>
    </properties>
   </object>
  </objectgroup>

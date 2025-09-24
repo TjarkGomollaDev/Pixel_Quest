@@ -87,7 +87,7 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
   void _loadFanAirStream() {
     _airStream = FanAirStream(
       baseWidth: width,
-      airStreamHeight: position.y + _hitbox.position.y - PixelAdventure.mapBorder * 2,
+      airStreamHeight: position.y + _hitbox.position.y - PixelAdventure.mapBorderWidth * 2,
       alwaysOn: _alwaysOn,
       fan: this,
       player: _player,
