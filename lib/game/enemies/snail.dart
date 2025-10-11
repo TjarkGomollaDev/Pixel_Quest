@@ -35,7 +35,7 @@ enum SnailState implements AnimationState {
 }
 
 class Snail extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityCollisionEnd, HasGameReference<PixelAdventure>, CollisionCallbacks {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isLeft;
@@ -92,6 +92,9 @@ class Snail extends PositionComponent
   bool _shellGotKicked = false;
   bool _shellGotStomped = false;
 
+  // collision
+  bool _playerHasLeftCollision = true;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
@@ -126,6 +129,7 @@ class Snail extends PositionComponent
     _hitbox.collisionType = CollisionType.passive;
     _shellHitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    _player.respawnNotifier.addListener(onEntityCollisionEnd);
   }
 
   void _loadAllSpriteAnimations() {
@@ -240,13 +244,18 @@ class Snail extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (!_snailGotStomped) {
+      _playerHasLeftCollision = false;
       _handleSnailStomp(collisionSide);
-    } else if (!_shellGotKicked) {
-      _handleShellKick();
-    } else if (!_shellGotStomped) {
+    } else if (!_shellGotKicked && _playerHasLeftCollision) {
+      _playerHasLeftCollision = false;
+      _handleShellKick(collisionSide);
+    } else if (!_shellGotStomped && _playerHasLeftCollision) {
       _handleShellStomp(collisionSide);
     }
   }
+
+  @override
+  void onEntityCollisionEnd() => _playerHasLeftCollision = true;
 
   Future<void> _handleSnailStomp(CollisionSide collisionSide) async {
     if (collisionSide == CollisionSide.Top) {
@@ -265,14 +274,30 @@ class Snail extends PositionComponent
     }
   }
 
-  void _handleShellKick() {
+  void _handleShellKick(CollisionSide collisionSide) {
     animationGroupComponent.current = SnailState.shellSpin;
     _shellGotKicked = true;
-    final shellPositionLeftX = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
-    final shellPositionRightX = shellPositionLeftX + _hitbox.width;
-    final shellCenter = (shellPositionLeftX + shellPositionRightX) / 2;
-    final playerCenter = (_player.hitboxLeft + _player.hitboxRight) / 2;
-    _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;
+
+    // depending on the collisionSide, the shell is kicked in the corresponding direction
+    switch (collisionSide) {
+      case CollisionSide.Left:
+        _shellMoveDirection = 1;
+        break;
+      case CollisionSide.Right:
+        _shellMoveDirection = -1;
+        break;
+      case CollisionSide.Top:
+        final shellLeft = scale.x > 0 ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
+        final shellCenter = shellLeft + _hitbox.width / 2;
+        final playerCenter = (_player.hitboxLeft + _player.hitboxRight) / 2;
+        _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;
+        _player.bounceUp();
+        break;
+      default:
+        return _player.collidedWithEnemy(collisionSide);
+    }
+
+    // flip shell if direction changes and update borders
     if (_shellMoveDirection != _moveDirection) flipHorizontallyAroundCenter();
     _updateActualBorders();
   }

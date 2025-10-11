@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
-import 'package:pixel_adventure/menu/level_btn.dart';
+import 'package:pixel_adventure/menu/level_info.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class MenuPage extends Component with HasGameReference<PixelAdventure> {
   late final TextComponent _logo;
+  final Map<String, LevelInfo> _levelInfos = {};
+  late final StreamSubscription _sub;
+
   @override
   FutureOr<void> onLoad() {
     add(
@@ -18,11 +21,25 @@ class MenuPage extends Component with HasGameReference<PixelAdventure> {
         anchor: Anchor.center,
       ),
     );
-    for (var level in MyLevel.values) {
-      final levelBtn = LevelBtn(myLevel: level, position: Vector2(30, 40 + 20.0 * level.index));
-      add(levelBtn);
+    int i = 0;
+    for (var levelMetadata in allLevels) {
+      final y = 40 + 15.0 * i;
+
+      final info = LevelInfo(levelMetadata: levelMetadata, position: Vector2(30, y));
+      add(info);
+      _levelInfos[levelMetadata.uuid] = info;
+      i++;
     }
+
+    _sub = game.dataCenter.onLevelDataChanged.listen((uuid) => _levelInfos[uuid]!.updateStars());
+
     return super.onLoad();
+  }
+
+  @override
+  void onRemove() {
+    _sub.cancel();
+    super.onRemove();
   }
 
   @override

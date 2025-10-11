@@ -1,73 +1,63 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:pixel_adventure/data/level_data_entity.dart';
+import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DataCenter {
   final SharedPreferences _prefs;
-
-  // data
-  final Map<int, LevelDataEntity> _cacheLevels = {};
-  int _cacheTotalLevels = 0;
-
-  // keys
-  String _levelKey(int index) => 'level-$index';
-  static const String _keyTotalLevels = 'total-levels';
 
   DataCenter._(this._prefs);
 
   static Future<DataCenter> init() async {
     final prefs = await SharedPreferences.getInstance();
     final dataCenter = DataCenter._(prefs);
-    dataCenter._loadTotalLevels();
+    // await dataCenter.clearAllLevels();
     dataCenter._loadAllLevels();
     return dataCenter;
   }
 
-  // getter
-  int get totalLevels => _cacheTotalLevels;
-  LevelDataEntity getLevel(int index) => _cacheLevels[index]!;
+  // data
+  final Map<String, LevelDataEntity> _cacheLevelData = {};
 
-  Future<void> saveTotalLevels(int total) async {
-    await _prefs.setInt(_keyTotalLevels, total);
-    _cacheTotalLevels = total;
-  }
+  // stream
+  final StreamController<String> _onLevelDataChanged = StreamController.broadcast();
+  Stream<String> get onLevelDataChanged => _onLevelDataChanged.stream;
 
-  void _loadTotalLevels() => _cacheTotalLevels = _prefs.getInt(_keyTotalLevels) ?? 0;
+  LevelDataEntity getLevel(String key) => _cacheLevelData[key]!;
 
   Future<void> saveLevel(LevelDataEntity data) async {
     final json = jsonEncode(data.toMap());
-    await _prefs.setString(_levelKey(data.index), json);
-    _cacheLevels[data.index] = data;
+    await _prefs.setString(data.uuid, json);
+    _cacheLevelData[data.uuid] = data;
+    _onLevelDataChanged.add(data.uuid);
   }
 
-  void _loadLevel(int index) {
-    final json = _prefs.getString(_levelKey(index));
+  void _loadLevel(String key) {
+    final json = _prefs.getString(key);
     if (json == null) {
-      _cacheLevels[index] = LevelDataEntity.newLevelData(index: index);
+      _cacheLevelData[key] = LevelDataEntity.newLevelData(uuid: key);
     } else {
       try {
         final map = jsonDecode(json) as Map<String, dynamic>;
-        _cacheLevels[index] = LevelDataEntity.fromMap(map, index);
+        _cacheLevelData[key] = LevelDataEntity.fromMap(map, key);
       } catch (_) {
-        _cacheLevels[index] = LevelDataEntity.newLevelData(index: index);
+        _cacheLevelData[key] = LevelDataEntity.newLevelData(uuid: key);
       }
     }
   }
 
   void _loadAllLevels() {
-    if (_cacheTotalLevels <= 0) return;
-    for (int i = 1; i <= _cacheTotalLevels; i++) {
-      _loadLevel(i);
+    if (allLevels.isEmpty) return;
+    for (var levelMetadata in allLevels) {
+      _loadLevel(levelMetadata.uuid);
     }
   }
 
   Future<void> clearAllLevels() async {
-    final keys = _prefs.getKeys().where((k) => k.startsWith('level-')).toList();
-    for (final key in keys) {
-      await _prefs.remove(key);
+    for (var levelMetadata in allLevels) {
+      await _prefs.remove(levelMetadata.uuid);
     }
-    _cacheLevels.clear();
-    await _prefs.remove(_keyTotalLevels);
-    _cacheTotalLevels = 0;
+    _cacheLevelData.clear();
   }
 }

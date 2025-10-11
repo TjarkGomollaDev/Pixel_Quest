@@ -100,9 +100,9 @@ class FanAirStream extends PositionComponent
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _player.respawnNotifier.addListener(onEntityCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    _player.respawnNotifier.addListener(onEntityCollisionEnd);
   }
 
   void _setUpParticle() => _particleBasePosition = Vector2((size.x - _baseWidth) / 2, size.y);

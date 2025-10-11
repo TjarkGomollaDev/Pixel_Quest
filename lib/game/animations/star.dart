@@ -9,7 +9,11 @@ import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> {
-  OutlineStar({required Vector2 position}) : super(position: position, size: Vector2.all(24));
+  final bool _spawnAnimation;
+
+  OutlineStar({required Vector2 position, bool spawnAnimation = false})
+    : _spawnAnimation = spawnAnimation,
+      super(position: position, size: Vector2.all(24));
 
   // animation settings
   static const String _path = 'Other/Star Outline.png';
@@ -18,7 +22,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
   Future<void> onLoad() async {
     _initialSetup();
     _loadSprite();
-    _spawnAnimation();
+    if (_spawnAnimation) _addSpawnAnimation();
   }
 
   void _initialSetup() {
@@ -35,7 +39,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
 
   void _loadSprite() => sprite = loadSprite(game, _path);
 
-  void _spawnAnimation() {
+  void _addSpawnAnimation() {
     scale = Vector2.zero();
     add(ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.6, curve: Curves.fastEaseInToSlowEaseOut)));
   }
@@ -44,7 +48,11 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
 }
 
 class Star extends SpriteComponent with HasGameReference<PixelAdventure> {
-  Star({required Vector2 position}) : super(position: position, size: Vector2.all(24));
+  final bool _spawnAnimation;
+
+  Star({required Vector2 position, bool spawnAnimation = false})
+    : _spawnAnimation = spawnAnimation,
+      super(position: position, size: Vector2.all(24));
 
   // animation settings
   static const String _path = 'Other/Star.png';
@@ -69,7 +77,7 @@ class Star extends SpriteComponent with HasGameReference<PixelAdventure> {
 
   void _loadSprite() {
     sprite = loadSprite(game, _path);
-    scale = Vector2.zero();
+    if (_spawnAnimation) scale = Vector2.zero();
   }
 
   Future<void> flyTo(Vector2 target) async {

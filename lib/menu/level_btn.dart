@@ -7,9 +7,9 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class LevelBtn extends SpriteComponent with HasGameReference<PixelAdventure>, TapCallbacks {
-  final MyLevel _myLevel;
+  final LevelMetadata _levelMetadata;
 
-  LevelBtn({required MyLevel myLevel, required super.position}) : _myLevel = myLevel;
+  LevelBtn({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata;
 
   // size
   static final Vector2 btnSize = Vector2(19, 17);
@@ -34,7 +34,7 @@ class LevelBtn extends SpriteComponent with HasGameReference<PixelAdventure>, Ta
   @override
   void onTapUp(TapUpEvent event) {
     scale = Vector2.all(1.0);
-    game.router.pushNamed(_myLevel.name);
+    game.router.pushNamed(_levelMetadata.uuid);
     super.onTapUp(event);
   }
 
@@ -52,5 +52,5 @@ class LevelBtn extends SpriteComponent with HasGameReference<PixelAdventure>, Ta
     anchor = Anchor.center;
   }
 
-  void _loadSprite() => sprite = loadSprite(game, '$_path${_myLevel.btnName}$_pathEnd');
+  void _loadSprite() => sprite = loadSprite(game, '$_path${_levelMetadata.btnFileName}$_pathEnd');
 }

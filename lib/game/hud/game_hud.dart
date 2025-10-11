@@ -82,19 +82,19 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
       action: () {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {
-          final myLevel = (currentRoute.world as Level).myLvel;
+          final myLevel = (currentRoute.world as Level).levelMetadata;
 
           // at this point, we need to create a new instance of the route, because otherwise the router will assume
           // that the route already exists and will not even create a new one, which is explicitly what we want to do here
-          game.router.pushReplacement(WorldRoute(() => Level(myLvel: myLevel), maintainState: false), name: myLevel.name);
+          game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: myLevel), maintainState: false), name: myLevel.uuid);
         } else if (currentRoute is PauseRoute) {
           final previousRoute = game.router.previousRoute;
           if (previousRoute is WorldRoute) {
-            final myLevel = (previousRoute.world as Level).myLvel;
+            final myLevel = (previousRoute.world as Level).levelMetadata;
             game.router.pop();
 
             // same as above
-            game.router.pushReplacement(WorldRoute(() => Level(myLvel: myLevel), maintainState: false), name: myLevel.name);
+            game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: myLevel), maintainState: false), name: myLevel.uuid);
           }
         }
       },

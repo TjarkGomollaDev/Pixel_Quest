@@ -480,6 +480,7 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> reachedFinish(ShapeHitbox finish) async {
     _horizontalMovement = 0;
     _spawnProtection = true;
+    world.saveData();
 
     // delays are not functional, but purely for a more visually appealing result
     final delays = [200, 800, 80, 620, 120, 600, 400, 200];
@@ -503,17 +504,16 @@ class Player extends SpriteAnimationGroupComponent
     final stars = [];
 
     // outline stars
-    for (final position in starPositions) {
-      final outlineStar = OutlineStar(position: position);
+    for (var position in starPositions) {
+      final outlineStar = OutlineStar(position: position, spawnAnimation: true);
       outlineStars.add(outlineStar);
     }
     world.addAll(outlineStars);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // earned stars
-    world.calculateEarnedStars();
     for (var i = 0; i < world.earnedStars; i++) {
-      final star = Star(position: playerCenter);
+      final star = Star(position: playerCenter, spawnAnimation: true);
       world.add(star);
       stars.add(star);
 

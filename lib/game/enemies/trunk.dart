@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
@@ -101,7 +101,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
   final double _timeBetweenShots = 0.8; // [Adjustable]
 
   // default vertical extension in y direction when checking if the trunk should enter attack mode
-  final double _extendRangeDefault = 20; // [Adjustable]
+  final double _extendRangeDefault = 30; // [Adjustable]
 
   // additional vertical range added on top of _extendRangeDefault after the trunk has attacked,
   // keeping the trunk in "combat ready" mode as long as the player stays within this extended range
@@ -142,11 +142,11 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
       }
     } else if (_wasShooting && _checkCombatReady()) {
       if (_isShooting) {
-        await _stopShooting();
+        _stopShooting();
       }
     } else {
       if (_isShooting) {
-        await _stopShooting();
+        _stopShooting();
         _startMovement();
       } else if (_wasShooting) {
         _startMovement();
@@ -272,7 +272,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
 
     // calculate speed factor
     _accelProgress = (_accelProgress + dt / _accelDuration).clamp(0.0, 1.0);
-    _speedFactor = 1 - math.pow(1 - _accelProgress, 3).toDouble();
+    _speedFactor = 1 - pow(1 - _accelProgress, 3).toDouble();
 
     // calculate current speed
     return _moveSpeed * _speedFactor;
@@ -303,16 +303,16 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
     _shootTimer.start();
   }
 
-  Future<void> _stopShooting() async {
+  void _stopShooting() {
     _isShooting = false;
     _shootTimer.stop();
-    await animationTickers?[TrunkState.attack]?.completed;
+    animationTickers![TrunkState.attack]?.onComplete?.call();
   }
 
-  Future<void> _shoot() async {
+  void _shoot() async {
     current = TrunkState.attack;
     await animationTickers![TrunkState.attack]!.completed;
-    if (_gotStomped) return;
+    if (!_isShooting || _gotStomped) return;
     _spawnBullet();
     current = TrunkState.idle;
   }

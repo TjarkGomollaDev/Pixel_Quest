@@ -57,9 +57,9 @@ class DecoratedWorld extends World with HasTimeScale {
 }
 
 class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCallbacks {
-  final MyLevel myLvel;
+  final LevelMetadata levelMetadata;
 
-  Level({required this.myLvel});
+  Level({required this.levelMetadata});
 
   // level map from Tiled file
   late final TiledComponent _levelMap;
@@ -133,7 +133,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   Future<void> _loadLevelMap() async {
-    _levelMap = await TiledComponent.load('${myLvel.name}.tmx', Vector2.all(GameSettings.tileSize))
+    _levelMap = await TiledComponent.load('${levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
       ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
   }
@@ -605,7 +605,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     _increaseDeathCount();
   }
 
-  void calculateEarnedStars() {
+  void _calculateEarnedStars() {
     if (playerFruitsCount >= totalFruitsCount) {
       earnedStars = 3;
     } else if (playerFruitsCount >= totalFruitsCount ~/ 2) {
@@ -616,14 +616,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   Future<void> saveData() async {
+    _calculateEarnedStars();
     final data = LevelDataEntity(
-      index: myLvel.index,
+      uuid: levelMetadata.uuid,
       stars: earnedStars,
       totalFruits: totalFruitsCount,
       earnedFruits: playerFruitsCount,
       deaths: deathCount,
     );
-    final storedData = game.dataCenter.getLevel(myLvel.index);
+    final storedData = game.dataCenter.getLevel(levelMetadata.uuid);
     if (data.shouldReplace(storedData: storedData)) await game.dataCenter.saveLevel(data);
   }
 }
