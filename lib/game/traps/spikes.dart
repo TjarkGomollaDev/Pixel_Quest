@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A spike trap that renders a row of spikes along one side of a tile area.
@@ -46,14 +47,14 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
@@ -62,13 +63,13 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
     if (_side > 4 || _side < 1) _side = 1;
     // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
     if (_side.isOdd) {
-      height = PixelAdventure.tileSize;
+      height = GameSettings.tileSize;
       width = snapValueToGrid(width);
     } else {
-      width = PixelAdventure.tileSize;
+      width = GameSettings.tileSize;
       height = snapValueToGrid(height);
     }
-    _count = (_side.isOdd ? width : height) / PixelAdventure.tileSize;
+    _count = (_side.isOdd ? width : height) / GameSettings.tileSize;
   }
 
   void _setupHitbox() {

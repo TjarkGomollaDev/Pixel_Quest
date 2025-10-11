@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level_02.tmx",
+    "activeFile": "Level_05.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -11,46 +11,87 @@
     "fileStates": {
         "Level_01.tmx": {
             "expandedObjectLayers": [
-                3
+                2
             ],
-            "scale": 1.4068,
+            "scale": 0.7964,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 989.4796701734433,
-                "y": 181.26243957918683
+                "x": 1377.4485183324964,
+                "y": 244.85183324962338
             }
         },
         "Level_02.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.2792,
-            "selectedLayer": 1,
+            "scale": 1.2364,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 168.07379612257662,
-                "y": 62.14821763602251
+                "x": 2263.021675833064,
+                "y": 276.60951148495633
             }
         },
         "Level_03.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.5773,
-            "selectedLayer": 1,
+            "scale": 0.8798,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 273.88575413681605,
-                "y": 188.93045077030365
+                "x": 8759.945442145941,
+                "y": 165.94680609229368
             }
         },
         "Level_04.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.216,
+            "scale": 0.9121,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 4703.431641267404,
+                "y": 243.39436465299858
+            }
+        },
+        "Level_05.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 0.8323,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 4080.259521807041,
+                "y": 183.82794665385074
+            }
+        },
+        "Level_11.tmx": {
+            "expandedObjectLayers": [
+                3
+            ],
+            "scale": 1.1311,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 52.161612589514675,
+                "y": 178.58721598443995
+            }
+        },
+        "Level_13.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 1.2465,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 511.8331327717609,
+                "y": 189.3301243481749
+            }
+        },
+        "Level_blank.tmx": {
+            "scale": 1.1508,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 301.8092105263158,
-                "y": 178.45394736842107
+                "x": 288.4949600278067,
+                "y": 238.09523809523805
             }
         },
         "Pixel Adventure.tsx": {
@@ -69,16 +110,21 @@
         "Level_01.tmx",
         "Level_03.tmx",
         "Level_02.tmx",
-        "Level_04.tmx"
+        "Level_04.tmx",
+        "Level_05.tmx"
     ],
     "project": "Pixel Adventure.tiled-project",
-    "property.type": "bool",
+    "property.type": "float",
     "recentFiles": [
-        "Pixel Adventure.tsx",
-        "Level_01.tmx",
+        "Level_02.tmx",
+        "Level_13.tmx",
         "Level_03.tmx",
+        "Level_blank.tmx",
+        "Level_11.tmx",
+        "Level_01.tmx",
+        "Pixel Adventure.tsx",
         "Level_04.tmx",
-        "Level_02.tmx"
+        "Level_05.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

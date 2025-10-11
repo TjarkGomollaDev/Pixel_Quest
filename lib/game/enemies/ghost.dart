@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum GhostState implements AnimationState {
@@ -33,14 +34,22 @@ class Ghost extends PositionComponent
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isLeft;
+  final double _delay;
   final Player _player;
 
-  Ghost({required double offsetNeg, required double offsetPos, required bool isLeft, required Player player, required super.position})
-    : _offsetNeg = offsetNeg,
-      _offsetPos = offsetPos,
-      _isLeft = isLeft,
-      _player = player,
-      super(size: gridSize);
+  Ghost({
+    required double offsetNeg,
+    required double offsetPos,
+    required bool isLeft,
+    required double delay,
+    required Player player,
+    required super.position,
+  }) : _offsetNeg = offsetNeg,
+       _offsetPos = offsetPos,
+       _isLeft = isLeft,
+       _delay = delay,
+       _player = player,
+       super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2(48, 32);
@@ -68,6 +77,7 @@ class Ghost extends PositionComponent
   // ghost timer
   late Timer _ghostTimer;
   bool _isVisible = true;
+  bool _start = true;
   final double _durationVisible = 2; // [Adjustable]
   final double _durationInVisible = 3; // [Adjustable]
 
@@ -106,27 +116,27 @@ class Ghost extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieLayerLevel;
+    priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in GhostState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: GhostState.idle);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
+    _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize;
+    _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
   }
 
   void _setUpMoveDirection() {
@@ -145,9 +155,13 @@ class Ghost extends PositionComponent
   void _startGhostTimer() => _ghostTimer = Timer(_durationVisible, onTick: _triggerDisappear);
 
   Future<void> _triggerDisappear() async {
-    animationGroupComponent.current = GhostState.disappear;
-    _particleTimer.stop();
     _ghostTimer.stop();
+    if (_start) {
+      await Future.delayed(Duration(milliseconds: (_delay * 1000).toInt()));
+      _start = false;
+    }
+    _particleTimer.stop();
+    animationGroupComponent.current = GhostState.disappear;
     await animationGroupComponent.animationTickers![GhostState.disappear]!.completed;
     animationGroupComponent.opacity = 0;
     _isVisible = false;

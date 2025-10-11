@@ -11,6 +11,7 @@ import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
@@ -70,14 +71,14 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieBulletLayerLevel;
+    priority = GameSettings.enemieBulletLayerLevel;
     opacity = 0;
     add(_hitbox);
   }

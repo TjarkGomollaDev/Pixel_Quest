@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/game_settings.dart';
 
 /// Mixin to add a `SpriteComponent` in its original size
 /// while keeping the parent `PositionComponent` aligned to a fixed grid size
@@ -100,7 +100,7 @@ mixin FixedGridOriginalSizeGroupAnimation on PositionComponent {
 }
 
 /// Snaps a single value to the nearest multiple of the global tile size.
-double snapValueToGrid(double value) => ((value / PixelAdventure.tileSize).round()) * PixelAdventure.tileSize;
+double snapValueToGrid(double value) => ((value / GameSettings.tileSize).round()) * GameSettings.tileSize;
 
 /// Snaps a 2D vector to the nearest multiple of the global tile size.
 Vector2 snapVectorToGrid(Vector2 vector) => Vector2(snapValueToGrid(vector.x), snapValueToGrid(vector.y));

@@ -7,6 +7,7 @@ import 'package:pixel_adventure/game/traps/fan_air_stream.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum FanState implements AnimationState {
@@ -67,19 +68,19 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     add(_hitbox);
   }
 
   void _loadAllAnimation() {
-    final loadAnimation = spriteAnimationWrapper<FanState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FanState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in FanState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: FanState.on);
   }
@@ -87,7 +88,7 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
   void _loadFanAirStream() {
     _airStream = FanAirStream(
       baseWidth: width,
-      airStreamHeight: position.y + _hitbox.position.y - PixelAdventure.mapBorderWidth * 2,
+      airStreamHeight: position.y + _hitbox.position.y - GameSettings.mapBorderWidth * 2,
       alwaysOn: _alwaysOn,
       fan: this,
       player: _player,

@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum SpikeHeadState implements AnimationState {
@@ -30,11 +31,13 @@ class SpikeHead extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
   // constructor parameters
   final double _offsetPos;
+  double _delay;
   final Player _player;
 
-  SpikeHead({required double offsetPos, required Player player, required super.position})
+  SpikeHead({required double offsetPos, required double delay, required Player player, required super.position})
     : _offsetPos = offsetPos,
       _player = player,
+      _delay = delay,
       super(size: gridSize);
 
   // size
@@ -57,7 +60,7 @@ class SpikeHead extends PositionComponent
   late final double _bottomtBorder;
 
   // movement
-  int _moveDirection = -1;
+  int _moveDirection = 1;
   late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]
@@ -81,6 +84,10 @@ class SpikeHead extends PositionComponent
 
   @override
   void update(double dt) {
+    if (_delay > 0) {
+      _delay -= dt;
+      return super.update(dt);
+    }
     if (!_directionChangePending) _movement(dt);
     super.update(dt);
   }
@@ -103,26 +110,26 @@ class SpikeHead extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in SpikeHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SpikeHeadState.idle, isBottomCenter: false);
   }
 
   void _setUpRange() {
     _rangeNeg = position.y;
-    _rangePos = position.y + height + _offsetPos * PixelAdventure.tileSize;
+    _rangePos = position.y + height + _offsetPos * GameSettings.tileSize;
   }
 
   void _setUpActualBorders() {

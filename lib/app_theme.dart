@@ -2,6 +2,7 @@ import 'dart:ui';
 
 abstract class AppTheme {
   // #### ALL COLORS ###########################################
+
   // Black, White and Transparent
   static const white = Color.fromRGBO(255, 255, 255, 1);
   static const black = Color.fromRGBO(0, 0, 0, 1);

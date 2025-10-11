@@ -5,6 +5,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> {
@@ -22,13 +23,13 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
 
     // general
-    priority = PixelAdventure.spotlightAnimationStarsLayer;
+    priority = GameSettings.spotlightAnimationStarsLayer;
     anchor = Anchor.center;
   }
 
@@ -56,13 +57,13 @@ class Star extends SpriteComponent with HasGameReference<PixelAdventure> {
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
 
     // general
-    priority = PixelAdventure.spotlightAnimationStarsLayer;
+    priority = GameSettings.spotlightAnimationStarsLayer;
     anchor = Anchor.center;
   }
 

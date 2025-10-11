@@ -7,6 +7,7 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// Invisible component representing the fan's air stream.
@@ -91,14 +92,14 @@ class FanAirStream extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     _player.respawnNotifier.addListener(onEntityCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);

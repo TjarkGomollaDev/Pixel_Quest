@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/enemies/ghost.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
@@ -30,17 +31,17 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
     }
 
     // general
-    priority = PixelAdventure.enemieParticleLayerLevel;
+    priority = GameSettings.enemieParticleLayerLevel;
   }
 
   void _loadAndPlayAnimationOneTime() {
-    animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize, loop: false);
+    animation = loadSpriteAnimation(game, _path, _amount, GameSettings.stepTime, _textureSize, loop: false);
     if (_spawnOnLeftSide) flipHorizontallyAroundCenter();
     animationTicker!.completed.then((_) => removeFromParent());
   }

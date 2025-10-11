@@ -7,6 +7,7 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A moving saw trap that travels back and forth along a defined path.
@@ -24,14 +25,25 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
+  final bool _isLeft;
+  final bool _showPath;
   final Player _player;
 
-  Saw({required double offsetNeg, required double offsetPos, required bool isVertical, required Player player, required super.position})
-    : _isVertical = isVertical,
-      _offsetPos = offsetPos,
-      _offsetNeg = offsetNeg,
-      _player = player,
-      super(size: gridSize);
+  Saw({
+    required double offsetNeg,
+    required double offsetPos,
+    required bool isVertical,
+    required bool isLeft,
+    required bool showPath,
+    required Player player,
+    required super.position,
+  }) : _offsetNeg = offsetNeg,
+       _offsetPos = offsetPos,
+       _isVertical = isVertical,
+       _isLeft = isLeft,
+       _showPath = showPath,
+       _player = player,
+       super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(32);
@@ -51,7 +63,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
   late final double _rangePos;
 
   // movement
-  int _moveDirection = -1;
+  late int _moveDirection;
   final double _moveSpeed = 50; // [Adjustable]
 
   @override
@@ -59,7 +71,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
     _initialSetup();
     _loadSpriteAnimation();
     _setUpRange();
-    _createChainPath();
+    if (_showPath) _createChainPath();
     return super.onLoad();
   }
 
@@ -71,14 +83,14 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = _showPath ? GameSettings.trapLayerLevel : GameSettings.trapBehindLayerLevel;
     anchor = Anchor.topCenter;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
@@ -88,13 +100,15 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
 
   void _setUpRange() {
     if (_isVertical) {
-      _rangeNeg = position.y - _offsetNeg * PixelAdventure.tileSize;
-      _rangePos = position.y + _offsetPos * PixelAdventure.tileSize;
+      _rangeNeg = position.y - _offsetNeg * GameSettings.tileSize;
+      _rangePos = position.y + _offsetPos * GameSettings.tileSize;
       position.x += width / 2;
     } else {
-      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width / 2;
-      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width / 2;
+      _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize + width / 2;
+      _rangePos = position.x + _offsetPos * GameSettings.tileSize + width / 2;
     }
+    _moveDirection = _isLeft ? -1 : 1;
+    if (!_isLeft) flipHorizontally();
   }
 
   void _createChainPath() {
@@ -108,7 +122,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
     );
 
     // calculate the length of the chain
-    final length = ((_rangePos - _rangeNeg + width) / PixelAdventure.tileSize);
+    final length = ((_rangePos - _rangeNeg + width) / GameSettings.tileSize);
     double offset = chainSize * 2;
 
     // exactly two chain elements fit into a tile and a tile is left free at both ends
@@ -118,9 +132,9 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
               sprite: chainSprite,
               size: Vector2.all(chainSize),
               position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
-              priority: PixelAdventure.trapParticlesLayerLevel,
+              priority: GameSettings.trapParticlesLayerLevel,
             )
-            ..debugMode = PixelAdventure.customDebug
+            ..debugMode = GameSettings.customDebug
             ..debugColor = AppTheme.debugColorTrapHitbox;
       game.world.add(chain);
       offset += chainSize;

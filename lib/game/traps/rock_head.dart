@@ -7,6 +7,7 @@ import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum RockHeadState implements AnimationState {
@@ -36,8 +37,12 @@ class RockHead extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure>, WorldCollision, FastCollision {
   // constructor parameters
   final double _offsetPos;
+  double _delay;
 
-  RockHead({required double offsetPos, required super.position}) : _offsetPos = offsetPos, super(size: gridSize);
+  RockHead({required double offsetPos, required double delay, required super.position})
+    : _offsetPos = offsetPos,
+      _delay = delay,
+      super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(48);
@@ -62,7 +67,7 @@ class RockHead extends PositionComponent
   late final double _bottomtBorder;
 
   // movement
-  int _moveDirection = -1;
+  int _moveDirection = 1;
   late double _moveSpeed;
   final double _moveSpeedUp = 100; // [Adjustable]
   final double _moveSpeedDown = 850; // [Adjustable]
@@ -85,33 +90,37 @@ class RockHead extends PositionComponent
 
   @override
   void update(double dt) {
+    if (_delay > 0) {
+      _delay -= dt;
+      return super.update(dt);
+    }
     if (!_directionChangePending) _movement(dt);
     super.update(dt);
   }
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in RockHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: RockHeadState.idle, isBottomCenter: false);
   }
 
   void _setUpRange() {
     _rangeNeg = position.y;
-    _rangePos = position.y + height + _offsetPos * PixelAdventure.tileSize;
+    _rangePos = position.y + height + _offsetPos * GameSettings.tileSize;
   }
 
   void _setUpActualBorders() {

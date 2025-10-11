@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/enemies/trunk_bullet.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum TrunkState implements AnimationState {
@@ -158,32 +159,32 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieLayerLevel;
+    priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {for (var state in TrunkState.values) state: loadAnimation(state)};
     current = TrunkState.run;
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
+    _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize;
+    _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
   }
 
   void _setUpAttackRange() {
-    _attackRangeNeg = _rangeNeg - _extandNegAttack * PixelAdventure.tileSize;
-    _attackRangePos = _rangePos + _extandPosAttack * PixelAdventure.tileSize;
+    _attackRangeNeg = _rangeNeg - _extandNegAttack * GameSettings.tileSize;
+    _attackRangePos = _rangePos + _extandPosAttack * GameSettings.tileSize;
   }
 
   void _setUpMoveDirection() {

@@ -34,8 +34,6 @@ class PausePage extends Component with HasGameReference<PixelAdventure> {
 
   @override
   Future<void> onLoad() async {
-    final game = findGame()!;
-
     final container = PositionComponent(position: game.canvasSize / 2, anchor: Anchor.center);
     final pausedTextPosition = Vector2(0, -60);
 

@@ -21,6 +21,7 @@ import 'package:pixel_adventure/game/traps/fire_trap.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum PlayerState implements AnimationState {
@@ -320,13 +321,13 @@ class Player extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }
 
     // general
-    priority = PixelAdventure.playerLayerLevel;
+    priority = GameSettings.playerLayerLevel;
     add(_hitbox);
   }
 
@@ -357,7 +358,7 @@ class Player extends SpriteAnimationGroupComponent
       game,
       '$_path${_character.name}/',
       _pathEnd,
-      PixelAdventure.stepTime,
+      GameSettings.stepTime,
       _textureSize,
     );
     animations = {for (var state in PlayerState.values) state: loadAnimation(state)};
@@ -476,15 +477,6 @@ class Player extends SpriteAnimationGroupComponent
 
   Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
 
-  int _earnedStars() {
-    final collected = world.playerFruitsCount;
-    final total = world.totalFruitsCount;
-
-    if (collected >= total) return 3;
-    if (collected >= total ~/ 2) return 2;
-    return 1;
-  }
-
   Future<void> reachedFinish(ShapeHitbox finish) async {
     _horizontalMovement = 0;
     _spawnProtection = true;
@@ -499,13 +491,13 @@ class Player extends SpriteAnimationGroupComponent
     // spotlight animation
     world.removeGameHudOnFinish();
     final playerCenter = hitbox.center.toVector2();
-    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: PixelAdventure.finishSpotlightAnimationRadius);
+    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
     world.add(spotlight);
     await spotlight.startAnimation(2.0);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // star positions
-    final starRadius = PixelAdventure.finishSpotlightAnimationRadius * 1.5;
+    final starRadius = GameSettings.finishSpotlightAnimationRadius * 1.5;
     final starPositions = calculateStarPositions(playerCenter, starRadius);
     final List<OutlineStar> outlineStars = [];
     final stars = [];
@@ -519,7 +511,8 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // earned stars
-    for (var i = 0; i < _earnedStars(); i++) {
+    world.calculateEarnedStars();
+    for (var i = 0; i < world.earnedStars; i++) {
       final star = Star(position: playerCenter);
       world.add(star);
       stars.add(star);

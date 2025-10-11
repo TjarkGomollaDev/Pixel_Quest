@@ -4,6 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/data/level_data_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/enemies/blue_bird.dart';
@@ -19,6 +20,7 @@ import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/hud/jump_btn.dart';
 import 'package:pixel_adventure/game/level/background_colored.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
+import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
@@ -38,20 +40,8 @@ import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
-
-enum MyLevel {
-  level_1('Level_01', '01', 1),
-  level_2('Level_02', '02', 2),
-  level_3('Level_03', '03', 3),
-  level_4('Level_04', '04', 4);
-
-  final String name;
-  final String btnName;
-  final int levelIndex;
-
-  const MyLevel(this.name, this.btnName, this.levelIndex);
-}
 
 class DecoratedWorld extends World with HasTimeScale {
   PaintDecorator? decorator;
@@ -96,6 +86,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   // death count
   int deathCount = 0;
 
+  // stars
+  int earnedStars = 0;
+
   // respawnables
   final List<Respawnable> _pendingRespawnables = [];
 
@@ -105,7 +98,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     await _loadLevelMap();
     _addBackgroundLayer();
     _addSpawningLayer();
-    // _addCollisions();
     return super.onLoad();
   }
 
@@ -121,15 +113,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   @override
   Future<void> onRemove() async {
     _removeGameHud();
-    if (game.showMobileControls) _removeMobileControls();
+    if (GameSettings.showMobileControls) _removeMobileControls();
     return super.onRemove();
   }
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       _fpsText = FpsTextComponent(
-        position: Vector2(game.size.x, 0) + Vector2(-PixelAdventure.hudMargin, PixelAdventure.hudMargin / 2),
+        position: Vector2(game.size.x, 0) + Vector2(-GameSettings.hudMargin, GameSettings.hudMargin / 2),
         anchor: Anchor.topRight,
       );
       game.camera.viewport.add(_fpsText!);
@@ -141,8 +133,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   Future<void> _loadLevelMap() async {
-    _levelMap = await TiledComponent.load('${myLvel.name}.tmx', Vector2.all(PixelAdventure.tileSize))
-      ..priority = PixelAdventure.mapLayerLevel;
+    _levelMap = await TiledComponent.load('${myLvel.name}.tmx', Vector2.all(GameSettings.tileSize))
+      ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
   }
 
@@ -157,10 +149,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void _addBackground(TileLayer backgroundLayer) {
     final backgroundType = backgroundLayer.properties.getValue<String?>('BackgroundType');
     final size = Vector2(
-      _levelMap.width - (PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize * 2 : 0),
-      _levelMap.height - (PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize * 2 : 0),
+      _levelMap.width - (GameSettings.mapBorderWidth != 0 ? GameSettings.tileSize * 2 : 0),
+      _levelMap.height - (GameSettings.mapBorderWidth != 0 ? GameSettings.tileSize * 2 : 0),
     );
-    final position = Vector2.all(PixelAdventure.mapBorderWidth != 0 ? PixelAdventure.tileSize : 0);
+    final position = Vector2.all(GameSettings.mapBorderWidth != 0 ? GameSettings.tileSize : 0);
     bool isInitialized = false;
     BackgroundTileColor? color;
     if (backgroundType != null) {
@@ -183,7 +175,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     if (!isInitialized) {
       _levelBackground = BackgroundColored(color: color ?? BackgroundTileColor.Gray, position: position, size: size);
     }
-    _levelBackground.priority = PixelAdventure.backgroundLayerLevel;
+    _levelBackground.priority = GameSettings.backgroundLayerLevel;
     add(_levelBackground);
   }
 
@@ -233,7 +225,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   /// and improves runtime performance significantly.
   void _addWorldCollisions(TileLayer backgroundLayer) {
     _addWorldBorders();
-    final hasBorder = PixelAdventure.mapBorderWidth != 0;
+    final hasBorder = GameSettings.mapBorderWidth != 0;
 
     // y axis range of map
     final yStart = hasBorder ? 1 : 0;
@@ -298,8 +290,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
         _collisionBlocks.add(
           WorldBlock(
             isPlatform: isPlatform,
-            position: Vector2(x * PixelAdventure.tileSize, y * PixelAdventure.tileSize),
-            size: isPlatform ? Vector2(w * PixelAdventure.tileSize, 5) : Vector2(w * PixelAdventure.tileSize, h * PixelAdventure.tileSize),
+            position: Vector2(x * GameSettings.tileSize, y * GameSettings.tileSize),
+            size: isPlatform ? Vector2(w * GameSettings.tileSize, 5) : Vector2(w * GameSettings.tileSize, h * GameSettings.tileSize),
           ),
         );
       }
@@ -308,8 +300,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   }
 
   void _addWorldBorders() {
-    const borderWidth = PixelAdventure.tileSize;
-    final hasBorder = PixelAdventure.mapBorderWidth != 0;
+    const borderWidth = GameSettings.tileSize;
+    final hasBorder = GameSettings.mapBorderWidth != 0;
     final verticalSize = Vector2(borderWidth, hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
     final horizontalSize = Vector2(hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
     final borders = <WorldBlock>[
@@ -365,15 +357,25 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             add(arrowUp);
             break;
           case 'Saw':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-            final saw = Saw(offsetNeg: offsetNeg, offsetPos: offsetPos, isVertical: isVertical, player: _player, position: gridPosition);
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? GameSettings.isVerticalDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
+            final showPath = spawnPoint.properties.getValue<bool?>('showPath') ?? GameSettings.showPath;
+            final saw = Saw(
+              offsetNeg: offsetNeg,
+              offsetPos: offsetPos,
+              isVertical: isVertical,
+              isLeft: isLeft,
+              showPath: showPath,
+              player: _player,
+              position: gridPosition,
+            );
             add(saw);
             break;
           case 'SawCircle':
-            final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? PixelAdventure.doubleSawDefault;
-            final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? PixelAdventure.clockwiseDefault;
+            final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? GameSettings.doubleSawDefault;
+            final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? GameSettings.clockwiseDefault;
             final sawCircle = SawCircle(
               doubleSaw: doubleSaw,
               clockwise: clockwise,
@@ -385,11 +387,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             break;
           case 'Spiked Ball':
             final radius =
-                (spawnPoint.properties.getValue<int?>('radius') ?? PixelAdventure.spikedBallRadiusDefault) * PixelAdventure.tileSize +
-                PixelAdventure.tileSize / 2;
-            final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? PixelAdventure.clockwiseDefault;
-            final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? PixelAdventure.spikedBallSwingArcDec;
-            final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? PixelAdventure.spikedBallSwingSpeed;
+                (spawnPoint.properties.getValue<int?>('radius') ?? GameSettings.spikedBallRadiusDefault) * GameSettings.tileSize +
+                GameSettings.tileSize / 2;
+            final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? GameSettings.clockwiseDefault;
+            final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? GameSettings.spikedBallSwingArcDec;
+            final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? GameSettings.spikedBallSwingSpeed;
             final spikedBall = SpikedBall(
               radius: radius,
               player: _player,
@@ -397,15 +399,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
               swingSpeed: swingSpeed,
               startLeft: startLeft,
               position:
-                  gridPosition - Vector2(radius - PixelAdventure.tileSize / 2, SpikedBallBall.gridSize.x / 2 - PixelAdventure.tileSize / 2),
+                  gridPosition - Vector2(radius - GameSettings.tileSize / 2, SpikedBallBall.gridSize.x / 2 - GameSettings.tileSize / 2),
               size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
             );
             add(spikedBall);
             break;
           case 'Chicken':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final chicken = Chicken(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             add(chicken);
             break;
@@ -414,7 +416,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             add(trampoline);
             break;
           case 'Fan':
-            final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? PixelAdventure.fanAlwaysOnDefault;
+            final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? GameSettings.fanAlwaysOnDefault;
             final fan = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
             add(fan);
             break;
@@ -423,15 +425,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             add(fireTrap);
             break;
           case 'Fire':
-            final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
+            final side = spawnPoint.properties.getValue<int?>('side') ?? GameSettings.sideDefault;
             final fire = Fire(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
             add(fire);
             break;
           case 'Moving Platform':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? PixelAdventure.isVerticalDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? GameSettings.isVerticalDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final movingPlatform = MovingPlatform(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -443,55 +445,65 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             add(movingPlatform);
             break;
           case 'Rock Head':
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final rockHead = RockHead(offsetPos: offsetPos, position: gridPosition);
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
+            final rockHead = RockHead(offsetPos: offsetPos, delay: delay, position: gridPosition);
             add(rockHead);
             break;
           case 'Spike Head':
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final spikeHead = SpikeHead(offsetPos: offsetPos, player: _player, position: gridPosition);
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
+            final spikeHead = SpikeHead(offsetPos: offsetPos, delay: delay, player: _player, position: gridPosition);
             add(spikeHead);
             break;
           case 'Plant':
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-            final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? PixelAdventure.doubleShotDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
+            final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? GameSettings.doubleShotDefault;
             final plant = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
             add(plant);
             break;
           case 'Blue Bird':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final bird = BlueBird(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             add(bird);
             break;
           case 'Snail':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final snail = Snail(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             add(snail);
             break;
           case 'Ghost':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
-            final ghost = Ghost(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
+            final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
+            final ghost = Ghost(
+              offsetNeg: offsetNeg,
+              offsetPos: offsetPos,
+              isLeft: isLeft,
+              delay: delay,
+              player: _player,
+              position: gridPosition,
+            );
             add(ghost);
             break;
           case 'Mushroom':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final mushroom = Mushroom(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             add(mushroom);
             break;
           case 'Trunk':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? PixelAdventure.extandNegAttackDefault;
-            final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? PixelAdventure.extandPosAttackDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? GameSettings.extandNegAttackDefault;
+            final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? GameSettings.extandPosAttackDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final trunk = Trunk(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
@@ -504,19 +516,19 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
             add(trunk);
             break;
           case 'Slime':
-            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? PixelAdventure.offsetNegDefault;
-            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? PixelAdventure.offsetPosDefault;
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
+            final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final slime = Slime(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             add(slime);
             break;
           case 'Turtle':
-            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? PixelAdventure.isLeftDefault;
+            final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final turtle = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
             add(turtle);
             break;
           case 'Spikes':
-            final side = spawnPoint.properties.getValue<int?>('side') ?? PixelAdventure.sideDefault;
+            final side = spawnPoint.properties.getValue<int?>('side') ?? GameSettings.sideDefault;
             final spikes = Spikes(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
             add(spikes);
             break;
@@ -538,7 +550,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
 
   void _addMobileControls() {
-    if (!game.showMobileControls) {
+    if (!GameSettings.showMobileControls) {
       _joystick = null;
       _jumpBtn = null;
       return;
@@ -546,7 +558,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
     _joystick = JoystickComponent(
       knob: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Knob.png'))),
       background: SpriteComponent(sprite: Sprite(game.images.fromCache('HUD/Joystick.png'))),
-      margin: EdgeInsets.only(left: PixelAdventure.hudMargin, bottom: PixelAdventure.hudMargin),
+      margin: EdgeInsets.only(left: GameSettings.hudMargin, bottom: GameSettings.hudMargin),
     );
     _player.setJoystick(_joystick!);
     _jumpBtn = JumpBtn(_player);
@@ -591,5 +603,27 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
   void playerRespawn() {
     _processRespawns();
     _increaseDeathCount();
+  }
+
+  void calculateEarnedStars() {
+    if (playerFruitsCount >= totalFruitsCount) {
+      earnedStars = 3;
+    } else if (playerFruitsCount >= totalFruitsCount ~/ 2) {
+      earnedStars = 2;
+    } else {
+      earnedStars = 1;
+    }
+  }
+
+  Future<void> saveData() async {
+    final data = LevelDataEntity(
+      index: myLvel.index,
+      stars: earnedStars,
+      totalFruits: totalFruitsCount,
+      earnedFruits: playerFruitsCount,
+      deaths: deathCount,
+    );
+    final storedData = game.dataCenter.getLevel(myLvel.index);
+    if (data.shouldReplace(storedData: storedData)) await game.dataCenter.saveLevel(data);
   }
 }

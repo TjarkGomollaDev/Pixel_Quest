@@ -6,6 +6,7 @@ import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum MovingPlatformState implements AnimationState {
@@ -102,21 +103,21 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapLayerLevel;
+    priority = GameSettings.trapLayerLevel;
     _player.respawnNotifier.addListener(onWorldCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
     current = MovingPlatformState.on;
   }
@@ -125,11 +126,11 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   void _setUpRange() {
     if (_isVertical) {
-      _rangeNeg = position.y - _offsetNeg * PixelAdventure.tileSize;
-      _rangePos = position.y + _offsetPos * PixelAdventure.tileSize;
+      _rangeNeg = position.y - _offsetNeg * GameSettings.tileSize;
+      _rangePos = position.y + _offsetPos * GameSettings.tileSize;
     } else {
-      _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize + width;
-      _rangePos = position.x + _offsetPos * PixelAdventure.tileSize;
+      _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize + width;
+      _rangePos = position.x + _offsetPos * GameSettings.tileSize;
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum BlueBirdState implements AnimationState {
@@ -96,28 +97,28 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, HasGa
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieLayerLevel;
+    priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     _startY = position.y;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {for (var state in BlueBirdState.values) state: loadAnimation(state)};
     current = BlueBirdState.fly;
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
+    _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize;
+    _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
   }
 
   void _setUpMoveDirection() {

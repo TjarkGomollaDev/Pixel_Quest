@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="128">
+ <tileset firstgid="1" source="Pixel Adventure.tsx"/>
+ <layer id="1" name="Background" width="54" height="20">
+  <properties>
+   <property name="BackgroundType" value="Szene 1"/>
+  </properties>
+  <data encoding="csv">
+4,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,5,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,211,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,
+25,95,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,97,23,
+25,139,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,141,23,
+26,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,27
+</data>
+ </layer>
+ <objectgroup id="2" name="Spawning">
+  <object id="68" name="Fan" type="Fan" x="720" y="256" width="32" height="16">
+   <properties>
+    <property name="alwaysOn" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="71" name="Rock Head" type="Rock Head" x="496" y="16" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="0"/>
+    <property name="offsetPos" type="float" value="10"/>
+   </properties>
+  </object>
+  <object id="73" name="Rock Head" type="Rock Head" x="560" y="16" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="0"/>
+    <property name="offsetPos" type="float" value="8"/>
+   </properties>
+  </object>
+  <object id="85" name="Spike Head" type="Spike Head" x="624" y="16" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="0"/>
+    <property name="offsetPos" type="float" value="12"/>
+   </properties>
+  </object>
+  <object id="86" name="Finish" type="Finish" x="176" y="208" width="64" height="64"/>
+  <object id="88" name="ArrowUp" type="ArrowUp" x="96" y="16" width="32" height="32"/>
+  <object id="89" name="Start" type="Start" x="48" y="208" width="64" height="64"/>
+  <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="32" width="16" height="16">
+   <properties>
+    <property name="radius" type="int" value="6"/>
+    <property name="startLeft" type="bool" value="true"/>
+    <property name="swingArcDec" type="int" value="180"/>
+    <property name="swingSpeed" type="int" value="360"/>
+   </properties>
+  </object>
+  <object id="94" name="Kiwi" type="Fruit" x="16" y="176" width="32" height="32"/>
+  <object id="95" name="Apple" type="Fruit" x="16" y="144" width="32" height="32"/>
+  <object id="106" name="Moving Platform" type="Moving Platform" x="96" y="128" width="32" height="16">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="5"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="125" name="Spikes" type="Spikes" x="16" y="256" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

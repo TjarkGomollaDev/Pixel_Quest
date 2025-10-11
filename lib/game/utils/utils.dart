@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// Renders a row of sprites or sprite animations along the given side of a [PositionComponent].
@@ -19,22 +21,29 @@ void addSpriteRow({
 }) {
   for (int i = 0; i < count; i++) {
     final component = animation != null
-        ? SpriteAnimationComponent(animation: animation, size: Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize))
-        : SpriteComponent(sprite: sprite, size: Vector2(PixelAdventure.tileSize, PixelAdventure.tileSize));
+        ? SpriteAnimationComponent(animation: animation, size: Vector2(GameSettings.tileSize, GameSettings.tileSize))
+        : SpriteComponent(sprite: sprite, size: Vector2(GameSettings.tileSize, GameSettings.tileSize));
 
     component.debugColor = Colors.transparent;
 
     final angle = [0.0, 1.5708, 3.1416, 4.7124][side - 1];
     final position = switch (side) {
-      2 => Vector2(parent.size.x, i * PixelAdventure.tileSize),
-      3 => Vector2(parent.size.x - i * PixelAdventure.tileSize, parent.size.y),
-      4 => Vector2(0, i * PixelAdventure.tileSize + parent.size.x),
-      _ => Vector2(i * PixelAdventure.tileSize, 0),
+      2 => Vector2(parent.size.x, i * GameSettings.tileSize),
+      3 => Vector2(parent.size.x - i * GameSettings.tileSize, parent.size.y),
+      4 => Vector2(0, i * GameSettings.tileSize + parent.size.x),
+      _ => Vector2(i * GameSettings.tileSize, 0),
     };
 
     component
       ..angle = angle
       ..position = position;
+
+    // to make it look nicer in the end, the animations should not all start on the same frame
+    if (component is SpriteAnimationComponent) {
+      final amount = component.animation!.frames.length;
+      final randomIndex = Random().nextInt(amount);
+      component.animationTicker!.currentIndex = randomIndex;
+    }
 
     parent.add(component);
   }

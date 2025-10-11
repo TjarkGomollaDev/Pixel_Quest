@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum SnailState implements AnimationState {
@@ -113,7 +114,7 @@ class Snail extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -121,21 +122,21 @@ class Snail extends PositionComponent
     }
 
     // general
-    priority = PixelAdventure.enemieLayerLevel;
+    priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     _shellHitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in SnailState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SnailState.snailWalk);
   }
 
   void _setUpRange() {
-    _rangeNeg = position.x - _offsetNeg * PixelAdventure.tileSize;
-    _rangePos = position.x + _offsetPos * PixelAdventure.tileSize + width;
+    _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize;
+    _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
   }
 
   void _setUpMoveDirection() {

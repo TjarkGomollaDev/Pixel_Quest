@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum PlayerSpecialEffectState implements AnimationState {
@@ -48,7 +49,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlayerSpecialEffectState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<PlayerSpecialEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {for (var state in PlayerSpecialEffectState.values) state: loadAnimation(state)};
     isVisible = false;
   }
@@ -74,7 +75,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
       position: game.camera.visibleWorldRect.topLeft.toVector2(),
       size: game.camera.viewport.size,
       paint: Paint()..color = AppTheme.white.withAlpha(70),
-      priority: PixelAdventure.flashEffectLayerLevel,
+      priority: GameSettings.flashEffectLayerLevel,
     );
 
     game.world.add(flash);

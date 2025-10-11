@@ -10,6 +10,7 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum ArrowUpState implements AnimationState {
@@ -69,20 +70,20 @@ class ArrowUp extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
     }
 
     // general
-    priority = PixelAdventure.collectiblesLayerLevel;
+    priority = GameSettings.collectiblesLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<ArrowUpState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<ArrowUpState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     final animations = {for (var state in ArrowUpState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ArrowUpState.idle, isBottomCenter: false);
   }

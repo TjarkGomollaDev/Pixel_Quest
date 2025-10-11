@@ -11,6 +11,7 @@ import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
@@ -62,14 +63,14 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieBulletLayerLevel;
+    priority = GameSettings.enemieBulletLayerLevel;
     add(_hitbox);
     _moveDirection = _isLeft ? -1 : 1;
   }

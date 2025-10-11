@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum FireTrapState implements AnimationState {
@@ -69,13 +70,13 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorWorldBlock;
     }
 
     // general
-    priority = PixelAdventure.trapBehindLayerLevel;
+    priority = GameSettings.trapBehindLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
 
@@ -91,7 +92,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {for (var state in FireTrapState.values) state: loadAnimation(state)};
     current = FireTrapState.off;
   }
@@ -126,7 +127,7 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
   @override
   FutureOr<void> onLoad() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }

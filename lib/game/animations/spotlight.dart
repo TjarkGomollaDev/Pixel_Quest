@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A spotlight effect that covers the entire screen with black
@@ -18,7 +19,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelAdventure> 
   @override
   FutureOr<void> onLoad() {
     radius = game.size.x;
-    priority = PixelAdventure.spotlightAnimationLayer;
+    priority = GameSettings.spotlightAnimationLayer;
     return super.onLoad();
   }
 

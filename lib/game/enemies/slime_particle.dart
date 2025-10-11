@@ -5,6 +5,7 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
@@ -34,20 +35,20 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
     }
 
     // general
-    priority = PixelAdventure.enemieParticleLayerLevel;
+    priority = GameSettings.enemieParticleLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   Future<void> _loadAndPlayAnimationOneTime() async {
-    animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize, loop: false);
+    animation = loadSpriteAnimation(game, _path, _amount, GameSettings.stepTime, _textureSize, loop: false);
     if (!spawnOnLeftSide) flipHorizontallyAroundCenter();
 
     // stop animation at first frame

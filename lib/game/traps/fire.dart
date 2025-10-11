@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 /// A fire that renders a row of animated flames along one side of a tile area.
@@ -49,31 +50,31 @@ class Fire extends PositionComponent with EntityCollision, HasGameReference<Pixe
     if (_side > 4 || _side < 1) _side = 1;
     // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
     if (_side.isOdd) {
-      height = PixelAdventure.tileSize;
+      height = GameSettings.tileSize;
       width = snapValueToGrid(width);
     } else {
-      width = PixelAdventure.tileSize;
+      width = GameSettings.tileSize;
       height = snapValueToGrid(height);
     }
-    _count = (_side.isOdd ? width : height) / PixelAdventure.tileSize;
+    _count = (_side.isOdd ? width : height) / GameSettings.tileSize;
   }
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
 
     // general
-    priority = PixelAdventure.trapBehindLayerLevel;
+    priority = GameSettings.trapBehindLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
   }
 
   void _loadSpriteAnimation() {
-    final animation = loadSpriteAnimation(game, _path, _amount, PixelAdventure.stepTime, _textureSize);
+    final animation = loadSpriteAnimation(game, _path, _amount, GameSettings.stepTime, _textureSize);
     addSpriteRow(game: game, side: _side, count: _count, parent: this, animation: animation);
   }
 

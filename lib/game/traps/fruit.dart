@@ -8,6 +8,7 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum FruitState implements AnimationState {
@@ -70,14 +71,14 @@ class Fruit extends SpriteAnimationGroupComponent
     if (_collectible) _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
 
     // debug
-    if (PixelAdventure.customDebug && _collectible) {
+    if (GameSettings.customDebug && _collectible) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       if (_collectible) _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
     }
 
     // general
-    priority = PixelAdventure.collectiblesLayerLevel;
+    priority = GameSettings.collectiblesLayerLevel;
     if (_collectible) {
       _hitbox.collisionType = CollisionType.passive;
       add(_hitbox);
@@ -87,12 +88,12 @@ class Fruit extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FruitState>(game, _path, _pathEnd, PixelAdventure.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<FruitState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {
       for (var state in FruitState.values)
         // small adjustment here, as we are not using the enum name for the fruit but the name from the class
         state: state == FruitState.idle
-            ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, PixelAdventure.stepTime, _textureSize)
+            ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, GameSettings.stepTime, _textureSize)
             : loadAnimation(state),
     };
     current = FruitState.idle;

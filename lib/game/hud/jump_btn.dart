@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class JumpBtn extends SpriteComponent with HasGameReference<PixelAdventure>, TapCallbacks {
@@ -13,8 +14,8 @@ class JumpBtn extends SpriteComponent with HasGameReference<PixelAdventure>, Tap
   FutureOr<void> onLoad() {
     sprite = Sprite(game.images.fromCache('HUD/JumpButton.png'));
     position = Vector2(
-      game.size.x - PixelAdventure.hudMobileControlsSize - PixelAdventure.hudMargin,
-      game.size.y - PixelAdventure.hudMobileControlsSize - PixelAdventure.hudMargin,
+      game.size.x - GameSettings.hudMobileControlsSize - GameSettings.hudMargin,
+      game.size.y - GameSettings.hudMobileControlsSize - GameSettings.hudMargin,
     );
     priority = 10;
     return super.onLoad();

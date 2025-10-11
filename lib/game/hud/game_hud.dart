@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
@@ -16,7 +17,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
 
   GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
     size = Vector2(160, Fruit.gridSize.y);
-    position = Vector2(PixelAdventure.tileSize * 3, 20);
+    position = Vector2(GameSettings.tileSize * 3, 20);
     anchor = Anchor.centerLeft;
   }
 

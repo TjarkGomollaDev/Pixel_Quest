@@ -6,6 +6,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class ChainItem {
@@ -80,13 +81,13 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure>
 
   void _initialSetup() {
     // debug
-    if (PixelAdventure.customDebug) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
 
     // general
-    priority = PixelAdventure.trapBehindLayerLevel;
+    priority = GameSettings.trapBehindLayerLevel;
     _centerPoint = Vector2(size.x / 2, SpikedBallBall.gridSize.x / 2);
   }
 
@@ -113,13 +114,13 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure>
   }
 
   void _creatChain() {
-    final count = (_radius - PixelAdventure.tileSize / 2 - SpikedBallBall.gridSize.x) / PixelAdventure.tileSize * 2 + 1;
-    final baseRadius = PixelAdventure.tileSize / 2;
+    final count = (_radius - GameSettings.tileSize / 2 - SpikedBallBall.gridSize.x) / GameSettings.tileSize * 2 + 1;
+    final baseRadius = GameSettings.tileSize / 2;
     final chainSprite = loadSprite(game, _pathChain);
     for (var i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
         ..anchor = Anchor.center
-        ..debugMode = PixelAdventure.customDebug
+        ..debugMode = GameSettings.customDebug
         ..debugColor = AppTheme.debugColorTrapHitbox;
 
       final chainItem = ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);
