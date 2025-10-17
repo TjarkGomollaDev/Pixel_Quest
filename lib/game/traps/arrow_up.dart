@@ -11,20 +11,20 @@ import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum ArrowUpState implements AnimationState {
   idle('Idle', 10),
   hit('Hit', 4, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const ArrowUpState(this.name, this.amount, {this.loop = true});
+  const ArrowUpState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A collectible arrow boost item that animates and can be picked up by the [Player].
@@ -36,7 +36,7 @@ enum ArrowUpState implements AnimationState {
 class ArrowUp extends PositionComponent
     with
         FixedGridOriginalSizeGroupAnimation,
-        HasGameReference<PixelAdventure>,
+        HasGameReference<PixelQuest>,
         HasWorldReference<Level>,
         Respawnable,
         EntityCollision,

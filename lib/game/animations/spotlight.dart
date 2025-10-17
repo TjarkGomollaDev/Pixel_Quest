@@ -3,12 +3,12 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A spotlight effect that covers the entire screen with black
 /// except for a circular area around a target center. Can animate
 /// shrinking the circle to reveal or hide the world.
-class Spotlight extends PositionComponent with HasGameReference<PixelAdventure> {
+class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   final Vector2 targetCenter;
   final double targetRadius;
 

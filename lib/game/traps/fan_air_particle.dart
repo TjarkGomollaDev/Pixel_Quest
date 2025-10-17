@@ -5,9 +5,9 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class FanAirParticle extends SpriteComponent with HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final double _streamTop;
   final double _streamLeft;

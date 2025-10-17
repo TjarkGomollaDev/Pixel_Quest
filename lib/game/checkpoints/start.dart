@@ -7,23 +7,23 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum StartState implements AnimationState {
   idle('Idle', 1),
   moving('Moving', 8, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const StartState(this.name, this.amount, {this.loop = true});
+  const StartState(this.fileName, this.amount, {this.loop = true});
 }
 
-class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
+class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   Start({required super.position}) : super(size: gridSize);
 
   // size

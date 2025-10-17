@@ -3,9 +3,9 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/enemies/ghost.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelAdventure> {
+class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final Ghost owner; // has to be public
   final bool _spawnOnLeftSide;

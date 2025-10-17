@@ -4,7 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/data/level_data_entity.dart';
+import 'package:pixel_adventure/data/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/enemies/blue_bird.dart';
@@ -41,7 +41,7 @@ import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 class DecoratedWorld extends World with HasTimeScale {
   PaintDecorator? decorator;
@@ -56,7 +56,7 @@ class DecoratedWorld extends World with HasTimeScale {
   }
 }
 
-class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCallbacks {
+class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbacks {
   final LevelMetadata levelMetadata;
 
   Level({required this.levelMetadata});
@@ -334,7 +334,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
         final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
         final start = Start(position: gridPosition);
         add(start);
-        _player = Player(character: game.characters[game.yourCharacterIndex], startPosition: start.playerPosition);
+        _player = Player(character: game.dataCenter.settings.playerCharacter, startPosition: start.playerPosition);
         add(_player);
         break;
       }
@@ -617,7 +617,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelAdventure>, TapCal
 
   Future<void> saveData() async {
     _calculateEarnedStars();
-    final data = LevelDataEntity(
+    final data = LevelEntity(
       uuid: levelMetadata.uuid,
       stars: earnedStars,
       totalFruits: totalFruitsCount,

@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum RockHeadState implements AnimationState {
   idle('Idle', 1),
@@ -17,13 +17,13 @@ enum RockHeadState implements AnimationState {
   bottomHit('Bottom Hit', 4, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const RockHeadState(this.name, this.amount, {this.loop = true});
+  const RockHeadState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A heavy stone trap that repeatedly slams down and retracts vertically
@@ -34,7 +34,7 @@ enum RockHeadState implements AnimationState {
 /// bottom borders it plays a hit animation before pausing for a short delay,
 /// creating a rhythmic crushing pattern.
 class RockHead extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure>, WorldCollision, FastCollision {
+    with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelQuest>, WorldCollision, FastCollision {
   // constructor parameters
   final double _offsetPos;
   double _delay;

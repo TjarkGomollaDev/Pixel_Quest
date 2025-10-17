@@ -9,7 +9,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum FireTrapState implements AnimationState {
   off('Off', 1),
@@ -17,13 +17,13 @@ enum FireTrapState implements AnimationState {
   hit('Hit', 4, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const FireTrapState(this.name, this.amount, {this.loop = true});
+  const FireTrapState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A flame trap that activates when the player steps on its trigger area.
@@ -36,7 +36,7 @@ enum FireTrapState implements AnimationState {
 /// Damage is only applied while the fire is burning. Triggering and timing
 /// are fully animation-driven, allowing the trap to synchronize visuals with
 /// its collision behavior for fair player feedback.
-class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// Renders a row of sprites or sprite animations along the given side of a [PositionComponent].
 ///
@@ -12,7 +12,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// You must provide either a [sprite] **or** a [spriteAnimation].
 /// If both are provided, [spriteAnimation] takes precedence.
 void addSpriteRow({
-  required PixelAdventure game,
+  required PixelQuest game,
   required int side,
   required double count,
   required PositionComponent parent,

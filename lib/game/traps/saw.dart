@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A moving saw trap that travels back and forth along a defined path.
 ///
@@ -20,7 +20,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// The saw continuously animates while moving and flips direction
 /// once reaching the end of its range. It acts as a passive collision area
 /// that can interact with the [Player].
-class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
+class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;

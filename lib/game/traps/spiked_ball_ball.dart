@@ -9,10 +9,10 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 class SpikedBallBall extends PositionComponent
-    with FixedGridOriginalSizeSprite, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeSprite, EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 

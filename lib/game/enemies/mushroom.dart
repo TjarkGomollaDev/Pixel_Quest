@@ -9,7 +9,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum MushroomState implements AnimationState {
   idle('Idle', 14),
@@ -17,13 +17,13 @@ enum MushroomState implements AnimationState {
   hit('Hit', 5, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const MushroomState(this.name, this.amount, {this.loop = true});
+  const MushroomState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A mushroom enemy that patrols horizontally within a specified range.
@@ -32,7 +32,7 @@ enum MushroomState implements AnimationState {
 /// pausing briefly and accelerating smoothly when changing direction.
 /// The mushroom can be stomped by the [Player], playing a hit animation before disappearing,
 /// or it will harm the player if touched from the side.
-class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;

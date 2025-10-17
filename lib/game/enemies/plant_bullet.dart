@@ -12,9 +12,9 @@ import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final bool _isLeft;
   final Player _player;

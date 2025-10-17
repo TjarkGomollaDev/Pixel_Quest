@@ -4,9 +4,9 @@ import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class LevelBtn extends SpriteComponent with HasGameReference<PixelAdventure>, TapCallbacks {
+class LevelBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
   final LevelMetadata _levelMetadata;
 
   LevelBtn({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata;

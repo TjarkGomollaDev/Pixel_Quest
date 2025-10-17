@@ -9,7 +9,7 @@ import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A spike trap that renders a row of spikes along one side of a tile area.
 ///
@@ -20,7 +20,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 ///
 /// The spikes themselves do not move, but act as a passive collision area
 /// that can interact with the [Player].
-class Spikes extends PositionComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Spikes extends PositionComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   int _side;
   final Player _player;

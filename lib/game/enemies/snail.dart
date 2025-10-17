@@ -10,7 +10,7 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum SnailState implements AnimationState {
   // snail
@@ -25,17 +25,17 @@ enum SnailState implements AnimationState {
   shellTopHit('Shell Top Hit', 5, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const SnailState(this.name, this.amount, {this.loop = true});
+  const SnailState(this.fileName, this.amount, {this.loop = true});
 }
 
 class Snail extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityCollisionEnd, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityCollisionEnd, HasGameReference<PixelQuest>, CollisionCallbacks {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isLeft;

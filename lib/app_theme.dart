@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 abstract class AppTheme {
   // #### ALL COLORS ###########################################
@@ -70,4 +70,7 @@ abstract class AppTheme {
 
   // ingame text
   static const ingameText = white;
+  static final ingameTextShimmer = Color(0xFF888888);
+  static final screenBlur = black.withAlpha(40);
+  static final tileBlur = black.withAlpha(56);
 }

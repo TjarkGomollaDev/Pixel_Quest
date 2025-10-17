@@ -13,27 +13,31 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
 
-class PixelAdventure extends FlameGame
+class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
-  final DataCenter dataCenter;
-
-  PixelAdventure({required this.dataCenter});
+  late final DataCenter dataCenter;
 
   @override
   Color backgroundColor() => AppTheme.backgroundColor;
-
-  // character
-  final List<PlayerCharacter> characters = PlayerCharacter.values;
-  int yourCharacterIndex = 0;
 
   // router
   late final RouterComponent router;
 
   @override
   Future<void> onLoad() async {
+    final startTime = DateTime.now();
+    dataCenter = await DataCenter.init();
     await _loadAllImagesIntoCache();
     _setUpCam();
     _setUpRouter();
+
+    await Future.delayed(Duration(seconds: 3000));
+    // final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
+    // final delayMs = 5800;
+    // if (elapsedMs < delayMs) {
+    //   await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+    // }
+
     return super.onLoad();
   }
 

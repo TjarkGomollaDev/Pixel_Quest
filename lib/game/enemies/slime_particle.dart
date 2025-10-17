@@ -6,9 +6,9 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
+class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   final bool spawnOnLeftSide;
   final Player player;

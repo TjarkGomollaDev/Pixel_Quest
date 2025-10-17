@@ -37,6 +37,7 @@ dependencies:
   flame: ^1.30.1
   flame_tiled: ^3.0.5
   shared_preferences: ^2.5.3
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +102,7 @@ flutter:
     - assets/images/Enemies/Slime/
     - assets/images/Enemies/Turtle/
     - assets/images/Enemies/Trunk/
+    - assets/images/Splash/
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="238" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="145">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="238" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="147">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="238" height="20">
   <properties>
@@ -29,7 +29,6 @@
 </data>
  </layer>
  <objectgroup id="2" name="Spawning">
-  <object id="89" name="Start" type="Start" x="96" y="80" width="64" height="64"/>
   <object id="107" name="Spikes" type="Spikes" x="16" y="288" width="608" height="16">
    <properties>
     <property name="side" type="int" value="1"/>
@@ -174,5 +173,6 @@
   <object id="141" name="Melon" type="Fruit" x="2704" y="112" width="32" height="32"/>
   <object id="143" name="Cherries" type="Fruit" x="3648" y="16" width="32" height="32"/>
   <object id="144" name="Bananas" type="Fruit" x="496" y="144" width="32" height="32"/>
+  <object id="146" name="Start" type="Start" x="96" y="80" width="64" height="64"/>
  </objectgroup>
 </map>

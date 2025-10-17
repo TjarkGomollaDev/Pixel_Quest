@@ -7,7 +7,7 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A single saw unit used inside a [SawCircle].
 ///
@@ -18,7 +18,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// This component does not move by itself, but is positioned and updated
 /// by its parent [SawCircle]. It acts as a passive collision area
 /// that can interact with the [Player].
-class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelAdventure> {
+class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   final bool _clockwise;
   final Player _player;

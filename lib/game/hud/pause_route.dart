@@ -6,15 +6,15 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class PauseRoute extends Route with HasGameReference<PixelAdventure> {
+class PauseRoute extends Route with HasGameReference<PixelQuest> {
   PauseRoute() : super(PausePage.new, transparent: true);
 
   @override
   void onPush(Route? previousRoute) {
     if (previousRoute is WorldRoute && previousRoute.world is DecoratedWorld) {
-      (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.black.withAlpha(40))..addBlur(6.0);
+      (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
       (previousRoute.world as DecoratedWorld).timeScale = 0;
     }
   }
@@ -28,7 +28,7 @@ class PauseRoute extends Route with HasGameReference<PixelAdventure> {
   }
 }
 
-class PausePage extends Component with HasGameReference<PixelAdventure> {
+class PausePage extends Component with HasGameReference<PixelQuest> {
   @override
   bool containsLocalPoint(Vector2 point) => false;
 
@@ -39,7 +39,7 @@ class PausePage extends Component with HasGameReference<PixelAdventure> {
 
     // text background
     final pausedBg = RoundedComponent(
-      color: AppTheme.black.withAlpha(56),
+      color: AppTheme.tileBlur,
       borderRadius: 4,
       position: pausedTextPosition,
       size: Vector2(210, 60),

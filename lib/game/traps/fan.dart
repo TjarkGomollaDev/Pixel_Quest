@@ -8,20 +8,20 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum FanState implements AnimationState {
   off('Off', 1),
   on('On', 4);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop = true;
 
-  const FanState(this.name, this.amount);
+  const FanState(this.fileName, this.amount);
 }
 
 /// A fan trap that continuously blows air upwards.
@@ -34,7 +34,7 @@ enum FanState implements AnimationState {
 ///
 /// The fan animation plays continuously while the trap is active.
 /// Damage is not applied; this trap only manipulates player movement.
-class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelAdventure> {
+class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelQuest> {
   // constructor parameters
   final bool _alwaysOn;
   final Player _player;

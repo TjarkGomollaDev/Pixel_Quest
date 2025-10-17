@@ -52,7 +52,7 @@
     <property name="offsetPos" type="float" value="12"/>
    </properties>
   </object>
-  <object id="86" name="Finish" type="Finish" x="352" y="208" width="64" height="64"/>
+  <object id="86" name="Finish" type="Finish" x="208" y="208" width="64" height="64"/>
   <object id="88" name="ArrowUp" type="ArrowUp" x="96" y="16" width="32" height="32"/>
   <object id="89" name="Start" type="Start" x="48" y="208" width="64" height="64"/>
   <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="32" width="16" height="16">
@@ -76,15 +76,6 @@
   <object id="125" name="Spikes" type="Spikes" x="16" y="256" width="32" height="16">
    <properties>
     <property name="side" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="129" name="Trunk" type="Trunk" x="192" y="240" width="64" height="32">
-   <properties>
-    <property name="extandNegAttack" type="float" value="0"/>
-    <property name="extandPosAttack" type="float" value="0"/>
-    <property name="isLeft" type="bool" value="true"/>
-    <property name="offsetNeg" type="float" value="3"/>
-    <property name="offsetPos" type="float" value="3"/>
    </properties>
   </object>
  </objectgroup>

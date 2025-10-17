@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum InGameActionBtnName {
   achievements('Achievements'),
@@ -24,7 +24,7 @@ enum InGameActionBtnName {
   const InGameActionBtnName(this.name);
 }
 
-class InGameActionBtn extends SpriteComponent with HasGameReference<PixelAdventure>, TapCallbacks {
+class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
   final InGameActionBtnName _name;
   final void Function() _action;
 

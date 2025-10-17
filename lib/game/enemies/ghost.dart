@@ -10,7 +10,7 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum GhostState implements AnimationState {
   idle('Idle', 10),
@@ -19,17 +19,17 @@ enum GhostState implements AnimationState {
   hit('Hit', 5, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const GhostState(this.name, this.amount, {this.loop = true});
+  const GhostState(this.fileName, this.amount, {this.loop = true});
 }
 
 class Ghost extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;

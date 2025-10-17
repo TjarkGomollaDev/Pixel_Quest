@@ -9,81 +9,95 @@
     ],
     "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
+        "/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/Development/Flutter/pixel_adventure/assets/tiles/Pixel Adventure.tsx": {
+            "scaleInDock": 1
+        },
+        "/Users/tjarkgomolla/Downloads/Splash_Screen.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 1.053,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 335.2326685660019,
+                "y": 193.73219373219376
+            }
+        },
         "Level_01.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.7964,
-            "selectedLayer": 0,
+            "scale": 0.6566,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1377.4485183324964,
-                "y": 244.85183324962338
+                "x": 3432.8358208955224,
+                "y": 300.0304599451721
             }
         },
         "Level_02.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.2364,
+            "scale": 1.3061,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1104.8204464574571,
-                "y": 201.3911355548366
+                "x": 3455.3250133986676,
+                "y": 180.69060561978407
             }
         },
         "Level_03.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.8798,
+            "scale": 1.3229,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 8759.945442145941,
-                "y": 165.94680609229368
+                "x": 7869.075515912013,
+                "y": 155.71849724091012
             }
         },
         "Level_04.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.9121,
-            "selectedLayer": 1,
+            "scale": 0.6041,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 4703.431641267404,
-                "y": 243.39436465299858
+                "x": 5475.914583678199,
+                "y": 256.5800364178116
             }
         },
         "Level_05.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.8323,
+            "scale": 0.7886,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 4080.259521807041,
-                "y": 183.82794665385074
+                "x": 9132.64012173472,
+                "y": 226.9845295460309
             }
         },
         "Level_11.tmx": {
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 1.1311,
-            "selectedLayer": 1,
+            "scale": 0.7423,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 729.3784811245691,
-                "y": 203.34187958624352
+                "x": 1040.0107773137547,
+                "y": 313.8892631011721
             }
         },
         "Level_13.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.2465,
-            "selectedLayer": 1,
+            "scale": 0.9046,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 261.53229041315683,
-                "y": 181.3076614520658
+                "x": 478.66460313950927,
+                "y": 170.2409904930356
             }
         },
         "Level_blank.tmx": {
@@ -97,6 +111,22 @@
         "Pixel Adventure.tsx": {
             "scaleInDock": 1.1967,
             "scaleInEditor": 4.79
+        },
+        "Splash_Foreground.tmx": {
+            "scale": 1.4598,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 378.1339909576655,
+                "y": 112.34415673379917
+            }
+        },
+        "Splash_Screen.tmx": {
+            "scale": 0.673,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 530.4606240713223,
+                "y": 248.1426448736998
+            }
         }
     },
     "last.imagePath": "/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/images/Terrain",
@@ -116,6 +146,9 @@
     "project": "Pixel Adventure.tiled-project",
     "property.type": "float",
     "recentFiles": [
+        "Splash_Screen.tmx",
+        "Splash_Foreground.tmx",
+        "/Users/tjarkgomolla/Downloads/Splash_Screen.tmx",
         "Level_02.tmx",
         "Level_13.tmx",
         "Level_03.tmx",

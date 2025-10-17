@@ -7,7 +7,7 @@ import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 class ChainItem {
   final DebugSpriteComponent chainComponent;
@@ -16,7 +16,7 @@ class ChainItem {
   ChainItem({required this.chainComponent, required this.radiusToCenterOfChain});
 }
 
-class SpikedBall extends PositionComponent with HasGameReference<PixelAdventure> {
+class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final double _radius;
   final int _swingArcDeg;

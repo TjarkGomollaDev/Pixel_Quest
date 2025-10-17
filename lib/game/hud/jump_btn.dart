@@ -3,9 +3,9 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class JumpBtn extends SpriteComponent with HasGameReference<PixelAdventure>, TapCallbacks {
+class JumpBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
   final Player player;
 
   JumpBtn(this.player);

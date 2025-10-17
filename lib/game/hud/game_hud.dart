@@ -10,9 +10,9 @@ import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
+class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final int _totalFruitsCount;
 
   GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
@@ -107,7 +107,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   void _setUpFruitsCount() {
     // fruit background
     _fruitBg = RoundedComponent(
-      color: AppTheme.black.withAlpha(56),
+      color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(_restartBtn.position.x + _bgSize + _spacingBetweenElements, position.y),
       size: Vector2.all(_bgSize),
@@ -133,7 +133,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelAdventure> {
   void _setUpDeathCount() {
     // death background
     _deathBg = RoundedComponent(
-      color: AppTheme.black.withAlpha(56),
+      color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _bgSize / 2 + _spacingBetweenElements * 4 / 5, position.y),
       size: Vector2.all(_bgSize),

@@ -10,24 +10,24 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum PlayerSpecialEffectState implements AnimationState {
   appearing('Appearing', 7, loop: false, special: true),
   disappearing('Disappearing', 7, loop: false, special: true);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
   final bool special;
 
-  const PlayerSpecialEffectState(this.name, this.amount, {this.loop = true, this.special = false});
+  const PlayerSpecialEffectState(this.fileName, this.amount, {this.loop = true, this.special = false});
 }
 
-class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, HasVisibility {
+class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, HasVisibility {
   final Player player;
 
   PlayerSpecialEffect({required this.player}) : super(position: Vector2.zero(), size: gridSize);

@@ -22,7 +22,7 @@ import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum PlayerState implements AnimationState {
   idle('Idle', 11),
@@ -33,13 +33,13 @@ enum PlayerState implements AnimationState {
   hit('Hit', 7, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const PlayerState(this.name, this.amount, {this.loop = true});
+  const PlayerState(this.fileName, this.amount, {this.loop = true});
 }
 
 enum PlayerCharacter {
@@ -48,13 +48,20 @@ enum PlayerCharacter {
   pinkMan('Pink Man'),
   virtualGuy('Virtual Guy');
 
-  final String name;
+  final String fileName;
 
-  const PlayerCharacter(this.name);
+  const PlayerCharacter(this.fileName);
+
+  static const PlayerCharacter defaultCharacter = PlayerCharacter.maskDude;
+
+  static PlayerCharacter getDefault() => defaultCharacter;
+
+  static PlayerCharacter fromName(String name) =>
+      PlayerCharacter.values.firstWhere((e) => e.name == name, orElse: () => PlayerCharacter.maskDude);
 }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameReference<PixelAdventure>, HasWorldReference<Level>, KeyboardHandler, CollisionCallbacks, HasVisibility {
+    with HasGameReference<PixelQuest>, HasWorldReference<Level>, KeyboardHandler, CollisionCallbacks, HasVisibility {
   // constructor parameters
   final PlayerCharacter _character;
   Vector2 _startPosition;
@@ -356,7 +363,7 @@ class Player extends SpriteAnimationGroupComponent
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<PlayerState>(
       game,
-      '$_path${_character.name}/',
+      '$_path${_character.fileName}/',
       _pathEnd,
       GameSettings.stepTime,
       _textureSize,

@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum CheckpointState implements AnimationState {
   flagIdle('Flag Idle', 10),
@@ -16,13 +16,13 @@ enum CheckpointState implements AnimationState {
   noFlag('No Flag', 1);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const CheckpointState(this.name, this.amount, {this.loop = true});
+  const CheckpointState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// Represents a checkpoint in the level where the player can respawn.
@@ -34,7 +34,7 @@ enum CheckpointState implements AnimationState {
 ///
 /// When the player collides with the checkpoint, the flag animation
 /// plays, and the player is registered as having reached the checkpoint.
-class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final Player _player;
 

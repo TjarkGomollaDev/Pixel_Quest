@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 mixin WorldCollision on PositionComponent {
   ShapeHitbox get worldHitbox;
@@ -14,7 +14,7 @@ mixin WorldCollisionEnd on PositionComponent {
   void onWorldCollisionEnd();
 }
 
-class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
+class WorldBlock extends PositionComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   // constructor parameters
   final bool isPlatform;
 
@@ -44,7 +44,7 @@ class WorldBlock extends PositionComponent with HasGameReference<PixelAdventure>
 /// This hitbox extends `RectangleHitbox` and overrides `renderDebugMode` to only draw itself
 /// when it overlaps the visible portion of the camera. This improves performance when many
 /// blocks exist in the level.
-class _WorldBlockHitbox extends RectangleHitbox with HasGameReference<PixelAdventure> {
+class _WorldBlockHitbox extends RectangleHitbox with HasGameReference<PixelQuest> {
   _WorldBlockHitbox({required super.size}) {
     debugMode = GameSettings.customDebug;
     debugColor = AppTheme.debugColorWorldBlock;

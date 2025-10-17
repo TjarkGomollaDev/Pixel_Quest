@@ -1,26 +1,21 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/menu/level_info.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class MenuPage extends Component with HasGameReference<PixelAdventure> {
-  late final TextComponent _logo;
+class MenuPage extends Component with HasGameReference<PixelQuest> {
   final Map<String, LevelInfo> _levelInfos = {};
-  late final StreamSubscription _sub;
+  StreamSubscription? _sub;
+
+  late final ParallaxComponent _menuBackground;
 
   @override
   FutureOr<void> onLoad() {
-    add(
-      _logo = TextComponent(
-        text: 'Your Game',
-        textRenderer: TextPaint(
-          style: const TextStyle(fontSize: 64, color: Color(0xFFC8FFF5), fontWeight: FontWeight.w800),
-        ),
-        anchor: Anchor.center,
-      ),
-    );
+    _menuBackground = BackgroundSzene(szene: Szene.szene1, position: Vector2.zero(), size: game.camera.viewport.size);
+    add(_menuBackground);
+
     int i = 0;
     for (var levelMetadata in allLevels) {
       final y = 40 + 15.0 * i;
@@ -31,20 +26,19 @@ class MenuPage extends Component with HasGameReference<PixelAdventure> {
       i++;
     }
 
-    _sub = game.dataCenter.onLevelDataChanged.listen((uuid) => _levelInfos[uuid]!.updateStars());
-
     return super.onLoad();
   }
 
   @override
-  void onRemove() {
-    _sub.cancel();
-    super.onRemove();
+  void onMount() {
+    _sub ??= game.dataCenter.onLevelDataChanged.listen((uuid) => _levelInfos[uuid]?.updateStars());
+    super.onMount();
   }
 
   @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    _logo.position = Vector2(size.x / 2, size.y / 2);
+  void onRemove() {
+    _sub?.cancel();
+    _sub = null;
+    super.onRemove();
   }
 }

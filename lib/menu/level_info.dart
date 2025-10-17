@@ -3,9 +3,9 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/menu/level_btn.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class LevelInfo extends PositionComponent with HasGameReference<PixelAdventure> {
+class LevelInfo extends PositionComponent with HasGameReference<PixelQuest> {
   final LevelMetadata _levelMetadata;
 
   LevelInfo({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata;

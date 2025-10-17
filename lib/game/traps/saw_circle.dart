@@ -6,7 +6,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A circular saw trap that moves one or two saws along the edges of a rectangular path.
 ///
@@ -17,7 +17,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 /// A single saw moves around the full loop, while a double-saw configuration
 /// places a second saw on the opposite side of the path, keeping both in sync.
 /// The saws act as passive collision areas that can interact with the [Player].
-class SawCircle extends PositionComponent with HasGameReference<PixelAdventure> {
+class SawCircle extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final bool _doubleSaw;
   final bool _clockwise;

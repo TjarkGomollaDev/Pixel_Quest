@@ -7,23 +7,23 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum FinishState implements AnimationState {
   idle('Idle', 1),
   pressed('Pressed', 8, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const FinishState(this.name, this.amount, {this.loop = true});
+  const FinishState(this.fileName, this.amount, {this.loop = true});
 }
 
-class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision {
+class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   // constructor parameters
   final Player _player;
 

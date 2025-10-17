@@ -1,11 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// Loads a single [Sprite] from the given asset [path] in the [game]'s cache.
 ///
 /// Use this for static images that do not need animation.
-Sprite loadSprite(PixelAdventure game, String path) => Sprite(game.images.fromCache(path));
+Sprite loadSprite(PixelQuest game, String path) => Sprite(game.images.fromCache(path));
 
 /// Loads a [SpriteAnimation] from a sprite sheet asset.
 ///
@@ -14,7 +14,7 @@ Sprite loadSprite(PixelAdventure game, String path) => Sprite(game.images.fromCa
 /// and [texturePosition] can be used to offset the first frame. The [loop] flag
 /// determines whether the animation repeats.
 SpriteAnimation loadSpriteAnimation(
-  PixelAdventure game,
+  PixelQuest game,
   String path,
   int amount,
   double stepTime,
@@ -40,14 +40,14 @@ SpriteAnimation loadSpriteAnimation(
 /// and [loop] properties, using a common path prefix and suffix ([path] and [pathEnd]).
 /// Useful for grouping all animations of a entity in a [SpriteAnimationGroupComponent].
 SpriteAnimation Function(T) spriteAnimationWrapper<T extends AnimationState>(
-  PixelAdventure game,
+  PixelQuest game,
   String path,
   String pathEnd,
   double stepTime,
   Vector2 textureSize,
 ) {
   return (T state) {
-    return loadSpriteAnimation(game, '$path${state.name}$pathEnd', state.amount, stepTime, textureSize, loop: state.loop);
+    return loadSpriteAnimation(game, '$path${state.fileName}$pathEnd', state.amount, stepTime, textureSize, loop: state.loop);
   };
 }
 

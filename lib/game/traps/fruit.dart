@@ -9,20 +9,20 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum FruitState implements AnimationState {
   idle('Idle', 17),
   collected('Collected', 6, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const FruitState(this.name, this.amount, {this.loop = true});
+  const FruitState(this.fileName, this.amount, {this.loop = true});
 }
 
 // ignore: constant_identifier_names
@@ -35,7 +35,7 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
 class Fruit extends SpriteAnimationGroupComponent
-    with EntityCollision, HasGameReference<PixelAdventure>, HasWorldReference<Level>, CollisionCallbacks {
+    with EntityCollision, HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks {
   // constructor parameters
   final String _name;
   final bool _collectible;

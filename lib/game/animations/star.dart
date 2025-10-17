@@ -6,9 +6,9 @@ import 'package:flutter/animation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> {
+class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
   final bool _spawnAnimation;
 
   OutlineStar({required Vector2 position, bool spawnAnimation = false})
@@ -47,7 +47,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelAdventure> 
   void fadeOut() => add(OpacityEffect.to(0, EffectController(duration: 0.1, curve: Curves.easeIn), onComplete: () => removeFromParent()));
 }
 
-class Star extends SpriteComponent with HasGameReference<PixelAdventure> {
+class Star extends SpriteComponent with HasGameReference<PixelQuest> {
   final bool _spawnAnimation;
 
   Star({required Vector2 position, bool spawnAnimation = false})

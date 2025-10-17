@@ -7,20 +7,20 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum MovingPlatformState implements AnimationState {
   off('Off', 1),
   on('On', 8);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop = true;
 
-  const MovingPlatformState(this.name, this.amount);
+  const MovingPlatformState(this.fileName, this.amount);
 }
 
 /// A moving platform that can travel horizontally or vertically
@@ -32,7 +32,7 @@ enum MovingPlatformState implements AnimationState {
 /// The platform automatically reverses direction when reaching the end
 /// of its movement range.
 class MovingPlatform extends SpriteAnimationGroupComponent
-    with HasGameReference<PixelAdventure>, CollisionCallbacks, WorldCollision, WorldCollisionEnd {
+    with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision, WorldCollisionEnd {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;

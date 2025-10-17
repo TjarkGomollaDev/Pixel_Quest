@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 /// Invisible component representing the fan's air stream.
 ///
@@ -19,8 +19,7 @@ import 'package:pixel_adventure/pixel_adventure.dart';
 ///
 /// Collision handling is used to detect when the player enters or
 /// leaves the stream, setting [_playerInStream] accordingly.
-class FanAirStream extends PositionComponent
-    with EntityCollision, EntityCollisionEnd, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class FanAirStream extends PositionComponent with EntityCollision, EntityCollisionEnd, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final double _baseWidth;
   final double _airStreamHeight;

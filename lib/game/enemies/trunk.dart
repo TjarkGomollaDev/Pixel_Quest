@@ -10,7 +10,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_adventure.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 enum TrunkState implements AnimationState {
   idle('Idle', 18),
@@ -19,16 +19,16 @@ enum TrunkState implements AnimationState {
   hit('Hit', 5, loop: false);
 
   @override
-  final String name;
+  final String fileName;
   @override
   final int amount;
   @override
   final bool loop;
 
-  const TrunkState(this.name, this.amount, {this.loop = true});
+  const TrunkState(this.fileName, this.amount, {this.loop = true});
 }
 
-class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelAdventure>, CollisionCallbacks {
+class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -284,11 +284,10 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
   }
 
   bool _checkIsPlayerInRange({double? extended}) {
-    // checks whether the player is within the range in which the trunk moves, optionally with a y extension to the top
     return _player.hitboxRight >= _attackRangeNeg &&
         _player.hitboxLeft <= _attackRangePos &&
-        _player.y + _player.height <= position.y + height &&
-        _player.y + _player.height >= position.y + _hitbox.position.y + (extended ?? 0);
+        _player.hitboxBottom >= position.y + _hitbox.position.y + (extended ?? 0) &&
+        _player.hitboxTop <= position.y + height;
   }
 
   bool _checkAttack() => (_checkIsPlayerBefore() && _checkIsPlayerInRange(extended: -_extendRangeDefault));
@@ -307,6 +306,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
     _isShooting = false;
     _shootTimer.stop();
     animationTickers![TrunkState.attack]?.onComplete?.call();
+    current = TrunkState.idle;
   }
 
   void _shoot() async {
