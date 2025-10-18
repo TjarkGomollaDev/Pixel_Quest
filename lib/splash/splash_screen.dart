@@ -2,11 +2,32 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/extensions/build_context.dart';
+import 'package:pixel_adventure/splash/animated_stars.dart';
 import 'package:pixel_adventure/splash/developer_logo.dart';
 import 'package:pixel_adventure/splash/splash_content.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  final GlobalKey<DeveloperLogoState> _developerLogoKey = GlobalKey<DeveloperLogoState>();
+  final GlobalKey<AnimatedStarsState> _starsKey = GlobalKey<AnimatedStarsState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _runAnimationSequence();
+  }
+
+  Future<void> _runAnimationSequence() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    await _starsKey.currentState?.startAnimation();
+    _developerLogoKey.currentState?.startShimmer();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,21 +35,11 @@ class SplashScreen extends StatelessWidget {
       children: [
         // background image
         Positioned.fill(
-          child: Image.asset(
-            'assets/images/Splash/Splash_Background.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.none,
-          ),
+          child: Image.asset('assets/images/Splash/Splash_Background.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
         ),
         // foreground image
         Positioned.fill(
-          child: Image.asset(
-            'assets/images/Splash/Splash_Foreground.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.none,
-          ),
+          child: Image.asset('assets/images/Splash/Splash_Foreground.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
         ),
         // blur layer
         Positioned.fill(
@@ -38,9 +49,18 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
         // content
-        Positioned(top: context.sizeOf.height * 0.25, left: 0, right: 0, child: const SplashContent()),
+        Positioned(
+          top: context.sizeOf.height * 0.25,
+          left: 0,
+          right: 0,
+          child: SplashContent(starsKey: _starsKey),
+        ),
         // developer logo
-        Positioned(left: context.paddingOf.left, bottom: 26, child: const DeveloperLogo()),
+        Positioned(
+          left: context.paddingOf.left,
+          bottom: 20,
+          child: DeveloperLogo(key: _developerLogoKey),
+        ),
       ],
     );
   }

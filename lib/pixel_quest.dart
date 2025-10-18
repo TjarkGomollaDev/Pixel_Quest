@@ -3,8 +3,6 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart' hide Route;
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/data_center.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
@@ -16,9 +14,6 @@ import 'package:pixel_adventure/menu/menu_page.dart';
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
   late final DataCenter dataCenter;
-
-  @override
-  Color backgroundColor() => AppTheme.backgroundColor;
 
   // router
   late final RouterComponent router;
@@ -32,11 +27,11 @@ class PixelQuest extends FlameGame
     _setUpRouter();
 
     await Future.delayed(Duration(seconds: 3000));
-    // final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
-    // final delayMs = 5800;
-    // if (elapsedMs < delayMs) {
-    //   await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-    // }
+    final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
+    final delayMs = 5200;
+    if (elapsedMs < delayMs) {
+      await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+    }
 
     return super.onLoad();
   }

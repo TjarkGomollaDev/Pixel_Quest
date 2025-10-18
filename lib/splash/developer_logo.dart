@@ -1,9 +1,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/extensions/int_double_extensions.dart';
+import 'package:shimmer/shimmer.dart';
 
-class DeveloperLogo extends StatelessWidget {
+class DeveloperLogo extends StatefulWidget {
   const DeveloperLogo({super.key});
+
+  @override
+  State<DeveloperLogo> createState() => DeveloperLogoState();
+}
+
+class DeveloperLogoState extends State<DeveloperLogo> {
+  bool _shimmerEnabled = false;
+
+  void startShimmer() => setState(() => _shimmerEnabled = true);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +23,7 @@ class DeveloperLogo extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: EdgeInsets.all(4),
             decoration: BoxDecoration(
               border: BoxBorder.all(color: AppTheme.ingameText),
               borderRadius: BorderRadius.circular(50).copyWith(bottomLeft: Radius.zero),
@@ -26,9 +36,16 @@ class DeveloperLogo extends StatelessWidget {
             ),
           ),
           6.widthSizedBox,
-          Text(
-            'tj.studios',
-            style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText),
+          Shimmer.fromColors(
+            baseColor: AppTheme.ingameText,
+            highlightColor: AppTheme.ingameTextShimmer,
+            period: Duration(milliseconds: 1000),
+            loop: 1,
+            enabled: _shimmerEnabled,
+            child: Text(
+              'tj.studios',
+              style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText),
+            ),
           ),
         ],
       ),

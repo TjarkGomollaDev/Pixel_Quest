@@ -65,12 +65,9 @@ abstract class AppTheme {
   static const debugColorParticleHitbox = grayLight1;
   static const debugColorWorldBlock = mintDark;
 
-  // background color
-  static const backgroundColor = Color(0xFF211F30);
-
   // ingame text
   static const ingameText = white;
-  static final ingameTextShimmer = Color(0xFF888888);
+  static final ingameTextShimmer = Color.fromARGB(255, 114, 114, 114);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
 }
