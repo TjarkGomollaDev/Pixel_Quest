@@ -19,9 +19,9 @@ enum InGameActionBtnName {
   settings('Settings'),
   volume('Volume');
 
-  final String name;
+  final String fileName;
 
-  const InGameActionBtnName(this.name);
+  const InGameActionBtnName(this.fileName);
 }
 
 class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
@@ -73,10 +73,10 @@ class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>,
     anchor = Anchor.center;
   }
 
-  void _loadSprite() => sprite = loadSprite(game, '$_path${_name.name}$_pathEnd');
+  void _loadSprite() => sprite = loadSprite(game, '$_path${_name.fileName}$_pathEnd');
 
   void setSpriteByName(InGameActionBtnName name) {
-    sprite = loadSprite(game, '$_path${name.name}$_pathEnd');
+    sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
   }
 }
 
@@ -103,6 +103,17 @@ class InGameActionToggleBtn extends InGameActionBtn {
   @override
   void onTapUp(TapUpEvent event) {
     scale = Vector2.all(1.0);
+    if (toggle) {
+      setSpriteByName(_name_2);
+      _action();
+    } else {
+      setSpriteByName(_name);
+      _action_2();
+    }
+    toggle = !toggle;
+  }
+
+  void triggerToggle() {
     if (toggle) {
       setSpriteByName(_name_2);
       _action();

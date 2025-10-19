@@ -100,7 +100,7 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   static const _hopDuration = 0.3;
   static const _buffer = 20;
   static const _msPerPixelHorizontal = 2.6;
-  static const _msPerPixelVertical = 3.4;
+  static const _msPerPixelVertical = 2.8;
 
   EffectController _deathController(double duration) => EffectController(duration: duration, curve: FastStartAccelerateCurve());
 

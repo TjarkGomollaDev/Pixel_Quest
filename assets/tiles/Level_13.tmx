@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="130">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="54" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="131">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="54" height="20">
   <properties>
@@ -65,7 +65,7 @@
   </object>
   <object id="94" name="Kiwi" type="Fruit" x="16" y="176" width="32" height="32"/>
   <object id="95" name="Apple" type="Fruit" x="16" y="144" width="32" height="32"/>
-  <object id="106" name="Moving Platform" type="Moving Platform" x="96" y="128" width="32" height="16">
+  <object id="106" name="Moving Platform" type="Moving Platform" x="96" y="80" width="32" height="16">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
     <property name="isVertical" type="bool" value="false"/>
@@ -74,6 +74,11 @@
    </properties>
   </object>
   <object id="125" name="Spikes" type="Spikes" x="16" y="256" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="130" name="Spikes" type="Spikes" x="160" y="128" width="32" height="16">
    <properties>
     <property name="side" type="int" value="1"/>
    </properties>

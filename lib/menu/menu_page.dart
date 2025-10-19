@@ -1,20 +1,24 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/menu/level_info.dart';
+import 'package:pixel_adventure/menu/menu_btns.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class MenuPage extends Component with HasGameReference<PixelQuest> {
+class MenuPage extends World with HasGameReference<PixelQuest> {
   final Map<String, LevelInfo> _levelInfos = {};
   StreamSubscription? _sub;
 
   late final ParallaxComponent _menuBackground;
+  final MenuBtns _menuBtns = MenuBtns();
 
   @override
   FutureOr<void> onLoad() {
-    _menuBackground = BackgroundSzene(szene: Szene.szene1, position: Vector2.zero(), size: game.camera.viewport.size);
+    _menuBackground = BackgroundSzene(szene: Szene.szene1, position: Vector2.zero(), size: game.size);
     add(_menuBackground);
+    add(_menuBtns);
 
     int i = 0;
     for (var levelMetadata in allLevels) {
@@ -31,14 +35,16 @@ class MenuPage extends Component with HasGameReference<PixelQuest> {
 
   @override
   void onMount() {
-    _sub ??= game.dataCenter.onLevelDataChanged.listen((uuid) => _levelInfos[uuid]?.updateStars());
+    game.setUpCameraForMenu();
+    _sub ??= game.dataCenter.onLevelDataChanged.listen((uuid) {
+      _levelInfos[uuid]?.updateStars();
+    });
+
     super.onMount();
   }
 
-  @override
-  void onRemove() {
+  void dispose() {
     _sub?.cancel();
     _sub = null;
-    super.onRemove();
   }
 }

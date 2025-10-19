@@ -57,9 +57,13 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         // developer logo
         Positioned(
-          left: context.paddingOf.left,
+          left: 0,
           bottom: 20,
-          child: DeveloperLogo(key: _developerLogoKey),
+          child: SafeArea(
+            bottom: false,
+            minimum: EdgeInsets.only(left: 40),
+            child: DeveloperLogo(key: _developerLogoKey),
+          ),
         ),
       ],
     );

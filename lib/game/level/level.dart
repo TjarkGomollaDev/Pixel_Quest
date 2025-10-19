@@ -627,4 +627,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     final storedData = game.dataCenter.getLevel(levelMetadata.uuid);
     if (data.shouldReplace(storedData: storedData)) await game.dataCenter.saveLevel(data);
   }
+
+  void pauseLevel() => _gameHud.togglePlayButton();
 }

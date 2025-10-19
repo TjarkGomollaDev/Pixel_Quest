@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -580,7 +579,7 @@ class Player extends SpriteAnimationGroupComponent
     _effect.shakeCamera();
     current = PlayerState.hit;
     await _effect.playDeathTrajectory(collisionSide);
-    game.setRefollowForCam(this);
+    game.setRefollowForLevelCamera(this);
     isVisible = false;
 
     // respawn
@@ -616,20 +615,6 @@ class Player extends SpriteAnimationGroupComponent
   Rect get hitbox => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
   Vector2 get hitboxPosition => _hitbox.position;
   Vector2 get startPosition => _startPosition;
-}
-
-class PlayerHitboxPositionProvider extends PositionProvider {
-  final Player player;
-
-  PlayerHitboxPositionProvider(this.player);
-
-  @override
-  Vector2 get position {
-    return Vector2(player.hitboxLeft, player.hitboxTop);
-  }
-
-  @override
-  set position(Vector2 value) {}
 }
 
 class PlayerRespawnNotifier extends ChangeNotifier {

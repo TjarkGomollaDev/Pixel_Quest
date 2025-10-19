@@ -9,7 +9,6 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
@@ -17,13 +16,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
     size = Vector2(160, Fruit.gridSize.y);
-    position = Vector2(GameSettings.tileSize * 3, 20);
+    position = Vector2(game.safePadding.minLeft(40), 20);
     anchor = Anchor.centerLeft;
   }
 
   // btns
   late final InGameActionBtn _menuBtn;
-  late final InGameActionBtn _playBtn;
+  late final InGameActionToggleBtn _playBtn;
   late final InGameActionBtn _restartBtn;
 
   // spacing
@@ -164,4 +163,6 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   void updateFruitCount(int collected) => _fruitsCount.text = '$collected/$_totalFruitsCount';
 
   void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
+
+  void togglePlayButton() => _playBtn.triggerToggle();
 }

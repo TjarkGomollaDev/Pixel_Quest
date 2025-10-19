@@ -3,17 +3,31 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/data/data_center.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/level_list.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
+import 'package:pixel_adventure/game/utils/position_provider.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
 
 class PixelQuest extends FlameGame
-    with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance {
+    with
+        HasKeyboardHandlerComponents,
+        DragCallbacks,
+        HasCollisionDetection,
+        HasPerformanceTracker,
+        SingleGameInstance,
+        WidgetsBindingObserver {
+  final EdgeInsets _flutterSafePadding;
+
+  PixelQuest({required EdgeInsets safeScreenPadding}) : _flutterSafePadding = safeScreenPadding;
+
   late final DataCenter dataCenter;
+  late final GameSafePadding safePadding;
 
   // router
   late final RouterComponent router;
@@ -23,10 +37,12 @@ class PixelQuest extends FlameGame
     final startTime = DateTime.now();
     dataCenter = await DataCenter.init();
     await _loadAllImagesIntoCache();
-    _setUpCam();
+    _setUpCameraDefault();
+    _setUpSafePadding();
     _setUpRouter();
+    WidgetsBinding.instance.addObserver(this);
 
-    await Future.delayed(Duration(seconds: 3000));
+    // await Future.delayed(Duration(seconds: 3000));
     final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
     final delayMs = 5200;
     if (elapsedMs < delayMs) {
@@ -36,33 +52,74 @@ class PixelQuest extends FlameGame
     return super.onLoad();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      final currentRoute = router.currentRoute;
+      if (currentRoute is WorldRoute && currentRoute.world is Level) (currentRoute.world as Level).pauseLevel();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void onRemove() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onRemove();
+  }
+
+  @override
+  void onDispose() {
+    ((router.routes[RouteNames.menu] as WorldRoute?)?.world as MenuPage?)?.dispose();
+    super.onDispose();
+  }
+
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
 
-  void _setUpCam() {
+  void _setUpCameraDefault() {
     final fixedHeight = GameSettings.mapHeight - GameSettings.mapBorderWidth * 2;
     final aspectRatio = size.x / size.y;
     final dynamicWidth = fixedHeight * aspectRatio;
 
+    // create a camera with fixed resolution that is used for both a level and the menu page
     camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight);
-    camera.viewfinder.anchor = Anchor(0.25, 0);
     add(camera);
   }
 
+  void setUpCameraForMenu() {
+    camera.viewfinder.anchor = Anchor.topLeft;
+    camera.setBounds(Rectangle.fromLTRB(0, 0, size.x, size.y));
+    camera.follow(StaticPositionProvider.topLeft);
+  }
+
   void setUpCameraForLevel(double mapWidth, Player player) {
+    // the player should not be visible on the far left of the screen, but rather at 1/4 of the screen width
+    camera.viewfinder.anchor = Anchor(0.25, 0);
+
     // camera bounds
     final leftBound = size.x * camera.viewfinder.anchor.x + GameSettings.mapBorderWidth;
     final rightBound = size.x * (1 - camera.viewfinder.anchor.x) + GameSettings.mapBorderWidth;
     camera.setBounds(Rectangle.fromLTRB(leftBound, GameSettings.mapBorderWidth, mapWidth - rightBound, GameSettings.mapBorderWidth));
 
     // viewfinder follows player
-    setRefollowForCam(player);
+    setRefollowForLevelCamera(player);
   }
 
-  void setRefollowForCam(Player player) => camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
+  void setRefollowForLevelCamera(Player player) => camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
+
+  void _setUpSafePadding() {
+    final scaleX = camera.viewport.size.x / size.x;
+    final scaleY = camera.viewport.size.y / size.y;
+    safePadding = GameSafePadding(
+      top: _flutterSafePadding.top / scaleY,
+      bottom: _flutterSafePadding.bottom / scaleY,
+      left: _flutterSafePadding.left / scaleX,
+      right: _flutterSafePadding.right / scaleX,
+    );
+  }
 
   void _setUpRouter() {
     final levelRoutes = {
-      RouteNames.menu: Route(MenuPage.new),
+      RouteNames.menu: WorldRoute(() => MenuPage()),
       RouteNames.pause: PauseRoute(),
       for (final levelMetadata in allLevels)
         levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),

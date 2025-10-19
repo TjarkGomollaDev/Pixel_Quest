@@ -36,7 +36,7 @@ class SplashContent extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Loading World',
+                        'Loading Game',
                         style: TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.ingameText),
                       ),
                       8.widthSizedBox,
