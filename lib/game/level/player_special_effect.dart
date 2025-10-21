@@ -8,6 +8,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -177,9 +178,4 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
     }
     player.angle = 0;
   }
-}
-
-class FastStartAccelerateCurve extends Curve {
-  @override
-  double transform(double t) => 0.4 * t + 0.6 * t * t;
 }

@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:pixel_adventure/data/entities/level_entity.dart';
-import 'package:pixel_adventure/data/entities/settings_entity.dart';
-import 'package:pixel_adventure/game/level/level_list.dart';
+import 'package:pixel_adventure/storage/entities/level_entity.dart';
+import 'package:pixel_adventure/storage/entities/settings_entity.dart';
+import 'package:pixel_adventure/data/level_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DataCenter {
+class StorageCenter {
   final SharedPreferences _prefs;
 
-  DataCenter._(this._prefs);
+  StorageCenter._(this._prefs);
 
-  static Future<DataCenter> init() async {
+  static Future<StorageCenter> init() async {
     final prefs = await SharedPreferences.getInstance();
-    final dataCenter = DataCenter._(prefs);
+    final dataCenter = StorageCenter._(prefs);
     await dataCenter.clearAllLevels(); // for testing
     dataCenter._loadAllLevels();
     dataCenter._loadSettings();

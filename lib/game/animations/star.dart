@@ -11,9 +11,12 @@ import 'package:pixel_adventure/pixel_quest.dart';
 class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
   final bool _spawnAnimation;
 
-  OutlineStar({required Vector2 position, bool spawnAnimation = false})
+  OutlineStar({required Vector2 position, Vector2? size, bool spawnAnimation = false})
     : _spawnAnimation = spawnAnimation,
-      super(position: position, size: Vector2.all(24));
+      super(position: position, size: size ?? defaultSize);
+
+  // size
+  static final Vector2 defaultSize = Vector2.all(24);
 
   // animation settings
   static const String _path = 'Other/Star Outline.png';
@@ -50,9 +53,12 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
 class Star extends SpriteComponent with HasGameReference<PixelQuest> {
   final bool _spawnAnimation;
 
-  Star({required Vector2 position, bool spawnAnimation = false})
+  Star({required Vector2 position, Vector2? size, bool spawnAnimation = false})
     : _spawnAnimation = spawnAnimation,
-      super(position: position, size: Vector2.all(24));
+      super(position: position, size: size ?? defaultSize);
+
+  // size
+  static final Vector2 defaultSize = Vector2.all(24);
 
   // animation settings
   static const String _path = 'Other/Star.png';

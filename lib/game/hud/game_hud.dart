@@ -9,16 +9,21 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final int _totalFruitsCount;
 
   GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
-    size = Vector2(160, Fruit.gridSize.y);
-    position = Vector2(game.safePadding.minLeft(40), 20);
-    anchor = Anchor.centerLeft;
+    final minLeft = game.safePadding.minLeft(40);
+    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
+    position = Vector2(minLeft, 10);
+    _verticalCenter = size.y / 2;
   }
+
+  // vertical center of the module
+  late final double _verticalCenter;
 
   // btns
   late final InGameActionBtn _menuBtn;
@@ -26,7 +31,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   late final InGameActionBtn _restartBtn;
 
   // spacing
-  final double _btnSpacing = 4;
+  static final double _btnSpacing = 4;
 
   // fruits count
   late final RoundedComponent _fruitBg;
@@ -45,20 +50,32 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
+    _initialSetup();
     _setUpBtns();
     _setUpFruitsCount();
     _setUpDeathCount();
     return super.onLoad();
   }
 
+  void _initialSetup() {
+    // debug
+    if (GameSettings.customDebug) {
+      debugMode = true;
+      debugColor = AppTheme.debugColorMenu;
+    }
+
+    // general
+    anchor = Anchor.topLeft;
+  }
+
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, position.y);
+    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, _verticalCenter);
     final btnOffset = Vector2(InGameActionBtn.btnSize.x + _btnSpacing, 0);
 
     // menu btn
     _menuBtn = InGameActionBtn(
-      name: InGameActionBtnName.levels,
+      type: InGameActionBtnType.levels,
       action: () {
         if (game.router.currentRoute is PauseRoute) game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
@@ -68,8 +85,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
     // pause and resume btn
     _playBtn = InGameActionToggleBtn(
-      name: InGameActionBtnName.pause,
-      name_2: InGameActionBtnName.play,
+      type: InGameActionBtnType.pause,
+      type_2: InGameActionBtnType.play,
       action: () => game.router.pushNamed(RouteNames.pause),
       action_2: () => game.router.pop(),
       position: btnBasePosition + btnOffset,
@@ -77,7 +94,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
     // restart the level btn
     _restartBtn = InGameActionBtn(
-      name: InGameActionBtnName.restart,
+      type: InGameActionBtnType.restart,
       action: () {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {
@@ -108,19 +125,23 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitBg = RoundedComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_restartBtn.position.x + _bgSize + _spacingBetweenElements, position.y),
+      position: Vector2(_restartBtn.position.x + _restartBtn.size.x + _spacingBetweenElements, _verticalCenter),
       size: Vector2.all(_bgSize),
-      anchor: Anchor.center,
+      anchor: Anchor.centerLeft,
     );
 
     // fruit item
-    _fruitItem = Fruit(name: FruitName.Apple.name, position: Vector2(_fruitBg.position.x, position.y + 1), collectible: false);
+    _fruitItem = Fruit(
+      name: FruitName.Apple.name,
+      position: Vector2(_fruitBg.position.x + _fruitBg.size.x / 2, _verticalCenter + 2),
+      collectible: false,
+    );
 
     // count text
     _fruitsCount = TextComponent(
       text: '0/$_totalFruitsCount',
       anchor: Anchor(0, 0.32),
-      position: Vector2(_fruitBg.position.x + _fruitBg.size.x / 2 + _counterTextMarginLeft, position.y),
+      position: Vector2(_fruitBg.position.x + _fruitBg.size.x + _counterTextMarginLeft, _verticalCenter),
       textRenderer: TextPaint(
         style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
       ),
@@ -134,15 +155,15 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathBg = RoundedComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _bgSize / 2 + _spacingBetweenElements * 4 / 5, position.y),
+      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _spacingBetweenElements * 4 / 5, _verticalCenter),
       size: Vector2.all(_bgSize),
-      anchor: Anchor.center,
+      anchor: Anchor.centerLeft,
     );
 
     // death item
     _deathItem = SpriteComponent(
       sprite: loadSprite(game, 'Other/Bone.png'),
-      position: _deathBg.position,
+      position: Vector2(_deathBg.position.x + _deathBg.size.x / 2, _verticalCenter),
       size: Vector2.all(32),
       anchor: Anchor.center,
     );
@@ -151,7 +172,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathCount = TextComponent(
       text: '0',
       anchor: Anchor(0, 0.32),
-      position: Vector2(_deathBg.position.x + _deathBg.size.x / 2 + _counterTextMarginLeft, position.y),
+      position: Vector2(_deathBg.position.x + _deathBg.size.x + _counterTextMarginLeft, _verticalCenter),
       textRenderer: TextPaint(
         style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
       ),

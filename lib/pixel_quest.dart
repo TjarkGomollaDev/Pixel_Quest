@@ -4,10 +4,10 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:pixel_adventure/data/data_center.dart';
+import 'package:pixel_adventure/storage/storage_center.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/level/level_list.dart';
+import 'package:pixel_adventure/data/level_data.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
@@ -15,18 +15,12 @@ import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
 
 class PixelQuest extends FlameGame
-    with
-        HasKeyboardHandlerComponents,
-        DragCallbacks,
-        HasCollisionDetection,
-        HasPerformanceTracker,
-        SingleGameInstance,
-        WidgetsBindingObserver {
+    with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
   final EdgeInsets _flutterSafePadding;
 
   PixelQuest({required EdgeInsets safeScreenPadding}) : _flutterSafePadding = safeScreenPadding;
 
-  late final DataCenter dataCenter;
+  late final StorageCenter storageCenter;
   late final GameSafePadding safePadding;
 
   // router
@@ -35,7 +29,7 @@ class PixelQuest extends FlameGame
   @override
   Future<void> onLoad() async {
     final startTime = DateTime.now();
-    dataCenter = await DataCenter.init();
+    storageCenter = await StorageCenter.init();
     await _loadAllImagesIntoCache();
     _setUpCameraDefault();
     _setUpSafePadding();
@@ -43,11 +37,11 @@ class PixelQuest extends FlameGame
     WidgetsBinding.instance.addObserver(this);
 
     // await Future.delayed(Duration(seconds: 3000));
-    final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
-    final delayMs = 5200;
-    if (elapsedMs < delayMs) {
-      await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-    }
+    // final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
+    // final delayMs = 5200;
+    // if (elapsedMs < delayMs) {
+    //   await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+    // }
 
     return super.onLoad();
   }
@@ -125,6 +119,7 @@ class PixelQuest extends FlameGame
         levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
     };
 
+    // dataCenter.getLevel('e31ee2d0-fc87-4358-a09c-e8f3130f3fc2').uuid)
     add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));
   }
 }

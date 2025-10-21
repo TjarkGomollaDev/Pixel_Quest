@@ -4,7 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/data/entities/level_entity.dart';
+import 'package:pixel_adventure/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/enemies/blue_bird.dart';
@@ -20,7 +20,7 @@ import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/hud/jump_btn.dart';
 import 'package:pixel_adventure/game/level/background_colored.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
-import 'package:pixel_adventure/game/level/level_list.dart';
+import 'package:pixel_adventure/data/level_data.dart';
 import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/traps/rock_head.dart';
@@ -334,7 +334,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
         final start = Start(position: gridPosition);
         add(start);
-        _player = Player(character: game.dataCenter.settings.playerCharacter, startPosition: start.playerPosition);
+        _player = Player(character: game.storageCenter.settings.character, startPosition: start.playerPosition);
         add(_player);
         break;
       }
@@ -624,8 +624,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       earnedFruits: playerFruitsCount,
       deaths: deathCount,
     );
-    final storedData = game.dataCenter.getLevel(levelMetadata.uuid);
-    if (data.shouldReplace(storedData: storedData)) await game.dataCenter.saveLevel(data);
+    final storedData = game.storageCenter.getLevel(levelMetadata.uuid);
+    if (data.shouldReplace(storedData: storedData)) await game.storageCenter.saveLevel(data);
   }
 
   void pauseLevel() => _gameHud.togglePlayButton();

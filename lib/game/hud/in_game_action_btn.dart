@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-enum InGameActionBtnName {
+enum InGameActionBtnType {
   achievements('Achievements'),
   back('Back'),
   close('Close'),
@@ -21,15 +21,15 @@ enum InGameActionBtnName {
 
   final String fileName;
 
-  const InGameActionBtnName(this.fileName);
+  const InGameActionBtnType(this.fileName);
 }
 
 class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
-  final InGameActionBtnName _name;
+  final InGameActionBtnType _type;
   final void Function() _action;
 
-  InGameActionBtn({required InGameActionBtnName name, required void Function() action, required super.position})
-    : _name = name,
+  InGameActionBtn({required InGameActionBtnType type, required void Function() action, required super.position})
+    : _type = type,
       _action = action;
 
   // size
@@ -73,41 +73,41 @@ class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>,
     anchor = Anchor.center;
   }
 
-  void _loadSprite() => sprite = loadSprite(game, '$_path${_name.fileName}$_pathEnd');
+  void _loadSprite() => sprite = loadSprite(game, '$_path${_type.fileName}$_pathEnd');
 
-  void setSpriteByName(InGameActionBtnName name) {
+  void setSpriteByName(InGameActionBtnType name) {
     sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
   }
 }
 
 class InGameActionToggleBtn extends InGameActionBtn {
-  final InGameActionBtnName _name_2;
+  final InGameActionBtnType _type_2;
   final void Function() _action_2;
   bool toggle = true;
 
   InGameActionToggleBtn({
-    required super.name,
-    required InGameActionBtnName name_2,
+    required super.type,
+    required InGameActionBtnType type_2,
     required super.action,
     required void Function() action_2,
     required super.position,
-  }) : _name_2 = name_2,
+  }) : _type_2 = type_2,
        _action_2 = action_2;
 
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    setSpriteByName(toggle ? _name : _name_2);
+    setSpriteByName(toggle ? _type : _type_2);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
     scale = Vector2.all(1.0);
     if (toggle) {
-      setSpriteByName(_name_2);
+      setSpriteByName(_type_2);
       _action();
     } else {
-      setSpriteByName(_name);
+      setSpriteByName(_type);
       _action_2();
     }
     toggle = !toggle;
@@ -115,10 +115,10 @@ class InGameActionToggleBtn extends InGameActionBtn {
 
   void triggerToggle() {
     if (toggle) {
-      setSpriteByName(_name_2);
+      setSpriteByName(_type_2);
       _action();
     } else {
-      setSpriteByName(_name);
+      setSpriteByName(_type);
       _action_2();
     }
     toggle = !toggle;

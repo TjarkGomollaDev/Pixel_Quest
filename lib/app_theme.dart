@@ -67,7 +67,9 @@ abstract class AppTheme {
 
   // ingame text
   static const ingameText = white;
-  static final ingameTextShimmer = Color.fromARGB(255, 114, 114, 114);
+  static final ingameTextShimmer = Color.fromRGBO(114, 114, 114, 1);
+  static final starColor = Color.fromRGBO(255, 255, 85, 1);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
+  static final levelTileBlur = black.withAlpha(30);
 }
