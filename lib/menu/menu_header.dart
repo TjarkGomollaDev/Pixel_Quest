@@ -75,7 +75,7 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
 
     // count text
     _starsCount = TextComponent(
-      text: '0/15',
+      text: '${game.storageCenter.highestUnlockedWorld.stars}/48',
       anchor: Anchor(0, 0.32),
       position: Vector2(_starBg.position.x + _starBg.size.x + _counterTextMarginLeft, _verticalCenter),
       textRenderer: TextPaint(
@@ -99,4 +99,6 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
 
     addAll([_settingsBtn, _achievmentsBtn]);
   }
+
+  void updateStarsCount(int stars) => _starsCount.text = '$stars/48';
 }

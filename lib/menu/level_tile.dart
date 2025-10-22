@@ -19,7 +19,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   late final Vector2 _center;
 
   // size
-  static final Vector2 tileSize = Vector2(62, 42);
+  static final Vector2 tileSize = Vector2(54, 38); // [Adjustable]
 
   // background
   late final RoundedComponent _tileBg;
@@ -28,9 +28,14 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   late final LevelBtn _levelBtn;
 
   // stars
+  static final Vector2 _starSize = Vector2.all(12); // [Adjustable]
   final List<OutlineStar> _outlineStars = [];
   final List<Star> _stars = [];
-  static const double _starSpacing = 14;
+
+  // spacing
+  static const double _starSpacingHorizontal = 2; // [Adjustable]
+  static const double _starsMarginTop = 3; // [Adjustable]
+  static const double _btnMarginBottom = 2; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -59,22 +64,26 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpBtn() {
-    _levelBtn = LevelBtn(levelMetadata: _levelMetadata, position: Vector2(_center.x, 29));
+    _levelBtn = LevelBtn(levelMetadata: _levelMetadata, position: Vector2(_center.x, size.y - LevelBtn.btnSize.y / 2 - _btnMarginBottom));
     add(_levelBtn);
   }
 
   void _setUpStars() {
     final data = game.storageCenter.getLevel(_levelMetadata.uuid);
-    final positions = [Vector2(_center.x - _starSpacing, 13), Vector2(_center.x, 11), Vector2(_center.x + _starSpacing, 13)];
+    final yPos = _starSize.y / 2 + _starsMarginTop;
+    final positions = [
+      Vector2(_center.x - _starSize.x - _starSpacingHorizontal, yPos + 2),
+      Vector2(_center.x, yPos),
+      Vector2(_center.x + _starSize.x + _starSpacingHorizontal, yPos + 2),
+    ];
     final angles = [-0.1, 0.0, 0.1];
-    final starSize = Vector2.all(12);
     for (var i = 0; i < data.stars; i++) {
-      final star = Star(position: positions[i], size: starSize);
+      final star = Star(position: positions[i], size: _starSize);
       star.angle = angles[i];
       _stars.add(star);
     }
     for (var i = data.stars; i < data.stars + 3 - data.stars; i++) {
-      final outlineStar = OutlineStar(position: positions[i], size: starSize);
+      final outlineStar = OutlineStar(position: positions[i], size: _starSize);
       outlineStar.angle = angles[i];
       _outlineStars.add(outlineStar);
     }

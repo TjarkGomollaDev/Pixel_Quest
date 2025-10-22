@@ -21,10 +21,22 @@ class LevelEntity {
     );
   }
 
-  bool shouldReplace({required LevelEntity storedData}) {
+  LevelEntity copyWith({int? stars, int? totalFruits, int? earnedFruits, int? deaths}) {
+    return LevelEntity(
+      uuid: uuid,
+      stars: stars ?? this.stars,
+      totalFruits: totalFruits ?? this.totalFruits,
+      earnedFruits: earnedFruits ?? this.earnedFruits,
+      deaths: deaths ?? this.deaths,
+    );
+  }
+
+  bool shouldReplace(LevelEntity storedData) {
     if (stars != storedData.stars) return stars > storedData.stars;
     if (earnedFruits != storedData.earnedFruits) return earnedFruits > storedData.earnedFruits;
     if (deaths != storedData.deaths) return deaths < storedData.deaths;
     return false;
   }
+
+  int starDifference(LevelEntity storedData) => stars > storedData.stars ? stars - storedData.stars : 0;
 }

@@ -82,7 +82,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     _dummyOutline = DraggableCornerOutline(
       onSwipeRight: () => _dummy.switchCharacter(),
       onSwipeLeft: () => _dummy.switchCharacter(next: false),
-      size: Vector2(38, 44),
+      size: Vector2(44, 46),
       cornerLength: 4,
       strokeWidth: 1.2,
       color: AppTheme.starColor,

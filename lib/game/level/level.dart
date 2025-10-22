@@ -4,6 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/data/border_tiles_config.dart';
 import 'package:pixel_adventure/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
@@ -138,12 +139,61 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     add(_levelMap);
   }
 
-  void _addBackgroundLayer() {
+  Future<void> _addBackgroundLayer() async {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
+      await _changeBorderTiles(backgroundLayer);
       _addBackground(backgroundLayer);
       _addWorldCollisions(backgroundLayer);
     }
+  }
+
+  Future<void> _changeBorderTiles(TileLayer backgroundLayer) async {
+    final config = await BorderTileConfig.load('assets/json/border_tiles.json');
+
+    final layerId = backgroundLayer.id!;
+    final width = _levelMap.tileMap.map.width;
+    final height = _levelMap.tileMap.map.height;
+
+    Gid getNewGid(int x, int y, int newTile) {
+      final oldGid = _levelMap.tileMap.getTileData(layerId: layerId, x: x, y: y);
+      return Gid(newTile, oldGid!.flips);
+    }
+
+    // 🔸 Top border
+    for (int x = 1; x < width - 1; x++) {
+      final index = (x - 1) % config.top.length;
+      _levelMap.tileMap.setTileData(layerId: layerId, x: x, y: 0, gid: getNewGid(x, 0, config.top[index]));
+    }
+
+    // 🔸 Bottom border
+    for (int x = 1; x < width - 1; x++) {
+      final index = (x - 1) % config.bottom.length;
+      _levelMap.tileMap.setTileData(layerId: layerId, x: x, y: height - 1, gid: getNewGid(x, height - 1, config.bottom[index]));
+    }
+
+    // 🔸 Left border
+    for (int y = 1; y < height - 1; y++) {
+      final index = (y - 1) % config.left.length;
+      _levelMap.tileMap.setTileData(layerId: layerId, x: 0, y: y, gid: getNewGid(0, y, config.left[index]));
+    }
+
+    // 🔸 Right border
+    for (int y = 1; y < height - 1; y++) {
+      final index = (y - 1) % config.right.length;
+      _levelMap.tileMap.setTileData(layerId: layerId, x: width - 1, y: y, gid: getNewGid(width - 1, y, config.right[index]));
+    }
+
+    // 🔸 Corners
+    _levelMap.tileMap.setTileData(layerId: layerId, x: 0, y: 0, gid: getNewGid(0, 0, config.corners[0])); // top-left
+    _levelMap.tileMap.setTileData(layerId: layerId, x: width - 1, y: 0, gid: getNewGid(width - 1, 0, config.corners[1])); // top-right
+    _levelMap.tileMap.setTileData(
+      layerId: layerId,
+      x: width - 1,
+      y: height - 1,
+      gid: getNewGid(width - 1, height - 1, config.corners[2]),
+    ); // bottom-right
+    _levelMap.tileMap.setTileData(layerId: layerId, x: 0, y: height - 1, gid: getNewGid(0, height - 1, config.corners[3])); // bottom-left
   }
 
   void _addBackground(TileLayer backgroundLayer) {
@@ -617,15 +667,15 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   Future<void> saveData() async {
     _calculateEarnedStars();
-    final data = LevelEntity(
-      uuid: levelMetadata.uuid,
-      stars: earnedStars,
-      totalFruits: totalFruitsCount,
-      earnedFruits: playerFruitsCount,
-      deaths: deathCount,
+    await game.storageCenter.saveLevel(
+      LevelEntity(
+        uuid: levelMetadata.uuid,
+        stars: earnedStars,
+        totalFruits: totalFruitsCount,
+        earnedFruits: playerFruitsCount,
+        deaths: deathCount,
+      ),
     );
-    final storedData = game.storageCenter.getLevel(levelMetadata.uuid);
-    if (data.shouldReplace(storedData: storedData)) await game.storageCenter.saveLevel(data);
   }
 
   void pauseLevel() => _gameHud.togglePlayButton();

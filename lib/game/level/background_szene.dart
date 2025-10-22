@@ -7,7 +7,9 @@ enum Szene {
   szene1('Szene 1', 4),
   szene2('Szene 2', 5),
   szene3('Szene 3', 4),
-  szene4('Szene 4', 5);
+  szene4('Szene 4', 5),
+  szene5('Szene 5', 3),
+  szene6('Szene 6', 4);
 
   final String name;
   final int amount;

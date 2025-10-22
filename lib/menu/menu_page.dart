@@ -11,6 +11,7 @@ import 'package:pixel_adventure/menu/level_tile.dart';
 import 'package:pixel_adventure/menu/menu_header.dart';
 import 'package:pixel_adventure/menu/previous_next_btn.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/storage/storage_center.dart';
 
 class MenuPage extends World with HasGameReference<PixelQuest> {
   StreamSubscription? _sub;
@@ -28,7 +29,7 @@ class MenuPage extends World with HasGameReference<PixelQuest> {
   final Map<String, LevelTile> _levelGrid = {};
   late final Vector2 _levelGridSize;
   late final Vector2 _levelGridPosition;
-  static final Vector2 _tileSpacing = Vector2(32, 16);
+  static final Vector2 _tileSpacing = Vector2(GameSettings.tileSize * 2, GameSettings.tileSize);
   static const double _levelGridChangeWorldBtnsSpacing = 20;
 
   // character picker
@@ -50,20 +51,23 @@ class MenuPage extends World with HasGameReference<PixelQuest> {
   void onMount() {
     debugPrint('mount');
     game.setUpCameraForMenu();
-    _sub ??= game.storageCenter.onLevelDataChanged.listen((uuid) {
-      _levelGrid[uuid]?.updateStars();
+    _sub ??= game.storageCenter.onDataChanged.listen((event) {
+      if (event.type == StorageEventType.world) {
+        _menuHeader.updateStarsCount(game.storageCenter.getWorld(event.uuid).stars);
+      } else if (event.type == StorageEventType.level) {
+        _levelGrid[event.uuid]?.updateStars();
+      }
     });
-
     super.onMount();
   }
 
   void _setUpMenuBackground() {
-    _menuBackground = BackgroundSzene(szene: Szene.szene1, position: Vector2.zero(), size: game.size);
+    _menuBackground = BackgroundSzene(szene: Szene.szene6, position: Vector2.zero(), size: game.size);
     add(_menuBackground);
   }
 
   void _setUpMenuForeground() async {
-    final sprite = loadSprite(game, 'Menu/Menu_Foreground.png');
+    final sprite = loadSprite(game, 'Menu/Worlds/World_1_Foreground.png');
     _menuForeground = SpriteComponent(sprite: sprite, size: game.size, anchor: Anchor.center, position: game.size / 2);
 
     // simulate BoxFit.cover
@@ -82,10 +86,9 @@ class MenuPage extends World with HasGameReference<PixelQuest> {
   }
 
   void _setUpTitle() {
-    final sprite = loadSprite(game, 'Menu/Menu_World.png');
+    final sprite = loadSprite(game, 'Menu/Worlds/World_1_Title.png');
 
     const double desiredHeight = 30;
-
     final double aspectRatio = sprite.srcSize.x / sprite.srcSize.y;
 
     final double calculatedWidth = desiredHeight * aspectRatio;
@@ -104,33 +107,25 @@ class MenuPage extends World with HasGameReference<PixelQuest> {
   }
 
   void _setUpLevelTiles() {
-    final tileSize = Vector2(48, 32);
+    final tileSize = Vector2(GameSettings.tileSize * 3, GameSettings.tileSize * 2);
     _levelGridSize = tileSize * 4 + _tileSpacing * 3;
-    _levelGridPosition = Vector2((game.size.x - _levelGridSize.x) / 2, 63);
+    _levelGridPosition = Vector2((game.size.x - _levelGridSize.x) / 2, 68);
 
     final tilePositions = [];
     for (var i = 0; i < 4; i++) {
       for (var j = 0; j < 4; j++) {
-        final position =
-            _levelGridPosition + Vector2(24, 21) + Vector2((tileSize.x + _tileSpacing.x) * j, (tileSize.y + _tileSpacing.y) * i);
+        final position = _levelGridPosition + tileSize / 2 + Vector2((tileSize.x + _tileSpacing.x) * j, (tileSize.y + _tileSpacing.y) * i);
         tilePositions.add(position);
       }
     }
 
     int index = 0;
     for (var position in tilePositions) {
-      if (index >= allLevels.length) {
-        // break;
-        final levelMetadata = allLevels[5];
-        final levelTile = LevelTile(levelMetadata: levelMetadata, position: position);
-        add(levelTile);
-        _levelGrid[levelMetadata.uuid] = levelTile;
-      } else {
-        final levelMetadata = allLevels[index];
-        final levelTile = LevelTile(levelMetadata: levelMetadata, position: position);
-        add(levelTile);
-        _levelGrid[levelMetadata.uuid] = levelTile;
-      }
+      if (index >= allLevels.length) break;
+      final levelMetadata = allLevels[index];
+      final levelTile = LevelTile(levelMetadata: levelMetadata, position: position);
+      add(levelTile);
+      _levelGrid[levelMetadata.uuid] = levelTile;
       index++;
     }
   }

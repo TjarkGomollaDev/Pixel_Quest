@@ -64,16 +64,20 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/tiles/
+    - assets/json/
     - assets/images/Terrain/
     - assets/images/Background/
     - assets/images/Background/Szene 1/
     - assets/images/Background/Szene 2/
     - assets/images/Background/Szene 3/
     - assets/images/Background/Szene 4/
+    - assets/images/Background/Szene 5/
+    - assets/images/Background/Szene 6/
     - assets/images/HUD/
     - assets/images/Menu/
     - assets/images/Menu/Buttons/
     - assets/images/Menu/Levels/
+    - assets/images/Menu/Worlds/
     - assets/images/Other/
     - assets/images/Traps/Saw/
     - assets/images/Traps/Trampoline/
