@@ -511,7 +511,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // outline stars
     for (var position in starPositions) {
-      final outlineStar = OutlineStar(position: position, spawnAnimation: true);
+      final outlineStar = OutlineStar(position: position, spawnSizeZero: true);
       outlineStars.add(outlineStar);
     }
     world.addAll(outlineStars);
@@ -519,7 +519,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // earned stars
     for (var i = 0; i < world.earnedStars; i++) {
-      final star = Star(position: playerCenter, spawnAnimation: true);
+      final star = Star(position: playerCenter, spawnSizeZero: true);
       world.add(star);
       stars.add(star);
 

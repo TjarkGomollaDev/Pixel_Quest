@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
-import 'package:pixel_adventure/data/level_data.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/level_btn.dart';
+import 'package:pixel_adventure/menu/widgets/level_btn.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
+class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, HasPaint implements OpacityProvider {
   final LevelMetadata _levelMetadata;
 
   LevelTile({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata, super(size: tileSize) {
@@ -22,13 +24,15 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   static final Vector2 tileSize = Vector2(54, 38); // [Adjustable]
 
   // background
-  late final RoundedComponent _tileBg;
+  late final RRectComponent _tileBg;
 
   // btns
   late final LevelBtn _levelBtn;
 
   // stars
   static final Vector2 _starSize = Vector2.all(12); // [Adjustable]
+  late final List<Vector2> _starPositions;
+  final List<double> _starAngles = [-0.1, 0, 0.1];
   final List<OutlineStar> _outlineStars = [];
   final List<Star> _stars = [];
 
@@ -43,8 +47,21 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
     _setUpTileBg();
     _setUpBtn();
     _setUpStars();
-
     return super.onLoad();
+  }
+
+  @override
+  set opacity(double value) {
+    if (value == 0.1) debugPrint(value.toString());
+    _levelBtn.opacity = value;
+    _tileBg.opacityy = value;
+    for (var star in _stars) {
+      star.opacity = value;
+    }
+    for (var outlineStar in _outlineStars) {
+      outlineStar.opacity = value;
+    }
+    super.opacity = value;
   }
 
   void _initialSetup() {
@@ -59,7 +76,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpTileBg() {
-    _tileBg = RoundedComponent(color: AppTheme.levelTileBlur, borderRadius: 3, position: _center, size: size, anchor: Anchor.center);
+    _tileBg = RRectComponent(color: AppTheme.levelTileBlur, borderRadius: 3, position: _center, size: size, anchor: Anchor.center);
     add(_tileBg);
   }
 
@@ -69,41 +86,40 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpStars() {
-    final data = game.storageCenter.getLevel(_levelMetadata.uuid);
     final yPos = _starSize.y / 2 + _starsMarginTop;
-    final positions = [
+    _starPositions = [
       Vector2(_center.x - _starSize.x - _starSpacingHorizontal, yPos + 2),
       Vector2(_center.x, yPos),
       Vector2(_center.x + _starSize.x + _starSpacingHorizontal, yPos + 2),
     ];
-    final angles = [-0.1, 0.0, 0.1];
+    final data = game.storageCenter.getLevel(_levelMetadata.uuid);
     for (var i = 0; i < data.stars; i++) {
-      final star = Star(position: positions[i], size: _starSize);
-      star.angle = angles[i];
+      final star = Star(position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
       _stars.add(star);
     }
     for (var i = data.stars; i < data.stars + 3 - data.stars; i++) {
-      final outlineStar = OutlineStar(position: positions[i], size: _starSize);
-      outlineStar.angle = angles[i];
+      final outlineStar = OutlineStar(position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
       _outlineStars.add(outlineStar);
     }
     addAll(_stars);
     addAll(_outlineStars);
   }
 
-  void _removeStars() {
-    for (var star in _stars) {
-      remove(star);
+  void _removeOutlineStars(int stars) {
+    for (var i = 0; i < stars; i++) {
+      remove(_outlineStars.first);
+      _outlineStars.removeAt(0);
     }
-    _stars.clear();
-    for (var outlineStar in _outlineStars) {
-      remove(outlineStar);
-    }
-    _outlineStars.clear();
   }
 
-  void updateStars() {
-    _removeStars();
-    _setUpStars();
+  Future<void> addNewStars(int stars) async {
+    for (var i = 0; i < stars; i++) {
+      final star = Star(position: _starPositions[_stars.length], size: _starSize, spawnSizeZero: true)..angle = _starAngles[_stars.length];
+      add(star);
+      _stars.add(star);
+      await star.popIn();
+      if (i != stars - 1) await Future.delayed(Duration(milliseconds: 100));
+    }
+    _removeOutlineStars(stars);
   }
 }

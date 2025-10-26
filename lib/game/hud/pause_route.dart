@@ -38,7 +38,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
     final pausedTextPosition = Vector2(0, -60);
 
     // text background
-    final pausedBg = RoundedComponent(
+    final pausedBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 4,
       position: pausedTextPosition,

@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/data/level_data.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class LevelBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
+class LevelBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks implements OpacityProvider {
   final LevelMetadata _levelMetadata;
 
   LevelBtn({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata;

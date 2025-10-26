@@ -7,7 +7,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/character_bio.dart';
+import 'package:pixel_adventure/menu/widgets/character_bio.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest> {
@@ -207,4 +207,11 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
     _chnageAnimation(character);
     _characterBio.setCharacterBio(character);
   }
+
+  void pauseAnimation() {
+    _clearAnimationLoop();
+    current = PlayerState.idle;
+  }
+
+  void resumeAnimation() => _startAnimationLoop(_loopId);
 }

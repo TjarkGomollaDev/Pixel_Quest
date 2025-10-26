@@ -27,66 +27,66 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.2425,
-            "selectedLayer": 1,
+            "scale": 0.6742,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 366.1971830985916,
-                "y": 272.0321931589537
+                "x": 1816.9682586769504,
+                "y": 250.6674577276773
             }
         },
         "Level_02.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.6716,
+            "scale": 0.7798,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 4632.22156045265,
-                "y": 268.0166765932102
+                "x": 225.69889715311626,
+                "y": 347.5250064119005
             }
         },
         "Level_03.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.8807,
-            "selectedLayer": 0,
+            "scale": 1.007,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 403.088452367435,
-                "y": 324.7416827523561
+                "x": 9642.50248262165,
+                "y": 234.35948361469715
             }
         },
         "Level_04.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.6041,
+            "scale": 1.1362,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 508.1940076146334,
-                "y": 297.9639132593942
+                "x": 1079.9155078331278,
+                "y": 244.67523323358563
             }
         },
         "Level_05.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.4704,
+            "scale": 1.2344,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 678.1462585034014,
-                "y": 225.3401360544218
+                "x": 7682.274789371355,
+                "y": 230.0712896953986
             }
         },
         "Level_11.tmx": {
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 0.7423,
+            "scale": 0.7113,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1040.0107773137547,
-                "y": 313.8892631011721
+                "x": 615.7739350485026,
+                "y": 106.84661886686354
             }
         },
         "Level_13.tmx": {
@@ -100,12 +100,20 @@
                 "y": 170.2409904930356
             }
         },
-        "Level_blank.tmx": {
-            "scale": 1.1508,
+        "Level_2-01.tmx": {
+            "scale": 2.3141,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 288.4949600278067,
-                "y": 238.09523809523805
+                "x": 187.9780476211054,
+                "y": 178.47111187934834
+            }
+        },
+        "Level_blank.tmx": {
+            "scale": 0.6409,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 483.69480418161953,
+                "y": 137.30691215478237
             }
         },
         "Menu_Foreground Kopie.tmx": {
@@ -117,11 +125,11 @@
             }
         },
         "Menu_Foreground.tmx": {
-            "scale": 1.0723,
-            "selectedLayer": 0,
+            "scale": 1.8424,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 401.00718082626133,
-                "y": 168.7960458826821
+                "x": 431.50238818931837,
+                "y": 120.49500651324358
             }
         },
         "Pixel Adventure.tsx": {

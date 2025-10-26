@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/extensions/build_context.dart';
-import 'package:pixel_adventure/splash/animated_stars.dart';
-import 'package:pixel_adventure/splash/developer_logo.dart';
-import 'package:pixel_adventure/splash/splash_content.dart';
+import 'package:pixel_adventure/splash/widgets/animated_stars.dart';
+import 'package:pixel_adventure/splash/widgets/developer_logo.dart';
+import 'package:pixel_adventure/splash/widgets/splash_content.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -34,12 +34,12 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   static final double _btnSpacing = 4;
 
   // fruits count
-  late final RoundedComponent _fruitBg;
+  late final RRectComponent _fruitBg;
   late final Fruit _fruitItem;
   late final TextComponent _fruitsCount;
 
   // death count
-  late final RoundedComponent _deathBg;
+  late final RRectComponent _deathBg;
   late final SpriteComponent _deathItem;
   late final TextComponent _deathCount;
 
@@ -122,7 +122,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpFruitsCount() {
     // fruit background
-    _fruitBg = RoundedComponent(
+    _fruitBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(_restartBtn.position.x + _restartBtn.size.x + _spacingBetweenElements, _verticalCenter),
@@ -152,7 +152,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpDeathCount() {
     // death background
-    _deathBg = RoundedComponent(
+    _deathBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _spacingBetweenElements * 4 / 5, _verticalCenter),

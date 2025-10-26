@@ -1,148 +1,176 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
-import 'package:pixel_adventure/data/level_data.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/character_picker.dart';
-import 'package:pixel_adventure/menu/dummy_character.dart';
-import 'package:pixel_adventure/menu/level_tile.dart';
-import 'package:pixel_adventure/menu/menu_header.dart';
-import 'package:pixel_adventure/menu/previous_next_btn.dart';
+import 'package:pixel_adventure/menu/widgets/character_picker.dart';
+import 'package:pixel_adventure/menu/widgets/dummy_character.dart';
+import 'package:pixel_adventure/menu/widgets/level_grid.dart';
+import 'package:pixel_adventure/menu/widgets/menu_header.dart';
+import 'package:pixel_adventure/menu/widgets/previous_next_btn.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
-import 'package:pixel_adventure/storage/storage_center.dart';
+import 'package:pixel_adventure/data/storage/storage_center.dart';
 
-class MenuPage extends World with HasGameReference<PixelQuest> {
+class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   StreamSubscription? _sub;
 
-  // back and foreground
+  // static content
   late final ParallaxComponent _menuBackground;
-  late final SpriteComponent _menuForeground;
-
-  // btns
   late final MenuHeader _menuHeader;
+  late final CharacterPicker _characterPicker;
   late final PreviousNextBtn _previousWorldBtn;
   late final PreviousNextBtn _nextWorldBtn;
 
-  // level grid
-  final Map<String, LevelTile> _levelGrid = {};
-  late final Vector2 _levelGridSize;
-  late final Vector2 _levelGridPosition;
-  static final Vector2 _tileSpacing = Vector2(GameSettings.tileSize * 2, GameSettings.tileSize);
+  // worlds content
+  final List<VisibleSpriteComponent> _worldTitles = [];
+  final List<VisibleSpriteComponent> _worldForegrounds = [];
+  final List<LevelGrid> _worldLevelGrids = [];
+
+  // world index
+  late int _currentWorldIndex;
+
+  // spacing
   static const double _levelGridChangeWorldBtnsSpacing = 20;
 
-  // character picker
-  late final CharacterPicker _characterPicker;
+  // animation event triggers
+  NewStarsStorageEvent? _pendingWorldStorageEvent;
+
+  bool _isChangingWorld = false;
 
   @override
   FutureOr<void> onLoad() {
+    _setUpCurrentWorldIndex();
     _setUpMenuBackground();
-    _setUpMenuForeground();
-    _setUpTitle();
     _setUpMenuHeader();
-    _setUpLevelTiles();
+    _setUpWorldForegrounds();
+    _setUpWorldTitles();
+    _setUpWorldLevelGrids();
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
     return super.onLoad();
   }
 
   @override
+  void onRemove() {
+    debugPrint('onRemove');
+    super.onRemove();
+  }
+
+  @override
   void onMount() {
-    debugPrint('mount');
+    debugPrint('onMount');
     game.setUpCameraForMenu();
-    _sub ??= game.storageCenter.onDataChanged.listen((event) {
-      if (event.type == StorageEventType.world) {
-        _menuHeader.updateStarsCount(game.storageCenter.getWorld(event.uuid).stars);
-      } else if (event.type == StorageEventType.level) {
-        _levelGrid[event.uuid]?.updateStars();
-      }
-    });
+    _setUpSubscription();
+    _checkForNewAnimationEvents();
+
     super.onMount();
   }
 
+  void dispose() {
+    _sub?.cancel();
+    _sub = null;
+  }
+
+  void _setUpSubscription() {
+    _sub ??= game.storageCenter.onDataChanged.listen((event) {
+      if (event is NewStarsStorageEvent) {
+        _menuHeader.updateStarsCount(index: _getWorldIndex(event.worldUuid), stars: event.totalStars);
+        _pendingWorldStorageEvent = event;
+      } else if (event is LevelStorageEvent) {
+        // todo
+      }
+    });
+  }
+
+  int _getWorldIndex(String worldUuid) {
+    if (worldUuid == game.staticCenter.allWorlds[_currentWorldIndex].uuid) return _currentWorldIndex;
+
+    // fallback
+    return game.staticCenter.allWorlds.getIndexByUUID(worldUuid);
+  }
+
+  Future<void> _checkForNewAnimationEvents() async {
+    if (_pendingWorldStorageEvent != null) {
+      await Future.delayed(Duration(milliseconds: 800));
+      await _worldLevelGrids[_getWorldIndex(_pendingWorldStorageEvent!.worldUuid)].addNewStarsInTile(
+        levelUuid: _pendingWorldStorageEvent!.levelUuid,
+        stars: _pendingWorldStorageEvent!.newStars,
+      );
+      await Future.delayed(Duration(milliseconds: 200));
+      await _menuHeader.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
+    }
+    _pendingWorldStorageEvent = null;
+  }
+
+  void _setUpCurrentWorldIndex() =>
+      _currentWorldIndex = game.staticCenter.allWorlds.getIndexByUUID(game.storageCenter.highestUnlockedWorld.uuid);
+
   void _setUpMenuBackground() {
-    _menuBackground = BackgroundSzene(szene: Szene.szene6, position: Vector2.zero(), size: game.size);
+    _menuBackground = BackgroundSzene(szene: Szene.szene1, position: Vector2.zero(), size: game.size);
     add(_menuBackground);
   }
 
-  void _setUpMenuForeground() async {
-    final sprite = loadSprite(game, 'Menu/Worlds/World_1_Foreground.png');
-    _menuForeground = SpriteComponent(sprite: sprite, size: game.size, anchor: Anchor.center, position: game.size / 2);
-
-    // simulate BoxFit.cover
-    final imageRatio = sprite.image.width / sprite.image.height;
-    final screenRatio = game.size.x / game.size.y;
-
-    if (imageRatio > screenRatio) {
-      // image is wider → height fits, width is cropped
-      _menuForeground.size = Vector2(game.size.y * imageRatio, game.size.y);
-    } else {
-      // image is higher → width fits, height is cropped
-      _menuForeground.size = Vector2(game.size.x, game.size.x / imageRatio);
-    }
-
-    add(_menuForeground);
-  }
-
-  void _setUpTitle() {
-    final sprite = loadSprite(game, 'Menu/Worlds/World_1_Title.png');
-
-    const double desiredHeight = 30;
-    final double aspectRatio = sprite.srcSize.x / sprite.srcSize.y;
-
-    final double calculatedWidth = desiredHeight * aspectRatio;
-    final title = SpriteComponent(
-      sprite: sprite,
-      size: Vector2(calculatedWidth, desiredHeight),
-      anchor: Anchor.topCenter,
-      position: Vector2(game.size.x / 2, 18),
-    );
-    add(title);
-  }
-
   void _setUpMenuHeader() {
-    _menuHeader = MenuHeader();
+    _menuHeader = MenuHeader(startWorldIndex: _currentWorldIndex);
     add(_menuHeader);
   }
 
-  void _setUpLevelTiles() {
-    final tileSize = Vector2(GameSettings.tileSize * 3, GameSettings.tileSize * 2);
-    _levelGridSize = tileSize * 4 + _tileSpacing * 3;
-    _levelGridPosition = Vector2((game.size.x - _levelGridSize.x) / 2, 68);
-
-    final tilePositions = [];
-    for (var i = 0; i < 4; i++) {
-      for (var j = 0; j < 4; j++) {
-        final position = _levelGridPosition + tileSize / 2 + Vector2((tileSize.x + _tileSpacing.x) * j, (tileSize.y + _tileSpacing.y) * i);
-        tilePositions.add(position);
-      }
+  void _setUpWorldForegrounds() async {
+    for (var world in game.staticCenter.allWorlds) {
+      final sprite = loadSprite(game, 'Menu/Worlds/${world.foreGroundFileName}.png');
+      final size = calculateSizeForBoxFit(sprite.srcSize, game.size);
+      final foreground = VisibleSpriteComponent(
+        sprite: sprite,
+        size: size,
+        anchor: Anchor.center,
+        position: game.size / 2,
+        show: world.index == _currentWorldIndex,
+      );
+      add(foreground);
+      _worldForegrounds.add(foreground);
     }
+  }
 
-    int index = 0;
-    for (var position in tilePositions) {
-      if (index >= allLevels.length) break;
-      final levelMetadata = allLevels[index];
-      final levelTile = LevelTile(levelMetadata: levelMetadata, position: position);
-      add(levelTile);
-      _levelGrid[levelMetadata.uuid] = levelTile;
-      index++;
+  void _setUpWorldTitles() {
+    for (var world in game.staticCenter.allWorlds) {
+      final sprite = loadSprite(game, 'Menu/Worlds/${world.titleFileName}.png');
+      final size = calculateSizeForHeight(sprite.srcSize, 30);
+      final title = VisibleSpriteComponent(
+        sprite: sprite,
+        size: size,
+        anchor: Anchor.topCenter,
+        position: Vector2(game.size.x / 2, 16),
+        show: world.index == _currentWorldIndex,
+      );
+      add(title);
+      _worldTitles.add(title);
+    }
+  }
+
+  void _setUpWorldLevelGrids() {
+    for (var world in game.staticCenter.allWorlds) {
+      final levelGrid = LevelGrid(worldUuid: world.uuid, show: world.index == _currentWorldIndex);
+      add(levelGrid);
+      _worldLevelGrids.add(levelGrid);
     }
   }
 
   void _setUpChangeWorldBtns() {
-    final levelGridVerticalCenter = _levelGridPosition.y + _levelGridSize.y / 2;
+    final levelGridVerticalCenter = _worldLevelGrids[0].position.y + _worldLevelGrids[0].size.y / 2;
     final btnHorizontalCenter = PreviousNextBtn.btnSize.x / 2;
     _previousWorldBtn = PreviousNextBtn(
       type: PreviousNextBtnType.previous,
-      action: () {},
-      position: Vector2(_levelGridPosition.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
+      action: () => _changeWorld(-1),
+      position: Vector2(_worldLevelGrids[0].position.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
     );
     _nextWorldBtn = PreviousNextBtn(
       type: PreviousNextBtnType.next,
-      action: () {},
+      action: () => _changeWorld(1),
       position: Vector2(
-        _levelGridPosition.x + _levelGridSize.x + _levelGridChangeWorldBtnsSpacing + btnHorizontalCenter,
+        _worldLevelGrids[0].position.x + _worldLevelGrids[0].size.x + _levelGridChangeWorldBtnsSpacing + btnHorizontalCenter,
         levelGridVerticalCenter,
       ),
     );
@@ -159,8 +187,38 @@ class MenuPage extends World with HasGameReference<PixelQuest> {
     add(_characterPicker);
   }
 
-  void dispose() {
-    _sub?.cancel();
-    _sub = null;
+  void _changeWorld(int direction) async {
+    if (_isChangingWorld) return;
+    final oldIndex = _currentWorldIndex;
+    final newIndex = _currentWorldIndex + direction;
+
+    // index out of range
+    if (newIndex < 0 || newIndex >= game.staticCenter.allWorlds.length) return;
+
+    _currentWorldIndex = newIndex;
+    _updateContent(oldIndex, newIndex);
+  }
+
+  Future<void> _updateContent(int oldIndex, int newIndex) async {
+    _isChangingWorld = true;
+    _worldTitles[oldIndex].hide();
+    _worldTitles[newIndex].show();
+    _worldForegrounds[oldIndex].hide();
+    _worldForegrounds[newIndex].show();
+    _menuHeader.hideStarsCount(oldIndex);
+    _menuHeader.showStarsCount(newIndex);
+    _worldLevelGrids[oldIndex].hide();
+    await _worldLevelGrids[newIndex].animatedShow(toLeft: newIndex > oldIndex);
+    _isChangingWorld = false;
+  }
+
+  void pauseMenu() {
+    timeScale = 0;
+    _characterPicker.pause();
+  }
+
+  void resumeMenu() {
+    timeScale = 1;
+    _characterPicker.resume();
   }
 }

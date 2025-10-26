@@ -2,15 +2,18 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
-  MenuHeader() {
+  final int _startWorldIndex;
+
+  MenuHeader({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -28,9 +31,12 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
   final double _btnSpacing = 4;
 
   // stars count
-  late final RoundedComponent _starBg;
+  late final RRectComponent _starBg;
   late final SpriteComponent _starItem;
-  late final TextComponent _starsCount;
+  final List<VisibleTextComponent> _worldStarsCounts = [];
+
+  // animation star
+  late final Star _animatedStar;
 
   // count settings
   static const double _bgSize = 19;
@@ -41,6 +47,7 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
     _initialSetup();
     _setUpBtns();
     _setUpStarsCount();
+    _setUpAnimatedStar();
     return super.onLoad();
   }
 
@@ -57,7 +64,7 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpStarsCount() {
     // star background
-    _starBg = RoundedComponent(
+    _starBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(0, _verticalCenter),
@@ -66,24 +73,29 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // star item
-    _starItem = SpriteComponent(
-      sprite: loadSprite(game, 'Other/Star.png'),
-      position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter),
-      size: Vector2.all(16),
-      anchor: Anchor.center,
-    );
+    _starItem = Star(position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter), size: Vector2.all(16));
 
-    // count text
-    _starsCount = TextComponent(
-      text: '${game.storageCenter.highestUnlockedWorld.stars}/48',
-      anchor: Anchor(0, 0.32),
-      position: Vector2(_starBg.position.x + _starBg.size.x + _counterTextMarginLeft, _verticalCenter),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
-      ),
-    );
+    addAll([_starBg, _starItem]);
 
-    addAll([_starBg, _starItem, _starsCount]);
+    // world star counts text
+    for (var world in game.staticCenter.allWorlds) {
+      final text = VisibleTextComponent(
+        text: '${game.storageCenter.getWorld(world.uuid).stars}/48',
+        anchor: Anchor(0, 0.32),
+        position: Vector2(_starBg.position.x + _starBg.size.x + _counterTextMarginLeft, _verticalCenter),
+        textRenderer: TextPaint(
+          style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
+        ),
+        show: world.index == _startWorldIndex,
+      );
+      add(text);
+      _worldStarsCounts.add(text);
+    }
+  }
+
+  void _setUpAnimatedStar() {
+    _animatedStar = Star(position: Vector2(_starItem.position.x, -position.y - _starItem.size.y / 2), size: _starItem.size);
+    add(_animatedStar);
   }
 
   void _setUpBtns() {
@@ -100,5 +112,16 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
     addAll([_settingsBtn, _achievmentsBtn]);
   }
 
-  void updateStarsCount(int stars) => _starsCount.text = '$stars/48';
+  void updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';
+
+  void showStarsCount(int index) => _worldStarsCounts[index].show();
+
+  void hideStarsCount(int index) => _worldStarsCounts[index].hide();
+
+  Future<void> starsCountAnimation(int count) async {
+    for (var i = 0; i < count; i++) {
+      await _animatedStar.fallTo(_starItem.position);
+      await Future.delayed(Duration(milliseconds: 50));
+    }
+  }
 }

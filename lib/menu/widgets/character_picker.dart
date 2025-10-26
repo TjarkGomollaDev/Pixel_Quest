@@ -5,8 +5,8 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/character_bio.dart';
-import 'package:pixel_adventure/menu/dummy_character.dart';
+import 'package:pixel_adventure/menu/widgets/character_bio.dart';
+import 'package:pixel_adventure/menu/widgets/dummy_character.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest> {
@@ -24,7 +24,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   late final DraggableCornerOutline _dummyOutline;
 
   // extra inforamtion
-  late final RoundedComponent _titelBg;
+  late final RRectComponent _titelBg;
   late final TextComponent _title;
   late final CharacterBio _characterBio;
 
@@ -50,7 +50,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpTitle() {
-    _titelBg = RoundedComponent(
+    _titelBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       position: Vector2(_center.x, _center.y - 40),
@@ -69,7 +69,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpCharacterBio() {
-    _characterBio = CharacterBio(character: game.storageCenter.settings.character, position: Vector2(24, 94));
+    _characterBio = CharacterBio(position: Vector2(24, 94));
     add(_characterBio);
   }
 
@@ -91,4 +91,8 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     );
     add(_dummyOutline);
   }
+
+  void pause() => _dummy.pauseAnimation();
+
+  void resume() => _dummy.resumeAnimation();
 }

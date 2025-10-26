@@ -1,29 +1,42 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:pixel_adventure/data/world_data.dart';
-import 'package:pixel_adventure/storage/entities/level_entity.dart';
-import 'package:pixel_adventure/storage/entities/settings_entity.dart';
-import 'package:pixel_adventure/data/level_data.dart';
-import 'package:pixel_adventure/storage/entities/world_entity.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/data/static/static_center.dart';
+import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
+import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
+import 'package:pixel_adventure/data/storage/entities/settings_entity.dart';
+import 'package:pixel_adventure/data/storage/entities/world_entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum StorageEventType { level, world }
+abstract class StorageEvent {
+  const StorageEvent();
+}
 
-class StorageEvent {
-  final StorageEventType type;
-  final String uuid;
+class LevelStorageEvent extends StorageEvent {
+  final String levelUuid;
+  final String worldUuid;
 
-  StorageEvent(this.type, this.uuid);
+  const LevelStorageEvent({required this.levelUuid, required this.worldUuid});
+}
+
+class NewStarsStorageEvent extends StorageEvent {
+  final String worldUuid;
+  final String levelUuid;
+  final int totalStars;
+  final int newStars;
+
+  const NewStarsStorageEvent({required this.worldUuid, required this.levelUuid, required this.totalStars, required this.newStars});
 }
 
 class StorageCenter {
   final SharedPreferences _prefs;
+  final StaticCenter _staticCenter;
 
-  StorageCenter._(this._prefs);
+  StorageCenter._(this._prefs, this._staticCenter);
 
-  static Future<StorageCenter> init() async {
+  static Future<StorageCenter> init({required StaticCenter staticCenter}) async {
     final prefs = await SharedPreferences.getInstance();
-    final dataCenter = StorageCenter._(prefs);
+    final dataCenter = StorageCenter._(prefs, staticCenter);
     await dataCenter.clearAllLevels(); // for testing
     await dataCenter.clearAllWorlds(); // for testing
     dataCenter._loadAllLevels();
@@ -51,7 +64,7 @@ class StorageCenter {
   // keys
   static const String _storageKeyUserSettings = 'user-settings';
 
-  Future<void> saveLevel(LevelEntity data) async {
+  Future<void> saveLevel({required LevelEntity data, required String worldUuid}) async {
     final storedData = _cacheLevelData[data.uuid]!;
 
     // check if any relevant field has changed
@@ -61,14 +74,16 @@ class StorageCenter {
     final json = jsonEncode(data.toMap());
     await _prefs.setString(data.uuid, json);
     _cacheLevelData[data.uuid] = data;
-    _onDataChanged.add(StorageEvent(StorageEventType.level, data.uuid));
+    _onDataChanged.add(LevelStorageEvent(levelUuid: data.uuid, worldUuid: worldUuid));
 
     // update world data
     final starDiff = data.starDifference(storedData);
     if (starDiff > 0) {
-      final uuid = allWorlds.getByLevelUUID(data.uuid);
-      final updatedWorld = _cacheWorldData[uuid]!.copyWithIncreasedStars(starDiff);
-      await saveWorld(updatedWorld);
+      final updatedWorld = _cacheWorldData[worldUuid]!.copyWithIncreasedStars(starDiff);
+      await saveWorld(updatedWorld, starDiff);
+      _onDataChanged.add(
+        NewStarsStorageEvent(worldUuid: worldUuid, levelUuid: data.uuid, totalStars: updatedWorld.stars, newStars: starDiff),
+      );
     }
   }
 
@@ -87,24 +102,24 @@ class StorageCenter {
   }
 
   void _loadAllLevels() {
-    if (allLevels.isEmpty) return;
-    for (var levelMetadata in allLevels) {
+    final levels = _staticCenter.allLevelsInAllWorlds.flat();
+    if (levels.isEmpty) return;
+    for (var levelMetadata in levels) {
       _loadLevel(levelMetadata.uuid);
     }
   }
 
   Future<void> clearAllLevels() async {
-    for (var levelMetadata in allLevels) {
+    for (var levelMetadata in _staticCenter.allLevelsInAllWorlds.flat()) {
       await _prefs.remove(levelMetadata.uuid);
     }
     _cacheLevelData.clear();
   }
 
-  Future<void> saveWorld(WorldEntity data) async {
+  Future<void> saveWorld(WorldEntity data, int newStars) async {
     final json = jsonEncode(data.toMap());
     await _prefs.setString(data.uuid, json);
     _cacheWorldData[data.uuid] = data;
-    _onDataChanged.add(StorageEvent(StorageEventType.world, data.uuid));
   }
 
   void _loadWorld(String key, int index) {
@@ -122,14 +137,14 @@ class StorageCenter {
   }
 
   void _loadAllWorlds() {
-    if (allWorlds.isEmpty) return;
-    for (var worldMetadata in allWorlds) {
-      _loadWorld(worldMetadata.uuid, worldMetadata.index);
+    if (_staticCenter.allWorlds.isEmpty) return;
+    for (var worldMetadata in _staticCenter.allWorlds) {
+      _loadWorld(worldMetadata.uuid, _staticCenter.allWorlds.getIndexByUUID(worldMetadata.uuid));
     }
   }
 
   Future<void> clearAllWorlds() async {
-    for (var worldMetadata in allWorlds) {
+    for (var worldMetadata in _staticCenter.allWorlds) {
       await _prefs.remove(worldMetadata.uuid);
     }
     _cacheWorldData.clear();

@@ -1,13 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/character_data.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class CharacterBio extends PositionComponent {
-  final PlayerCharacter _character;
-
-  CharacterBio({required PlayerCharacter character, required super.position}) : _character = character, super(size: Vector2(80, 20));
+class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
+  CharacterBio({required super.position}) : super(size: Vector2(80, 20));
 
   // text labels
   late final TextComponent _nameTextLabel;
@@ -48,7 +46,7 @@ class CharacterBio extends PositionComponent {
     addAll([_nameTextLabel, _originTextLabel, _abilityTextLabel, _nameTextValue, _originTextValue, _abilityTextValue]);
 
     // initial display
-    setCharacterBio(_character, animation: false);
+    setCharacterBio(game.storageCenter.settings.character, animation: false);
   }
 
   TextComponent _createTextComponent(String text, Vector2 position) {
@@ -63,7 +61,7 @@ class CharacterBio extends PositionComponent {
   }
 
   Future<void> setCharacterBio(PlayerCharacter character, {bool animation = true}) async {
-    final data = characterData[character];
+    final data = game.staticCenter.allCharacters[character];
     if (data == null) return;
 
     // cancel any currently running typing animation

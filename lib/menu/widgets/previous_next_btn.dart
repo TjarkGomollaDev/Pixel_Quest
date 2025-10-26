@@ -19,7 +19,7 @@ class PreviousNextBtn extends SpriteComponent with HasGameReference<PixelQuest>,
   static final Vector2 btnSize = Vector2(15, 16);
 
   // animation settings
-  static const String _path = 'Menu/Buttons/Back.png';
+  static const String _path = 'Menu/Buttons/Change.png';
 
   @override
   FutureOr<void> onLoad() {

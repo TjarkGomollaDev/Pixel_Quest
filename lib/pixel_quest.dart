@@ -4,10 +4,11 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:pixel_adventure/storage/storage_center.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/data/static/static_center.dart';
+import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/data/level_data.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
@@ -20,6 +21,7 @@ class PixelQuest extends FlameGame
 
   PixelQuest({required EdgeInsets safeScreenPadding}) : _flutterSafePadding = safeScreenPadding;
 
+  late final StaticCenter staticCenter;
   late final StorageCenter storageCenter;
   late final GameSafePadding safePadding;
 
@@ -29,7 +31,8 @@ class PixelQuest extends FlameGame
   @override
   Future<void> onLoad() async {
     final startTime = DateTime.now();
-    storageCenter = await StorageCenter.init();
+    staticCenter = await StaticCenter.init();
+    storageCenter = await StorageCenter.init(staticCenter: staticCenter);
     await _loadAllImagesIntoCache();
     _setUpCameraDefault();
     _setUpSafePadding();
@@ -48,9 +51,12 @@ class PixelQuest extends FlameGame
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final currentRoute = router.currentRoute;
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      final currentRoute = router.currentRoute;
       if (currentRoute is WorldRoute && currentRoute.world is Level) (currentRoute.world as Level).pauseLevel();
+      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).pauseMenu();
+    } else if (state == AppLifecycleState.resumed) {
+      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).resumeMenu();
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -115,7 +121,7 @@ class PixelQuest extends FlameGame
     final levelRoutes = {
       RouteNames.menu: WorldRoute(() => MenuPage()),
       RouteNames.pause: PauseRoute(),
-      for (final levelMetadata in allLevels)
+      for (final levelMetadata in staticCenter.allLevelsInAllWorlds.flat())
         levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
     };
 

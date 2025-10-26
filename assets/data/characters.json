@@ -1,0 +1,26 @@
+[
+  {
+    "key": "maskDude",
+    "name": "Mojo",
+    "origin": "Banana River",
+    "ability": "Monkey Call"
+  },
+  {
+    "key": "ninjaFrog",
+    "name": "Croakashi",
+    "origin": "Kyoto Swamp",
+    "ability": "Spin Attack"
+  },
+  {
+    "key": "pinkMan",
+    "name": "Popstar P",
+    "origin": "Pink Hills",
+    "ability": "Disco Dash"
+  },
+  {
+    "key": "virtualGuy",
+    "name": "Gl1tch.exe",
+    "origin": "The Cloud",
+    "ability": "Hack Attack"
+  }
+]

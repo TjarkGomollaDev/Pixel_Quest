@@ -8,11 +8,11 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
-  final bool _spawnAnimation;
+class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> implements OpacityProvider {
+  final bool _spawnSizeZero;
 
-  OutlineStar({required Vector2 position, Vector2? size, bool spawnAnimation = false})
-    : _spawnAnimation = spawnAnimation,
+  OutlineStar({required Vector2 position, Vector2? size, bool spawnSizeZero = false})
+    : _spawnSizeZero = spawnSizeZero,
       super(position: position, size: size ?? defaultSize);
 
   // size
@@ -25,7 +25,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
   Future<void> onLoad() async {
     _initialSetup();
     _loadSprite();
-    if (_spawnAnimation) _addSpawnAnimation();
+    if (_spawnSizeZero) _addSpawnAnimation();
   }
 
   void _initialSetup() {
@@ -50,11 +50,11 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> {
   void fadeOut() => add(OpacityEffect.to(0, EffectController(duration: 0.1, curve: Curves.easeIn), onComplete: () => removeFromParent()));
 }
 
-class Star extends SpriteComponent with HasGameReference<PixelQuest> {
-  final bool _spawnAnimation;
+class Star extends SpriteComponent with HasGameReference<PixelQuest> implements OpacityProvider {
+  final bool _spawnSizeZero;
 
-  Star({required Vector2 position, Vector2? size, bool spawnAnimation = false})
-    : _spawnAnimation = spawnAnimation,
+  Star({required Vector2 position, Vector2? size, bool spawnSizeZero = false})
+    : _spawnSizeZero = spawnSizeZero,
       super(position: position, size: size ?? defaultSize);
 
   // size
@@ -83,15 +83,52 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> {
 
   void _loadSprite() {
     sprite = loadSprite(game, _path);
-    if (_spawnAnimation) scale = Vector2.zero();
+    if (_spawnSizeZero) scale = Vector2.zero();
   }
 
-  Future<void> flyTo(Vector2 target) async {
+  Future<void> flyTo(Vector2 target, {double flyDuration = 1}) async {
     final completer = Completer<void>();
     addAll([
       ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.1, curve: Curves.easeOut)),
-      MoveEffect.to(target, EffectController(duration: 1, curve: Curves.easeOutBack), onComplete: () => completer.complete()),
+      MoveEffect.to(
+        target,
+        EffectController(duration: flyDuration, curve: Curves.easeOutBack),
+        onComplete: () => completer.complete(),
+      ),
     ]);
+
+    return completer.future;
+  }
+
+  Future<void> fallTo(Vector2 target, {double fallDuration = 0.4}) async {
+    final startPosition = position.clone();
+    final completer = Completer<void>();
+    add(
+      SequenceEffect(
+        [
+          MoveEffect.to(target, EffectController(duration: fallDuration, curve: Curves.easeOutBack)),
+          ScaleEffect.to(Vector2.all(1.3), EffectController(duration: 0.1, curve: Curves.easeOut)),
+          ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.1, curve: Curves.easeIn)),
+        ],
+        onComplete: () {
+          position = startPosition;
+          completer.complete();
+        },
+      ),
+    );
+
+    return completer.future;
+  }
+
+  Future<void> popIn({double duration = 0.6}) async {
+    final completer = Completer<void>();
+
+    add(
+      SequenceEffect([
+        ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.6, curve: Curves.easeOutBack)),
+        ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.4, curve: Curves.easeIn)),
+      ], onComplete: () => completer.complete()),
+    );
 
     return completer.future;
   }
