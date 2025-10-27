@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/widgets/level_btn.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -24,9 +25,9 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   static final Vector2 tileSize = Vector2(54, 38); // [Adjustable]
 
   // background
-  late final RRectComponent _tileBg;
+  late final VisibleSpriteComponent _tileBg;
 
-  // btns
+  // btn
   late final LevelBtn _levelBtn;
 
   // stars
@@ -38,8 +39,8 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   // spacing
   static const double _starSpacingHorizontal = 2; // [Adjustable]
-  static const double _starsMarginTop = 3; // [Adjustable]
-  static const double _btnMarginBottom = 2; // [Adjustable]
+  static const double _starsMarginTop = 5; // [Adjustable]
+  static const double _btnMarginBottom = -1; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -54,7 +55,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   set opacity(double value) {
     if (value == 0.1) debugPrint(value.toString());
     _levelBtn.opacity = value;
-    _tileBg.opacityy = value;
+    _tileBg.opacity = value;
     for (var star in _stars) {
       star.opacity = value;
     }
@@ -76,7 +77,8 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   }
 
   void _setUpTileBg() {
-    _tileBg = RRectComponent(color: AppTheme.levelTileBlur, borderRadius: 3, position: _center, size: size, anchor: Anchor.center);
+    final sprite = loadSprite(game, 'Menu/Worlds/Level_Tile.png');
+    _tileBg = VisibleSpriteComponent(sprite: sprite, anchor: Anchor.center, position: _center);
     add(_tileBg);
   }
 

@@ -1,8 +1,9 @@
 [
-  {
-    "foreGroundFileName": "World_1_Foreground",
-    "titleFileName": "World_1_Title",
+  {  
     "uuid": "014809d5-8ec5-4171-a82e-df72e7839d45",
+    "titleFileName": "World_1_Title",
+    "foregroundFileName": "World_1_Foreground",
+    "backgroundSzene": "szene1",
     "levelUuids": [
       "bd278912-62ee-4e96-8130-6deb764016bc",
       "875a7aa7-5899-4dfe-96a5-d99d070c44d6",
@@ -22,9 +23,10 @@
       "d8f75fd3-2ec9-4bea-aba6-7f94b3103834"]
   },
   {
-    "foreGroundFileName": "World_2_Foreground",
-    "titleFileName": "World_2_Title",
     "uuid": "07ee6495-e92a-4845-95a6-500f402420d3",
+    "titleFileName": "World_2_Title",
+    "foregroundFileName": "World_2_Foreground",
+    "backgroundSzene": "szene2",
     "levelUuids": [
       "7eb6e210-54e5-447f-908d-3ee026a25532",
       "b3588b00-e9f3-477d-b130-a64518417e0b",

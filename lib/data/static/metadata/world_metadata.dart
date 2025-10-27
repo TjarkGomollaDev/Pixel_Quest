@@ -1,19 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:pixel_adventure/game/level/background_szene.dart';
 
 class WorldMetadata {
   final String uuid;
   final List<String> levelUuids;
   final int index;
-  final String foreGroundFileName;
   final String titleFileName;
+  final String foregroundFileName;
+  final Szene backgroundSzene;
 
   const WorldMetadata._({
     required this.uuid,
     required this.levelUuids,
     required this.index,
-    required this.foreGroundFileName,
     required this.titleFileName,
+    required this.foregroundFileName,
+    required this.backgroundSzene,
   });
 
   factory WorldMetadata._fromMap(Map<String, dynamic> map, int index) {
@@ -21,8 +24,9 @@ class WorldMetadata {
       uuid: map['uuid'] as String,
       levelUuids: List<String>.from(map['levelUuids']),
       index: index,
-      foreGroundFileName: map['foreGroundFileName'] as String,
       titleFileName: map['titleFileName'] as String,
+      foregroundFileName: map['foregroundFileName'] as String,
+      backgroundSzene: Szene.fromName(map['backgroundSzene'] as String),
     );
   }
 

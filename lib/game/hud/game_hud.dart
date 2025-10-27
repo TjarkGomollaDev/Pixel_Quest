@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
+import 'package:pixel_adventure/game/utils/in_game_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
@@ -26,9 +26,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   late final double _verticalCenter;
 
   // btns
-  late final InGameActionBtn _menuBtn;
-  late final InGameActionToggleBtn _playBtn;
-  late final InGameActionBtn _restartBtn;
+  late final InGameBtn _menuBtn;
+  late final InGameToggleBtn _playBtn;
+  late final InGameBtn _restartBtn;
 
   // spacing
   static final double _btnSpacing = 4;
@@ -70,12 +70,12 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(InGameActionBtn.btnSize.x / 2, _verticalCenter);
-    final btnOffset = Vector2(InGameActionBtn.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(InGameBtn.btnSize.x / 2, _verticalCenter);
+    final btnOffset = Vector2(InGameBtn.btnSize.x + _btnSpacing, 0);
 
     // menu btn
-    _menuBtn = InGameActionBtn(
-      type: InGameActionBtnType.levels,
+    _menuBtn = InGameBtn(
+      type: InGameBtnType.levels,
       action: () {
         if (game.router.currentRoute is PauseRoute) game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
@@ -84,17 +84,17 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // pause and resume btn
-    _playBtn = InGameActionToggleBtn(
-      type: InGameActionBtnType.pause,
-      type_2: InGameActionBtnType.play,
+    _playBtn = InGameToggleBtn(
+      type: InGameBtnType.pause,
+      type_2: InGameBtnType.play,
       action: () => game.router.pushNamed(RouteNames.pause),
       action_2: () => game.router.pop(),
       position: btnBasePosition + btnOffset,
     );
 
     // restart the level btn
-    _restartBtn = InGameActionBtn(
-      type: InGameActionBtnType.restart,
+    _restartBtn = InGameBtn(
+      type: InGameBtnType.restart,
       action: () {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {

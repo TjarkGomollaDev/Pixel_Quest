@@ -11,16 +11,23 @@ enum Szene {
   szene5('Szene 5', 3),
   szene6('Szene 6', 4);
 
-  final String name;
+  final String fileName;
   final int amount;
 
-  const Szene(this.name, this.amount);
+  const Szene(this.fileName, this.amount);
+
+  static const Szene defaultSzene = Szene.szene1;
+
+  static Szene getDefault() => defaultSzene;
+
+  static Szene fromName(String name) => Szene.values.firstWhere((element) => element.name == name, orElse: () => defaultSzene);
 }
 
-class BackgroundSzene extends ParallaxComponent {
+class BackgroundSzene extends ParallaxComponent with HasVisibility {
   final Szene _szene;
+  final bool _show;
 
-  BackgroundSzene({required Szene szene, required super.position, required super.size}) : _szene = szene;
+  BackgroundSzene({required Szene szene, required super.position, required super.size, bool show = true}) : _szene = szene, _show = show;
 
   // animation settings
   static const String _path = 'Background/';
@@ -31,12 +38,22 @@ class BackgroundSzene extends ParallaxComponent {
   @override
   Future<void> onLoad() async {
     parallax = await game.loadParallax(
-      [for (var i = 1; i <= _szene.amount; i++) ParallaxImageData('$_path${_szene.name}/$i$_pathEnd')],
-      baseVelocity: _baseVelocity,
+      [for (var i = 1; i <= _szene.amount; i++) ParallaxImageData('$_path${_szene.fileName}/$i$_pathEnd')],
       velocityMultiplierDelta: _velocityMultiplierDelta,
       repeat: ImageRepeat.repeatX,
       fill: LayerFill.height,
     );
-    return super.onLoad();
+
+    _show ? show() : hide();
+  }
+
+  void show() {
+    isVisible = true;
+    parallax!.baseVelocity = _baseVelocity;
+  }
+
+  void hide() {
+    isVisible = false;
+    parallax!.baseVelocity = Vector2.zero();
   }
 }

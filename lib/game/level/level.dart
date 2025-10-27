@@ -157,7 +157,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     BackgroundTileColor? color;
     if (backgroundType != null) {
       for (var szene in Szene.values) {
-        if (szene.name == backgroundType) {
+        if (szene.fileName == backgroundType) {
           _levelBackground = BackgroundSzene(szene: szene, position: position, size: size);
           isInitialized = true;
           break;

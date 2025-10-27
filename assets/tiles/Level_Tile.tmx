@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="3" height="2" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="107">
+ <tileset firstgid="1" source="Pixel Adventure.tsx"/>
+ <layer id="1" name="Background" width="3" height="2">
+  <properties>
+   <property name="BackgroundType" value="Szene 1"/>
+  </properties>
+  <data encoding="csv">
+212,190,213,
+234,190,235
+</data>
+ </layer>
+ <objectgroup id="2" name="Spawning"/>
+</map>

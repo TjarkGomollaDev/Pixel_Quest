@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-enum InGameActionBtnType {
+enum InGameBtnType {
+  // normal size
   achievements('Achievements'),
-  back('Back'),
-  close('Close'),
   leaderboard('Leaderboard'),
   levels('Levels'),
   next('Next'),
@@ -17,23 +16,29 @@ enum InGameActionBtnType {
   previous('Previous'),
   restart('Restart'),
   settings('Settings'),
-  volume('Volume');
+  volume('Volume'),
+
+  // small size
+  closeSmall('Close Small'),
+  backSmall('Back Small'),
+  editSmall('Edit Small'),
+  previousSmall('Previous Small'),
+  nexStSmall('Next Small');
 
   final String fileName;
 
-  const InGameActionBtnType(this.fileName);
+  const InGameBtnType(this.fileName);
 }
 
-class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
-  final InGameActionBtnType _type;
+class InGameBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
+  final InGameBtnType _type;
   final void Function() _action;
 
-  InGameActionBtn({required InGameActionBtnType type, required void Function() action, required super.position})
-    : _type = type,
-      _action = action;
+  InGameBtn({required InGameBtnType type, required void Function() action, required super.position}) : _type = type, _action = action;
 
   // size
   static final Vector2 btnSize = Vector2(21, 22);
+  static final Vector2 btnSizeSmall = Vector2(15, 16);
 
   // animation settings
   static const String _path = 'Menu/Buttons/';
@@ -75,19 +80,17 @@ class InGameActionBtn extends SpriteComponent with HasGameReference<PixelQuest>,
 
   void _loadSprite() => sprite = loadSprite(game, '$_path${_type.fileName}$_pathEnd');
 
-  void setSpriteByName(InGameActionBtnType name) {
-    sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
-  }
+  void setSpriteByName(InGameBtnType name) => sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
 }
 
-class InGameActionToggleBtn extends InGameActionBtn {
-  final InGameActionBtnType _type_2;
+class InGameToggleBtn extends InGameBtn {
+  final InGameBtnType _type_2;
   final void Function() _action_2;
   bool toggle = true;
 
-  InGameActionToggleBtn({
+  InGameToggleBtn({
     required super.type,
-    required InGameActionBtnType type_2,
+    required InGameBtnType type_2,
     required super.action,
     required void Function() action_2,
     required super.position,

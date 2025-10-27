@@ -7,7 +7,7 @@ class RRectComponent extends PositionComponent {
 
   RRectComponent({this.color, required super.size, required super.position, this.borderRadius = 0, super.anchor});
 
-  double opacityy = 1;
+  double opacity = 1;
 
   @override
   void render(Canvas canvas) {
@@ -15,7 +15,7 @@ class RRectComponent extends PositionComponent {
     canvas.drawRRect(
       RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, width, height), Radius.circular(borderRadius)),
       Paint()
-        ..color = color!.withAlpha((color!.a * 255 * opacityy).toInt())
+        ..color = color!.withAlpha((color!.a * 255 * opacity).toInt())
         ..style = PaintingStyle.fill,
     );
   }

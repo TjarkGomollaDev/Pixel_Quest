@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 
-class VisibleSpriteComponent extends SpriteComponent with HasVisibility {
+class VisibleSpriteComponent extends SpriteComponent with HasVisibility implements OpacityProvider {
   VisibleSpriteComponent({
     super.sprite,
     super.autoResize,
@@ -17,7 +18,7 @@ class VisibleSpriteComponent extends SpriteComponent with HasVisibility {
     super.key,
     bool show = true,
   }) {
-    show ? this.show() : hide();
+    if (!show) hide();
   }
 
   void show() => isVisible = true;
@@ -38,7 +39,7 @@ class VisibleTextComponent extends TextComponent with HasVisibility {
     super.key,
     bool show = true,
   }) {
-    show ? this.show() : hide();
+    if (!show) hide();
   }
 
   void show() => isVisible = true;

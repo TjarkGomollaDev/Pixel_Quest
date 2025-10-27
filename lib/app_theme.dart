@@ -71,5 +71,4 @@ abstract class AppTheme {
   static final starColor = Color.fromRGBO(255, 255, 85, 1);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
-  static final levelTileBlur = black.withAlpha(20);
 }

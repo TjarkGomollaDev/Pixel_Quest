@@ -64,6 +64,7 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
 
     // general
     anchor = Anchor.center;
+    priority = 5;
   }
 
   void _setUpAllCharacters() {

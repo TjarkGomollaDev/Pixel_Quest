@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
-import 'package:pixel_adventure/game/hud/in_game_action_btn.dart';
+import 'package:pixel_adventure/game/utils/in_game_btn.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
@@ -24,8 +24,8 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
   late final double _verticalCenter;
 
   // btns
-  late final InGameActionBtn _settingsBtn;
-  late final InGameActionBtn _achievmentsBtn;
+  late final InGameBtn _settingsBtn;
+  late final InGameBtn _achievmentsBtn;
 
   // spacing
   final double _btnSpacing = 4;
@@ -100,14 +100,14 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(size.x - InGameActionBtn.btnSize.x * 1.5 - _btnSpacing, _verticalCenter);
-    final btnOffset = Vector2(InGameActionBtn.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(size.x - InGameBtn.btnSize.x * 1.5 - _btnSpacing, _verticalCenter);
+    final btnOffset = Vector2(InGameBtn.btnSize.x + _btnSpacing, 0);
 
     // settings btn
-    _settingsBtn = InGameActionBtn(type: InGameActionBtnType.settings, action: () {}, position: btnBasePosition);
+    _settingsBtn = InGameBtn(type: InGameBtnType.settings, action: () {}, position: btnBasePosition);
 
     // achievements btn
-    _achievmentsBtn = InGameActionBtn(type: InGameActionBtnType.leaderboard, action: () {}, position: btnBasePosition + btnOffset);
+    _achievmentsBtn = InGameBtn(type: InGameBtnType.volume, action: () {}, position: btnBasePosition + btnOffset);
 
     addAll([_settingsBtn, _achievmentsBtn]);
   }

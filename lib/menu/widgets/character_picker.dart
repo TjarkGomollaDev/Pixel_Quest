@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/corner_outline.dart';
+import 'package:pixel_adventure/game/animations/spotlight.dart';
+import 'package:pixel_adventure/game/utils/in_game_btn.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/widgets/character_bio.dart';
@@ -10,31 +11,30 @@ import 'package:pixel_adventure/menu/widgets/dummy_character.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest> {
-  CharacterPicker({required super.position}) : super(size: Vector2(100, 86)) {
-    _center = size / 2;
+  CharacterPicker() {
+    size = game.size;
   }
-
-  // center of the module
-  late final Vector2 _center;
 
   // dummy player
   late final DummyCharacter _dummy;
-
-  // draggable outline
-  late final DraggableCornerOutline _dummyOutline;
 
   // extra inforamtion
   late final RRectComponent _titelBg;
   late final TextComponent _title;
   late final CharacterBio _characterBio;
 
+  // spotlight
+  late final InGameBtn _editBtn;
+  late final Spotlight _spotlight;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _setUpTitle();
-    _setUpCharacterBio();
     _setUpDummyCharacter();
-    _setUpOutline();
+    _setUpTitle();
+    _setUpEditBtn();
+    _setUpSpotlight();
+
     return super.onLoad();
   }
 
@@ -46,50 +46,55 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     }
 
     // general
-    anchor = Anchor.center;
+    priority = 10;
+  }
+
+  void _setUpDummyCharacter() {
+    _characterBio = CharacterBio(position: Vector2(24, 94));
+    _dummy = DummyCharacter(
+      defaultPosition: Vector2(
+        game.size.x / 2 - 17 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+        7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
+      ),
+      characterBio: _characterBio,
+    );
+    add(_dummy);
   }
 
   void _setUpTitle() {
     _titelBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_center.x, _center.y - 40),
-      size: Vector2(62, 14),
+      position: _dummy.position + Vector2(0, -38),
+      size: Vector2(58, 15),
       anchor: Anchor.center,
     );
     _title = TextComponent(
       text: 'Your Player',
       anchor: Anchor(0.5, 0.32),
-      position: Vector2(_center.x, _center.y - 40),
+      position: _titelBg.position,
       textRenderer: TextPaint(
         style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText, height: 1),
       ),
     );
+
     addAll([_titelBg, _title]);
   }
 
-  void _setUpCharacterBio() {
-    _characterBio = CharacterBio(position: Vector2(24, 94));
-    add(_characterBio);
-  }
-
-  void _setUpDummyCharacter() {
-    _dummy = DummyCharacter(defaultPosition: _center, characterBio: _characterBio);
-    add(_dummy);
-  }
-
-  void _setUpOutline() {
-    _dummyOutline = DraggableCornerOutline(
-      onSwipeRight: () => _dummy.switchCharacter(),
-      onSwipeLeft: () => _dummy.switchCharacter(next: false),
-      size: Vector2(44, 46),
-      cornerLength: 4,
-      strokeWidth: 1.2,
-      color: AppTheme.starColor,
-      anchor: Anchor.center,
-      position: _center,
+  void _setUpEditBtn() {
+    _editBtn = InGameBtn(
+      type: InGameBtnType.editSmall,
+      action: () {
+        _spotlight.startAnimation(0.5);
+      },
+      position: _dummy.position + Vector2(0, 39),
     );
-    add(_dummyOutline);
+    add(_editBtn);
+  }
+
+  void _setUpSpotlight() {
+    _spotlight = Spotlight(targetCenter: _dummy.center.clone());
+    add(_spotlight);
   }
 
   void pause() => _dummy.pauseAnimation();

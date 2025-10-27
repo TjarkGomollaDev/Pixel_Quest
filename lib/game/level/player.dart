@@ -55,8 +55,7 @@ enum PlayerCharacter {
 
   static PlayerCharacter getDefault() => defaultCharacter;
 
-  static PlayerCharacter fromName(String name) =>
-      PlayerCharacter.values.firstWhere((e) => e.name == name, orElse: () => PlayerCharacter.maskDude);
+  static PlayerCharacter fromName(String name) => PlayerCharacter.values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
 }
 
 class Player extends SpriteAnimationGroupComponent
