@@ -36,7 +36,7 @@ class OutlineStar extends SpriteComponent with HasGameReference<PixelQuest> impl
     }
 
     // general
-    priority = GameSettings.spotlightAnimationStarsLayer;
+    priority = GameSettings.spotlightAnimationContentLayer;
     anchor = Anchor.center;
   }
 
@@ -77,7 +77,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
     }
 
     // general
-    priority = GameSettings.spotlightAnimationStarsLayer;
+    priority = GameSettings.spotlightAnimationContentLayer;
     anchor = Anchor.center;
   }
 

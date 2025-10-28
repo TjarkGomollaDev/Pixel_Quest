@@ -83,7 +83,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       position: btnBasePosition,
     );
 
-    // pause and resume btn
+    // play toggle btn
     _playBtn = InGameToggleBtn(
       type: InGameBtnType.pause,
       type_2: InGameBtnType.play,
@@ -98,19 +98,25 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       action: () {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {
-          final myLevel = (currentRoute.world as Level).levelMetadata;
+          final levelMetadata = (currentRoute.world as Level).levelMetadata;
 
           // at this point, we need to create a new instance of the route, because otherwise the router will assume
           // that the route already exists and will not even create a new one, which is explicitly what we want to do here
-          game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: myLevel), maintainState: false), name: myLevel.uuid);
+          game.router.pushReplacement(
+            WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
+            name: levelMetadata.uuid,
+          );
         } else if (currentRoute is PauseRoute) {
           final previousRoute = game.router.previousRoute;
           if (previousRoute is WorldRoute) {
-            final myLevel = (previousRoute.world as Level).levelMetadata;
+            final levelMetadata = (previousRoute.world as Level).levelMetadata;
             game.router.pop();
 
             // same as above
-            game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: myLevel), maintainState: false), name: myLevel.uuid);
+            game.router.pushReplacement(
+              WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
+              name: levelMetadata.uuid,
+            );
           }
         }
       },

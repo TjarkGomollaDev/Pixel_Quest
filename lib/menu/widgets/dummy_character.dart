@@ -41,7 +41,7 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
   final List<Effect> _activeEffects = [];
 
   // height of the jump animation
-  static const double _jumpHeight = 50.0; // [Adjustable]
+  static const double _jumpHeight = 42; // [Adjustable]
   static late double _jumpUpDuration;
   static late double _jumpDownDuration;
 

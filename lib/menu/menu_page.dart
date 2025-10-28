@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/utils/in_game_btn.dart';
+import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/widgets/character_picker.dart';
+import 'package:pixel_adventure/menu/widgets/dummy_character.dart';
 import 'package:pixel_adventure/menu/widgets/level_grid.dart';
-import 'package:pixel_adventure/menu/widgets/menu_header.dart';
+import 'package:pixel_adventure/menu/widgets/menu_top_bar.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 
@@ -16,8 +19,9 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   StreamSubscription? _sub;
 
   // static content
-  late final MenuHeader _menuHeader;
+  late final MenuTopBar _menuTopBar;
   late final CharacterPicker _characterPicker;
+  late final InputBlocker _blockerWhenSpotlight;
   late final InGameBtn _previousWorldBtn;
   late final InGameBtn _nextWorldBtn;
 
@@ -45,9 +49,10 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpWorldForegrounds();
     _setUpWorldTitles();
     _setUpWorldLevelGrids();
-    _setUpMenuHeader();
+    _setUpMenuTopBar();
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
+
     return super.onLoad();
   }
 
@@ -75,7 +80,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _setUpSubscription() {
     _sub ??= game.storageCenter.onDataChanged.listen((event) {
       if (event is NewStarsStorageEvent) {
-        _menuHeader.updateStarsCount(index: _getWorldIndex(event.worldUuid), stars: event.totalStars);
+        _menuTopBar.updateStarsCount(index: _getWorldIndex(event.worldUuid), stars: event.totalStars);
         _pendingWorldStorageEvent = event;
       } else if (event is LevelStorageEvent) {
         // todo
@@ -98,7 +103,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
         stars: _pendingWorldStorageEvent!.newStars,
       );
       await Future.delayed(Duration(milliseconds: 200));
-      await _menuHeader.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
+      await _menuTopBar.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
     }
     _pendingWorldStorageEvent = null;
   }
@@ -159,9 +164,9 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     }
   }
 
-  void _setUpMenuHeader() {
-    _menuHeader = MenuHeader(startWorldIndex: _currentWorldIndex);
-    add(_menuHeader);
+  void _setUpMenuTopBar() {
+    _menuTopBar = MenuTopBar(startWorldIndex: _currentWorldIndex);
+    add(_menuTopBar);
   }
 
   void _setUpChangeWorldBtns() {
@@ -184,8 +189,15 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpCharacterPicker() {
-    _characterPicker = CharacterPicker();
-    add(_characterPicker);
+    _blockerWhenSpotlight = InputBlocker(priorityWhenActive: GameSettings.chracterPicker - 1);
+    _characterPicker = CharacterPicker(
+      inputBlocker: _blockerWhenSpotlight,
+      spotlightCenter: Vector2(
+        game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+        7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
+      ),
+    );
+    addAll([_blockerWhenSpotlight, _characterPicker]);
   }
 
   void _changeWorld(int direction) async {
@@ -208,8 +220,8 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _worldForegrounds[newIndex].show();
     _worldTitles[oldIndex].hide();
     _worldTitles[newIndex].show();
-    _menuHeader.hideStarsCount(oldIndex);
-    _menuHeader.showStarsCount(newIndex);
+    _menuTopBar.hideStarsCount(oldIndex);
+    _menuTopBar.showStarsCount(newIndex);
     _worldLevelGrids[oldIndex].hide();
     await _worldLevelGrids[newIndex].animatedShow(toLeft: newIndex > oldIndex);
     _isChangingWorld = false;

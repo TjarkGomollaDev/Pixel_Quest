@@ -499,7 +499,7 @@ class Player extends SpriteAnimationGroupComponent
     final playerCenter = hitbox.center.toVector2();
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
     world.add(spotlight);
-    await spotlight.startAnimation(2.0);
+    await spotlight.focusOnTarget();
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // star positions
@@ -555,7 +555,7 @@ class Player extends SpriteAnimationGroupComponent
     for (var e in stars) {
       e.fadeOut();
     }
-    await spotlight.shrinkToBlack(0.4);
+    await spotlight.shrinkToBlack();
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // level official finished, go back to menu

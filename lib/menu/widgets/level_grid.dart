@@ -22,7 +22,6 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   // show animation settings
   final double move = LevelTile.tileSize.x / 2; // [Adjustable]
-  final double durationAnimation = 0.4; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -65,7 +64,7 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Has
     }
   }
 
-  Future<void> animatedShow({required bool toLeft}) async {
+  Future<void> animatedShow({required bool toLeft, double duration = 0.4}) async {
     final completer = Completer<void>();
     show();
     final x = _grid.values.last;
@@ -74,10 +73,10 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Has
       final endPosition = tile.position.clone();
       tile.position += moveOffset;
       tile.addAll([
-        MoveEffect.to(endPosition, EffectController(duration: durationAnimation, curve: Curves.linear)),
+        MoveEffect.to(endPosition, EffectController(duration: duration, curve: Curves.linear)),
         OpacityEffect.to(
           1,
-          EffectController(duration: durationAnimation, curve: Curves.easeIn),
+          EffectController(duration: duration, curve: Curves.easeIn),
           onComplete: () {
             if (x == tile) {
               completer.complete();

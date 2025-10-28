@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -18,7 +19,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
-    radius = game.size.x;
+    radius = game.size.length;
     priority = GameSettings.spotlightAnimationLayer;
     return super.onLoad();
   }
@@ -32,7 +33,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
     canvas.saveLayer(Rect.fromLTWH(game.camera.viewfinder.position.x, 0, game.size.x, game.size.y), layerPaint);
 
     // draw a full black rectangle covering the entire screen
-    final paint = Paint()..color = Colors.black;
+    final paint = Paint()..color = AppTheme.black;
     canvas.drawRect(game.camera.visibleWorldRect, paint);
 
     // draw a transparent circle to "cut out" the spotlight
@@ -44,16 +45,40 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
     canvas.restore();
   }
 
-  /// Animates the spotlight from the current radius to the target radius
+  /// Animates the spotlight from full screen to the target radius
   /// over the given duration using an ease-in curve.
-  Future<void> startAnimation(double duration) {
+  Future<void> focusOnTarget({double duration = 2}) {
     final completer = Completer<void>();
 
     final controller = CurvedEffectController(duration, Curves.easeInOutCubicEmphasized);
     add(
       FunctionEffect<Spotlight>(
         (spotlight, progress) {
+          // interpolate from full screen to target radius
           radius = game.size.length - (game.size.length - targetRadius) * progress;
+        },
+        controller,
+        onComplete: () => completer.complete(),
+      ),
+    );
+
+    return completer.future;
+  }
+
+  /// Animates the spotlight to expand back to full size,
+  /// effectively revealing the whole screen again.
+  Future<void> expandToFull({double duration = 2}) {
+    final completer = Completer<void>();
+    final startRadius = radius;
+    final endRadius = game.size.length;
+
+    final controller = CurvedEffectController(duration, Curves.easeInOutCubicEmphasized);
+
+    add(
+      FunctionEffect<Spotlight>(
+        (spotlight, progress) {
+          // interpolate from current radius to full screen
+          radius = startRadius + (endRadius - startRadius) * progress;
         },
         controller,
         onComplete: () => completer.complete(),
@@ -65,7 +90,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
 
   /// Animates the spotlight to shrink the circle down to zero radius,
   /// effectively making the entire screen black over the given duration.
-  Future<void> shrinkToBlack(double duration) {
+  Future<void> shrinkToBlack({double duration = 0.4}) {
     final completer = Completer<void>();
 
     final startRadius = radius;

@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
-  CharacterBio({required super.position}) : super(size: Vector2(80, 20));
+class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
+  CharacterBio({required super.position, bool show = true}) {
+    size = Vector2(100, 64);
+    if (!show) hide();
+  }
 
   // text labels
   late final TextComponent _nameTextLabel;
@@ -18,7 +23,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
   late final TextComponent _abilityTextValue;
 
   // spacing
-  static const double _verticalSpacing = 8; // [Adjustable]
+  static const double _verticalSpacing = 11; // [Adjustable]
 
   // typing speed in ms
   static const int _charDelay = 50; // [Adjustable]
@@ -28,15 +33,26 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   Future<void> onLoad() async {
+    _initialSetup();
     _setUpBio();
     super.onLoad();
   }
 
+  void _initialSetup() {
+    // debug
+    debugColor = Colors.transparent;
+
+    // general
+    anchor = Anchor.centerLeft;
+  }
+
   void _setUpBio() {
+    final startY = size.y / 2;
+
     // set up labeels
-    _nameTextLabel = _createTextComponent('Name:  ', Vector2(0, 0));
-    _originTextLabel = _createTextComponent('Origin:  ', Vector2(0, _verticalSpacing));
-    _abilityTextLabel = _createTextComponent('Ability:  ', Vector2(0, _verticalSpacing * 2));
+    _nameTextLabel = _createTextComponent('Name:  ', Vector2(0, startY - _verticalSpacing));
+    _originTextLabel = _createTextComponent('Origin:  ', Vector2(0, startY));
+    _abilityTextLabel = _createTextComponent('Ability:  ', Vector2(0, startY + _verticalSpacing));
 
     // set up values
     _nameTextValue = _createTextComponent('', _nameTextLabel.position + Vector2(_nameTextLabel.size.x, 0));
@@ -52,10 +68,10 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
   TextComponent _createTextComponent(String text, Vector2 position) {
     return TextComponent(
       text: text,
-      anchor: Anchor.topLeft,
       position: position,
+      anchor: Anchor.centerLeft,
       textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 4, color: AppTheme.ingameText, height: 1),
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 5, color: AppTheme.ingameText, height: 1),
       ),
     );
   }
@@ -94,5 +110,22 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest> {
       component.text += text[i];
       await Future.delayed(const Duration(milliseconds: _charDelay));
     }
+  }
+
+  void show() => isVisible = true;
+
+  void hide() => isVisible = false;
+
+  Future<void> animatedShow({double duration = 0.4}) async {
+    if (isVisible) return;
+    isVisible = true;
+
+    final endPosition = position.clone();
+    position += Vector2(30, 0);
+    final completer = Completer<void>();
+
+    add(MoveEffect.to(endPosition, EffectController(duration: duration, curve: Curves.easeOutCubic)));
+
+    return completer.future;
   }
 }

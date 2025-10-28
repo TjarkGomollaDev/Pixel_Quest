@@ -10,10 +10,10 @@ import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
+class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   final int _startWorldIndex;
 
-  MenuHeader({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {
+  MenuTopBar({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -25,7 +25,7 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
 
   // btns
   late final InGameBtn _settingsBtn;
-  late final InGameBtn _achievmentsBtn;
+  late final InGameToggleBtn _volumeBtn;
 
   // spacing
   final double _btnSpacing = 4;
@@ -106,10 +106,21 @@ class MenuHeader extends PositionComponent with HasGameReference<PixelQuest> {
     // settings btn
     _settingsBtn = InGameBtn(type: InGameBtnType.settings, action: () {}, position: btnBasePosition);
 
-    // achievements btn
-    _achievmentsBtn = InGameBtn(type: InGameBtnType.volume, action: () {}, position: btnBasePosition + btnOffset);
+    // volume toggle btn
+    _volumeBtn = InGameToggleBtn(
+      type: InGameBtnType.volumeOn,
+      type_2: InGameBtnType.volumeOff,
+      action: () => switchVolume(soundsEnabled: false),
+      action_2: () => switchVolume(),
+      position: btnBasePosition + btnOffset,
+      initialState: game.storageCenter.settings.soundsEnabled,
+    );
 
-    addAll([_settingsBtn, _achievmentsBtn]);
+    addAll([_settingsBtn, _volumeBtn]);
+  }
+
+  void switchVolume({bool soundsEnabled = true}) {
+    game.storageCenter.saveSettings(game.storageCenter.settings.copyWith(soundsEnabled: soundsEnabled));
   }
 
   void updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';

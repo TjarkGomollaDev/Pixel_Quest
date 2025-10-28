@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -16,7 +17,8 @@ enum InGameBtnType {
   previous('Previous'),
   restart('Restart'),
   settings('Settings'),
-  volume('Volume'),
+  volumeOn('Volume On'),
+  volumeOff('Volume Off'),
 
   // small size
   closeSmall('Close Small'),
@@ -30,11 +32,15 @@ enum InGameBtnType {
   const InGameBtnType(this.fileName);
 }
 
-class InGameBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
+class InGameBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility {
   final InGameBtnType _type;
   final void Function() _action;
 
-  InGameBtn({required InGameBtnType type, required void Function() action, required super.position}) : _type = type, _action = action;
+  InGameBtn({required InGameBtnType type, required void Function() action, required super.position, bool show = true})
+    : _type = type,
+      _action = action {
+    if (!show) hide();
+  }
 
   // size
   static final Vector2 btnSize = Vector2(21, 22);
@@ -81,6 +87,23 @@ class InGameBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
   void _loadSprite() => sprite = loadSprite(game, '$_path${_type.fileName}$_pathEnd');
 
   void setSpriteByName(InGameBtnType name) => sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
+
+  void show() => isVisible = true;
+
+  void hide() => isVisible = false;
+
+  Future<void> animatedShow({double duration = 0.25}) async {
+    if (isVisible) return;
+    scale = Vector2.all(0);
+    isVisible = true;
+
+    final completer = Completer<void>();
+    final controller = EffectController(duration: duration, curve: Curves.easeOutBack);
+
+    add(ScaleEffect.to(Vector2.all(1.0), controller, onComplete: () => completer.complete()));
+
+    return completer.future;
+  }
 }
 
 class InGameToggleBtn extends InGameBtn {
@@ -94,8 +117,13 @@ class InGameToggleBtn extends InGameBtn {
     required super.action,
     required void Function() action_2,
     required super.position,
+    bool show = true,
+    bool initialState = true,
   }) : _type_2 = type_2,
-       _action_2 = action_2;
+       _action_2 = action_2 {
+    if (!show) hide();
+    if (!initialState) toggle = false;
+  }
 
   @override
   FutureOr<void> onLoad() {

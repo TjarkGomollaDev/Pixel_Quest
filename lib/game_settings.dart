@@ -30,9 +30,11 @@ abstract class GameSettings {
   static const int trapBehindLayerLevel = -1;
   static const int collectiblesLayerLevel = 5;
   static const int spotlightAnimationLayer = 18;
-  static const int spotlightAnimationStarsLayer = 18;
+  static const int spotlightAnimationContentLayer = 19;
   static const int playerLayerLevel = 20;
   static const int hudElementsLayer = 30;
+
+  static const int chracterPicker = 10;
 
   // default spawn values
   static const bool isLeftDefault = true;
