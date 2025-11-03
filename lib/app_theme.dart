@@ -85,5 +85,7 @@ abstract class AppTheme {
   static const goldBlock = yellowDark;
   static const orangeBlock = orangeDark;
   static const borderBlock = Color.fromRGBO(84, 45, 42, 1);
-  static const skyBlock = blueLight;
+  static const skyBlock1 = Color.fromARGB(255, 2, 121, 247);
+  static const skyBlock2 = Color.fromARGB(255, 8, 117, 251); // etwas kräftiger/blauer
+  static const skyBlock3 = Color.fromARGB(255, 0, 127, 243);
 }

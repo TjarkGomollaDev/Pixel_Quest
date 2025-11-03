@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="3" height="2" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="107">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="7" height="4" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="107">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
- <layer id="1" name="Background" width="3" height="2">
+ <layer id="1" name="Background" width="7" height="4">
   <properties>
    <property name="BackgroundType" value="Szene 1"/>
   </properties>
   <data encoding="csv">
-212,190,213,
-234,190,235
+1,2,2,2,2,2,3,
+23,0,0,0,0,0,25,
+23,0,0,0,0,0,25,
+45,46,46,46,46,46,47
 </data>
  </layer>
  <objectgroup id="2" name="Spawning"/>

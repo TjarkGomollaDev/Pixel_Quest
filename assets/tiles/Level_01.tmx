@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="238" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="153">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="238" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="155">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="238" height="20">
   <properties>
@@ -173,6 +173,6 @@
   <object id="141" name="Melon" type="Fruit" x="2704" y="112" width="32" height="32"/>
   <object id="143" name="Cherries" type="Fruit" x="3648" y="16" width="32" height="32"/>
   <object id="144" name="Bananas" type="Fruit" x="496" y="144" width="32" height="32"/>
-  <object id="152" name="Start" type="Start" x="96" y="80" width="64" height="64"/>
+  <object id="154" name="Start" type="Start" x="96" y="80" width="64" height="64"/>
  </objectgroup>
 </map>

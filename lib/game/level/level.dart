@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui';
-import 'package:flame/components.dart';
+import 'package:flame/components.dart' hide Matrix4;
 import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Image;
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
@@ -107,7 +109,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   Future<void> onLoad() async {
     _initialSetup();
     await _loadLevelMap();
-    _startMiniMapRecording();
+    await _startMiniMapRecording();
     _addBackgroundLayer();
     await _endMiniMapRecording();
     _addSpawningLayer();
@@ -151,21 +153,51 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     add(_levelMap);
   }
 
-  void _startMiniMapRecording() {
+  Future<void> _startMiniMapRecording() async {
     _miniMapRecorder = PictureRecorder();
     _miniMapCanvas = Canvas(_miniMapRecorder);
     _miniMapPaint = Paint();
     _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
 
+    await _addBackgroundToMiniMap();
     if (_hasBorder) _addBordersToMiniMap();
   }
 
-  void _addBordersToMiniMap() {
-    // background
-    _miniMapPaint.color = AppTheme.skyBlock;
-    _miniMapCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
+  Future<void> _addBackgroundToMiniMap() async {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    final patternSize = Vector2.all(16);
+    final random = Random();
 
-    // borders
+    // different colors for the background
+    final colors = [AppTheme.skyBlock1, AppTheme.skyBlock2, AppTheme.skyBlock3];
+
+    // create a small pattern
+    for (int y = 0; y < patternSize.y; y++) {
+      for (int x = 0; x < patternSize.x; x++) {
+        _miniMapPaint.color = colors[random.nextInt(colors.length)];
+        canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
+      }
+    }
+
+    // convert pattern to image
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
+
+    // shader that repeats the image
+    _miniMapPaint.shader = ImageShader(image, TileMode.repeated, TileMode.repeated, Float64List.fromList(Matrix4.identity().storage));
+
+    // use the shader to create the background across the entire mini map size
+    final rect = _hasBorder
+        ? Rect.fromLTWH(1, 1, _miniMapSize.x - 2, _miniMapSize.y - 2)
+        : Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y);
+    _miniMapCanvas.drawRect(rect, _miniMapPaint);
+
+    // remove shader
+    _miniMapPaint.shader = null;
+  }
+
+  Future<void> _addBordersToMiniMap() async {
     _miniMapPaint.color = AppTheme.borderBlock;
     for (var rect in [
       Rect.fromLTWH(0, 0, _miniMapSize.x, 1), // top

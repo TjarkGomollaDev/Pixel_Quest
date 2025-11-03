@@ -3,8 +3,10 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/hud/mini_map_view.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
-class MiniMap extends PositionComponent {
+class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final Sprite miniMapSprite;
   final double levelWidth;
@@ -15,14 +17,14 @@ class MiniMap extends PositionComponent {
   }
 
   late final MiniMapView _miniMapView;
-  static final Vector2 miniMapTargetSize = Vector2(80, 60); // [Adjustable]
-  static const double borderWidth = 1; // [Adjustable]
+  static final Vector2 miniMapTargetSize = Vector2(94, 46); // [Adjustable]
+  static const double borderWidth = 9; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
     anchor = Anchor.topRight;
-    setUpFrame();
     setUpMiniMap();
+    setUpFrame();
 
     return super.onLoad();
   }
@@ -36,6 +38,9 @@ class MiniMap extends PositionComponent {
         ..color = Colors.white,
     );
     add(rect);
+
+    final sprite = SpriteComponent(sprite: loadSprite(game, 'HUD/MiniMap Border.png'));
+    add(sprite);
   }
 
   void setUpMiniMap() {

@@ -3,7 +3,6 @@ import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 enum MiniMapPlayerMarker { circle, triangel }
@@ -31,10 +30,14 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   double _offsetX = 0;
 
   // scales the sprite so that it matches the target height of the mini map
-  late final double spriteToMiniMapScale;
+  late final double _spriteToMiniMapScale;
 
   // ratio between real world width and mini map width
-  late final double worldToMiniMapScale;
+  late final double _worldToMiniMapScale;
+
+  // precomputed map limits
+  late final double _mapMaxOffset;
+  late final double _halfTargetWidth;
 
   // player marker
   static final MiniMapPlayerMarker _playerMarker = MiniMapPlayerMarker.circle; // [Adjustable]
@@ -50,7 +53,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   void update(double dt) {
-    setWorldOffset(game.camera.visibleWorldRect.left - GameSettings.mapBorderWidth);
+    _setWorldOffset(_player.hitbox.center.dx);
     super.update(dt);
   }
 
@@ -59,24 +62,27 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     canvas.save();
     canvas.clipRect(Rect.fromLTWH(0, 0, _targetSize.x, _targetSize.y));
     canvas.translate(-_offsetX, 0);
-    _sprite.render(canvas, size: Vector2(_sprite.srcSize.x * spriteToMiniMapScale, _targetSize.y));
+    _sprite.render(canvas, size: Vector2(_sprite.srcSize.x * _spriteToMiniMapScale, _targetSize.y));
     _renderPlayerMarker(canvas);
     canvas.restore();
   }
 
   void _setUpScales() {
-    spriteToMiniMapScale = _targetSize.y / _sprite.srcSize.y;
-    worldToMiniMapScale = (_sprite.srcSize.x * spriteToMiniMapScale) / _levelWidth;
+    _spriteToMiniMapScale = _targetSize.y / _sprite.srcSize.y;
+    _worldToMiniMapScale = (_sprite.srcSize.x * _spriteToMiniMapScale) / _levelWidth;
+
+    _mapMaxOffset = (_sprite.srcSize.x * _spriteToMiniMapScale) - _targetSize.x;
+    _halfTargetWidth = _targetSize.x / 2;
   }
 
   void _setUpPlayerMarker() {
     _playerMarkerPaint = Paint()..color = Colors.white;
-    _playerMarkerSize = _player.hitboxSize * worldToMiniMapScale;
+    _playerMarkerSize = _player.hitboxSize * _worldToMiniMapScale;
   }
 
   void _renderPlayerMarker(Canvas canvas) {
-    final x = _player.hitbox.center.dx * worldToMiniMapScale;
-    final y = _player.hitbox.center.dy * worldToMiniMapScale;
+    final x = _player.hitbox.center.dx * _worldToMiniMapScale;
+    final y = _player.hitbox.center.dy * _worldToMiniMapScale;
 
     return switch (_playerMarker) {
       MiniMapPlayerMarker.circle => _renderCircleMarker(canvas, x, y),
@@ -100,5 +106,5 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   /// Sets the visible area of the mini map based on the real world position.
-  void setWorldOffset(double worldX) => _offsetX = (worldX * worldToMiniMapScale);
+  void _setWorldOffset(double worldX) => _offsetX = (worldX * _worldToMiniMapScale - _halfTargetWidth).clamp(0, _mapMaxOffset);
 }
