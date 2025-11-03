@@ -614,6 +614,7 @@ class Player extends SpriteAnimationGroupComponent
   Rect get hitbox => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
   Vector2 get hitboxPosition => _hitbox.position;
   Vector2 get startPosition => _startPosition;
+  Vector2 get hitboxSize => _hitbox.size;
 }
 
 class PlayerRespawnNotifier extends ChangeNotifier {

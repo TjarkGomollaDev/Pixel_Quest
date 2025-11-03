@@ -125,8 +125,13 @@ class PixelQuest extends FlameGame
         levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
     };
 
-    // dataCenter.getLevel('e31ee2d0-fc87-4358-a09c-e8f3130f3fc2').uuid)
-    add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));
+    add(
+      router = RouterComponent(
+        routes: levelRoutes,
+        initialRoute: staticCenter.allLevelsInOneWorld('014809d5-8ec5-4171-a82e-df72e7839d45').getLevelByNumber(1).uuid,
+      ),
+    );
+    // add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));
   }
 }
 

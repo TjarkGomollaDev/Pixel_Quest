@@ -26,6 +26,7 @@ class StaticCenter {
   List<LevelMetadata> allLevelsInOneWorld(String worldUuid) => _allLevels[worldUuid]!;
   Map<String, List<LevelMetadata>> get allLevelsInAllWorlds => _allLevels;
   List<WorldMetadata> get allWorlds => _allWorlds;
+  WorldMetadata getWorld(String worldUuid) => _allWorlds.getWorldByUUID(worldUuid);
   Map<PlayerCharacter, CharacterMetadata> get allCharacters => _allCharacters;
 
   Future<void> _loadData() async {

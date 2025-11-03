@@ -2,6 +2,18 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 
+enum LevelBaseBlock {
+  gras,
+  mud,
+  sand;
+
+  static const LevelBaseBlock defaultBaseBlock = mud;
+
+  static LevelBaseBlock getDefault() => defaultBaseBlock;
+
+  static LevelBaseBlock fromName(String name) => LevelBaseBlock.values.firstWhere((e) => e.name == name, orElse: () => defaultBaseBlock);
+}
+
 class WorldMetadata {
   final String uuid;
   final List<String> levelUuids;
@@ -9,6 +21,7 @@ class WorldMetadata {
   final String titleFileName;
   final String foregroundFileName;
   final Szene backgroundSzene;
+  final LevelBaseBlock baseBlock;
 
   const WorldMetadata._({
     required this.uuid,
@@ -17,6 +30,7 @@ class WorldMetadata {
     required this.titleFileName,
     required this.foregroundFileName,
     required this.backgroundSzene,
+    required this.baseBlock,
   });
 
   factory WorldMetadata._fromMap(Map<String, dynamic> map, int index) {
@@ -27,6 +41,7 @@ class WorldMetadata {
       titleFileName: map['titleFileName'] as String,
       foregroundFileName: map['foregroundFileName'] as String,
       backgroundSzene: Szene.fromName(map['backgroundSzene'] as String),
+      baseBlock: LevelBaseBlock.fromName(map['baseBlock'] as String),
     );
   }
 

@@ -4,6 +4,7 @@
     "titleFileName": "World_1_Title",
     "foregroundFileName": "World_1_Foreground",
     "backgroundSzene": "szene1",
+    "baseBlock": "mud",
     "levelUuids": [
       "bd278912-62ee-4e96-8130-6deb764016bc",
       "875a7aa7-5899-4dfe-96a5-d99d070c44d6",
@@ -27,6 +28,7 @@
     "titleFileName": "World_2_Title",
     "foregroundFileName": "World_2_Foreground",
     "backgroundSzene": "szene2",
+    "baseBlock": "sand",
     "levelUuids": [
       "7eb6e210-54e5-447f-908d-3ee026a25532",
       "b3588b00-e9f3-477d-b130-a64518417e0b",

@@ -3,6 +3,8 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/hud/mini_map.dart';
+import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/in_game_btn.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
@@ -14,8 +16,15 @@ import 'package:pixel_adventure/pixel_quest.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final int _totalFruitsCount;
+  final Sprite _miniMapSprite;
+  final double _levelWidth;
+  final Player _player;
 
-  GameHud({required int totalFruitsCount}) : _totalFruitsCount = totalFruitsCount {
+  GameHud({required int totalFruitsCount, required Sprite miniMapSprite, required double levelWidth, required Player player})
+    : _totalFruitsCount = totalFruitsCount,
+      _miniMapSprite = miniMapSprite,
+      _levelWidth = levelWidth,
+      _player = player {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -48,12 +57,16 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   static const double _spacingBetweenElements = 20;
   static const double _counterTextMarginLeft = 4;
 
+  // mini map
+  late final MiniMap _miniMap;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
     _setUpBtns();
     _setUpFruitsCount();
     _setUpDeathCount();
+    _setUpMiniMap();
     return super.onLoad();
   }
 
@@ -65,7 +78,6 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     }
 
     // general
-    anchor = Anchor.topLeft;
   }
 
   void _setUpBtns() {
@@ -192,4 +204,14 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
 
   void togglePlayButton() => _playBtn.triggerToggle();
+
+  void _setUpMiniMap() {
+    _miniMap = MiniMap(
+      miniMapSprite: _miniMapSprite,
+      player: _player,
+      levelWidth: _levelWidth,
+      position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
+    );
+    add(_miniMap);
+  }
 }

@@ -20,7 +20,7 @@ enum Szene {
 
   static Szene getDefault() => defaultSzene;
 
-  static Szene fromName(String name) => Szene.values.firstWhere((element) => element.name == name, orElse: () => defaultSzene);
+  static Szene fromName(String name) => Szene.values.firstWhere((e) => e.name == name, orElse: () => defaultSzene);
 }
 
 class BackgroundSzene extends ParallaxComponent with HasVisibility {

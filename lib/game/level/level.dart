@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
@@ -17,7 +19,8 @@ import 'package:pixel_adventure/game/enemies/snail.dart';
 import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
-import 'package:pixel_adventure/game/hud/jump_btn.dart';
+import 'package:pixel_adventure/game/level/tile_id_helper.dart';
+import 'package:pixel_adventure/game/utils/jump_btn.dart';
 import 'package:pixel_adventure/game/level/background_colored.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
@@ -63,12 +66,20 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   // level map from Tiled file
   late final TiledComponent _levelMap;
+  static const _hasBorder = GameSettings.mapBorderWidth != 0;
 
   // level background
   late final ParallaxComponent _levelBackground;
 
   // all collision blocks
   final List<WorldBlock> _collisionBlocks = [];
+
+  // mini map
+  late final PictureRecorder _miniMapRecorder;
+  late final Canvas _miniMapCanvas;
+  late final Paint _miniMapPaint;
+  late final Vector2 _miniMapSize;
+  late final Sprite _readyMadeMiniMap;
 
   // player
   late final Player _player;
@@ -96,7 +107,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   Future<void> onLoad() async {
     _initialSetup();
     await _loadLevelMap();
+    _startMiniMapRecording();
     _addBackgroundLayer();
+    await _endMiniMapRecording();
     _addSpawningLayer();
     return super.onLoad();
   }
@@ -138,7 +151,49 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     add(_levelMap);
   }
 
-  Future<void> _addBackgroundLayer() async {
+  void _startMiniMapRecording() {
+    _miniMapRecorder = PictureRecorder();
+    _miniMapCanvas = Canvas(_miniMapRecorder);
+    _miniMapPaint = Paint();
+    _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
+
+    if (_hasBorder) _addBordersToMiniMap();
+  }
+
+  void _addBordersToMiniMap() {
+    // background
+    _miniMapPaint.color = AppTheme.skyBlock;
+    _miniMapCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
+
+    // borders
+    _miniMapPaint.color = AppTheme.borderBlock;
+    for (var rect in [
+      Rect.fromLTWH(0, 0, _miniMapSize.x, 1), // top
+      Rect.fromLTWH(0, _miniMapSize.y - 1, _miniMapSize.x, 1), // bottom
+      Rect.fromLTWH(0, 0, 1, _miniMapSize.y), // left
+      Rect.fromLTWH(_miniMapSize.x - 1, 0, 1, _miniMapSize.y), // right
+    ]) {
+      _miniMapCanvas.drawRect(rect, _miniMapPaint);
+    }
+  }
+
+  void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
+    _miniMapPaint.color = getMiniMapColor(
+      tileId: tileId,
+      isPlatform: isPlatform,
+      baseBlock: game.staticCenter.getWorld(levelMetadata.worldUuid).baseBlock,
+    );
+    _miniMapCanvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
+  }
+
+  Future<void> _endMiniMapRecording() async {
+    final picture = _miniMapRecorder.endRecording();
+    final image = await picture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
+
+    _readyMadeMiniMap = Sprite(image);
+  }
+
+  void _addBackgroundLayer() {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
       _addBackground(backgroundLayer);
@@ -225,19 +280,16 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   /// and improves runtime performance significantly.
   void _addWorldCollisions(TileLayer backgroundLayer) {
     _addWorldBorders();
-    final hasBorder = GameSettings.mapBorderWidth != 0;
 
     // y axis range of map
-    final yStart = hasBorder ? 1 : 0;
-    final yEnd = hasBorder ? _levelMap.tileMap.map.height - 1 : _levelMap.tileMap.map.height;
+    final yStart = _hasBorder ? 1 : 0;
+    final yEnd = _hasBorder ? _levelMap.tileMap.map.height - 1 : _levelMap.tileMap.map.height;
 
     // x axis range of map
-    final xStart = hasBorder ? 1 : 0;
-    final xEnd = hasBorder ? _levelMap.tileMap.map.width - 1 : _levelMap.tileMap.map.width;
+    final xStart = _hasBorder ? 1 : 0;
+    final xEnd = _hasBorder ? _levelMap.tileMap.map.width - 1 : _levelMap.tileMap.map.width;
 
-    // platform ids
-    final platformValues = {18, 19, 20, 40, 41, 42, 62, 63, 64};
-
+    // visited tiles
     final visited = List.generate(_levelMap.tileMap.map.height, (_) => List.filled(_levelMap.tileMap.map.width, false));
 
     for (var y = yStart; y < yEnd; y++) {
@@ -246,21 +298,22 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         if (visited[y][x]) continue;
 
         // skip empty tiles
-        final tile = backgroundLayer.tileData![y][x].tile;
-        if (tile == 0) continue;
+        final tileId = backgroundLayer.tileData![y][x].tile;
+        if (tileId == 0) continue;
 
         // check if current tile is a platform
-        final isPlatform = platformValues.contains(tile);
+        final isPlatform = platformBlockIds.contains(tileId);
+
+        _addTileToMiniMap(x, y, tileId, isPlatform);
 
         // find width to the right
         int w = 1;
-        while (x + w < xEnd &&
-            !visited[y][x + w] &&
-            backgroundLayer.tileData![y][x + w].tile != 0 &&
-            (isPlatform
-                ? platformValues.contains(backgroundLayer.tileData![y][x + w].tile)
-                : !platformValues.contains(backgroundLayer.tileData![y][x + w].tile))) {
-          w++;
+        int nextTileId = backgroundLayer.tileData![y][x + w].tile;
+        bool isNextPlatform = platformBlockIds.contains(nextTileId);
+        while (x + w < xEnd && !visited[y][x + w] && nextTileId != 0 && (isPlatform ? isNextPlatform : !isNextPlatform)) {
+          _addTileToMiniMap(x + w, y, nextTileId, isNextPlatform);
+          nextTileId = backgroundLayer.tileData![y][x + ++w].tile;
+          isNextPlatform = platformBlockIds.contains(nextTileId);
         }
 
         // find height downwards
@@ -269,11 +322,13 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
           bool done = false;
           while (y + h < yEnd && !done) {
             for (var dx = 0; dx < w; dx++) {
-              final t = backgroundLayer.tileData![y + h][x + dx].tile;
-              if (t == 0 || platformValues.contains(t) || visited[y + h][x + dx]) {
+              final tileBelowId = backgroundLayer.tileData![y + h][x + dx].tile;
+              final isBelowPlatform = platformBlockIds.contains(tileBelowId);
+              if (tileBelowId == 0 || isBelowPlatform || visited[y + h][x + dx]) {
                 done = true;
                 break;
               }
+              _addTileToMiniMap(x + dx, y + h, tileBelowId, isBelowPlatform);
             }
             if (!done) h++;
           }
@@ -301,23 +356,22 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   void _addWorldBorders() {
     const borderWidth = GameSettings.tileSize;
-    final hasBorder = GameSettings.mapBorderWidth != 0;
-    final verticalSize = Vector2(borderWidth, hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
-    final horizontalSize = Vector2(hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
-    final borders = <WorldBlock>[
-      // left
-      WorldBlock(position: Vector2(hasBorder ? 0 : -borderWidth, hasBorder ? 0 : -borderWidth), size: verticalSize),
+    final verticalSize = Vector2(borderWidth, _hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
+    final horizontalSize = Vector2(_hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
+    final borders = [
       // top
-      WorldBlock(position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? 0 : -borderWidth), size: horizontalSize),
-      // right
-      WorldBlock(
-        position: Vector2(hasBorder ? _levelMap.width - borderWidth : _levelMap.width, hasBorder ? 0 : -borderWidth),
-        size: verticalSize,
-      ),
+      WorldBlock(position: Vector2(_hasBorder ? borderWidth : 0, _hasBorder ? 0 : -borderWidth), size: horizontalSize),
       // bottom
       WorldBlock(
-        position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
+        position: Vector2(_hasBorder ? borderWidth : 0, _hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
         size: horizontalSize,
+      ),
+      // left
+      WorldBlock(position: Vector2(_hasBorder ? 0 : -borderWidth, _hasBorder ? 0 : -borderWidth), size: verticalSize),
+      // right
+      WorldBlock(
+        position: Vector2(_hasBorder ? _levelMap.width - borderWidth : _levelMap.width, _hasBorder ? 0 : -borderWidth),
+        size: verticalSize,
       ),
     ];
 
@@ -571,7 +625,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _addGameHud() {
-    _gameHud = GameHud(totalFruitsCount: totalFruitsCount);
+    _gameHud = GameHud(totalFruitsCount: totalFruitsCount, miniMapSprite: _readyMadeMiniMap, levelWidth: _levelMap.width, player: _player);
     game.camera.viewport.add(_gameHud);
   }
 

@@ -133,11 +133,11 @@
             }
         },
         "Menu_Foreground.tmx": {
-            "scale": 1.3243,
-            "selectedLayer": 0,
+            "scale": 0.808,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 419.8444461224798,
-                "y": 117.79808200558784
+                "x": 512.3762376237623,
+                "y": -3.712871287128678
             }
         },
         "Pixel Adventure.tsx": {
