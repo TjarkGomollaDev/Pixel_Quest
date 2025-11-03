@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -40,9 +41,9 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   late final double _halfTargetWidth;
 
   // player marker
-  static final MiniMapPlayerMarker _playerMarker = MiniMapPlayerMarker.circle; // [Adjustable]
+  static final MiniMapPlayerMarker _playerMarker = MiniMapPlayerMarker.triangel; // [Adjustable]
   late final Paint _playerMarkerPaint;
-  late final Vector2 _playerMarkerSize;
+  late final double _playerMarkerSize;
 
   @override
   FutureOr<void> onLoad() {
@@ -76,8 +77,8 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpPlayerMarker() {
-    _playerMarkerPaint = Paint()..color = Colors.white;
-    _playerMarkerSize = _player.hitboxSize * _worldToMiniMapScale;
+    _playerMarkerPaint = Paint()..color = AppTheme.white;
+    _playerMarkerSize = _player.hitboxSize.y * _worldToMiniMapScale;
   }
 
   void _renderPlayerMarker(Canvas canvas) {
@@ -90,16 +91,15 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     };
   }
 
-  void _renderCircleMarker(Canvas canvas, double x, double y) =>
-      canvas.drawCircle(Offset(x, y), _playerMarkerSize.y / 2, _playerMarkerPaint);
+  void _renderCircleMarker(Canvas canvas, double x, double y) => canvas.drawCircle(Offset(x, y), _playerMarkerSize / 2, _playerMarkerPaint);
 
   void _renderTriangleMarker(Canvas canvas, double x, double y) {
     final facingRight = _player.scale.x > 0;
 
     final Path triangle = Path()
-      ..moveTo(x + (facingRight ? _playerMarkerSize.x / 2 : -_playerMarkerSize.x / 2), y)
-      ..lineTo(x - (facingRight ? _playerMarkerSize.x / 2 : -_playerMarkerSize.x / 2), y - _playerMarkerSize.y / 2)
-      ..lineTo(x - (facingRight ? _playerMarkerSize.x / 2 : -_playerMarkerSize.x / 2), y + _playerMarkerSize.y / 2)
+      ..moveTo(x + (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y)
+      ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y - _playerMarkerSize / 2)
+      ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y + _playerMarkerSize / 2)
       ..close();
 
     canvas.drawPath(triangle, _playerMarkerPaint);

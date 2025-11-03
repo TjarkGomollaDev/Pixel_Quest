@@ -27,11 +27,11 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.151,
+            "scale": 1.15,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 319.721980886186,
-                "y": 270.19982623805384
+                "x": 103.47826086956519,
+                "y": 256.5217391304348
             }
         },
         "Level_02.tmx": {
@@ -93,11 +93,11 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.9046,
-            "selectedLayer": 0,
+            "scale": 1.4577,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 478.66460313950927,
-                "y": 170.2409904930356
+                "x": 82.3214653220827,
+                "y": 265.48672566371675
             }
         },
         "Level_2-01.tmx": {
@@ -115,11 +115,11 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 3.4449,
+            "scale": 4.027,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 48.76774362100495,
-                "y": 9.289094023048563
+                "x": 58.10777253538614,
+                "y": -4.469828656568168
             }
         },
         "Level_blank.tmx": {
@@ -184,6 +184,7 @@
     "project": "Pixel Adventure.tiled-project",
     "property.type": "float",
     "recentFiles": [
+        "Pixel Adventure.tsx",
         "Menu_Foreground Kopie.tmx",
         "Splash_Screen.tmx",
         "Splash_Foreground.tmx",
@@ -194,7 +195,6 @@
         "Level_blank.tmx",
         "Level_11.tmx",
         "Level_01.tmx",
-        "Pixel Adventure.tsx",
         "Level_04.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",

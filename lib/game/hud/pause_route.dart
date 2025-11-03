@@ -58,9 +58,9 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
 
     // outline
     final pausedOutline = CornerOutline(
-      size: pausedBg.size + Vector2.all(16),
+      size: pausedBg.size + Vector2.all(14),
       cornerLength: 16,
-      strokeWidth: 6,
+      strokeWidth: 5,
       color: AppTheme.ingameText,
       anchor: Anchor.center,
       position: pausedText.position,
@@ -88,7 +88,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
 
     // exit
     final exitText = TextComponent(
-      text: 'Exit',
+      text: 'Menu',
       anchor: Anchor(0.48, 0.32),
       position: Vector2(0, 100),
       textRenderer: TextPaint(

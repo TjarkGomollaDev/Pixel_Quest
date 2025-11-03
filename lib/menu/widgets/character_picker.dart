@@ -115,9 +115,9 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       action: () async {
         if (!_isSpotlightActive) return;
         _isSpotlightActive = false;
+        _inputBlocker.deactivate();
         _hideSpotlightContent();
         await _spotlight.expandToFull();
-        _inputBlocker.deactivate();
       },
       position: _dummy.position + Vector2(_spotlightRadius * 0.9, -_spotlightRadius * 0.9),
       show: false,

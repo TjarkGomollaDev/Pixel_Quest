@@ -160,7 +160,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
 
     await _addBackgroundToMiniMap();
-    if (_hasBorder) _addBordersToMiniMap();
   }
 
   Future<void> _addBackgroundToMiniMap() async {
@@ -188,25 +187,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _miniMapPaint.shader = ImageShader(image, TileMode.repeated, TileMode.repeated, Float64List.fromList(Matrix4.identity().storage));
 
     // use the shader to create the background across the entire mini map size
-    final rect = _hasBorder
-        ? Rect.fromLTWH(1, 1, _miniMapSize.x - 2, _miniMapSize.y - 2)
-        : Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y);
-    _miniMapCanvas.drawRect(rect, _miniMapPaint);
+    _miniMapCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
 
     // remove shader
     _miniMapPaint.shader = null;
-  }
-
-  Future<void> _addBordersToMiniMap() async {
-    _miniMapPaint.color = AppTheme.borderBlock;
-    for (var rect in [
-      Rect.fromLTWH(0, 0, _miniMapSize.x, 1), // top
-      Rect.fromLTWH(0, _miniMapSize.y - 1, _miniMapSize.x, 1), // bottom
-      Rect.fromLTWH(0, 0, 1, _miniMapSize.y), // left
-      Rect.fromLTWH(_miniMapSize.x - 1, 0, 1, _miniMapSize.y), // right
-    ]) {
-      _miniMapCanvas.drawRect(rect, _miniMapPaint);
-    }
   }
 
   void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
