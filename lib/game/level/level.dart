@@ -20,6 +20,7 @@ import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/enemies/snail.dart';
 import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/jump_btn.dart';
@@ -62,6 +63,7 @@ class DecoratedWorld extends World with HasTimeScale {
 }
 
 class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbacks {
+  // constructor parameters
   final LevelMetadata levelMetadata;
 
   Level({required this.levelMetadata});
@@ -73,8 +75,14 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // level background
   late final ParallaxComponent _levelBackground;
 
-  // all collision blocks
+  // all collision blocks from background layer
   final List<WorldBlock> _collisionBlocks = [];
+
+  // all spawning objects from spawning layer
+  final List<PositionComponent> _spawningObjects = [];
+
+  // all spawning objects which should be displayed on the mini map
+  final List<EntityOnMiniMap> _miniMapEntities = [];
 
   // mini map
   late final PictureRecorder _miniMapRecorder;
@@ -86,20 +94,16 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // player
   late final Player _player;
 
-  // HUD
+  // hud
   late final GameHud _gameHud;
   late final JoystickComponent? _joystick;
   late final JumpBtn? _jumpBtn;
   late final FpsTextComponent? _fpsText;
 
-  // fruits count
+  // counts
   int totalFruitsCount = 0;
   int playerFruitsCount = 0;
-
-  // death count
   int deathCount = 0;
-
-  // stars
   int earnedStars = 0;
 
   // respawnables
@@ -111,8 +115,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     await _loadLevelMap();
     await _startMiniMapRecording();
     _addBackgroundLayer();
-    await _endMiniMapRecording();
     _addSpawningLayer();
+    await _endMiniMapRecording();
     return super.onLoad();
   }
 
@@ -168,13 +172,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     final patternSize = Vector2.all(16);
     final random = Random();
 
-    // different colors for the background
-    final colors = [AppTheme.skyBlock1, AppTheme.skyBlock2, AppTheme.skyBlock3];
-
     // create a small pattern
     for (int y = 0; y < patternSize.y; y++) {
       for (int x = 0; x < patternSize.x; x++) {
-        _miniMapPaint.color = colors[random.nextInt(colors.length)];
+        _miniMapPaint.color = miniMapBackgroundColors[random.nextInt(miniMapBackgroundColors.length)];
         canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
       }
     }
@@ -200,6 +201,28 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       baseBlock: game.staticCenter.getWorld(levelMetadata.worldUuid).baseBlock,
     );
     _miniMapCanvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
+  }
+
+  void _addSpecialTileToMiniMap(Vector2 position, Vector2 mapOffset, Color color) {
+    final mapPosition = position / GameSettings.tileSize + mapOffset;
+    _miniMapPaint.color = color;
+    _miniMapCanvas.drawRect(Rect.fromLTWH(mapPosition.x, mapPosition.y, 1, 1), _miniMapPaint);
+  }
+
+  void _drawMiniMapPattern(Vector2 position, List<List<Color?>> pattern) {
+    for (int y = 0; y < pattern.length; y++) {
+      for (int x = 0; x < pattern[y].length; x++) {
+        final color = pattern[y][x];
+        if (color == null) continue;
+        _miniMapPaint.color = color;
+        _miniMapCanvas.drawRect(Rect.fromLTWH(position.x + x, position.y + y, 1, 1), _miniMapPaint);
+      }
+    }
+  }
+
+  void _addCheckpointToMiniMap(Vector2 position) {
+    final mapPosition = position / GameSettings.tileSize + Vector2(1, 0);
+    _drawMiniMapPattern(mapPosition, miniMapCheckpointPattern);
   }
 
   Future<void> _endMiniMapRecording() async {
@@ -401,11 +424,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     // the start with player is always created first in the level, as many other objects require a reference to the player
     for (var spawnPoint in spawnPointsLayer.objects) {
       if (spawnPoint.class_ == 'Start') {
-        final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
+        final gridPosition = snapVectorToGrid(spawnPoint.position);
         final start = Start(position: gridPosition);
         add(start);
         _player = Player(character: game.storageCenter.settings.character, startPosition: start.playerPosition);
         add(_player);
+        _addCheckpointToMiniMap(gridPosition);
         break;
       }
     }
@@ -413,18 +437,17 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     // all other objects are created
     for (var spawnPoint in spawnPointsLayer.objects) {
       try {
-        final gridPosition = snapVectorToGrid(Vector2(spawnPoint.x, spawnPoint.y));
+        final gridPosition = snapVectorToGrid(spawnPoint.position);
+        PositionComponent? spawnObject;
         switch (spawnPoint.class_) {
           case 'Fruit':
             final fruitName = spawnPoint.name;
             final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
-            final fruit = Fruit(name: safeName, position: gridPosition);
+            spawnObject = Fruit(name: safeName, position: gridPosition);
             totalFruitsCount++;
-            add(fruit);
             break;
           case 'ArrowUp':
-            final arrowUp = ArrowUp(player: _player, position: gridPosition);
-            add(arrowUp);
+            spawnObject = ArrowUp(player: _player, position: gridPosition);
             break;
           case 'Saw':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
@@ -432,7 +455,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? GameSettings.isVerticalDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final showPath = spawnPoint.properties.getValue<bool?>('showPath') ?? GameSettings.showPath;
-            final saw = Saw(
+            spawnObject = Saw(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               isVertical: isVertical,
@@ -441,19 +464,17 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               player: _player,
               position: gridPosition,
             );
-            add(saw);
             break;
           case 'SawCircle':
             final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? GameSettings.doubleSawDefault;
             final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? GameSettings.clockwiseDefault;
-            final sawCircle = SawCircle(
+            spawnObject = SawCircle(
               doubleSaw: doubleSaw,
               clockwise: clockwise,
               player: _player,
               position: gridPosition,
               size: spawnPoint.size,
             );
-            add(sawCircle);
             break;
           case 'Spiked Ball':
             final radius =
@@ -462,7 +483,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? GameSettings.clockwiseDefault;
             final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? GameSettings.spikedBallSwingArcDec;
             final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? GameSettings.spikedBallSwingSpeed;
-            final spikedBall = SpikedBall(
+            spawnObject = SpikedBall(
               radius: radius,
               player: _player,
               swingArcDeg: swingArcDec,
@@ -472,39 +493,34 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
                   gridPosition - Vector2(radius - GameSettings.tileSize / 2, SpikedBallBall.gridSize.x / 2 - GameSettings.tileSize / 2),
               size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
             );
-            add(spikedBall);
             break;
           case 'Chicken':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final chicken = Chicken(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-            add(chicken);
+            spawnObject = Chicken(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Trampoline':
-            final trampoline = Trampoline(player: _player, position: gridPosition);
-            add(trampoline);
+            spawnObject = Trampoline(player: _player, position: gridPosition);
             break;
           case 'Fan':
             final alwaysOn = spawnPoint.properties.getValue<bool?>('alwaysOn') ?? GameSettings.fanAlwaysOnDefault;
-            final fan = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
-            add(fan);
+            spawnObject = Fan(alwaysOn: alwaysOn, player: _player, position: gridPosition);
             break;
           case 'FireTrap':
-            final fireTrap = FireTrap(player: _player, position: gridPosition);
-            add(fireTrap);
+            spawnObject = FireTrap(player: _player, position: gridPosition);
+            _addSpecialTileToMiniMap(gridPosition, Vector2(0, 1), AppTheme.woodBlock);
             break;
           case 'Fire':
             final side = spawnPoint.properties.getValue<int?>('side') ?? GameSettings.sideDefault;
-            final fire = Fire(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
-            add(fire);
+            spawnObject = Fire(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
             break;
           case 'Moving Platform':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isVertical = spawnPoint.properties.getValue<bool?>('isVertical') ?? GameSettings.isVerticalDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final movingPlatform = MovingPlatform(
+            spawnObject = MovingPlatform(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               isVertical: isVertical,
@@ -512,46 +528,40 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               player: _player,
               position: gridPosition,
             );
-            add(movingPlatform);
             break;
           case 'Rock Head':
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
-            final rockHead = RockHead(offsetPos: offsetPos, delay: delay, position: gridPosition);
-            add(rockHead);
+            spawnObject = RockHead(offsetPos: offsetPos, delay: delay, position: gridPosition);
             break;
           case 'Spike Head':
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
-            final spikeHead = SpikeHead(offsetPos: offsetPos, delay: delay, player: _player, position: gridPosition);
-            add(spikeHead);
+            spawnObject = SpikeHead(offsetPos: offsetPos, delay: delay, player: _player, position: gridPosition);
             break;
           case 'Plant':
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? GameSettings.doubleShotDefault;
-            final plant = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
-            add(plant);
+            spawnObject = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
             break;
           case 'Blue Bird':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final bird = BlueBird(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-            add(bird);
+            spawnObject = BlueBird(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Snail':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final snail = Snail(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-            add(snail);
+            spawnObject = Snail(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Ghost':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
-            final ghost = Ghost(
+            spawnObject = Ghost(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               isLeft: isLeft,
@@ -559,14 +569,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               player: _player,
               position: gridPosition,
             );
-            add(ghost);
             break;
           case 'Mushroom':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final mushroom = Mushroom(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-            add(mushroom);
+            spawnObject = Mushroom(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Trunk':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
@@ -574,7 +582,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             final extandNegAttack = spawnPoint.properties.getValue<double?>('extandNegAttack') ?? GameSettings.extandNegAttackDefault;
             final extandPosAttack = spawnPoint.properties.getValue<double?>('extandPosAttack') ?? GameSettings.extandPosAttackDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final trunk = Trunk(
+            spawnObject = Trunk(
               offsetNeg: offsetNeg,
               offsetPos: offsetPos,
               extandNegAttack: extandNegAttack,
@@ -583,36 +591,41 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               player: _player,
               position: gridPosition,
             );
-            add(trunk);
             break;
           case 'Slime':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
             final offsetPos = spawnPoint.properties.getValue<double?>('offsetPos') ?? GameSettings.offsetPosDefault;
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final slime = Slime(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
-            add(slime);
+            spawnObject = Slime(offsetNeg: offsetNeg, offsetPos: offsetPos, isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Turtle':
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            final turtle = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
-            add(turtle);
+            spawnObject = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
             break;
           case 'Spikes':
             final side = spawnPoint.properties.getValue<int?>('side') ?? GameSettings.sideDefault;
-            final spikes = Spikes(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
-            add(spikes);
+            spawnObject = Spikes(side: side, player: _player, position: gridPosition, size: spawnPoint.size);
             break;
           case 'Checkpoint':
-            final checkpoint = Checkpoint(player: _player, position: gridPosition);
-            add(checkpoint);
+            spawnObject = Checkpoint(player: _player, position: gridPosition);
+            _addCheckpointToMiniMap(gridPosition);
             break;
           case 'Finish':
-            final finish = Finish(player: _player, position: gridPosition);
-            add(finish);
+            spawnObject = Finish(player: _player, position: gridPosition);
+            _addCheckpointToMiniMap(gridPosition);
             break;
         }
+        if (spawnObject != null) _spawningObjects.add(spawnObject);
       } catch (e, stack) {
         debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
+      }
+    }
+    addAll(_spawningObjects);
+
+    for (var spawnObject in _spawningObjects) {
+      if (spawnObject is EntityOnMiniMap) {
+        spawnObject.onRemovedFromLevel = (entity) => _miniMapEntities.remove(entity);
+        _miniMapEntities.add(spawnObject);
       }
     }
   }
@@ -641,7 +654,13 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _addGameHud() {
-    _gameHud = GameHud(totalFruitsCount: totalFruitsCount, miniMapSprite: _readyMadeMiniMap, levelWidth: _levelMap.width, player: _player);
+    _gameHud = GameHud(
+      totalFruitsCount: totalFruitsCount,
+      miniMapSprite: _readyMadeMiniMap,
+      levelWidth: _levelMap.width,
+      player: _player,
+      entities: _miniMapEntities,
+    );
     game.camera.viewport.add(_gameHud);
   }
 

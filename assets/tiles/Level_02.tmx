@@ -125,7 +125,7 @@
   <object id="136" name="FireTrap" type="FireTrap" x="2240" y="208" width="16" height="32"/>
   <object id="137" name="FireTrap" type="FireTrap" x="2256" y="208" width="16" height="32"/>
   <object id="138" name="FireTrap" type="FireTrap" x="2144" y="208" width="16" height="32"/>
-  <object id="139" name="Checkpoint" type="Checkpoint" x="1552" y="208" width="64" height="64"/>
+  <object id="139" name="Checkpoint" type="Checkpoint" x="1536" y="208" width="64" height="64"/>
   <object id="140" name="Kiwi" type="Fruit" x="1136" y="80" width="32" height="32"/>
   <object id="141" name="Kiwi" type="Fruit" x="720" y="64" width="32" height="32"/>
   <object id="142" name="Cherries" type="Fruit" x="192" y="64" width="32" height="32"/>

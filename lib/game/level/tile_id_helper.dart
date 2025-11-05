@@ -29,3 +29,12 @@ Color getMiniMapColor({required int tileId, required bool isPlatform, required L
     LevelBaseBlock.sand => AppTheme.black,
   };
 }
+
+const List<List<Color?>> miniMapCheckpointPattern = [
+  [AppTheme.black, AppTheme.white, AppTheme.black, AppTheme.white],
+  [AppTheme.white, AppTheme.black, AppTheme.white, AppTheme.black],
+  [AppTheme.black, AppTheme.white, AppTheme.black, AppTheme.white],
+  [AppTheme.woodBlock, null, null, null],
+];
+
+const List<Color> miniMapBackgroundColors = [AppTheme.skyBlock1, AppTheme.skyBlock2, AppTheme.skyBlock3];

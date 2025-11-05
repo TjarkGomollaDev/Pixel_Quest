@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -32,7 +33,7 @@ enum MushroomState implements AnimationState {
 /// pausing briefly and accelerating smoothly when changing direction.
 /// The mushroom can be stomped by the [Player], playing a hit animation before disappearing,
 /// or it will harm the player if touched from the side.
-class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini_map_view.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -11,11 +12,18 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
+  final List<EntityOnMiniMap> _entities;
 
-  MiniMap({required Sprite miniMapSprite, required double levelWidth, required Player player, required super.position})
-    : _player = player,
-      _levelWidth = levelWidth,
-      _miniMapSprite = miniMapSprite {
+  MiniMap({
+    required Sprite miniMapSprite,
+    required double levelWidth,
+    required Player player,
+    required List<EntityOnMiniMap> entities,
+    required super.position,
+  }) : _miniMapSprite = miniMapSprite,
+       _levelWidth = levelWidth,
+       _player = player,
+       _entities = entities {
     size = miniMapTargetSize + Vector2.all(_borderWidth * 2);
   }
 
@@ -75,6 +83,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       targetSize: targetSize,
       levelWidth: _levelWidth,
       player: _player,
+      entities: _entities,
       position: viewPosition,
     );
 

@@ -128,7 +128,7 @@ class PixelQuest extends FlameGame
     add(
       router = RouterComponent(
         routes: levelRoutes,
-        initialRoute: staticCenter.allLevelsInOneWorld('014809d5-8ec5-4171-a82e-df72e7839d45').getLevelByNumber(1).uuid,
+        initialRoute: staticCenter.allLevelsInOneWorld('014809d5-8ec5-4171-a82e-df72e7839d45').getLevelByNumber(4).uuid,
       ),
     );
     // add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));

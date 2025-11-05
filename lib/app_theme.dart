@@ -72,7 +72,7 @@ abstract class AppTheme {
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
 
-  // block colors for mini map
+  // colors for mini map
   static const brickBlock = Color.fromRGBO(207, 76, 94, 1);
 
   static const grasDarkBlock = Color.fromRGBO(218, 145, 80, 1);
@@ -84,8 +84,12 @@ abstract class AppTheme {
   static const platformBlock = tealDark;
   static const goldBlock = yellowDark;
   static const orangeBlock = orangeDark;
-  static const borderBlock = Color.fromRGBO(84, 45, 42, 1);
+  static const woodBlock = Color.fromRGBO(84, 45, 42, 1);
+
   static const skyBlock1 = Color.fromARGB(255, 2, 121, 247);
-  static const skyBlock2 = Color.fromARGB(255, 8, 117, 251); // etwas kräftiger/blauer
+  static const skyBlock2 = Color.fromARGB(255, 8, 117, 251);
   static const skyBlock3 = Color.fromARGB(255, 0, 127, 243);
+
+  static const playerMarker = redDark;
+  static const entityMarker = white;
 }

@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -34,7 +35,7 @@ enum RockHeadState implements AnimationState {
 /// bottom borders it plays a hit animation before pausing for a short delay,
 /// creating a rhythmic crushing pattern.
 class RockHead extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelQuest>, WorldCollision, FastCollision {
+    with FixedGridOriginalSizeGroupAnimation, HasGameReference<PixelQuest>, WorldCollision, FastCollision, EntityOnMiniMap {
   // constructor parameters
   final double _offsetPos;
   double _delay;
@@ -110,6 +111,7 @@ class RockHead extends PositionComponent
     priority = GameSettings.trapLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    marker = EntityMiniMapMarker(size: _hitbox.height, type: EntityMiniMapMarkerType.square);
   }
 
   void _loadAllSpriteAnimations() {

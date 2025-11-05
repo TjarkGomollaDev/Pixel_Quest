@@ -5,6 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/ghost_particle.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
@@ -29,7 +30,7 @@ enum GhostState implements AnimationState {
 }
 
 class Ghost extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;

@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/in_game_btn.dart';
@@ -19,12 +20,19 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
+  final List<EntityOnMiniMap> _entities;
 
-  GameHud({required int totalFruitsCount, required Sprite miniMapSprite, required double levelWidth, required Player player})
-    : _totalFruitsCount = totalFruitsCount,
-      _miniMapSprite = miniMapSprite,
-      _levelWidth = levelWidth,
-      _player = player {
+  GameHud({
+    required int totalFruitsCount,
+    required Sprite miniMapSprite,
+    required double levelWidth,
+    required Player player,
+    required List<EntityOnMiniMap> entities,
+  }) : _totalFruitsCount = totalFruitsCount,
+       _miniMapSprite = miniMapSprite,
+       _levelWidth = levelWidth,
+       _player = player,
+       _entities = entities {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -210,6 +218,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       miniMapSprite: _miniMapSprite,
       player: _player,
       levelWidth: _levelWidth,
+      entities: _entities,
       position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
     );
     add(_miniMap);
