@@ -36,7 +36,7 @@ enum FireTrapState implements AnimationState {
 /// Damage is only applied while the fire is burning. Triggering and timing
 /// are fully animation-driven, allowing the trap to synchronize visuals with
 /// its collision behavior for fair player feedback.
-class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   final Player _player;
 

@@ -57,6 +57,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
 
   // entity marker
   late final Paint _entityMarkerPaint;
+  late final Vector2 _entityMarkerPlatformSize;
 
   @override
   FutureOr<void> onLoad() {
@@ -94,6 +95,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     _playerMarkerPaint = Paint()..color = AppTheme.playerMarker;
     _playerMarkerSize = _player.hitboxSize.y * _worldToMiniMapScale;
     _entityMarkerPaint = Paint();
+    _entityMarkerPlatformSize = Vector2(2, 1) * _spriteToMiniMapScale;
   }
 
   /// Sets the visible area of the mini map based on the real world position.
@@ -144,6 +146,8 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
         case EntityMiniMapMarkerType.square:
           _renderEntitySquareMarker(canvas, position, size);
           break;
+        case EntityMiniMapMarkerType.platform:
+          _renderEntityPlatformMarker(canvas, position);
       }
     }
   }
@@ -151,6 +155,9 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   void _renderEntityCircleMarker(Canvas canvas, Vector2 position, double size) =>
       canvas.drawCircle(Offset(position.x, position.y - size / 2), size / 2, _entityMarkerPaint);
 
-  void _renderEntitySquareMarker(Canvas canvas, Vector2 pos, double size) =>
-      canvas.drawRect(Rect.fromLTWH(pos.x - size / 2, pos.y - size, size, size), _entityMarkerPaint);
+  void _renderEntitySquareMarker(Canvas canvas, Vector2 position, double size) =>
+      canvas.drawRect(Rect.fromLTWH(position.x - size / 2, position.y - size, size, size), _entityMarkerPaint);
+
+  void _renderEntityPlatformMarker(Canvas canvas, Vector2 position) =>
+      canvas.drawRect(Rect.fromLTWH(position.x, position.y, _entityMarkerPlatformSize.x, _entityMarkerPlatformSize.y), _entityMarkerPaint);
 }

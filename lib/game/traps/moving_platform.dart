@@ -3,6 +3,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -32,7 +33,7 @@ enum MovingPlatformState implements AnimationState {
 /// The platform automatically reverses direction when reaching the end
 /// of its movement range.
 class MovingPlatform extends SpriteAnimationGroupComponent
-    with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision, WorldCollisionEnd {
+    with HasGameReference<PixelQuest>, WorldCollision, WorldCollisionEnd, EntityOnMiniMap {
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
@@ -101,6 +102,10 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     super.onRemove();
   }
 
+  // we return top left instead of bottom center, and we have to take _correctingPosition() into account
+  @override
+  Vector2 get markerPosition => Vector2(_hitbox.toAbsoluteRect().left, position.y + _hitbox.position.y);
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -114,6 +119,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     _player.respawnNotifier.addListener(onWorldCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    marker = EntityMiniMapMarker(type: EntityMiniMapMarkerType.platform, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadAllSpriteAnimations() {

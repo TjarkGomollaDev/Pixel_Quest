@@ -32,8 +32,7 @@ enum TrampolineState implements AnimationState {
 /// the jump animation, applies an upward bounce force to the player, and then
 /// automatically resets back to idle once the animation is complete.
 /// The trampoline acts as a passive collision object and does not move by itself.
-class Trampoline extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimation, EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   final Player _player;
 

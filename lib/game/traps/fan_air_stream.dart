@@ -19,7 +19,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 ///
 /// Collision handling is used to detect when the player enters or
 /// leaves the stream, setting [_playerInStream] accordingly.
-class FanAirStream extends PositionComponent with EntityCollision, EntityCollisionEnd, HasGameReference<PixelQuest>, CollisionCallbacks {
+class FanAirStream extends PositionComponent with EntityCollision, EntityCollisionEnd, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _baseWidth;
   final double _airStreamHeight;

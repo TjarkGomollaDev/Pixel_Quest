@@ -120,7 +120,7 @@ class SpikeHead extends PositionComponent
     // general
     priority = GameSettings.trapLayerLevel;
     add(_hitbox);
-    marker = EntityMiniMapMarker(size: _hitbox.height, type: EntityMiniMapMarkerType.square);
+    marker = EntityMiniMapMarker(size: _hitbox.height, type: EntityMiniMapMarkerType.square, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadAllSpriteAnimations() {

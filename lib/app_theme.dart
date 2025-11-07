@@ -81,15 +81,16 @@ abstract class AppTheme {
   static const dirtDarkBlock = Color.fromRGBO(150, 76, 71, 1);
   static const dirtLightBlock = Color.fromRGBO(175, 114, 89, 1);
 
-  static const platformBlock = tealDark;
+  static const woodBlock = Color.fromRGBO(84, 45, 42, 1);
+  static const platformBlock = woodBlock;
   static const goldBlock = yellowDark;
   static const orangeBlock = orangeDark;
-  static const woodBlock = Color.fromRGBO(84, 45, 42, 1);
 
   static const skyBlock1 = Color.fromARGB(255, 2, 121, 247);
   static const skyBlock2 = Color.fromARGB(255, 8, 117, 251);
   static const skyBlock3 = Color.fromARGB(255, 0, 127, 243);
 
   static const playerMarker = redDark;
-  static const entityMarker = white;
+  static const entityMarkerStandard = white;
+  static const entityMarkerSpecial = grayLight4;
 }

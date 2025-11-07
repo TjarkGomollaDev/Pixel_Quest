@@ -34,8 +34,7 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// animation before disappearing from the level. Once collected, it increments
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
-class Fruit extends SpriteAnimationGroupComponent
-    with EntityCollision, HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks {
+class Fruit extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, HasWorldReference<Level> {
   // constructor parameters
   final String _name;
   final bool _collectible;

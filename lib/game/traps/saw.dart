@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -20,7 +21,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// The saw continuously animates while moving and flips direction
 /// once reaching the end of its range. It acts as a passive collision area
 /// that can interact with the [Player].
-class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
+class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -49,7 +50,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
   static final Vector2 gridSize = Vector2.all(32);
 
   // actual hitbox
-  final CircleHitbox _hitbox = CircleHitbox();
+  final CircleHitbox _hitbox = CircleHitbox(radius: gridSize.x / 2);
 
   // animation settings
   static const double _stepTime = 0.03;
@@ -94,6 +95,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, HasGameReferenc
     anchor = Anchor.topCenter;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);

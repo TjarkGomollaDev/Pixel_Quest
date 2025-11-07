@@ -37,12 +37,12 @@ mixin EntityOnMiniMap on PositionComponent {
   }
 }
 
-enum EntityMiniMapMarkerType { circle, square }
+enum EntityMiniMapMarkerType { circle, square, platform }
 
 class EntityMiniMapMarker {
   final double size;
   final EntityMiniMapMarkerType type;
   final Color color;
 
-  const EntityMiniMapMarker({this.size = 24, this.type = EntityMiniMapMarkerType.circle, this.color = AppTheme.entityMarker});
+  const EntityMiniMapMarker({this.size = 24, this.type = EntityMiniMapMarkerType.circle, this.color = AppTheme.entityMarkerStandard});
 }

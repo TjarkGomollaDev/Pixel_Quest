@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -12,7 +13,7 @@ import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class SpikedBallBall extends PositionComponent
-    with FixedGridOriginalSizeSprite, EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+    with FixedGridOriginalSizeSprite, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final Player _player;
 
@@ -47,6 +48,7 @@ class SpikedBallBall extends PositionComponent
     anchor = Anchor.center;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadSprite() {

@@ -38,9 +38,9 @@ import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
-import 'package:pixel_adventure/game/traps/saw_circle.dart';
+import 'package:pixel_adventure/game/traps/saw_circle_component.dart';
 import 'package:pixel_adventure/game/traps/spike_head.dart';
-import 'package:pixel_adventure/game/traps/spiked_ball.dart';
+import 'package:pixel_adventure/game/traps/spiked_ball_component.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
@@ -468,13 +468,18 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
           case 'SawCircle':
             final doubleSaw = spawnPoint.properties.getValue<bool?>('doubleSaw') ?? GameSettings.doubleSawDefault;
             final clockwise = spawnPoint.properties.getValue<bool?>('clockwise') ?? GameSettings.clockwiseDefault;
-            spawnObject = SawCircle(
+            spawnObject = SawCircleComponent(
               doubleSaw: doubleSaw,
               clockwise: clockwise,
               player: _player,
               position: gridPosition,
               size: spawnPoint.size,
             );
+
+            // add the single saws from the saw circle component to the mini map entities
+            for (var singleSaw in (spawnObject as SawCircleComponent).getSingleSaws()) {
+              if (singleSaw != null) _addEntityToMiniMap(singleSaw);
+            }
             break;
           case 'Spiked Ball':
             final radius =
@@ -483,7 +488,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             final startLeft = spawnPoint.properties.getValue<bool?>('startLeft') ?? GameSettings.clockwiseDefault;
             final swingArcDec = spawnPoint.properties.getValue<int?>('swingArcDec') ?? GameSettings.spikedBallSwingArcDec;
             final swingSpeed = spawnPoint.properties.getValue<int?>('swingSpeed') ?? GameSettings.spikedBallSwingSpeed;
-            spawnObject = SpikedBall(
+            spawnObject = SpikedBallComponent(
               radius: radius,
               player: _player,
               swingArcDeg: swingArcDec,
@@ -493,6 +498,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
                   gridPosition - Vector2(radius - GameSettings.tileSize / 2, SpikedBallBall.gridSize.x / 2 - GameSettings.tileSize / 2),
               size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
             );
+
+            // add the ball from the spiked ball component
+            _addEntityToMiniMap((spawnObject as SpikedBallComponent).ball);
             break;
           case 'Chicken':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;
@@ -620,14 +628,17 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
       }
     }
-    addAll(_spawningObjects);
 
+    // add all spawn objects and, if necessary, add them to the mini map
     for (var spawnObject in _spawningObjects) {
-      if (spawnObject is EntityOnMiniMap) {
-        spawnObject.onRemovedFromLevel = (entity) => _miniMapEntities.remove(entity);
-        _miniMapEntities.add(spawnObject);
-      }
+      add(spawnObject);
+      if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
     }
+  }
+
+  void _addEntityToMiniMap(EntityOnMiniMap entity) {
+    entity.onRemovedFromLevel = (e) => _miniMapEntities.remove(e);
+    _miniMapEntities.add(entity);
   }
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);

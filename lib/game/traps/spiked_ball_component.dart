@@ -16,7 +16,7 @@ class ChainItem {
   ChainItem({required this.chainComponent, required this.radiusToCenterOfChain});
 }
 
-class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
+class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final double _radius;
   final int _swingArcDeg;
@@ -24,7 +24,7 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
   final bool _startLeft;
   final Player _player;
 
-  SpikedBall({
+  SpikedBallComponent({
     required double radius,
     required int swingArcDeg,
     required int swingSpeed,
@@ -36,7 +36,11 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
        _swingArcDeg = swingArcDeg,
        _swingSpeed = swingSpeed,
        _startLeft = startLeft,
-       _player = player;
+       _player = player {
+    // in this case, we create the spiked ball in the constructor and not in onLoad(), so that we have access to it
+    // immediately after creation via the getter, this is important for the mini map
+    _createSpikedBall();
+  }
 
   // animation settings
   static final Vector2 _textureSize = Vector2.all(8);
@@ -67,8 +71,8 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
   FutureOr<void> onLoad() {
     _initialSetup();
     _setUpHalfArc();
-    _createSpikedBall();
-    _creatChain();
+    _addSpikedBall();
+    _setUpChain();
     _setUpSpeed();
     return super.onLoad();
   }
@@ -91,6 +95,13 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
     _centerPoint = Vector2(size.x / 2, SpikedBallBall.gridSize.x / 2);
   }
 
+  void _createSpikedBall() {
+    _radiusToCenterOfSpikedBall = _radius - SpikedBallBall.gridSize.x / 2;
+    _spikedBall = SpikedBallBall(player: _player);
+  }
+
+  SpikedBallBall get ball => _spikedBall;
+
   void _setUpHalfArc() {
     // convert deg to rad
     _halfArcRad = _swingArcDeg.clamp(40, 180) * pi / 180;
@@ -104,16 +115,14 @@ class SpikedBall extends PositionComponent with HasGameReference<PixelQuest> {
     _time = _startLeft ? 0 : pi;
   }
 
-  void _createSpikedBall() {
-    _radiusToCenterOfSpikedBall = _radius - SpikedBallBall.gridSize.x / 2;
-    _spikedBall = SpikedBallBall(player: _player);
+  void _addSpikedBall() {
     add(_spikedBall);
 
     // initially align the spiked ball
     _transformSpikedBall();
   }
 
-  void _creatChain() {
+  void _setUpChain() {
     final count = (_radius - GameSettings.tileSize / 2 - SpikedBallBall.gridSize.x) / GameSettings.tileSize * 2 + 1;
     final baseRadius = GameSettings.tileSize / 2;
     final chainSprite = loadSprite(game, _pathChain);

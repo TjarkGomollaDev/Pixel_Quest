@@ -20,7 +20,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 ///
 /// The spikes themselves do not move, but act as a passive collision area
 /// that can interact with the [Player].
-class Spikes extends PositionComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class Spikes extends PositionComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   int _side;
   final Player _player;

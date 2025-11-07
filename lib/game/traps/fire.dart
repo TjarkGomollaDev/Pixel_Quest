@@ -20,7 +20,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 ///
 /// The fire itself does not move, but acts as a passive collision area
 /// that can interact with the [Player].
-class Fire extends PositionComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class Fire extends PositionComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
   int _side;
   final Player _player;

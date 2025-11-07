@@ -17,17 +17,27 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// A single saw moves around the full loop, while a double-saw configuration
 /// places a second saw on the opposite side of the path, keeping both in sync.
 /// The saws act as passive collision areas that can interact with the [Player].
-class SawCircle extends PositionComponent with HasGameReference<PixelQuest> {
+class SawCircleComponent extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final bool _doubleSaw;
   final bool _clockwise;
   final Player _player;
 
-  SawCircle({required bool doubleSaw, required bool clockwise, required Player player, required Vector2 position, required Vector2 size})
-    : _clockwise = clockwise,
-      _doubleSaw = doubleSaw,
-      _player = player,
-      super(size: _adjustedSize(size), position: position - Vector2.all(sawRadius));
+  SawCircleComponent({
+    required bool doubleSaw,
+    required bool clockwise,
+    required Player player,
+    required Vector2 position,
+    required Vector2 size,
+  }) : _clockwise = clockwise,
+       _doubleSaw = doubleSaw,
+       _player = player,
+       super(size: _adjustedSize(size), position: position - Vector2.all(sawRadius)) {
+    // in this case, we create the single saws in the constructor and not in onLoad(), so that we have access to the single saws
+    // immediately after creation via getSingleSaws(), this is important for the mini map
+    _setUpPath();
+    _createSingleSaws();
+  }
 
   static Vector2 _adjustedSize(Vector2 input) {
     final gridSize = snapVectorToGrid(input);
@@ -57,7 +67,6 @@ class SawCircle extends PositionComponent with HasGameReference<PixelQuest> {
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _setUpPath();
     _addSingleSaws();
     return super.onLoad();
   }
@@ -91,17 +100,22 @@ class SawCircle extends PositionComponent with HasGameReference<PixelQuest> {
     _pathLength = _pathWidth * 2 + _pathHeight * 2;
   }
 
-  void _addSingleSaws() {
+  void _createSingleSaws() {
     _saw1 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[0]);
-    add(_saw1);
-
-    // if needed, add the second saw
     if (_doubleSaw) {
       _saw2 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[2]);
-      add(_saw2!);
     } else {
       _saw2 = null;
     }
+  }
+
+  List<SawCircleSingleSaw?> getSingleSaws() => [_saw1, _saw2];
+
+  void _addSingleSaws() {
+    add(_saw1);
+
+    // if needed, add the second saw
+    if (_doubleSaw) add(_saw2!);
 
     // by default, the saw moves counterclockwise.
     if (_clockwise) _distanceOnPathSaw1 = _pathWidth + _pathHeight * 2;
