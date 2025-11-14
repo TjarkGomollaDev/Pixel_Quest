@@ -95,7 +95,11 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
     anchor = Anchor.topCenter;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
+    marker = EntityMiniMapMarker(
+      size: _hitbox.height,
+      color: AppTheme.entityMarkerSpecial,
+      layer: EntityMiniMapMarkerLayer.behindForeground,
+    );
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);

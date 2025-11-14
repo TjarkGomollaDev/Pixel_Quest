@@ -20,19 +20,22 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
-  final List<EntityOnMiniMap> _entities;
+  final List<EntityOnMiniMap> _entitiesAboveForeground;
+  final List<EntityOnMiniMap> _entitiesBehindForeground;
 
   GameHud({
     required int totalFruitsCount,
     required Sprite miniMapSprite,
     required double levelWidth,
     required Player player,
-    required List<EntityOnMiniMap> entities,
+    required List<EntityOnMiniMap> entitiesAboveForeground,
+    required List<EntityOnMiniMap> entitiesBehindForeground,
   }) : _totalFruitsCount = totalFruitsCount,
        _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
-       _entities = entities {
+       _entitiesAboveForeground = entitiesAboveForeground,
+       _entitiesBehindForeground = entitiesBehindForeground {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -218,7 +221,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       miniMapSprite: _miniMapSprite,
       player: _player,
       levelWidth: _levelWidth,
-      entities: _entities,
+      entitiesAboveForeground: _entitiesAboveForeground,
+      entitiesBehindForeground: _entitiesBehindForeground,
       position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
     );
     add(_miniMap);

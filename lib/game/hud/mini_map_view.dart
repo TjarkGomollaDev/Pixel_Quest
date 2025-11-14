@@ -4,31 +4,35 @@ import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 enum MiniMapPlayerMarker { circle, triangel }
 
-class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
+class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, HasWorldReference<Level> {
   // constructor parameters
-  final Sprite _sprite;
+  final Sprite _spriteForeground;
   final Vector2 _targetSize;
   final double _levelWidth;
   final Player _player;
-  final List<EntityOnMiniMap> _entities;
+  final List<EntityOnMiniMap> _entitiesAboveForeground;
+  final List<EntityOnMiniMap> _entitiesBehindForeground;
 
   MiniMapView({
     required Sprite sprite,
     required Vector2 targetSize,
     required double levelWidth,
     required Player player,
-    required List<EntityOnMiniMap> entities,
+    required List<EntityOnMiniMap> entitiesAboveForeground,
+    required List<EntityOnMiniMap> entitiesBehindForeground,
     required super.position,
-  }) : _sprite = sprite,
+  }) : _spriteForeground = sprite,
        _levelWidth = levelWidth,
        _targetSize = targetSize,
        _player = player,
-       _entities = entities,
+       _entitiesAboveForeground = entitiesAboveForeground,
+       _entitiesBehindForeground = entitiesBehindForeground,
        super(size: targetSize);
 
   // internal horizontal offset in mini map coordinates used to "scroll" the map when the player moves
@@ -59,10 +63,13 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   late final Paint _entityMarkerPaint;
   late final Vector2 _entityMarkerPlatformSize;
 
+  late final Sprite _spriteBackground;
+
   @override
   FutureOr<void> onLoad() {
     _setUpScales();
     _setUpMarker();
+    _spriteBackground = (game.world as Level).readyMadeMiniMapBackground;
     return super.onLoad();
   }
 
@@ -77,17 +84,19 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     canvas.save();
     canvas.clipRect(Rect.fromLTWH(0, 0, _targetSize.x, _targetSize.y));
     canvas.translate(-_offsetX, 0);
-    _sprite.render(canvas, size: Vector2(_sprite.srcSize.x * _spriteToMiniMapScale, _targetSize.y));
-    _renderEntities(canvas);
+    _spriteBackground.render(canvas, size: Vector2(_spriteForeground.srcSize.x * _spriteToMiniMapScale, _targetSize.y));
+    _renderEntities(canvas, _entitiesBehindForeground);
+    _spriteForeground.render(canvas, size: Vector2(_spriteForeground.srcSize.x * _spriteToMiniMapScale, _targetSize.y));
+    _renderEntities(canvas, _entitiesAboveForeground);
     _renderPlayerMarker(canvas);
     canvas.restore();
   }
 
   void _setUpScales() {
-    _spriteToMiniMapScale = _targetSize.y / _sprite.srcSize.y;
-    _worldToMiniMapScale = (_sprite.srcSize.x * _spriteToMiniMapScale) / _levelWidth;
+    _spriteToMiniMapScale = _targetSize.y / _spriteForeground.srcSize.y;
+    _worldToMiniMapScale = (_spriteForeground.srcSize.x * _spriteToMiniMapScale) / _levelWidth;
 
-    _mapMaxOffset = (_sprite.srcSize.x * _spriteToMiniMapScale) - _targetSize.x;
+    _mapMaxOffset = (_spriteForeground.srcSize.x * _spriteToMiniMapScale) - _targetSize.x;
     _halfTargetWidth = _targetSize.x / 2;
   }
 
@@ -129,8 +138,8 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     canvas.drawPath(triangle, _playerMarkerPaint);
   }
 
-  void _renderEntities(Canvas canvas) {
-    for (final entity in _entities) {
+  void _renderEntities(Canvas canvas, List<EntityOnMiniMap> entities) {
+    for (final entity in entities) {
       final position = entity.markerPosition * _worldToMiniMapScale;
 
       // check: only render if within the visible area

@@ -82,14 +82,16 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   final List<PositionComponent> _spawningObjects = [];
 
   // all spawning objects which should be displayed on the mini map
-  final List<EntityOnMiniMap> _miniMapEntities = [];
+  final List<EntityOnMiniMap> _miniMapEntitiesAboveForeground = [];
+  final List<EntityOnMiniMap> _miniMapEntitiesBehindForeground = [];
 
   // mini map
   late final PictureRecorder _miniMapRecorder;
   late final Canvas _miniMapCanvas;
   late final Paint _miniMapPaint;
   late final Vector2 _miniMapSize;
-  late final Sprite _readyMadeMiniMap;
+  late final Sprite _readyMadeMiniMapForground;
+  late final Sprite readyMadeMiniMapBackground;
 
   // player
   late final Player _player;
@@ -187,11 +189,18 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     // shader that repeats the image
     _miniMapPaint.shader = ImageShader(image, TileMode.repeated, TileMode.repeated, Float64List.fromList(Matrix4.identity().storage));
 
+    final bgRecorder = PictureRecorder();
+    final bgCanvas = Canvas(bgRecorder);
+
     // use the shader to create the background across the entire mini map size
-    _miniMapCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
+    bgCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
 
     // remove shader
     _miniMapPaint.shader = null;
+
+    final bgPicture = bgRecorder.endRecording();
+    final bgImage = await bgPicture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
+    readyMadeMiniMapBackground = Sprite(bgImage);
   }
 
   void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
@@ -229,7 +238,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     final picture = _miniMapRecorder.endRecording();
     final image = await picture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
 
-    _readyMadeMiniMap = Sprite(image);
+    _readyMadeMiniMapForground = Sprite(image);
   }
 
   void _addBackgroundLayer() {
@@ -637,8 +646,13 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _addEntityToMiniMap(EntityOnMiniMap entity) {
-    entity.onRemovedFromLevel = (e) => _miniMapEntities.remove(e);
-    _miniMapEntities.add(entity);
+    final list = switch (entity.marker.layer) {
+      EntityMiniMapMarkerLayer.aboveForeground => _miniMapEntitiesAboveForeground,
+      EntityMiniMapMarkerLayer.behindForeground => _miniMapEntitiesBehindForeground,
+    };
+
+    entity.onRemovedFromLevel = list.remove;
+    list.add(entity);
   }
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
@@ -667,10 +681,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   void _addGameHud() {
     _gameHud = GameHud(
       totalFruitsCount: totalFruitsCount,
-      miniMapSprite: _readyMadeMiniMap,
+      miniMapSprite: _readyMadeMiniMapForground,
       levelWidth: _levelMap.width,
       player: _player,
-      entities: _miniMapEntities,
+      entitiesAboveForeground: _miniMapEntitiesAboveForeground,
+      entitiesBehindForeground: _miniMapEntitiesBehindForeground,
     );
     game.camera.viewport.add(_gameHud);
   }

@@ -10,14 +10,14 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-/// A single saw unit used inside a [SawCircle].
+/// A single saw unit used inside a [SawCircleComponent].
 ///
 /// The saw is rendered as a rotating sprite animation with a circular hitbox,
 /// anchored at its center. Depending on configuration, it can be mirrored
 /// to represent clockwise or counterclockwise motion within the circular trap.
 ///
 /// This component does not move by itself, but is positioned and updated
-/// by its parent [SawCircle]. It acts as a passive collision area
+/// by its parent [SawCircleComponent]. It acts as a passive collision area
 /// that can interact with the [Player].
 class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -27,7 +27,11 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, 
   SawCircleSingleSaw({required bool clockwise, required Player player, required super.position})
     : _clockwise = clockwise,
       _player = player,
-      super(size: gridSize);
+      super(size: gridSize) {
+    // marker is set here because the single saw is not added directly to the level,
+    // but via the parent SawCircleComponent, and we need direct access before onLoad()
+    _setUpMarker();
+  }
 
   // size
   static final Vector2 gridSize = Vector2.all(32);
@@ -60,8 +64,13 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, 
     _hitbox.collisionType = CollisionType.passive;
     anchor = Anchor.center;
     add(_hitbox);
-    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
   }
+
+  void _setUpMarker() => marker = EntityMiniMapMarker(
+    size: _hitbox.height,
+    color: AppTheme.entityMarkerSpecial,
+    layer: EntityMiniMapMarkerLayer.behindForeground,
+  );
 
   void _loadSpriteAnimation() {
     animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
