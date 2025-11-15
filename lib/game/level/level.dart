@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
-import 'package:flame/components.dart' hide Matrix4;
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
@@ -91,7 +89,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   late final Paint _miniMapPaint;
   late final Vector2 _miniMapSize;
   late final Sprite _readyMadeMiniMapForground;
-  late final Sprite readyMadeMiniMapBackground;
 
   // player
   late final Player _player;
@@ -164,43 +161,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _miniMapCanvas = Canvas(_miniMapRecorder);
     _miniMapPaint = Paint();
     _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
-
-    await _addBackgroundToMiniMap();
-  }
-
-  Future<void> _addBackgroundToMiniMap() async {
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-    final patternSize = Vector2.all(16);
-    final random = Random();
-
-    // create a small pattern
-    for (int y = 0; y < patternSize.y; y++) {
-      for (int x = 0; x < patternSize.x; x++) {
-        _miniMapPaint.color = miniMapBackgroundColors[random.nextInt(miniMapBackgroundColors.length)];
-        canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
-      }
-    }
-
-    // convert pattern to image
-    final picture = recorder.endRecording();
-    final image = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
-
-    // shader that repeats the image
-    _miniMapPaint.shader = ImageShader(image, TileMode.repeated, TileMode.repeated, Float64List.fromList(Matrix4.identity().storage));
-
-    final bgRecorder = PictureRecorder();
-    final bgCanvas = Canvas(bgRecorder);
-
-    // use the shader to create the background across the entire mini map size
-    bgCanvas.drawRect(Rect.fromLTWH(0, 0, _miniMapSize.x, _miniMapSize.y), _miniMapPaint);
-
-    // remove shader
-    _miniMapPaint.shader = null;
-
-    final bgPicture = bgRecorder.endRecording();
-    final bgImage = await bgPicture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
-    readyMadeMiniMapBackground = Sprite(bgImage);
   }
 
   void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
@@ -218,7 +178,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _miniMapCanvas.drawRect(Rect.fromLTWH(mapPosition.x, mapPosition.y, 1, 1), _miniMapPaint);
   }
 
-  void _drawMiniMapPattern(Vector2 position, List<List<Color?>> pattern) {
+  void _addPatternToMiniMap(Vector2 position, List<List<Color?>> pattern) {
     for (int y = 0; y < pattern.length; y++) {
       for (int x = 0; x < pattern[y].length; x++) {
         final color = pattern[y][x];
@@ -231,7 +191,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   void _addCheckpointToMiniMap(Vector2 position) {
     final mapPosition = position / GameSettings.tileSize + Vector2(1, 0);
-    _drawMiniMapPattern(mapPosition, miniMapCheckpointPattern);
+    _addPatternToMiniMap(mapPosition, miniMapCheckpointPattern);
   }
 
   Future<void> _endMiniMapRecording() async {

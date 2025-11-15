@@ -7,6 +7,21 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
+/// A container component for displaying the mini map HUD element.
+///
+/// MiniMap is responsible for:
+/// - positioning the mini map in the HUD (top-right by default)
+/// - adding a decorative frame around the map
+/// - instantiating and configuring a `MiniMapView` that does the actual rendering
+///
+/// MiniMap only adjusts the `MiniMapView` to account
+/// for frame borders and optical alignment.
+///
+/// Responsibilities:
+/// - scale and offset the mini map view to hide borders in the source sprite
+/// - provide a fixed target size for the HUD element
+/// - add a border sprite for visual decoration
+/// - delegate all actual rendering to `MiniMapView`
 class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final Sprite _miniMapSprite;
@@ -43,6 +58,11 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     return super.onLoad();
   }
 
+  /// Adds a decorative frame around the mini map.
+  ///
+  /// Loads the frame sprite and adds it as a child component.
+  /// Applies a small vertical adjustment to compensate for the protruding
+  /// ends of the frame so that it visually aligns with the mini map view.
   void setUpFrame() {
     final sprite = SpriteComponent(sprite: loadSprite(game, 'HUD/MiniMap Border 4.png'));
     add(sprite);

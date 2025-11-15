@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:math';
+import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart' hide Route;
+import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -25,6 +28,8 @@ class PixelQuest extends FlameGame
   late final StorageCenter storageCenter;
   late final GameSafePadding safePadding;
 
+  late final Image miniMapBackgroundPattern;
+
   // router
   late final RouterComponent router;
 
@@ -37,6 +42,7 @@ class PixelQuest extends FlameGame
     _setUpCameraDefault();
     _setUpSafePadding();
     _setUpRouter();
+    await _createMiniMapBackgroundPattern();
     WidgetsBinding.instance.addObserver(this);
 
     // await Future.delayed(Duration(seconds: 3000));
@@ -132,6 +138,26 @@ class PixelQuest extends FlameGame
       ),
     );
     // add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));
+  }
+
+  Future<void> _createMiniMapBackgroundPattern() async {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    final patternSize = Vector2.all(16);
+    final random = Random();
+    final paint = Paint();
+
+    // create a small pattern
+    for (int y = 0; y < patternSize.y; y++) {
+      for (int x = 0; x < patternSize.x; x++) {
+        paint.color = miniMapBackgroundColors[random.nextInt(miniMapBackgroundColors.length)];
+        canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
+      }
+    }
+
+    // convert pattern to image
+    final picture = recorder.endRecording();
+    miniMapBackgroundPattern = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
   }
 }
 
