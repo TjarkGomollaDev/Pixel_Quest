@@ -40,7 +40,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
 
   void _initialSetup() {
     // debug
-    debugColor = Colors.transparent;
+    debugColor = AppTheme.transparent;
 
     // general
     anchor = Anchor.centerLeft;

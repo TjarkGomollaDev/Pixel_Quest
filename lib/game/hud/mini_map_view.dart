@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
-enum MiniMapPlayerMarker { circle, triangel }
+// TODO frame world abhängig machen, pause route text buttons und überarbeiten und sound button mit in game hud, player marker style in storage
 
 /// A purely visual mini map component that renders a horizontal slice of the level.
 ///
@@ -74,7 +74,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   late final Paint _backgroundPaint;
 
   // player marker
-  static final MiniMapPlayerMarker _playerMarker = MiniMapPlayerMarker.triangel; // [Adjustable]
+  late final PlayerMiniMapMarkerType _playerMarker; // [Adjustable]
   late final Paint _playerMarkerPaint;
   late final double _playerMarkerSize;
 
@@ -121,7 +121,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   /// Computes all scaling values based solely on provided constructor data.
   void _setUpScales() {
     _spriteToMiniMapScale = _targetSize.y / _spriteForeground.srcSize.y;
-    _worldToMiniMapScale = (_spriteForeground.srcSize.x * _spriteToMiniMapScale) / _levelWidth;
+    _worldToMiniMapScale = _spriteForeground.srcSize.x * _spriteToMiniMapScale / _levelWidth;
     _mapWidth = _spriteForeground.srcSize.x * _spriteToMiniMapScale;
     _mapMaxOffset = _mapWidth - _targetSize.x;
     _halfTargetWidth = _targetSize.x / 2;
@@ -140,6 +140,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
 
   /// Initializes marker sizes and paints for the player and all entity markers.
   void _setUpMarker() {
+    _playerMarker = game.storageCenter.settings.playerMarker;
     _playerMarkerPaint = Paint()..color = AppTheme.playerMarker;
     _playerMarkerSize = _player.hitboxSize.y * _worldToMiniMapScale;
     _entityMarkerPaint = Paint();
@@ -159,8 +160,8 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
     final y = _player.hitbox.center.dy * _worldToMiniMapScale;
 
     return switch (_playerMarker) {
-      MiniMapPlayerMarker.circle => _renderCirclePlayerMarker(canvas, x, y),
-      MiniMapPlayerMarker.triangel => _renderTrianglePlayerMarker(canvas, x, y),
+      PlayerMiniMapMarkerType.circle => _renderCirclePlayerMarker(canvas, x, y),
+      PlayerMiniMapMarkerType.triangel => _renderTrianglePlayerMarker(canvas, x, y),
     };
   }
 

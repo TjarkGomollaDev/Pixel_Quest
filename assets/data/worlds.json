@@ -3,6 +3,7 @@
     "uuid": "014809d5-8ec5-4171-a82e-df72e7839d45",
     "titleFileName": "World_1_Title",
     "foregroundFileName": "World_1_Foreground",
+    "miniMapFrameFileName": "MiniMap_Frame_World_1",
     "backgroundSzene": "szene1",
     "baseBlock": "mud",
     "levelUuids": [
@@ -27,6 +28,7 @@
     "uuid": "07ee6495-e92a-4845-95a6-500f402420d3",
     "titleFileName": "World_2_Title",
     "foregroundFileName": "World_2_Foreground",
+    "miniMapFrameFileName": "MiniMap_Frame_World_2",
     "backgroundSzene": "szene2",
     "baseBlock": "sand",
     "levelUuids": [

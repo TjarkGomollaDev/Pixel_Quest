@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
-import 'package:pixel_adventure/game/utils/in_game_btn.dart';
+import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
@@ -22,8 +22,8 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   late final MenuTopBar _menuTopBar;
   late final CharacterPicker _characterPicker;
   late final InputBlocker _blockerWhenSpotlight;
-  late final InGameBtn _previousWorldBtn;
-  late final InGameBtn _nextWorldBtn;
+  late final SpriteBtn _previousWorldBtn;
+  late final SpriteBtn _nextWorldBtn;
 
   // worlds content
   final List<BackgroundSzene> _worldBackgrounds = [];
@@ -75,6 +75,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void dispose() {
     _sub?.cancel();
     _sub = null;
+    _menuTopBar.dispose();
   }
 
   void _setUpSubscription() {
@@ -171,15 +172,15 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _setUpChangeWorldBtns() {
     final levelGridVerticalCenter = _worldLevelGrids[0].position.y + _worldLevelGrids[0].size.y / 2;
-    final btnHorizontalCenter = InGameBtn.btnSizeSmall.x / 2;
-    _previousWorldBtn = InGameBtn(
-      type: InGameBtnType.previousSmall,
-      action: () => _changeWorld(-1),
+    final btnHorizontalCenter = SpriteBtn.btnSizeSmall.x / 2;
+    _previousWorldBtn = SpriteBtn(
+      type: SpriteBtnType.previousSmall,
+      onPressed: () => _changeWorld(-1),
       position: Vector2(_worldLevelGrids[0].position.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
     );
-    _nextWorldBtn = InGameBtn(
-      type: InGameBtnType.nexStSmall,
-      action: () => _changeWorld(1),
+    _nextWorldBtn = SpriteBtn(
+      type: SpriteBtnType.nexStSmall,
+      onPressed: () => _changeWorld(1),
       position: Vector2(
         _worldLevelGrids[0].position.x + _worldLevelGrids[0].size.x + _levelGridChangeWorldBtnsSpacing + btnHorizontalCenter,
         levelGridVerticalCenter,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini_map_view.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -7,13 +8,8 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-/// A container component for displaying the mini map HUD element.
-///
-/// MiniMap is responsible for:
-/// - positioning the mini map in the HUD (top-right by default)
-/// - adding a decorative frame around the map
-/// - instantiating and configuring a `MiniMapView` that does the actual rendering
-///
+/// A container component for displaying the mini map with a decorative frame.
+/// All actual drawing and calculations are handled by MiniMapView.
 /// MiniMap only adjusts the `MiniMapView` to account
 /// for frame borders and optical alignment.
 ///
@@ -27,6 +23,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
+  final LevelMetadata _levelMetadata;
   final List<EntityOnMiniMap> _entitiesAboveForeground;
   final List<EntityOnMiniMap> _entitiesBehindForeground;
 
@@ -34,21 +31,31 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     required Sprite miniMapSprite,
     required double levelWidth,
     required Player player,
+    required LevelMetadata levelMetadata,
     required List<EntityOnMiniMap> entitiesAboveForeground,
     required List<EntityOnMiniMap> entitiesBehindForeground,
     required super.position,
   }) : _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
+       _levelMetadata = levelMetadata,
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground {
-    size = miniMapTargetSize + Vector2.all(_borderWidth * 2);
+    size = miniMapTargetSize + Vector2.all(_frameBorderWidth * 2);
   }
 
-  // the target size represents the size of the mini map view without the mini map frame
+  // renders the actual mini map
   late final MiniMapView _miniMapView;
+
+  // the target size represents the size of the mini map view, so the size of the inside of the frame
   static final Vector2 miniMapTargetSize = Vector2(96, 48); // [Adjustable]
-  static const double _borderWidth = 12; // [Adjustable]
+
+  // image of the frame
+  late final SpriteComponent _frame;
+
+  // border width of the frame image
+  static const double _frameBorderWidth = 12; // [Adjustable]
+  static const double _frameOverhangAdjust = 3; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -64,11 +71,13 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// Applies a small vertical adjustment to compensate for the protruding
   /// ends of the frame so that it visually aligns with the mini map view.
   void setUpFrame() {
-    final sprite = SpriteComponent(sprite: loadSprite(game, 'HUD/MiniMap Border 4.png'));
-    add(sprite);
+    _frame = SpriteComponent(
+      sprite: loadSprite(game, 'HUD/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
+    );
+    add(_frame);
 
     // optical adjustment to compensate for the protruding ends of the frame
-    position.y -= 3;
+    position.y -= _frameOverhangAdjust;
   }
 
   /// Sets up the MiniMap View.
@@ -95,10 +104,10 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
 
       // scaled target size and an offset so that the view remains centered
       targetSize = Vector2(scaledWidth, scaledHeight);
-      viewPosition = Vector2.all(_borderWidth) + (miniMapTargetSize - targetSize) / 2;
+      viewPosition = Vector2.all(_frameBorderWidth) + (miniMapTargetSize - targetSize) / 2;
     } else {
       targetSize = miniMapTargetSize;
-      viewPosition = Vector2.all(_borderWidth);
+      viewPosition = Vector2.all(_frameBorderWidth);
     }
 
     _miniMapView = MiniMapView(

@@ -18,8 +18,6 @@ enum Szene {
 
   static const Szene defaultSzene = Szene.szene1;
 
-  static Szene getDefault() => defaultSzene;
-
   static Szene fromName(String name) => Szene.values.firstWhere((e) => e.name == name, orElse: () => defaultSzene);
 }
 

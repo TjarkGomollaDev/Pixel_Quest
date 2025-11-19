@@ -1,5 +1,5 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
 
 /// Mixin to add a `SpriteComponent` in its original size
@@ -26,7 +26,7 @@ mixin FixedGridOriginalSizeSprite on PositionComponent {
             anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
             sprite: sprite,
           )
-          ..debugColor = Colors.transparent
+          ..debugColor = AppTheme.transparent
           ..priority = -1;
     add(spriteComponent);
   }
@@ -56,7 +56,7 @@ mixin FixedGridOriginalSizeAnimation on PositionComponent {
             anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
             animation: animation,
           )
-          ..debugColor = Colors.transparent
+          ..debugColor = AppTheme.transparent
           ..priority = -1;
 
     add(animationComponent);
@@ -93,7 +93,7 @@ mixin FixedGridOriginalSizeGroupAnimation on PositionComponent {
             animations: animations,
             current: current,
           )
-          ..debugColor = Colors.transparent
+          ..debugColor = AppTheme.transparent
           ..priority = -1;
     add(animationGroupComponent);
   }

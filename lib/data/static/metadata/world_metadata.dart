@@ -9,8 +9,6 @@ enum LevelBaseBlock {
 
   static const LevelBaseBlock defaultBaseBlock = mud;
 
-  static LevelBaseBlock getDefault() => defaultBaseBlock;
-
   static LevelBaseBlock fromName(String name) => LevelBaseBlock.values.firstWhere((e) => e.name == name, orElse: () => defaultBaseBlock);
 }
 
@@ -20,6 +18,7 @@ class WorldMetadata {
   final int index;
   final String titleFileName;
   final String foregroundFileName;
+  final String miniMapFrameFileName;
   final Szene backgroundSzene;
   final LevelBaseBlock baseBlock;
 
@@ -29,6 +28,7 @@ class WorldMetadata {
     required this.index,
     required this.titleFileName,
     required this.foregroundFileName,
+    required this.miniMapFrameFileName,
     required this.backgroundSzene,
     required this.baseBlock,
   });
@@ -40,6 +40,7 @@ class WorldMetadata {
       index: index,
       titleFileName: map['titleFileName'] as String,
       foregroundFileName: map['foregroundFileName'] as String,
+      miniMapFrameFileName: map['miniMapFrameFileName'] as String,
       backgroundSzene: Szene.fromName(map['backgroundSzene'] as String),
       baseBlock: LevelBaseBlock.fromName(map['baseBlock'] as String),
     );

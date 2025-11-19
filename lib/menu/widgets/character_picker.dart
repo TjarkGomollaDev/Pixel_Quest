@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
-import 'package:pixel_adventure/game/utils/in_game_btn.dart';
+import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -25,14 +25,14 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   late final DummyCharacter _dummy;
   late final RRectComponent _titelBg;
   late final TextComponent _title;
-  late final InGameBtn _editBtn;
+  late final SpriteBtn _editBtn;
 
   // spotlight
   late final Spotlight _spotlight;
-  late final InGameBtn _closeBtn;
+  late final SpriteBtn _closeBtn;
   late final CharacterBio _characterBio;
-  late final InGameBtn _previousCharacterBtn;
-  late final InGameBtn _nextCharacterBtn;
+  late final SpriteBtn _previousCharacterBtn;
+  late final SpriteBtn _nextCharacterBtn;
   bool _isSpotlightActive = false;
 
   // spotlight spacing
@@ -95,9 +95,9 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpEditBtn() {
-    _editBtn = InGameBtn(
-      type: InGameBtnType.editSmall,
-      action: () async {
+    _editBtn = SpriteBtn(
+      type: SpriteBtnType.editSmall,
+      onPressed: () async {
         if (_isSpotlightActive) return;
         _isSpotlightActive = true;
         _inputBlocker.activate();
@@ -110,9 +110,9 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpCloseBtn() {
-    _closeBtn = InGameBtn(
-      type: InGameBtnType.closeSmall,
-      action: () async {
+    _closeBtn = SpriteBtn(
+      type: SpriteBtnType.closeSmall,
+      onPressed: () async {
         if (!_isSpotlightActive) return;
         _isSpotlightActive = false;
         _inputBlocker.deactivate();
@@ -127,19 +127,19 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
 
   void _setUpCharacterChangeBtns() {
     final basePosition = Vector2(_characterBio.x + 28, _characterBio.position.y + _characterBio.size.y / 2);
-    final btnHorizontalCenter = InGameBtn.btnSizeSmall.x / 2;
-    _previousCharacterBtn = InGameBtn(
-      type: InGameBtnType.previousSmall,
-      action: () {
+    final btnHorizontalCenter = SpriteBtn.btnSizeSmall.x / 2;
+    _previousCharacterBtn = SpriteBtn(
+      type: SpriteBtnType.previousSmall,
+      onPressed: () {
         if (!_isSpotlightActive) return;
         _dummy.switchCharacter(next: false);
       },
       position: basePosition + Vector2(-_characterChangeBtnSpacing / 2 - btnHorizontalCenter, 0),
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
-    _nextCharacterBtn = InGameBtn(
-      type: InGameBtnType.nexStSmall,
-      action: () {
+    _nextCharacterBtn = SpriteBtn(
+      type: SpriteBtnType.nexStSmall,
+      onPressed: () {
         if (!_isSpotlightActive) return;
         _dummy.switchCharacter();
       },
@@ -155,10 +155,10 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _showSpotlightContent() {
-    _closeBtn.animatedShow();
+    _closeBtn.scaleIn();
     _characterBio.animatedShow();
-    _nextCharacterBtn.animatedShow();
-    _previousCharacterBtn.animatedShow();
+    _nextCharacterBtn.scaleIn();
+    _previousCharacterBtn.scaleIn();
   }
 
   void _hideSpotlightContent() {

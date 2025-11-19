@@ -3,15 +3,17 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils/in_game_btn.dart';
+import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game/utils/volume.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -20,6 +22,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
+  final LevelMetadata _levelMetadata;
   final List<EntityOnMiniMap> _entitiesAboveForeground;
   final List<EntityOnMiniMap> _entitiesBehindForeground;
 
@@ -28,12 +31,14 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     required Sprite miniMapSprite,
     required double levelWidth,
     required Player player,
+    required LevelMetadata levelMetadata,
     required List<EntityOnMiniMap> entitiesAboveForeground,
     required List<EntityOnMiniMap> entitiesBehindForeground,
   }) : _totalFruitsCount = totalFruitsCount,
        _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
+       _levelMetadata = levelMetadata,
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground {
     final minLeft = game.safePadding.minLeft(40);
@@ -46,12 +51,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   late final double _verticalCenter;
 
   // btns
-  late final InGameBtn _menuBtn;
-  late final InGameToggleBtn _playBtn;
-  late final InGameBtn _restartBtn;
+  late final SpriteBtn _menuBtn;
+  late final SpriteToggleBtn _volumeBtn;
+  late final SpriteToggleBtn _pauseBtn;
+  late final SpriteBtn _restartBtn;
 
-  // spacing
-  static final double _btnSpacing = 4;
+  // btn spacing
+  static const double _btnSpacing = 4;
 
   // fruits count
   late final RRectComponent _fruitBg;
@@ -93,32 +99,41 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(InGameBtn.btnSize.x / 2, _verticalCenter);
-    final btnOffset = Vector2(InGameBtn.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(SpriteBtn.btnSize.x / 2, _verticalCenter);
+    final btnOffset = Vector2(SpriteBtn.btnSize.x + _btnSpacing, 0);
 
     // menu btn
-    _menuBtn = InGameBtn(
-      type: InGameBtnType.levels,
-      action: () {
+    _menuBtn = SpriteBtn(
+      type: SpriteBtnType.levels,
+      onPressed: () {
         if (game.router.currentRoute is PauseRoute) game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
       },
       position: btnBasePosition,
     );
 
-    // play toggle btn
-    _playBtn = InGameToggleBtn(
-      type: InGameBtnType.pause,
-      type_2: InGameBtnType.play,
-      action: () => game.router.pushNamed(RouteNames.pause),
-      action_2: () => game.router.pop(),
-      position: btnBasePosition + btnOffset,
+    _volumeBtn = SpriteToggleBtn(
+      type: SpriteBtnType.volumeOn,
+      type_2: SpriteBtnType.volumeOff,
+      onPressed: () => switchVolume(game: game, soundsEnabled: false),
+      onPressed_2: () => switchVolume(game: game),
+      position: _menuBtn.position + btnOffset,
+      initialState: game.storageCenter.settings.soundsEnabled,
+    );
+
+    // pause btn
+    _pauseBtn = SpriteToggleBtn(
+      type: SpriteBtnType.pause,
+      type_2: SpriteBtnType.play,
+      onPressed: () => game.router.pushNamed(RouteNames.pause),
+      onPressed_2: () => game.router.pop(),
+      position: _volumeBtn.position + btnOffset,
     );
 
     // restart the level btn
-    _restartBtn = InGameBtn(
-      type: InGameBtnType.restart,
-      action: () {
+    _restartBtn = SpriteBtn(
+      type: SpriteBtnType.restart,
+      onPressed: () {
         final currentRoute = game.router.currentRoute;
         if (currentRoute is WorldRoute) {
           final levelMetadata = (currentRoute.world as Level).levelMetadata;
@@ -143,10 +158,10 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
           }
         }
       },
-      position: btnBasePosition + btnOffset * 2,
+      position: _pauseBtn.position + btnOffset,
     );
 
-    addAll([_menuBtn, _playBtn, _restartBtn]);
+    addAll([_menuBtn, _volumeBtn, _pauseBtn, _restartBtn]);
   }
 
   void _setUpFruitsCount() {
@@ -214,12 +229,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
 
-  void togglePlayButton() => _playBtn.triggerToggle();
+  void togglePlayButton() => _pauseBtn.triggerToggle();
 
   void _setUpMiniMap() {
     _miniMap = MiniMap(
       miniMapSprite: _miniMapSprite,
       player: _player,
+      levelMetadata: _levelMetadata,
       levelWidth: _levelWidth,
       entitiesAboveForeground: _entitiesAboveForeground,
       entitiesBehindForeground: _entitiesBehindForeground,

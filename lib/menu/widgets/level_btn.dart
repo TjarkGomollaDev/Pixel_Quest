@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -47,7 +47,7 @@ class LevelBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCal
 
   void _initialSetup() {
     // debug
-    debugColor = Colors.transparent;
+    debugColor = AppTheme.transparent;
 
     // general
     anchor = Anchor.center;

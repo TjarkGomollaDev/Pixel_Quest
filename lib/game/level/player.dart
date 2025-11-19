@@ -53,8 +53,6 @@ enum PlayerCharacter {
 
   static const PlayerCharacter defaultCharacter = PlayerCharacter.maskDude;
 
-  static PlayerCharacter getDefault() => defaultCharacter;
-
   static PlayerCharacter fromName(String name) => PlayerCharacter.values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
 }
 

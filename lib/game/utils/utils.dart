@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -24,7 +24,7 @@ void addSpriteRow({
         ? SpriteAnimationComponent(animation: animation, size: Vector2(GameSettings.tileSize, GameSettings.tileSize))
         : SpriteComponent(sprite: sprite, size: Vector2(GameSettings.tileSize, GameSettings.tileSize));
 
-    component.debugColor = Colors.transparent;
+    component.debugColor = AppTheme.transparent;
 
     final angle = [0.0, 1.5708, 3.1416, 4.7124][side - 1];
     final position = switch (side) {

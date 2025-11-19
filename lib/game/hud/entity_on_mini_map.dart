@@ -37,6 +37,16 @@ mixin EntityOnMiniMap on PositionComponent {
   }
 }
 
+enum PlayerMiniMapMarkerType {
+  circle,
+  triangel;
+
+  static const PlayerMiniMapMarkerType defaultMarker = PlayerMiniMapMarkerType.triangel;
+
+  static PlayerMiniMapMarkerType fromName(String name) =>
+      PlayerMiniMapMarkerType.values.firstWhere((c) => c.name == name, orElse: () => defaultMarker);
+}
+
 enum EntityMiniMapMarkerType { circle, square, platform }
 
 enum EntityMiniMapMarkerLayer { aboveForeground, behindForeground }

@@ -37,6 +37,7 @@ class StorageCenter {
   static Future<StorageCenter> init({required StaticCenter staticCenter}) async {
     final prefs = await SharedPreferences.getInstance();
     final dataCenter = StorageCenter._(prefs, staticCenter);
+    await dataCenter.clearSettings(); // for testing
     await dataCenter.clearAllLevels(); // for testing
     await dataCenter.clearAllWorlds(); // for testing
     dataCenter._loadAllLevels();
@@ -168,5 +169,9 @@ class StorageCenter {
         _cacheSettings = SettingsEntity.defaultSettings();
       }
     }
+  }
+
+  Future<void> clearSettings() async {
+    await _prefs.remove(_storageKeyUserSettings);
   }
 }

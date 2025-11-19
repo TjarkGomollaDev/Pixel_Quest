@@ -644,6 +644,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       miniMapSprite: _readyMadeMiniMapForground,
       levelWidth: _levelMap.width,
       player: _player,
+      levelMetadata: levelMetadata,
       entitiesAboveForeground: _miniMapEntitiesAboveForeground,
       entitiesBehindForeground: _miniMapEntitiesBehindForeground,
     );
