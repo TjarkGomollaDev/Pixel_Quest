@@ -15,7 +15,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// - Visibility control
 /// - Animated show effect
 ///
-/// IMPORTANT: Any component using this mixin **must call `_setUpBaseBtn()`**
+/// IMPORTANT: Any component using this mixin **must call `_setUpBaseBtn`**
 /// during initialization (e.g., in the constructor) to set up the `_onPressed` callback
 /// and initial visibility. Failure to call this will result in the button not functioning correctly.
 mixin _BaseBtn on PositionComponent, TapCallbacks, HasVisibility {
