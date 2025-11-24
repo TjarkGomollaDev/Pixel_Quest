@@ -4,55 +4,89 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-/// BaseBtn is a mixin that provides basic button functionality for Flame components.
+/// `_BaseBtn` is a mixin providing robust button behavior for Flame components.
 ///
-/// It handles:
-/// - Tap interactions (onTapDown, onTapUp, onTapCancel)
-/// - Scale animations when pressed
-/// - Visibility control
-/// - Animated show effect
+/// It provides:
+/// - Tap interaction handling (`onTapDown`, `onTapUp`, `onTapCancel`)
+/// - Tap locking (prevents double inputs)
+/// - Visibility control by modifying the component's `size`
+/// - Optional animated show/hide using scale effects
 ///
-/// IMPORTANT: Any component using this mixin **must call `_setUpBaseBtn`**
-/// during initialization (e.g., in the constructor) to set up the `_onPressed` callback
-/// and initial visibility. Failure to call this will result in the button not functioning correctly.
-mixin _BaseBtn on PositionComponent, TapCallbacks, HasVisibility {
+/// IMPORTANT — REQUIRED SETUP:
+/// Any component using `_BaseBtn` **must call BOTH** of the following:
+///
+/// 1. `_setUpBaseBtn(onPressed: ..., show: ...)`
+///    → MUST be called inside the constructor
+///
+/// 2. `_setUpOriginalSize(size)`
+///    → MUST be called in `onLoad()` (where the true size is known)
+///
+/// If either of these is missing, the button will not behave correctly.
+///
+/// **Why not use `HasVisibility`?**
+/// For buttons, relying on `isVisible` alone can be error-prone with simultaneous
+/// animations and taps. Instead, this mixin sets `size = Vector2.zero()` when hiding
+/// and restores the original size when showing. This ensures the button cannot be
+/// tapped while hidden and avoids subtle race conditions.
+mixin _BaseBtn on PositionComponent, TapCallbacks {
+  // the callback invoked when the button is successfully tapped
   late void Function() _onPressed;
+
+  // scale values for press animation
   static final Vector2 _normalScale = Vector2.all(1);
   static final Vector2 _maxScale = Vector2.all(1.05);
 
-  /// Sets scale to normal.
-  void setNormalScale() => scale = _normalScale;
+  // all three flags are combined ensuring the button
+  // reacts only when it is ready, visible, and not animating
+  bool _tapLocked = false;
+  bool _logicalVisible = true;
+  bool _animating = false;
 
-  /// Sets scale to max.
-  void setMaxScale() => scale = _maxScale;
+  // stores the original, tappable size of the button
+  late Vector2 _originalSize;
 
   @override
   void onTapDown(TapDownEvent event) {
+    if (!_canReceiveTap) return;
     scale = _maxScale;
     super.onTapDown(event);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
+    if (!_canReceiveTap) return;
+    _tapLocked = true;
+    Future.delayed(const Duration(milliseconds: 80), () => _tapLocked = false);
     scale = _normalScale;
-    _onPressed();
+    _callOnPressed();
     super.onTapUp(event);
   }
 
   @override
   void onTapCancel(TapCancelEvent event) {
+    if (!_canReceiveTap) return;
     scale = _normalScale;
     super.onTapCancel(event);
   }
 
+  /// Initializes the button.
+  /// MUST be called inside the constructor of any class mixing in `_BaseBtn`.
+  ///
+  /// - [onPressed] : callback to execute when the button is tapped
+  /// - [show]      : whether the button starts visible or hidden
   void _setUpBaseBtn({required void Function() onPressed, required bool show}) {
     _onPressed = onPressed;
     if (!show) hide();
     _initialSetup();
   }
+
+  /// Sets the original (intended) size of the button.
+  /// MUST be called in `onLoad()` where the true size is finally available.
+  void _setUpOriginalSize(Vector2 size) => _originalSize = size;
 
   void _initialSetup() {
     // debug
@@ -62,40 +96,114 @@ mixin _BaseBtn on PositionComponent, TapCallbacks, HasVisibility {
     anchor = Anchor.center;
   }
 
-  /// Sets visibility to true.
-  void show() => isVisible = true;
+  /// Sets scale to normal.
+  void setNormalScale() => scale = _normalScale;
 
-  /// Sets visibility to false.
-  void hide() => isVisible = false;
+  /// Sets scale to max.
+  void setMaxScale() => scale = _maxScale;
 
-  /// Animates the component to appear with a scale effect.
+  /// Determines whether this button may receive and react to taps.
   ///
-  /// Sets the component visible, then scales it from [_normalScale] using a smooth
-  /// `Curves.easeOutBack` animation over the given [duration].
-  /// Returns a Future that completes when the animation finishes.
-  Future<void> scaleIn({double duration = 0.25}) async {
-    if (isVisible) return;
-    scale = Vector2.all(0);
-    isVisible = true;
+  /// All interaction is blocked when:
+  /// - `_tapLocked` is true (tap cooldown)
+  /// - `_logicalVisible` is false (hidden)
+  /// - `_animating` is true (during show/hide animation)
+  bool get _canReceiveTap => !_tapLocked && _logicalVisible && !_animating;
+
+  /// Calls the assigned `_onPressed` callback.
+  ///
+  /// This method is extracted from `onTapUp` so that subclasses
+  /// can override the behavior when the button is pressed without
+  /// needing to duplicate the entire `onTapUp` logic.
+  void _callOnPressed() => _onPressed();
+
+  /// Shows the button immediately.
+  /// Restores the original size and marks the logical visibility flag.
+  void show() {
+    size = _originalSize;
+    _logicalVisible = true;
+  }
+
+  /// Hides the button immediately.
+  /// Sets the size to zero to prevent interaction and visual presence.
+  void hide() {
+    size = Vector2.zero();
+    _logicalVisible = false;
+  }
+
+  /// Animates the button to appear with a scale effect.
+  ///
+  /// Sets the button visible, restores its original size, then scales it
+  /// from zero to [_normalScale] using a smooth `Curves.easeOutBack` animation.
+  /// While animating, taps are blocked.
+  ///
+  /// Parameters:
+  /// - [delay]    : optional delay before the animation starts (in seconds)
+  /// - [duration] : duration of the scale animation (in seconds)
+  Future<void> animatedShow({double delay = 0.0, double duration = 0.25}) async {
+    if (_animating) return;
+    _animating = true;
+    show();
+    scale = Vector2.zero();
     final completer = Completer<void>();
 
     add(
       ScaleEffect.to(
         _normalScale,
-        EffectController(duration: duration, curve: Curves.easeOutBack),
-        onComplete: () => completer.complete(),
+        EffectController(duration: duration, startDelay: delay, curve: Curves.easeOutBack),
+        onComplete: () {
+          _animating = false;
+          completer.complete();
+        },
+      ),
+    );
+    return completer.future;
+  }
+
+  /// Animates the button to disappear with a scale effect.
+  ///
+  /// Scales the button from [_normalScale] down to zero over the given [duration].
+  /// Sets `_logicalVisible` to false immediately, and the `size` is set to zero
+  /// when the animation completes. Taps are blocked during the animation.
+  ///
+  /// Parameters:
+  /// - [delay]    : optional delay before the animation starts (in seconds)
+  /// - [duration] : duration of the scale animation (in seconds)
+  Future<void> animatedHide({double delay = 0.0, double duration = 0.15}) async {
+    if (_animating) return;
+    _animating = true;
+    _logicalVisible = false;
+    scale = _normalScale;
+    final completer = Completer<void>();
+
+    add(
+      ScaleEffect.to(
+        Vector2.zero(),
+        EffectController(duration: duration, startDelay: delay, curve: FastStartAccelerateCurve()),
+        onComplete: () {
+          size = Vector2.zero();
+          _animating = false;
+          completer.complete();
+        },
       ),
     );
 
     return completer.future;
   }
 
-  /// Animates the button with a subtle "pop in" effect.
+  /// Performs a subtle visual "pop in" animation on the button.
+  ///
+  /// This is purely a visual effect: the button's logical visibility
+  /// and tap handling are **not affected**. The button can still be
+  /// tapped while the animation is running.
   ///
   /// The button first scales up to [_maxScale] and then back to [_normalScale]
-  /// using a [SequenceEffect]. You can optionally set a [delay] before the
-  /// animation starts and control the [duration] of each scale effect.
-  Future<void> popIn({double delay = 0.0, double duration = 0.2}) {
+  /// using a [SequenceEffect].
+  ///
+  /// Parameters:
+  /// - [delay]    : optional delay before the animation starts (in seconds)
+  /// - [duration] : duration of each scale step (in seconds)
+  Future<void> animatePopIn({double delay = 0.0, double duration = 0.2}) {
     final completer = Completer<void>();
     add(
       SequenceEffect([
@@ -144,6 +252,7 @@ class TextBtn extends PositionComponent with TapCallbacks, HasVisibility, _BaseB
   @override
   FutureOr<void> onLoad() {
     _setUpText();
+    _setUpOriginalSize(_textComponent.size);
     return super.onLoad();
   }
 
@@ -181,8 +290,10 @@ enum SpriteBtnType {
   closeSmall('Close Small'),
   backSmall('Back Small'),
   editSmall('Edit Small'),
+  upSmall('Up Small'),
+  downSmall('Down Small'),
   previousSmall('Previous Small'),
-  nexStSmall('Next Small');
+  nextSmall('Next Small');
 
   final String fileName;
 
@@ -202,8 +313,15 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
   }
 
   // size
-  static final Vector2 btnSize = Vector2(21, 22);
-  static final Vector2 btnSizeSmall = Vector2(15, 16);
+  static final Vector2 _btnSize = Vector2(21, 22);
+  static final Vector2 _btnSizeSmall = Vector2(15, 16);
+  static final Vector2 _btnOffset = Vector2.all(2);
+
+  // size getter
+  static get btnSize => _btnSize;
+  static get btnSizeCorrected => _btnSize - _btnOffset;
+  static get btnSizeSmall => _btnSizeSmall;
+  static get btnSizeSmallCorrected => _btnSizeSmall - _btnOffset;
 
   // animation settings
   static const String _path = 'Menu/Buttons/';
@@ -212,12 +330,11 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
   @override
   FutureOr<void> onLoad() {
     _loadSprite();
+    _setUpOriginalSize(sprite!.srcSize);
     return super.onLoad();
   }
 
   void _loadSprite() => sprite = loadSprite(game, '$_path${_type.fileName}$_pathEnd');
-
-  void _setSpriteByName(SpriteBtnType name) => sprite = loadSprite(game, '$_path${name.fileName}$_pathEnd');
 }
 
 /// SpriteToggleBtn is a [SpriteBtn] that can toggle between two sprites and actions.
@@ -227,7 +344,7 @@ class SpriteToggleBtn extends SpriteBtn {
   // constructor parameters
   final SpriteBtnType _type_2;
   final void Function() _onPressed_2;
-  bool _toggle;
+  bool _toggleState;
 
   SpriteToggleBtn({
     required super.type,
@@ -239,34 +356,39 @@ class SpriteToggleBtn extends SpriteBtn {
     bool initialState = true,
   }) : _type_2 = type_2,
        _onPressed_2 = onPressed_2,
-       _toggle = initialState;
+       _toggleState = initialState;
+
+  late final Sprite _sprite;
+  late final Sprite _sprite_2;
 
   @override
-  FutureOr<void> onLoad() {
-    _setSpriteByName(_toggle ? _type : _type_2);
+  void _loadSprite() {
+    _sprite = loadSprite(game, '${SpriteBtn._path}${_type.fileName}${SpriteBtn._pathEnd}');
+    _sprite_2 = loadSprite(game, '${SpriteBtn._path}${_type_2.fileName}${SpriteBtn._pathEnd}');
+    _setSpriteToState();
   }
 
   @override
-  void onTapUp(TapUpEvent event) {
-    scale = _BaseBtn._normalScale;
-    triggerToggle();
-  }
+  void _callOnPressed() => triggerToggle();
+
+  void _setSpriteToState() => sprite = _toggleState ? _sprite : _sprite_2;
 
   /// Switches the sprite and triggers the correct action.
   void triggerToggle() {
-    if (_toggle) {
-      _setSpriteByName(_type_2);
-      _onPressed();
-    } else {
-      _setSpriteByName(_type);
+    _toggleState = !_toggleState;
+    if (_toggleState) {
       _onPressed_2();
+      _setSpriteToState();
+    } else {
+      _onPressed();
+      _setSpriteToState();
     }
-    _toggle = !_toggle;
   }
 
+  // Sets a new toggle state.
   void setState(bool value) {
-    if (value == _toggle) return;
-    _toggle = value;
-    _toggle ? _setSpriteByName(_type) : _setSpriteByName(_type_2);
+    if (value == _toggleState) return;
+    _toggleState = value;
+    _setSpriteToState();
   }
 }

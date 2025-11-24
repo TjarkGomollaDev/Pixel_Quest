@@ -160,7 +160,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
 
     // add pop-in effect for all buttons
     for (var i = 0; i < _btns.length; i++) {
-      _btns[i].popIn(delay: (i + 2) * 0.45);
+      _btns[i].animatePopIn(delay: (i + 2) * 0.45);
     }
   }
 }

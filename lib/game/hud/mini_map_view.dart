@@ -8,8 +8,6 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
-// TODO frame world abhängig machen, pause route text buttons und überarbeiten und sound button mit in game hud, player marker style in storage
-
 /// A purely visual mini map component that renders a horizontal slice of the level.
 ///
 /// This class performs **no game logic, world calculations, or entity management**.
@@ -23,7 +21,7 @@ import 'package:vector_math/vector_math_64.dart' as math64;
 /// - rendering entities in two separate layers (behind/above foreground),
 /// - drawing the player marker,
 /// - handling horizontal scrolling based solely on the provided player position.
-class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
+class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
   // constructor parameters
   final Sprite _spriteForeground;
   final Vector2 _targetSize;
@@ -217,4 +215,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest> {
   /// Draws a platform-style rectangular entity marker.
   void _renderEntityPlatformMarker(Canvas canvas, Vector2 position) =>
       canvas.drawRect(Rect.fromLTWH(position.x, position.y, _entityMarkerPlatformSize.x, _entityMarkerPlatformSize.y), _entityMarkerPaint);
+
+  void show() => isVisible = true;
+  void hide() => isVisible = false;
 }

@@ -138,7 +138,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     _nextCharacterBtn = SpriteBtn(
-      type: SpriteBtnType.nexStSmall,
+      type: SpriteBtnType.nextSmall,
       onPressed: () {
         if (!_isSpotlightActive) return;
         _dummy.switchCharacter();
@@ -155,10 +155,10 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _showSpotlightContent() {
-    _closeBtn.scaleIn();
+    _closeBtn.animatedShow();
     _characterBio.animatedShow();
-    _nextCharacterBtn.scaleIn();
-    _previousCharacterBtn.scaleIn();
+    _nextCharacterBtn.animatedShow();
+    _previousCharacterBtn.animatedShow();
   }
 
   void _hideSpotlightContent() {

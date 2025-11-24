@@ -179,7 +179,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
       position: Vector2(_worldLevelGrids[0].position.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
     );
     _nextWorldBtn = SpriteBtn(
-      type: SpriteBtnType.nexStSmall,
+      type: SpriteBtnType.nextSmall,
       onPressed: () => _changeWorld(1),
       position: Vector2(
         _worldLevelGrids[0].position.x + _worldLevelGrids[0].size.x + _levelGridChangeWorldBtnsSpacing + btnHorizontalCenter,
