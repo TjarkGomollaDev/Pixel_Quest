@@ -112,6 +112,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       position: btnBasePosition,
     );
 
+    // volume btn
     _volumeBtn = SpriteToggleBtn(
       type: SpriteBtnType.volumeOn,
       type_2: SpriteBtnType.volumeOff,

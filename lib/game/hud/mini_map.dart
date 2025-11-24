@@ -159,12 +159,14 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     _scrollRightBtn = SpriteBtn(
       type: SpriteBtnType.nextSmall,
       onPressed: () => _miniMapView.scrollManual(1),
+      holdMode: true,
       position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtn.btnSizeSmallCorrected.y / 2),
     );
 
     _scrollLeftBtn = SpriteBtn(
       type: SpriteBtnType.previousSmall,
       onPressed: () => _miniMapView.scrollManual(-1),
+      holdMode: true,
       position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtn.btnSizeSmallCorrected.y - _btnSpacing),
     );
 
@@ -181,5 +183,6 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     _miniMapView.hide();
     _frame.hide();
     await Future.wait([_scrollLeftBtn.animatedHide(delay: 0.15), _scrollRightBtn.animatedHide()]);
+    _miniMapView.deactivateScrollMode();
   }
 }

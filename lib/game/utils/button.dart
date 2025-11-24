@@ -16,12 +16,14 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// - Visibility handling by modifying component size
 /// - Optional animated show/hide using scale effects
 /// - Correct handling of synchronous *and* asynchronous callbacks
+/// - Optional **hold mode** (continuous input while the button is held)
 ///
+/// ---
 /// ### SETUP REQUIREMENTS
 ///
 /// Any component mixing in `_BaseBtn` **must** call:
 ///
-/// 1. `_setUpBaseBtn(onPressed: ..., show: ...)`
+/// 1. `_setUpBaseBtn(onPressed: ..., show: ..., holdMode: ...)`
 ///    → Call inside the constructor
 ///
 /// 2. `_setUpOriginalSize(size)`
@@ -29,22 +31,23 @@ import 'package:pixel_adventure/pixel_quest.dart';
 ///
 /// If either of these is missing, the button will not behave correctly.
 ///
-/// ### ABOUT THE CALLBACK TYPE (`FutureOr<void> Function()`)
+/// ---
+/// ### ABOUT THE CALLBACK
 ///
-/// `_onPressed` accepts **both**:
+/// `_onPressed` accepts both:
 /// - `void Function()`
 /// - `Future<void> Function()`
 ///
-/// This means a button can run:
-/// - **normal sync code → tap finishes immediately**
-/// - **async code → button is locked until the Future completes**
+/// Normal tap (not hold mode):
+/// - Returning `void` → no blocking
+/// - Returning `Future<void>` → `_executing` is set and the button disables further taps until done
 ///
-/// This automatic blocking is controlled by:
-/// - `_executing = true` while a Future is running
+/// Hold mode:
+/// - `_onPressed` is executed **every frame** while held
+/// - It is **never awaited**
+/// - Hold input **never blocks** other taps after release
 ///
-/// As long as `_executing` is true, `_canReceiveTap` returns false,
-/// preventing unwanted rapid input during long-running operations.
-///
+/// ---
 /// ### NON-BLOCKING CALLBACKS
 ///
 /// If you *want* an async callback **not to block the button**, wrap it with:
@@ -56,6 +59,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// the async work *fire-and-forget*, so `_executing` never activates.
 /// The button remains immediately tappable.
 ///
+/// ---
 /// ### WHY NOT USE `isVisible`?
 ///
 /// For buttons, relying on `isVisible` mixin alone can be error-prone with simultaneous
@@ -63,6 +67,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// and restores the original size when showing. This ensures the button cannot be
 /// tapped while hidden and avoids subtle race conditions.
 ///
+/// ---
 /// ### TAP BLOCKING RULES
 ///
 /// A tap is only accepted when ALL are true:
@@ -70,6 +75,8 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// - `_logicalVisible == true`
 /// - `_animating == false`
 /// - `_executing == false` (only true when async callback returns a Future)
+///
+/// These rules **also apply during hold mode**, ensuring full consistency.
 mixin _BaseBtn on PositionComponent, TapCallbacks {
   // the assigned callback for the button
   late FutureOr<void> Function() _onPressed;
@@ -88,24 +95,36 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   // stores the original, tappable size of the button
   late Vector2 _originalSize;
 
+  // flags used for hold mode
+  bool _holdMode = false;
+  bool _isHeld = false;
+
   @override
   void onTapDown(TapDownEvent event) {
     if (!_canReceiveTap) return;
     scale = _maxScale;
+    if (_holdMode) _isHeld = true;
+
     super.onTapDown(event);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
     if (!_canReceiveTap) return;
-    _tapLocked = true;
-    Future.delayed(const Duration(milliseconds: 80), () => _tapLocked = false);
     scale = _normalScale;
-    final result = _callOnPressed();
-    if (result is Future) {
-      _executing = true;
-      result.whenComplete(() => _executing = false);
+    if (!_holdMode) {
+      // single tap logic below
+      _tapLocked = true;
+      Future.delayed(const Duration(milliseconds: 80), () => _tapLocked = false);
+      final result = _callOnPressed();
+      if (result is Future) {
+        _executing = true;
+        result.whenComplete(() => _executing = false);
+      }
+    } else {
+      _isHeld = false;
     }
+
     super.onTapUp(event);
   }
 
@@ -113,7 +132,16 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   void onTapCancel(TapCancelEvent event) {
     if (!_canReceiveTap) return;
     scale = _normalScale;
+    if (_holdMode) _isHeld = false;
+
     super.onTapCancel(event);
+  }
+
+  @override
+  void update(double dt) {
+    if (!(_holdMode && _isHeld && _canReceiveTap)) return;
+    _callOnPressed();
+    super.update(dt);
   }
 
   /// Initializes the button.
@@ -121,9 +149,11 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   ///
   /// - [onPressed] : callback to execute when the button is tapped
   /// - [show]      : whether the button starts visible or hidden
-  void _setUpBaseBtn({required FutureOr<void> Function() onPressed, required bool show}) {
+  /// - [holdMode]  : if hold mode is to be used instead of a single tap
+  void _setUpBaseBtn({required FutureOr<void> Function() onPressed, required bool show, required bool holdMode}) {
     _onPressed = onPressed;
     if (!show) hide();
+    _holdMode = holdMode;
     _initialSetup();
   }
 
@@ -289,10 +319,16 @@ class TextBtn extends PositionComponent with TapCallbacks, HasVisibility, _BaseB
   final String _text;
   final TextStyle? _textStyle;
 
-  TextBtn({required String text, required void Function() onPressed, required super.position, bool show = true, TextStyle? textStyle})
-    : _text = text,
-      _textStyle = textStyle {
-    _setUpBaseBtn(onPressed: onPressed, show: show);
+  TextBtn({
+    required String text,
+    required void Function() onPressed,
+    required super.position,
+    bool show = true,
+    bool holdMode = false,
+    TextStyle? textStyle,
+  }) : _text = text,
+       _textStyle = textStyle {
+    _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: holdMode);
   }
 
   late final TextComponent _textComponent;
@@ -356,9 +392,14 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
   // constructor parameters
   final SpriteBtnType _type;
 
-  SpriteBtn({required SpriteBtnType type, required FutureOr<void> Function() onPressed, required super.position, bool show = true})
-    : _type = type {
-    _setUpBaseBtn(onPressed: onPressed, show: show);
+  SpriteBtn({
+    required SpriteBtnType type,
+    required FutureOr<void> Function() onPressed,
+    required super.position,
+    bool show = true,
+    bool holdMode = false,
+  }) : _type = type {
+    _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: holdMode);
   }
 
   // size
@@ -401,7 +442,6 @@ class SpriteToggleBtn extends SpriteBtn {
     required super.onPressed,
     required FutureOr<void> Function() onPressed_2,
     required super.position,
-    super.show = true,
     bool initialState = true,
   }) : _type_2 = type_2,
        _onPressed_2 = onPressed_2,

@@ -69,7 +69,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   late final double _halfTargetWidth;
 
   // used for manual scrolling
-  static const double scrollAmount = 10; // [Adjustable]
+  static const double scrollAmount = 2; // [Adjustable]
   bool _manualScrollActive = false;
   double _lastPlayerX = 0;
 
@@ -174,6 +174,9 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
     _manualScrollActive = true;
     _setWorldOffset(_offsetX + scrollAmount * direction);
   }
+
+  /// Disables the scroll mode.
+  void deactivateScrollMode() => _manualScrollActive = false;
 
   /// Renders the player marker in the mini map using the chosen marker style.
   void _renderPlayerMarker(Canvas canvas) {
