@@ -68,6 +68,11 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   late final double _mapMaxOffset;
   late final double _halfTargetWidth;
 
+  // used for manual scrolling
+  static const double scrollAmount = 10; // [Adjustable]
+  bool _manualScrollActive = false;
+  double _lastPlayerX = 0;
+
   // map background
   late final Paint _backgroundPaint;
 
@@ -90,7 +95,13 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
 
   @override
   void update(double dt) {
-    _setWorldOffset(_player.hitbox.center.dx);
+    final playerX = _player.hitbox.center.dx;
+
+    // detect if the player moved horizontally, if that is the case automatic follow mode should re-activate
+    if ((playerX - _lastPlayerX).abs() > 0.1) _manualScrollActive = false;
+    if (!_manualScrollActive) _setWorldOffset(playerX * _worldToMiniMapScale - _halfTargetWidth);
+    _lastPlayerX = playerX;
+
     super.update(dt);
   }
 
@@ -145,11 +156,23 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
     _entityMarkerPlatformSize = Vector2(2, 1) * _spriteToMiniMapScale;
   }
 
-  /// Sets the visible area of the mini map based on the real world position.
-  void _setWorldOffset(double worldX) {
-    _offsetX = (worldX * _worldToMiniMapScale - _halfTargetWidth).clamp(0, _mapMaxOffset);
+  /// Sets the visible area of the mini map based on a x position in the mini map.
+  void _setWorldOffset(double miniMapX) {
+    _offsetX = (miniMapX).clamp(0, _mapMaxOffset);
     _visibleMinX = _offsetX - _visibleBuffer;
     _visibleMaxX = _offsetX + _targetSize.x + _visibleBuffer;
+  }
+
+  /// Scrolls the minimap manually by a fixed amount.
+  /// The `direction` parameter determines the scroll direction:
+  ///   -1 → scroll left
+  ///    1 → scroll right
+  ///
+  /// Once this function is called, the minimap will stop automatically
+  /// following the player until the player moves again.
+  void scrollManual(int direction) {
+    _manualScrollActive = true;
+    _setWorldOffset(_offsetX + scrollAmount * direction);
   }
 
   /// Renders the player marker in the mini map using the chosen marker style.

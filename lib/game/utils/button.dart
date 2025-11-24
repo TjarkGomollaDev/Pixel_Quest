@@ -8,33 +8,71 @@ import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-/// `_BaseBtn` is a mixin providing robust button behavior for Flame components.
+/// `_BaseBtn` is a mixin providing consistent and safe button behavior for Flame.
 ///
-/// It provides:
-/// - Tap interaction handling (`onTapDown`, `onTapUp`, `onTapCancel`)
+/// It supports:
+/// - Tap interaction (`onTapDown`, `onTapUp`, `onTapCancel`)
 /// - Tap locking (prevents double inputs)
-/// - Visibility control by modifying the component's `size`
+/// - Visibility handling by modifying component size
 /// - Optional animated show/hide using scale effects
+/// - Correct handling of synchronous *and* asynchronous callbacks
 ///
-/// IMPORTANT — REQUIRED SETUP:
-/// Any component using `_BaseBtn` **must call BOTH** of the following:
+/// ### SETUP REQUIREMENTS
+///
+/// Any component mixing in `_BaseBtn` **must** call:
 ///
 /// 1. `_setUpBaseBtn(onPressed: ..., show: ...)`
-///    → MUST be called inside the constructor
+///    → Call inside the constructor
 ///
 /// 2. `_setUpOriginalSize(size)`
-///    → MUST be called in `onLoad()` (where the true size is known)
+///    → Call inside `onLoad()` when the final size is known.
 ///
 /// If either of these is missing, the button will not behave correctly.
 ///
-/// **Why not use `HasVisibility`?**
-/// For buttons, relying on `isVisible` alone can be error-prone with simultaneous
+/// ### ABOUT THE CALLBACK TYPE (`FutureOr<void> Function()`)
+///
+/// `_onPressed` accepts **both**:
+/// - `void Function()`
+/// - `Future<void> Function()`
+///
+/// This means a button can run:
+/// - **normal sync code → tap finishes immediately**
+/// - **async code → button is locked until the Future completes**
+///
+/// This automatic blocking is controlled by:
+/// - `_executing = true` while a Future is running
+///
+/// As long as `_executing` is true, `_canReceiveTap` returns false,
+/// preventing unwanted rapid input during long-running operations.
+///
+/// ### NON-BLOCKING CALLBACKS
+///
+/// If you *want* an async callback **not to block the button**, wrap it with:
+/// ```dart
+/// onPressed: nonBlocking(() async { ... })
+/// ```
+///
+/// `nonBlocking()` returns a `FutureOr<void>` wrapper that starts
+/// the async work *fire-and-forget*, so `_executing` never activates.
+/// The button remains immediately tappable.
+///
+/// ### WHY NOT USE `isVisible`?
+///
+/// For buttons, relying on `isVisible` mixin alone can be error-prone with simultaneous
 /// animations and taps. Instead, this mixin sets `size = Vector2.zero()` when hiding
 /// and restores the original size when showing. This ensures the button cannot be
 /// tapped while hidden and avoids subtle race conditions.
+///
+/// ### TAP BLOCKING RULES
+///
+/// A tap is only accepted when ALL are true:
+/// - `_tapLocked == false`
+/// - `_logicalVisible == true`
+/// - `_animating == false`
+/// - `_executing == false` (only true when async callback returns a Future)
 mixin _BaseBtn on PositionComponent, TapCallbacks {
-  // the callback invoked when the button is successfully tapped
-  late void Function() _onPressed;
+  // the assigned callback for the button
+  late FutureOr<void> Function() _onPressed;
 
   // scale values for press animation
   static final Vector2 _normalScale = Vector2.all(1);
@@ -45,6 +83,7 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   bool _tapLocked = false;
   bool _logicalVisible = true;
   bool _animating = false;
+  bool _executing = false;
 
   // stores the original, tappable size of the button
   late Vector2 _originalSize;
@@ -62,7 +101,11 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
     _tapLocked = true;
     Future.delayed(const Duration(milliseconds: 80), () => _tapLocked = false);
     scale = _normalScale;
-    _callOnPressed();
+    final result = _callOnPressed();
+    if (result is Future) {
+      _executing = true;
+      result.whenComplete(() => _executing = false);
+    }
     super.onTapUp(event);
   }
 
@@ -78,7 +121,7 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   ///
   /// - [onPressed] : callback to execute when the button is tapped
   /// - [show]      : whether the button starts visible or hidden
-  void _setUpBaseBtn({required void Function() onPressed, required bool show}) {
+  void _setUpBaseBtn({required FutureOr<void> Function() onPressed, required bool show}) {
     _onPressed = onPressed;
     if (!show) hide();
     _initialSetup();
@@ -108,14 +151,19 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
   /// - `_tapLocked` is true (tap cooldown)
   /// - `_logicalVisible` is false (hidden)
   /// - `_animating` is true (during show/hide animation)
-  bool get _canReceiveTap => !_tapLocked && _logicalVisible && !_animating;
+  /// - `_executing` is true (async onPressed callback still running)
+  bool get _canReceiveTap => !_tapLocked && _logicalVisible && !_animating && !_executing;
 
-  /// Calls the assigned `_onPressed` callback.
+  /// Executes the button callback.
+  /// This method simply calls `_onPressed()` and returns its result.
   ///
-  /// This method is extracted from `onTapUp` so that subclasses
-  /// can override the behavior when the button is pressed without
-  /// needing to duplicate the entire `onTapUp` logic.
-  void _callOnPressed() => _onPressed();
+  /// Return type rules:
+  /// - If callback returns `void`: result is `void` → no tap blocking
+  /// - If callback returns `Future<void>`: result is a Future → `_executing` is set
+  ///
+  /// Subclasses may override this to modify behavior (e.g. toggle buttons)
+  /// without rewriting the entire `onTapUp` logic.
+  FutureOr<void> _callOnPressed() => _onPressed();
 
   /// Shows the button immediately.
   /// Restores the original size and marks the logical visibility flag.
@@ -308,7 +356,8 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
   // constructor parameters
   final SpriteBtnType _type;
 
-  SpriteBtn({required SpriteBtnType type, required void Function() onPressed, required super.position, bool show = true}) : _type = type {
+  SpriteBtn({required SpriteBtnType type, required FutureOr<void> Function() onPressed, required super.position, bool show = true})
+    : _type = type {
     _setUpBaseBtn(onPressed: onPressed, show: show);
   }
 
@@ -343,14 +392,14 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
 class SpriteToggleBtn extends SpriteBtn {
   // constructor parameters
   final SpriteBtnType _type_2;
-  final void Function() _onPressed_2;
+  final FutureOr<void> Function() _onPressed_2;
   bool _toggleState;
 
   SpriteToggleBtn({
     required super.type,
     required SpriteBtnType type_2,
     required super.onPressed,
-    required void Function() onPressed_2,
+    required FutureOr<void> Function() onPressed_2,
     required super.position,
     super.show = true,
     bool initialState = true,
@@ -374,21 +423,32 @@ class SpriteToggleBtn extends SpriteBtn {
   void _setSpriteToState() => sprite = _toggleState ? _sprite : _sprite_2;
 
   /// Switches the sprite and triggers the correct action.
-  void triggerToggle() {
+  FutureOr<void> triggerToggle() {
     _toggleState = !_toggleState;
-    if (_toggleState) {
-      _onPressed_2();
-      _setSpriteToState();
-    } else {
-      _onPressed();
-      _setSpriteToState();
-    }
+    _setSpriteToState();
+    if (_toggleState) return _onPressed_2();
+    return _onPressed();
   }
 
-  // Sets a new toggle state.
+  /// Sets a new toggle state.
   void setState(bool value) {
     if (value == _toggleState) return;
     _toggleState = value;
     _setSpriteToState();
   }
+}
+
+/// Wraps an async callback so the button does NOT block while it runs.
+///
+/// Usage:
+/// onPressed: nonBlocking(() async { ... });
+///
+/// The returned function is `FutureOr<void>` and starts the async work
+/// without returning the Future to `_BaseBtn`.
+/// Because `_callOnPressed()` receives a **void**, `_executing` never activates.
+/// This keeps the button tappable even during long async operations.
+FutureOr<void> Function() nonBlocking(Future<void> Function() asyncFn) {
+  return () {
+    asyncFn(); // fire-and-forget
+  };
 }

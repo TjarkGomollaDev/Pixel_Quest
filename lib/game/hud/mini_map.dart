@@ -151,43 +151,35 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     _hideBtn = SpriteToggleBtn(
       type: SpriteBtnType.downSmall,
       type_2: SpriteBtnType.upSmall,
-      onPressed: () => _hide(),
-      onPressed_2: () => _show(),
+      onPressed: _hide,
+      onPressed_2: _show,
       position: Vector2(size.x - SpriteBtn.btnSizeSmallCorrected.x / 2, SpriteBtn.btnSizeSmallCorrected.y / 2 + _frameOverhangAdjust),
     );
 
     _scrollRightBtn = SpriteBtn(
       type: SpriteBtnType.nextSmall,
-      onPressed: () {},
+      onPressed: () => _miniMapView.scrollManual(1),
       position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtn.btnSizeSmallCorrected.y / 2),
     );
 
     _scrollLeftBtn = SpriteBtn(
       type: SpriteBtnType.previousSmall,
-      onPressed: () {},
+      onPressed: () => _miniMapView.scrollManual(-1),
       position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtn.btnSizeSmallCorrected.y - _btnSpacing),
     );
 
     addAll([_hideBtn, _scrollRightBtn, _scrollLeftBtn]);
   }
 
-  bool _transition = false;
-
   Future<void> _show() async {
-    if (_transition) return;
-    _transition = true;
     _miniMapView.show();
     _frame.show();
     await Future.wait([_scrollLeftBtn.animatedShow(), _scrollRightBtn.animatedShow(delay: 0.15)]);
-    _transition = false;
   }
 
   Future<void> _hide() async {
-    if (_transition) return;
-    _transition = true;
     _miniMapView.hide();
     _frame.hide();
     await Future.wait([_scrollLeftBtn.animatedHide(delay: 0.15), _scrollRightBtn.animatedHide()]);
-    _transition = false;
   }
 }
