@@ -312,7 +312,12 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
 
 /// TextBtn is a button component that displays text and reacts to taps.
 ///
-/// It uses [_BaseBtn] for scaling and tap handling.
+/// [TextBtn] uses [_BaseBtn] to provide:
+/// - consistent tap handling (tap down/up/cancel)
+/// - optional hold mode (callback every frame while held)
+/// - tap locking and async-safe execution
+/// - show/hide and animated show/hide via scale effects
+///
 /// Optionally, a custom TextStyle can be provided.
 class TextBtn extends PositionComponent with TapCallbacks, HasVisibility, _BaseBtn {
   // constructor parameters
@@ -356,6 +361,12 @@ class TextBtn extends PositionComponent with TapCallbacks, HasVisibility, _BaseB
   }
 }
 
+/// Describes all predefined sprite-based menu buttons.
+///
+/// Each enum value:
+/// - holds its file name without extension
+/// - can build its full asset path via [path]
+/// - provides shared size information for normal and small buttons
 enum SpriteBtnType {
   // normal size
   achievements('Achievements'),
@@ -379,43 +390,57 @@ enum SpriteBtnType {
   previousSmall('Previous Small'),
   nextSmall('Next Small');
 
-  final String fileName;
-
-  const SpriteBtnType(this.fileName);
-}
-
-/// SpriteBtn is a button component that displays a sprite and reacts to taps.
-///
-/// It uses [_BaseBtn] for scaling and tap handling.
-/// Sprite is loaded from a path based on the provided SpriteBtnType.
-class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
-  // constructor parameters
-  final SpriteBtnType _type;
-
-  SpriteBtn({
-    required SpriteBtnType type,
-    required FutureOr<void> Function() onPressed,
-    required super.position,
-    bool show = true,
-    bool holdMode = false,
-  }) : _type = type {
-    _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: holdMode);
-  }
+  // path
+  static const String _basePath = 'Menu/Buttons/';
+  static const String _pathEnd = '.png';
+  String get path => _basePath + fileName + _pathEnd;
 
   // size
   static final Vector2 _btnSize = Vector2(21, 22);
   static final Vector2 _btnSizeSmall = Vector2(15, 16);
   static final Vector2 _btnOffset = Vector2.all(2);
 
-  // size getter
-  static get btnSize => _btnSize;
-  static get btnSizeCorrected => _btnSize - _btnOffset;
-  static get btnSizeSmall => _btnSizeSmall;
-  static get btnSizeSmallCorrected => _btnSizeSmall - _btnOffset;
+  // static size getter
+  static Vector2 get btnSize => _btnSize;
+  static Vector2 get btnSizeCorrected => _btnSize - _btnOffset;
+  static Vector2 get btnSizeSmall => _btnSizeSmall;
+  static Vector2 get btnSizeSmallCorrected => _btnSizeSmall - _btnOffset;
 
-  // animation settings
-  static const String _path = 'Menu/Buttons/';
-  static const String _pathEnd = '.png';
+  final String fileName;
+  const SpriteBtnType(this.fileName);
+}
+
+/// SpriteBtn is a button component that displays a sprite and reacts to taps.
+///
+/// [SpriteBtn] uses [_BaseBtn] to provide:
+/// - consistent tap handling (tap down/up/cancel)
+/// - optional hold mode (callback every frame while held)
+/// - tap locking and async-safe execution
+/// - show/hide and animated show/hide via scale effects
+///
+/// The sprite is loaded from the provided [path]. For predefined menu buttons,
+/// use [SpriteBtn.fromType] with a [SpriteBtnType] value.
+class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
+  // constructor parameters
+  final String _path;
+
+  SpriteBtn({
+    required String path,
+    required FutureOr<void> Function() onPressed,
+    required super.position,
+    bool show = true,
+    bool holdMode = false,
+  }) : _path = path {
+    _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: holdMode);
+  }
+
+  SpriteBtn.fromType({
+    required SpriteBtnType type,
+    required FutureOr<void> Function() onPressed,
+    required Vector2 position,
+    bool show = true,
+    bool holdMode = false,
+  }) : this(path: type.path, onPressed: onPressed, position: position, show: show, holdMode: holdMode);
 
   @override
   FutureOr<void> onLoad() {
@@ -424,45 +449,69 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
     return super.onLoad();
   }
 
-  void _loadSprite() => sprite = loadSprite(game, '$_path${_type.fileName}$_pathEnd');
+  void _loadSprite() => sprite = loadSprite(game, _path);
 }
 
-/// SpriteToggleBtn is a [SpriteBtn] that can toggle between two sprites and actions.
+/// A [SpriteBtn] that can toggle between two sprites and two actions.
 ///
-/// When tapped, it switches sprite and calls the respective action.
+/// When tapped, [SpriteToggleBtn]:
+/// - toggles its internal state
+/// - swaps between the two sprites
+/// - executes the corresponding callback for the new state
+///
+/// It inherits all behavior from [SpriteBtn].
+///
+/// Use [SpriteToggleBtn.fromType] when both sprites are defined as [SpriteBtnType]s.
 class SpriteToggleBtn extends SpriteBtn {
   // constructor parameters
-  final SpriteBtnType _type_2;
+  final String _path_2;
   final FutureOr<void> Function() _onPressed_2;
   bool _toggleState;
 
   SpriteToggleBtn({
-    required super.type,
-    required SpriteBtnType type_2,
+    required super.path,
+    required String path_2,
     required super.onPressed,
     required FutureOr<void> Function() onPressed_2,
     required super.position,
     bool initialState = true,
-  }) : _type_2 = type_2,
+  }) : _path_2 = path_2,
        _onPressed_2 = onPressed_2,
        _toggleState = initialState;
 
+  SpriteToggleBtn.fromType({
+    required SpriteBtnType type,
+    required SpriteBtnType type_2,
+    required FutureOr<void> Function() onPressed,
+    required FutureOr<void> Function() onPressed_2,
+    required Vector2 position,
+    bool initialState = true,
+  }) : this(
+         path: type.path,
+         path_2: type_2.path,
+         onPressed: onPressed,
+         onPressed_2: onPressed_2,
+         position: position,
+         initialState: initialState,
+       );
+
+  // sprite that is displayed depending on the toggle state
   late final Sprite _sprite;
   late final Sprite _sprite_2;
 
   @override
   void _loadSprite() {
-    _sprite = loadSprite(game, '${SpriteBtn._path}${_type.fileName}${SpriteBtn._pathEnd}');
-    _sprite_2 = loadSprite(game, '${SpriteBtn._path}${_type_2.fileName}${SpriteBtn._pathEnd}');
+    _sprite = loadSprite(game, _path);
+    _sprite_2 = loadSprite(game, _path_2);
     _setSpriteToState();
   }
 
   @override
-  void _callOnPressed() => triggerToggle();
+  FutureOr<void> _callOnPressed() => triggerToggle();
 
   void _setSpriteToState() => sprite = _toggleState ? _sprite : _sprite_2;
 
-  /// Switches the sprite and triggers the correct action.
+  /// Switches the sprite and triggers the corresponding action.
   FutureOr<void> triggerToggle() {
     _toggleState = !_toggleState;
     _setSpriteToState();
@@ -470,7 +519,7 @@ class SpriteToggleBtn extends SpriteBtn {
     return _onPressed();
   }
 
-  /// Sets a new toggle state.
+  /// Sets a new toggle state and updates the displayed sprite accordingly.
   void setState(bool value) {
     if (value == _toggleState) return;
     _toggleState = value;

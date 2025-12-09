@@ -108,8 +108,25 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // respawnables
   final List<Respawnable> _pendingRespawnables = [];
 
+  // timestamp used to measure loading time and used in conjunction with the loading overlay
+  late final DateTime _startTime;
+
+  /// Pre-warms the Tiled loading pipeline to prevent the initial stutter
+  /// that occurs when opening the first level after app launch.
+  ///
+  /// Tiled and Flame perform heavy one-time initialization on the first
+  /// `TiledComponent.load()` call. Invoking this method during startup
+  /// runs that cost upfront, ensuring smooth level loading without
+  /// frame drops.
+  ///
+  /// This does not add a level to the world; it simply triggers the
+  /// internal Tiled warm-up.
+  static Future<void> warmUp({required LevelMetadata levelMetadata}) async =>
+      await TiledComponent.load('${levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize));
+
   @override
   Future<void> onLoad() async {
+    _startTime = DateTime.now();
     _initialSetup();
     await _loadLevelMap();
     await _startMiniMapRecording();
@@ -120,10 +137,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   @override
-  void onMount() {
+  Future<void> onMount() async {
     _setUpCamera();
     _addGameHud();
     _addMobileControls();
+    await _hideLoadingOverlay();
+    await Future.delayed(Duration(milliseconds: 100));
     _player.spawnInLevel();
     super.onMount();
   }
@@ -661,6 +680,13 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   void increaseFruitsCount() => _gameHud.updateFruitCount(++playerFruitsCount);
 
   void _increaseDeathCount() => _gameHud.updateDeathCount(++deathCount);
+
+  Future<void> _hideLoadingOverlay() async {
+    final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
+    final delayMs = 1400;
+    if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+    await game.hideLoadingOverlay();
+  }
 
   void queueForRespawn(Respawnable item) {
     _pendingRespawnables.add(item);

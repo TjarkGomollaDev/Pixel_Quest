@@ -1,0 +1,176 @@
+Date : 2025-12-08 03:52:31
+Directory : /Users/tjarkgomolla/Development/Flutter/pixel_adventure
+Total : 114 files,  5361 codes, 468 comments, 646 blanks, all 6475 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         94 |      3,099 |        464 |        618 |      4,181 |
+| XML      |         13 |      1,937 |          0 |          8 |      1,945 |
+| JSON     |          3 |        251 |          0 |          0 |        251 |
+| Ruby     |          2 |         63 |          4 |         20 |         87 |
+| YAML     |          1 |          9 |          0 |          0 |          9 |
+| Swift    |          1 |          2 |          0 |          0 |          2 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                      |        114 |      5,361 |        468 |        646 |      6,475 |
+| . (Files)                                                                                              |          1 |          9 |          0 |          0 |          9 |
+| assets                                                                                                 |         16 |      2,188 |          0 |          8 |      2,196 |
+| assets/data                                                                                            |          3 |        251 |          0 |          0 |        251 |
+| assets/tiles                                                                                           |         13 |      1,937 |          0 |          8 |      1,945 |
+| ios                                                                                                    |          1 |         31 |          3 |         10 |         44 |
+| lib                                                                                                    |         94 |      3,099 |        464 |        618 |      4,181 |
+| lib (Files)                                                                                            |          6 |        146 |         18 |         33 |        197 |
+| lib/data                                                                                               |          8 |        394 |         10 |         81 |        485 |
+| lib/data/static                                                                                        |          4 |        160 |          3 |         32 |        195 |
+| lib/data/static (Files)                                                                                |          1 |         29 |          3 |          7 |         39 |
+| lib/data/static/metadata                                                                               |          3 |        131 |          0 |         25 |        156 |
+| lib/data/storage                                                                                       |          4 |        234 |          7 |         49 |        290 |
+| lib/data/storage (Files)                                                                               |          1 |        144 |          7 |         27 |        178 |
+| lib/data/storage/entities                                                                              |          3 |         90 |          0 |         22 |        112 |
+| lib/extensions                                                                                         |          2 |         16 |          0 |          5 |         21 |
+| lib/game                                                                                               |         64 |      1,417 |        337 |        298 |      2,052 |
+| lib/game/animations                                                                                    |          2 |         59 |          6 |         13 |         78 |
+| lib/game/checkpoints                                                                                   |          3 |          3 |          0 |          0 |          3 |
+| lib/game/collision                                                                                     |          1 |          1 |          0 |          0 |          1 |
+| lib/game/enemies                                                                                       |         13 |         54 |          2 |          4 |         60 |
+| lib/game/hud                                                                                           |          7 |        305 |        102 |         79 |        486 |
+| lib/game/level                                                                                         |          7 |        378 |         25 |         75 |        478 |
+| lib/game/traps                                                                                         |         16 |         86 |          9 |          7 |        102 |
+| lib/game/utils                                                                                         |         15 |        531 |        193 |        120 |        844 |
+| lib/menu                                                                                               |          9 |        828 |         89 |        164 |      1,081 |
+| lib/menu (Files)                                                                                       |          2 |        130 |          3 |         15 |        148 |
+| lib/menu/widgets                                                                                       |          7 |        698 |         86 |        149 |        933 |
+| lib/splash                                                                                             |          5 |        298 |         10 |         37 |        345 |
+| lib/splash (Files)                                                                                     |          1 |         60 |          5 |          7 |         72 |
+| lib/splash/widgets                                                                                     |          4 |        238 |          5 |         30 |        273 |
+| macos                                                                                                  |          2 |         34 |          1 |         10 |         45 |
+| macos (Files)                                                                                          |          1 |         32 |          1 |         10 |         43 |
+| macos/Flutter                                                                                          |          1 |          2 |          0 |          0 |          2 |
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                               | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/data/characters.json                    | JSON     |         26 |          0 |          0 |         26 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/data/levels.json                        | JSON     |        172 |          0 |          0 |        172 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/data/worlds.json                        | JSON     |         53 |          0 |          0 |         53 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_01.tmx                      | XML      |         18 |          0 |          0 |         18 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_02.tmx                      | XML      |        397 |          0 |          0 |        397 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_022.tmx                     | XML      |        105 |          0 |          1 |        106 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_03.tmx                      | XML      |        479 |          0 |          0 |        479 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_04.tmx                      | XML      |         18 |          0 |          0 |         18 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_05.tmx                      | XML      |        535 |          0 |          1 |        536 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_11.tmx                      | XML      |        162 |          0 |          1 |        163 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_13.tmx                      | XML      |         89 |          0 |          1 |         90 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_2-01.tmx                    | XML      |         35 |          0 |          1 |         36 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_Tile.tmx                    | XML      |         17 |          0 |          1 |         18 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_blank.tmx                   | XML      |         -4 |          0 |          0 |         -4 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Menu_Foreground.tmx               | XML      |         54 |          0 |          1 |         55 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Splash_Foreground.tmx             | XML      |         32 |          0 |          1 |         33 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/ios/Podfile                                    | Ruby     |         31 |          3 |         10 |         44 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/app_theme.dart                             | Dart     |         18 |          0 |          5 |         23 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/static/metadata/character_data.dart   | Dart     |         24 |          0 |          5 |         29 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/static/metadata/level_metadata.dart   | Dart     |         52 |          0 |         10 |         62 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/static/metadata/world_metadata.dart   | Dart     |         55 |          0 |         10 |         65 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/static/static_center.dart             | Dart     |         29 |          3 |          7 |         39 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/storage/entities/level_entity.dart    | Dart     |         35 |          0 |          8 |         43 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/storage/entities/settings_entity.dart | Dart     |         38 |          0 |          7 |         45 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/storage/entities/world_entity.dart    | Dart     |         17 |          0 |          7 |         24 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/data/storage/storage_center.dart           | Dart     |        144 |          7 |         27 |        178 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/extensions/build_context.dart              | Dart     |          7 |          0 |          2 |          9 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/extensions/int_double_extensions.dart      | Dart     |          9 |          0 |          3 |         12 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/animations/spotlight.dart             | Dart     |         18 |          4 |          4 |         26 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/animations/star.dart                  | Dart     |         41 |          2 |          9 |         52 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/checkpoints/checkpoint.dart           | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/checkpoints/finish.dart               | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/checkpoints/start.dart                | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/collision/world_collision.dart        | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/blue_bird.dart                | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/chicken.dart                  | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/ghost.dart                    | Dart     |         15 |          0 |          0 |         15 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/ghost_particle.dart           | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/mushroom.dart                 | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/plant.dart                    | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/plant_bullet.dart             | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/slime.dart                    | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/slime_particle.dart           | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/snail.dart                    | Dart     |         20 |          3 |          4 |         27 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/trunk.dart                    | Dart     |          3 |         -1 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/trunk_bullet.dart             | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/turtle.dart                   | Dart     |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/entity_on_mini_map.dart           | Dart     |         48 |          5 |         14 |         67 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/game_hud.dart                     | Dart     |         65 |          2 |          9 |         76 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/in_game_action_btn.dart           | Dart     |        -92 |         -4 |        -20 |       -116 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/jump_btn.dart                     | Dart     |        -34 |          0 |         -6 |        -40 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/mini_map.dart                     | Dart     |        126 |         36 |         27 |        189 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/mini_map_view.dart                | Dart     |        151 |         53 |         44 |        248 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/pause_route.dart                  | Dart     |         41 |         10 |         11 |         62 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/background_szene.dart           | Dart     |         13 |          1 |          4 |         18 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/level.dart                      | Dart     |        105 |          6 |         16 |        127 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/loading_dummy_character.dart    | Dart     |         98 |          9 |         23 |        130 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/loading_overlay.dart            | Dart     |        143 |          9 |         29 |        181 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/player.dart                     | Dart     |        -12 |          0 |         -4 |        -16 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/player_special_effect.dart      | Dart     |         -2 |          0 |         -1 |         -3 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/tile_id_helper.dart             | Dart     |         33 |          0 |          8 |         41 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/arrow_up.dart                   | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/fan.dart                        | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/fan_air_particle.dart           | Dart     |          5 |          0 |          0 |          5 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/fire.dart                       | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/fire_trap.dart                  | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/moving_platform.dart            | Dart     |          5 |          1 |          1 |          7 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/rock_head.dart                  | Dart     |         11 |          0 |          0 |         11 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/saw.dart                        | Dart     |         20 |          0 |          0 |         20 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/saw_circle.dart                 | Dart     |       -110 |        -30 |        -23 |       -163 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/saw_circle_component.dart       | Dart     |        121 |         32 |         25 |        178 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/saw_circle_single_saw.dart      | Dart     |          9 |          2 |          1 |         12 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/spike_head.dart                 | Dart     |          9 |          0 |          0 |          9 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/spiked_ball.dart                | Dart     |       -123 |        -19 |        -32 |       -174 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/spiked_ball_ball.dart           | Dart     |          5 |          2 |          1 |          8 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/spiked_ball_component.dart      | Dart     |        129 |         21 |         34 |        184 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/traps/spikes.dart                     | Dart     |          1 |          0 |          0 |          1 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/button.dart                     | Dart     |        262 |        174 |         59 |        495 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/corner_outline.dart             | Dart     |         29 |          0 |          3 |         32 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/curves.dart                     | Dart     |         12 |          0 |          3 |         15 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/debug.dart                      | Dart     |          0 |          7 |          0 |          7 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/dummy_character.dart            | Dart     |         49 |          5 |         10 |         64 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/game_safe_padding.dart          | Dart     |         13 |          0 |          4 |         17 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/input_blocker.dart              | Dart     |         16 |          0 |          6 |         22 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/jump_btn.dart                   | Dart     |         35 |          0 |          6 |         41 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/load_sprites.dart               | Dart     |         14 |         -7 |          2 |          9 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/position_provider.dart          | Dart     |         22 |          0 |         10 |         32 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/rrect.dart                      | Dart     |          5 |          0 |          2 |          7 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/settings_notifier.dart          | Dart     |         18 |         13 |          7 |         38 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/utils.dart                      | Dart     |          7 |          1 |          1 |          9 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/visible_components.dart         | Dart     |         43 |          0 |          5 |         48 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/utils/volume.dart                     | Dart     |          6 |          0 |          2 |          8 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game_settings.dart                         | Dart     |         48 |          8 |         10 |         66 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/main.dart                                  | Dart     |         28 |          0 |          1 |         29 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/level_btn.dart                        | Dart     |        -41 |         -4 |        -12 |        -57 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/menu_page.dart                        | Dart     |        171 |          7 |         27 |        205 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/character_bio.dart            | Dart     |         91 |         13 |         28 |        132 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/character_picker.dart         | Dart     |        149 |          5 |         21 |        175 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/level_btn.dart                | Dart     |         43 |          4 |         12 |         59 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/level_grid.dart               | Dart     |         78 |          2 |         14 |         94 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/level_tile.dart               | Dart     |        100 |          8 |         18 |        126 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/menu_dummy_character.dart     | Dart     |        132 |         39 |         28 |        199 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/menu/widgets/menu_top_bar.dart             | Dart     |        105 |         15 |         28 |        148 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/pixel_adventure.dart                       | Dart     |        -94 |        -11 |        -22 |       -127 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/pixel_quest.dart                           | Dart     |        127 |         21 |         35 |        183 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/router.dart                                | Dart     |         19 |          0 |          4 |         23 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/splash/splash_screen.dart                  | Dart     |         60 |          5 |          7 |         72 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/splash/widgets/animated_stars.dart         | Dart     |         67 |          2 |         10 |         79 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/splash/widgets/developer_logo.dart         | Dart     |         49 |          0 |          6 |         55 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/splash/widgets/loading_dots.dart           | Dart     |         72 |          0 |         10 |         82 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/splash/widgets/splash_content.dart         | Dart     |         50 |          3 |          4 |         57 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/macos/Flutter/GeneratedPluginRegistrant.swift  | Swift    |          2 |          0 |          0 |          2 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/macos/Podfile                                  | Ruby     |         32 |          1 |         10 |         43 |
+| /Users/tjarkgomolla/Development/Flutter/pixel_adventure/pubspec.yaml                                   | YAML     |          9 |          0 |          0 |          9 |
+| Total                                                                                                  |          |      5,361 |        468 |        646 |      6,475 |
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

@@ -1,11 +1,16 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-class RRectComponent extends PositionComponent {
+class RRectComponent extends PositionComponent with HasVisibility {
   final double borderRadius;
   final Color? color;
 
-  RRectComponent({this.color, required super.size, required super.position, this.borderRadius = 0, super.anchor});
+  RRectComponent({this.color, required super.size, required super.position, this.borderRadius = 0, super.anchor, bool show = true}) {
+    if (!show) hide();
+  }
+
+  void show() => isVisible = true;
+  void hide() => isVisible = false;
 
   double opacity = 1;
 

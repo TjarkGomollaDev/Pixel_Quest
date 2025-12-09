@@ -1,3 +1,5 @@
+import 'package:flame/extensions.dart';
+
 abstract class GameSettings {
   // custom debug mode
   static const bool customDebug = false;
@@ -56,4 +58,8 @@ abstract class GameSettings {
   static const bool spikedBallStartLeft = false;
   static const int spikedBallSwingArcDec = 170;
   static const int spikedBallSwingSpeed = 320;
+
+  // parallax background
+  static final Vector2 parallaxBaseVelocityLevel = Vector2(0.5, 0);
+  static final Vector2 parallaxBaseVelocityLoadingOverlay = Vector2(10, 0);
 }

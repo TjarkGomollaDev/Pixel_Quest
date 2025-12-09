@@ -44,7 +44,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
        _levelMetadata = levelMetadata,
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground {
-    size = miniMapTargetSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtn.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
+    size = miniMapTargetSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
   }
 
   // renders the actual mini map
@@ -148,26 +148,29 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpBtns() {
-    _hideBtn = SpriteToggleBtn(
+    _hideBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.downSmall,
       type_2: SpriteBtnType.upSmall,
       onPressed: _hide,
       onPressed_2: _show,
-      position: Vector2(size.x - SpriteBtn.btnSizeSmallCorrected.x / 2, SpriteBtn.btnSizeSmallCorrected.y / 2 + _frameOverhangAdjust),
+      position: Vector2(
+        size.x - SpriteBtnType.btnSizeSmallCorrected.x / 2,
+        SpriteBtnType.btnSizeSmallCorrected.y / 2 + _frameOverhangAdjust,
+      ),
     );
 
-    _scrollRightBtn = SpriteBtn(
+    _scrollRightBtn = SpriteBtn.fromType(
       type: SpriteBtnType.nextSmall,
       onPressed: () => _miniMapView.scrollManual(1),
       holdMode: true,
-      position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtn.btnSizeSmallCorrected.y / 2),
+      position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtnType.btnSizeSmallCorrected.y / 2),
     );
 
-    _scrollLeftBtn = SpriteBtn(
+    _scrollLeftBtn = SpriteBtn.fromType(
       type: SpriteBtnType.previousSmall,
       onPressed: () => _miniMapView.scrollManual(-1),
       holdMode: true,
-      position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtn.btnSizeSmallCorrected.y - _btnSpacing),
+      position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtnType.btnSizeSmallCorrected.y - _btnSpacing),
     );
 
     addAll([_hideBtn, _scrollRightBtn, _scrollLeftBtn]);

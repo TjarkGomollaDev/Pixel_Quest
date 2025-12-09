@@ -9,48 +9,62 @@ import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
-import 'package:pixel_adventure/game/hud/pause_route.dart';
 import 'package:pixel_adventure/game/level/level.dart';
+import 'package:pixel_adventure/game/level/loading_overlay.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
+import 'package:pixel_adventure/router.dart';
 
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
+  // constructor parameters
   final EdgeInsets _flutterSafePadding;
 
   PixelQuest({required EdgeInsets safeScreenPadding}) : _flutterSafePadding = safeScreenPadding;
 
+  // general data that is used throughout the app and is loaded once when the app is launched
   late final StaticCenter staticCenter;
   late final StorageCenter storageCenter;
+
+  // factor to convert Flutter pixels in world units
+  late final double _worldToScreenScale;
+
+  // padding that depends on the device and is converted to the pixel size of the game
   late final GameSafePadding safePadding;
 
+  // mini map background image
   late final Image miniMapBackgroundPattern;
 
   // router
   late final RouterComponent router;
 
+  // overlay for level while loading
+  late final LoadingOverlay loadingOverlay;
+
+  // timestamp used to measure loading time and used in conjunction with the splash screen
+  late final DateTime _startTime;
+
   @override
   Future<void> onLoad() async {
-    final startTime = DateTime.now();
+    _startTime = DateTime.now();
     staticCenter = await StaticCenter.init();
     storageCenter = await StorageCenter.init(staticCenter: staticCenter);
     await _loadAllImagesIntoCache();
     _setUpCameraDefault();
     _setUpSafePadding();
     _setUpRouter();
+    await Level.warmUp(levelMetadata: staticCenter.allLevelsInOneWorldByIndex(0).first);
     await _createMiniMapBackgroundPattern();
-    WidgetsBinding.instance.addObserver(this);
+    _setUpLoadingOverlay();
 
     // await Future.delayed(Duration(seconds: 3000));
-    // final elapsedMs = DateTime.now().difference(startTime).inMilliseconds;
+    // final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
     // final delayMs = 5200;
-    // if (elapsedMs < delayMs) {
-    //   await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-    // }
+    // if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
 
     return super.onLoad();
   }
@@ -59,12 +73,18 @@ class PixelQuest extends FlameGame
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final currentRoute = router.currentRoute;
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if (currentRoute is WorldRoute && currentRoute.world is Level) (currentRoute.world as Level).pauseLevel();
+      if (currentRoute is WorldRoute && currentRoute.world is Level) return (currentRoute.world as Level).pauseLevel();
       if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).pauseMenu();
     } else if (state == AppLifecycleState.resumed) {
       if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).resumeMenu();
     }
     super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  Future<void> onMount() async {
+    WidgetsBinding.instance.addObserver(this);
+    super.onMount();
   }
 
   @override
@@ -85,10 +105,12 @@ class PixelQuest extends FlameGame
     final fixedHeight = GameSettings.mapHeight - GameSettings.mapBorderWidth * 2;
     final aspectRatio = size.x / size.y;
     final dynamicWidth = fixedHeight * aspectRatio;
-
     // create a camera with fixed resolution that is used for both a level and the menu page
     camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight);
     add(camera);
+
+    // calculate scale factor
+    _worldToScreenScale = camera.viewport.size.y / size.y;
   }
 
   void setUpCameraForMenu() {
@@ -113,31 +135,18 @@ class PixelQuest extends FlameGame
   void setRefollowForLevelCamera(Player player) => camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
 
   void _setUpSafePadding() {
-    final scaleX = camera.viewport.size.x / size.x;
-    final scaleY = camera.viewport.size.y / size.y;
     safePadding = GameSafePadding(
-      top: _flutterSafePadding.top / scaleY,
-      bottom: _flutterSafePadding.bottom / scaleY,
-      left: _flutterSafePadding.left / scaleX,
-      right: _flutterSafePadding.right / scaleX,
+      top: _flutterSafePadding.top / _worldToScreenScale,
+      bottom: _flutterSafePadding.bottom / _worldToScreenScale,
+      left: _flutterSafePadding.left / _worldToScreenScale,
+      right: _flutterSafePadding.right / _worldToScreenScale,
     );
   }
 
   void _setUpRouter() {
-    final levelRoutes = {
-      RouteNames.menu: WorldRoute(() => MenuPage()),
-      RouteNames.pause: PauseRoute(),
-      for (final levelMetadata in staticCenter.allLevelsInAllWorlds.flat())
-        levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
-    };
-
-    add(
-      router = RouterComponent(
-        routes: levelRoutes,
-        initialRoute: staticCenter.allLevelsInOneWorld('014809d5-8ec5-4171-a82e-df72e7839d45').getLevelByNumber(1).uuid,
-      ),
-    );
-    // add(router = RouterComponent(routes: levelRoutes, initialRoute: RouteNames.menu));
+    router = createRouter(staticCenter: staticCenter);
+    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(1).uuid);
+    add(router);
   }
 
   Future<void> _createMiniMapBackgroundPattern() async {
@@ -159,9 +168,15 @@ class PixelQuest extends FlameGame
     final picture = recorder.endRecording();
     miniMapBackgroundPattern = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
   }
-}
 
-abstract class RouteNames {
-  static const String menu = 'menu';
-  static const String pause = 'pause';
+  void _setUpLoadingOverlay() {
+    loadingOverlay = LoadingOverlay(screenToWorldScale: _worldToScreenScale, safePadding: safePadding, size: camera.viewport.size);
+
+    // important that it is explicitly added to the router
+    router.add(loadingOverlay);
+  }
+
+  Future<void> showLoadingOverlay(LevelMetadata levelMetadata) async => await loadingOverlay.showOverlay(levelMetadata);
+
+  Future<void> hideLoadingOverlay() async => await loadingOverlay.hideOverlay();
 }

@@ -2,92 +2,43 @@ import 'dart:async';
 import 'package:flame/components.dart' hide Timer;
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/menu/widgets/character_bio.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest> {
+class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
   // constructor parameters
   final Vector2 _defaultPosition;
   final CharacterBio _characterBio;
 
-  DummyCharacter({required Vector2 defaultPosition, required CharacterBio characterBio})
+  MenuDummyCharacter({required Vector2 defaultPosition, required CharacterBio characterBio})
     : _defaultPosition = defaultPosition,
       _characterBio = characterBio,
-      super(position: defaultPosition, size: gridSize);
-
-  // animation settings
-  static final Vector2 gridSize = Vector2.all(32);
-  static final Vector2 _textureSize = Vector2(32, 32);
-  static const String _path = 'Main Characters/';
-  static const String _pathEnd = ' (32x32).png';
-
-  // all available characters and the current index
-  final List<PlayerCharacter> _allCharacters = [];
-  int _currentCharacterIndex = 0;
-
-  // contains all animations of all characters
-  final Map<PlayerCharacter, Map<PlayerState, SpriteAnimation>> _allCharacterAnimations = {};
+      super(position: defaultPosition, size: DummyCharacter.gridSize);
 
   // list of animations running in an endless loop
   final List<Future<void> Function(int)> _animationSequence = [];
 
   // important for the animation loop
   int _loopId = 0;
+  bool _animationEnabled = false;
   final List<Effect> _activeEffects = [];
 
   // height of the jump animation
   static const double _jumpHeight = 42; // [Adjustable]
-  static late double _jumpUpDuration;
-  static late double _jumpDownDuration;
+  static late final double _jumpUpDuration;
+  static late final double _jumpDownDuration;
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
-    _setUpAllCharacters();
-    _loadAllSpriteAnimations();
     _setUpAnimationLoop();
-    _startAnimationLoop(_loopId);
     return super.onLoad();
   }
 
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
-    anchor = Anchor.center;
-    priority = 5;
-  }
-
-  void _setUpAllCharacters() {
-    _allCharacters.addAll(PlayerCharacter.values);
-    _currentCharacterIndex = _allCharacters.indexOf(game.storageCenter.settings.character);
-  }
-
-  void _loadAllSpriteAnimations() {
-    for (var character in PlayerCharacter.values) {
-      final loadAnimation = spriteAnimationWrapper<PlayerState>(
-        game,
-        '$_path${character.fileName}/',
-        _pathEnd,
-        GameSettings.stepTime,
-        _textureSize,
-      );
-      _allCharacterAnimations[character] = {for (final s in PlayerState.values) s: loadAnimation(s)};
-    }
-
-    animations = _allCharacterAnimations[game.storageCenter.settings.character];
-    current = PlayerState.idle;
-  }
-
+  /// Defines the ordered sequence of demo animations (idle, run, jump, etc.)
+  /// and precomputes the jump timings based on [_jumpHeight].
   void _setUpAnimationLoop() {
     // sequence of animations performed by the dummy character
     _animationSequence.addAll([
@@ -110,16 +61,9 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
     _jumpDownDuration = 0.006 * _jumpHeight;
   }
 
-  void _startAnimationLoop(int loopId) async {
-    // runs through the sequence of animations until the loop is ended by a character change
-    while (_loopId == loopId) {
-      for (final action in _animationSequence) {
-        if (_loopId != loopId) return;
-        await action(loopId);
-      }
-    }
-  }
-
+  /// Plays a given [state] (idle, run, etc.) for [duration] seconds for
+  /// the animation loop identified by [loopId]. If the loopId no longer
+  /// matches, the animation for this state ends early.
   Future<void> _playState(PlayerState state, double duration, int loopId) async {
     if (_loopId != loopId) return;
 
@@ -141,6 +85,9 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
     await completer.future;
   }
 
+  /// Plays a jump + fall animation for the current loop, moving the dummy
+  /// character up by [_jumpHeight] and then back down to [_defaultPosition].
+  /// The animation aborts early if the [loopId] no longer matches.
   Future<void> _jumpAnimation(int loopId) async {
     if (_loopId != loopId) return;
 
@@ -175,6 +122,24 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
     await completer.future;
   }
 
+  /// Runs the full animation sequence in a loop for the current [_loopId].
+  /// The loop automatically stops when [_loopId] changes (e.g. on character
+  /// change or when the animation is cleared).
+  void _startAnimationLoop() async {
+    final loopId = _loopId;
+
+    // runs through the sequence of animations until the loop is ended
+    while (_loopId == loopId) {
+      for (final action in _animationSequence) {
+        if (_loopId != loopId) return;
+        await action(loopId);
+      }
+    }
+  }
+
+  /// Stops the current animation loop by incrementing [_loopId], removing
+  /// all active effects, and resetting the dummy character back to its
+  /// default position.
   void _clearAnimationLoop() {
     // new loop ID, old loops stop automatically
     _loopId++;
@@ -190,29 +155,44 @@ class DummyCharacter extends SpriteAnimationGroupComponent with HasGameReference
     position = _defaultPosition;
   }
 
-  void _chnageAnimation(PlayerCharacter character) {
-    _clearAnimationLoop();
-
-    // change animations for new character
-    animations = _allCharacterAnimations[character];
-    current = PlayerState.idle;
-
-    // start new loop
-    _startAnimationLoop(_loopId);
-  }
-
+  /// Switches to the next or previous character, saves the selection in storage,
+  /// and updates the character bio and animation loop accordingly.
   void switchCharacter({bool next = true}) {
-    _currentCharacterIndex = (_currentCharacterIndex + (next ? 1 : -1)) % _allCharacters.length;
-    final character = _allCharacters[_currentCharacterIndex];
+    currentCharacterIndex = (currentCharacterIndex + (next ? 1 : -1)) % allCharacters.length;
+    final character = allCharacters[currentCharacterIndex];
     game.storageCenter.saveSettings(game.storageCenter.settings.copyWith(character: character));
-    _chnageAnimation(character);
+    _changeAnimation(character);
     _characterBio.setCharacterBio(character);
   }
 
+  /// Changes the active character animation set to [character],
+  /// resets the state to idle, and restarts the animation loop
+  /// only if animation is currently enabled.
+  void _changeAnimation(PlayerCharacter character) {
+    if (_animationEnabled) _clearAnimationLoop();
+
+    // change animations for new character
+    animations = allCharacterAnimations[character];
+    current = PlayerState.idle;
+
+    // start new loop
+    if (_animationEnabled) _startAnimationLoop();
+  }
+
+  /// Resumes the dummy character animation: enables the animation loop
+  /// and starts the demo sequence if it is currently disabled.
+  void resumeAnimation() {
+    if (_animationEnabled) return;
+    _animationEnabled = true;
+    _startAnimationLoop();
+  }
+
+  /// Pauses the dummy character animation: disables the animation loop,
+  /// clears all active effects, and sets the current state to idle.
   void pauseAnimation() {
+    if (!_animationEnabled) return;
+    _animationEnabled = false;
     _clearAnimationLoop();
     current = PlayerState.idle;
   }
-
-  void resumeAnimation() => _startAnimationLoop(_loopId);
 }

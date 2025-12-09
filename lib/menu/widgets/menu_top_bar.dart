@@ -108,17 +108,17 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(size.x - SpriteBtn.btnSize.x * 2.5 - _btnSpacing * 2, _verticalCenter);
-    final btnOffset = Vector2(SpriteBtn.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSize.x * 2.5 - _btnSpacing * 2, _verticalCenter);
+    final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
 
     // achievements btn
-    _achievementsBtn = SpriteBtn(type: SpriteBtnType.leaderboard, onPressed: () {}, position: btnBasePosition);
+    _achievementsBtn = SpriteBtn.fromType(type: SpriteBtnType.leaderboard, onPressed: () {}, position: btnBasePosition);
 
     // settings btn
-    _settingsBtn = SpriteBtn(type: SpriteBtnType.settings, onPressed: () {}, position: _achievementsBtn.position + btnOffset);
+    _settingsBtn = SpriteBtn.fromType(type: SpriteBtnType.settings, onPressed: () {}, position: _achievementsBtn.position + btnOffset);
 
     // volume toggle btn
-    _volumeBtn = SpriteToggleBtn(
+    _volumeBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.volumeOn,
       type_2: SpriteBtnType.volumeOff,
       onPressed: () => switchVolume(game: game, soundsEnabled: false),
@@ -126,8 +126,6 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
       position: _settingsBtn.position + btnOffset,
       initialState: game.storageCenter.settings.soundsEnabled,
     );
-
-    debugPrint(game.storageCenter.settings.soundsEnabled.toString());
 
     addAll([_achievementsBtn, _settingsBtn, _volumeBtn]);
   }

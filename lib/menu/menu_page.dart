@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
+import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/widgets/character_picker.dart';
-import 'package:pixel_adventure/menu/widgets/dummy_character.dart';
 import 'package:pixel_adventure/menu/widgets/level_grid.dart';
 import 'package:pixel_adventure/menu/widgets/menu_top_bar.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -52,24 +52,25 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpMenuTopBar();
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
-
+    _setUpSubscription();
+    debugPrint('load');
     return super.onLoad();
   }
 
   @override
-  void onRemove() {
-    debugPrint('onRemove');
-    super.onRemove();
+  void onMount() {
+    debugPrint('mount');
+    resumeMenu();
+    game.setUpCameraForMenu();
+    _checkForNewAnimationEvents();
+    super.onMount();
   }
 
   @override
-  void onMount() {
-    debugPrint('onMount');
-    game.setUpCameraForMenu();
-    _setUpSubscription();
-    _checkForNewAnimationEvents();
-
-    super.onMount();
+  void onRemove() {
+    debugPrint('remove');
+    pauseMenu();
+    super.onRemove();
   }
 
   void dispose() {
@@ -83,8 +84,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
       if (event is NewStarsStorageEvent) {
         _menuTopBar.updateStarsCount(index: _getWorldIndex(event.worldUuid), stars: event.totalStars);
         _pendingWorldStorageEvent = event;
-      } else if (event is LevelStorageEvent) {
-        // todo
       }
     });
   }
@@ -97,15 +96,14 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   Future<void> _checkForNewAnimationEvents() async {
-    if (_pendingWorldStorageEvent != null) {
-      await Future.delayed(Duration(milliseconds: 800));
-      await _worldLevelGrids[_getWorldIndex(_pendingWorldStorageEvent!.worldUuid)].addNewStarsInTile(
-        levelUuid: _pendingWorldStorageEvent!.levelUuid,
-        stars: _pendingWorldStorageEvent!.newStars,
-      );
-      await Future.delayed(Duration(milliseconds: 200));
-      await _menuTopBar.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
-    }
+    if (_pendingWorldStorageEvent == null) return;
+    await Future.delayed(Duration(milliseconds: 800));
+    await _worldLevelGrids[_getWorldIndex(_pendingWorldStorageEvent!.worldUuid)].addNewStarsInTile(
+      levelUuid: _pendingWorldStorageEvent!.levelUuid,
+      stars: _pendingWorldStorageEvent!.newStars,
+    );
+    await Future.delayed(Duration(milliseconds: 200));
+    await _menuTopBar.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
     _pendingWorldStorageEvent = null;
   }
 
@@ -172,13 +170,13 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _setUpChangeWorldBtns() {
     final levelGridVerticalCenter = _worldLevelGrids[0].position.y + _worldLevelGrids[0].size.y / 2;
-    final btnHorizontalCenter = SpriteBtn.btnSizeSmall.x / 2;
-    _previousWorldBtn = SpriteBtn(
+    final btnHorizontalCenter = SpriteBtnType.btnSizeSmall.x / 2;
+    _previousWorldBtn = SpriteBtn.fromType(
       type: SpriteBtnType.previousSmall,
       onPressed: () => _changeWorld(-1),
       position: Vector2(_worldLevelGrids[0].position.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
     );
-    _nextWorldBtn = SpriteBtn(
+    _nextWorldBtn = SpriteBtn.fromType(
       type: SpriteBtnType.nextSmall,
       onPressed: () => _changeWorld(1),
       position: Vector2(

@@ -38,4 +38,5 @@ void main() async {
 Future<void> _configureFlame() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 }

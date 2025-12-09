@@ -11,6 +11,7 @@ import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/router.dart';
 
 class PauseRoute extends Route with HasGameReference<PixelQuest> {
   PauseRoute() : super(PausePage.new, transparent: true);

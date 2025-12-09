@@ -24,6 +24,7 @@ class StaticCenter {
 
   // getter
   List<LevelMetadata> allLevelsInOneWorld(String worldUuid) => _allLevels[worldUuid]!;
+  List<LevelMetadata> allLevelsInOneWorldByIndex(int index) => _allLevels[_allWorlds[index].uuid]!;
   Map<String, List<LevelMetadata>> get allLevelsInAllWorlds => _allLevels;
   List<WorldMetadata> get allWorlds => _allWorlds;
   WorldMetadata getWorld(String worldUuid) => _allWorlds.getWorldByUUID(worldUuid);

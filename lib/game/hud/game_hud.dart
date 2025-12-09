@@ -16,6 +16,7 @@ import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/volume.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/router.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final int _totalFruitsCount;
@@ -99,11 +100,11 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(SpriteBtn.btnSize.x / 2, _verticalCenter);
-    final btnOffset = Vector2(SpriteBtn.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(SpriteBtnType.btnSize.x / 2, _verticalCenter);
+    final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
 
     // menu btn
-    _menuBtn = SpriteBtn(
+    _menuBtn = SpriteBtn.fromType(
       type: SpriteBtnType.levels,
       onPressed: () {
         if (game.router.currentRoute is PauseRoute) game.router.pop();
@@ -113,7 +114,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // volume btn
-    _volumeBtn = SpriteToggleBtn(
+    _volumeBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.volumeOn,
       type_2: SpriteBtnType.volumeOff,
       onPressed: () => switchVolume(game: game, soundsEnabled: false),
@@ -123,7 +124,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // pause btn
-    _pauseBtn = SpriteToggleBtn(
+    _pauseBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.pause,
       type_2: SpriteBtnType.play,
       onPressed: () => game.router.pushNamed(RouteNames.pause),
@@ -132,37 +133,31 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // restart the level btn
-    _restartBtn = SpriteBtn(
-      type: SpriteBtnType.restart,
-      onPressed: () {
-        final currentRoute = game.router.currentRoute;
-        if (currentRoute is WorldRoute) {
-          final levelMetadata = (currentRoute.world as Level).levelMetadata;
-
-          // at this point, we need to create a new instance of the route, because otherwise the router will assume
-          // that the route already exists and will not even create a new one, which is explicitly what we want to do here
-          game.router.pushReplacement(
-            WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
-            name: levelMetadata.uuid,
-          );
-        } else if (currentRoute is PauseRoute) {
-          final previousRoute = game.router.previousRoute;
-          if (previousRoute is WorldRoute) {
-            final levelMetadata = (previousRoute.world as Level).levelMetadata;
-            game.router.pop();
-
-            // same as above
-            game.router.pushReplacement(
-              WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
-              name: levelMetadata.uuid,
-            );
-          }
-        }
-      },
-      position: _pauseBtn.position + btnOffset,
-    );
+    _restartBtn = SpriteBtn.fromType(type: SpriteBtnType.restart, onPressed: _restartLevel, position: _pauseBtn.position + btnOffset);
 
     addAll([_menuBtn, _volumeBtn, _pauseBtn, _restartBtn]);
+  }
+
+  void _restartLevel() {
+    final currentRoute = game.router.currentRoute;
+    WorldRoute? levelRoute;
+
+    switch (currentRoute) {
+      case WorldRoute():
+        levelRoute = currentRoute;
+      case PauseRoute():
+        final previousRoute = game.router.previousRoute;
+        if (previousRoute is WorldRoute) {
+          game.router.pop();
+          levelRoute = previousRoute;
+        }
+    }
+
+    if (levelRoute == null) return;
+
+    final levelMetadata = (levelRoute.world as Level).levelMetadata;
+    game.showLoadingOverlay(levelMetadata);
+    game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false), name: levelMetadata.uuid);
   }
 
   void _setUpFruitsCount() {

@@ -11,18 +11,23 @@ class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest> {
   final double _streamTop;
   final double _streamLeft;
   final double _streamRight;
-  final Vector2 basePosition;
-  final double baseWidth;
+  final Vector2 _basePosition;
+  final double _baseWidth;
+  final double? _scaleFactor;
 
   FanAirParticle({
     required double streamTop,
     required double streamLeft,
     required double streamRight,
-    required this.basePosition,
-    required this.baseWidth,
+    required Vector2 basePosition,
+    required double baseWidth,
+    double? scaleFactor,
   }) : _streamTop = streamTop,
        _streamLeft = streamLeft,
-       _streamRight = streamRight;
+       _streamRight = streamRight,
+       _basePosition = basePosition,
+       _baseWidth = baseWidth,
+       _scaleFactor = scaleFactor;
 
   // size
   static final List<Vector2> _sizeList = [Vector2.all(14), Vector2.all(12), Vector2.all(8), Vector2.all(6)];
@@ -38,7 +43,7 @@ class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest> {
   late final Vector3 _borders;
 
   // movement
-  final double _moveSpeed = 280; // [Adjustable]
+  final double _moveSpeed = 400; // [Adjustable]
   late Vector2 _velocity;
 
   // random
@@ -73,12 +78,12 @@ class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest> {
 
   void _setUpParticle() {
     // size
-    size = _sizeList[_random.nextInt(_sizeList.length)];
+    size = _sizeList[_random.nextInt(_sizeList.length)] * (_scaleFactor ?? 1);
     final particleOffset = size.x * _ratioParticleBackground;
 
     // position
-    final spawnX = basePosition.x - particleOffset + (baseWidth - size.x + particleOffset * 2) * _random.nextDouble();
-    final spawnY = basePosition.y - size.y + particleOffset;
+    final spawnX = _basePosition.x - particleOffset + (_baseWidth - size.x + particleOffset * 2) * _random.nextDouble();
+    final spawnY = _basePosition.y - size.y + particleOffset;
     position = Vector2(spawnX, spawnY);
 
     // velocity

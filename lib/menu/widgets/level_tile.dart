@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/widgets/level_btn.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, HasPaint implements OpacityProvider {
+  // constructor parameters
   final LevelMetadata _levelMetadata;
 
   LevelTile({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata, super(size: tileSize) {
@@ -28,7 +28,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   late final VisibleSpriteComponent _tileBg;
 
   // btn
-  late final LevelBtn _levelBtn;
+  late final SpriteBtn _levelBtn;
 
   // stars
   static final Vector2 _starSize = Vector2.all(12); // [Adjustable]
@@ -53,7 +53,6 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   @override
   set opacity(double value) {
-    if (value == 0.1) debugPrint(value.toString());
     _levelBtn.opacity = value;
     _tileBg.opacity = value;
     for (var star in _stars) {
@@ -83,7 +82,14 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   }
 
   void _setUpBtn() {
-    _levelBtn = LevelBtn(levelMetadata: _levelMetadata, position: Vector2(_center.x, size.y - LevelBtn.btnSize.y / 2 - _btnMarginBottom));
+    _levelBtn = SpriteBtn(
+      path: 'Menu/Levels/${_levelMetadata.btnFileName}.png',
+      onPressed: () async {
+        await game.showLoadingOverlay(_levelMetadata);
+        game.router.pushReplacementNamed(_levelMetadata.uuid);
+      },
+      position: Vector2(_center.x, size.y - 17 / 2 - _btnMarginBottom),
+    );
     add(_levelBtn);
   }
 
@@ -103,8 +109,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
       final outlineStar = OutlineStar(position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
       _outlineStars.add(outlineStar);
     }
-    addAll(_stars);
-    addAll(_outlineStars);
+    addAll([..._stars, ..._outlineStars]);
   }
 
   void _removeOutlineStars(int stars) {
