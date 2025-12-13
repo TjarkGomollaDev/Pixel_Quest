@@ -197,7 +197,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   void _renderTrianglePlayerMarker(Canvas canvas, double x, double y) {
     final facingRight = _player.scale.x > 0;
 
-    final Path triangle = Path()
+    final triangle = Path()
       ..moveTo(x + (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y)
       ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y - _playerMarkerSize / 2)
       ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y + _playerMarkerSize / 2)

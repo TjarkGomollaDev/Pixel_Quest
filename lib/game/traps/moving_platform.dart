@@ -34,6 +34,7 @@ enum MovingPlatformState implements AnimationState {
 /// of its movement range.
 class MovingPlatform extends SpriteAnimationGroupComponent
     with HasGameReference<PixelQuest>, WorldCollision, WorldCollisionEnd, EntityOnMiniMap {
+  // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isVertical;
@@ -134,6 +135,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     if (_isVertical) {
       _rangeNeg = position.y - _offsetNeg * GameSettings.tileSize;
       _rangePos = position.y + _offsetPos * GameSettings.tileSize;
+
+      // only relevant for mini map not for the actual functionality
+      yMoveRange = Vector2(_rangeNeg + _hitbox.position.y + _hitbox.height / 2, _rangePos + _hitbox.position.y + _hitbox.height / 2);
     } else {
       _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize + width;
       _rangePos = position.x + _offsetPos * GameSettings.tileSize;

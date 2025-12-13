@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 enum BackgroundTileColor { Blue, Brown, Gray, Green, Pink, Purple, Yellow }
 
 class BackgroundColored extends ParallaxComponent {
+  // constructor parameters
   final BackgroundTileColor _color;
 
   BackgroundColored({required BackgroundTileColor color, required super.position, required super.size}) : _color = color;

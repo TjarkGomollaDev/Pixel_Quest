@@ -3,40 +3,77 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 
+/// Mixin that marks a component as renderable on the mini map.
+///
+/// An entity can provide:
+/// - a marker position (where its marker is drawn on the mini map),
+/// - an occlusion position (used to check whether it is hidden by the mini map frame),
+/// - an optional movement range in y (`yMoveRange`) used for pre-filtering arrow candidates,
+/// - marker styling information (`EntityMiniMapMarker`),
+/// - a removal callback hook (`onRemovedFromLevel`) to keep mini map lists in sync.
+///
+/// The mixin supports entities with collision hitboxes:
+/// - If the entity implements `EntityCollision` or `WorldCollision`,
+///   marker and occlusion positions are derived from the hitbox rect.
+/// - Otherwise, it falls back to the component bounds.
 mixin EntityOnMiniMap on PositionComponent {
-  /// Returns the world-space position where the minimap marker should be placed.
-  /// - If the entity implements EntityCollision, we return the hitbox bottom-center.
-  /// - Otherwise we return the bottom-center from the PositionComponent.
-  Vector2 get markerPosition {
-    if (this is EntityCollision) {
-      final offset = (this as EntityCollision).entityHitbox.toAbsoluteRect().bottomCenter;
-      return Vector2(offset.dx, offset.dy);
-    } else if (this is WorldCollision) {
-      final offset = (this as WorldCollision).worldHitbox.toAbsoluteRect().bottomCenter;
-      return Vector2(offset.dx, offset.dy);
-    }
-
-    // fallback
-    return Vector2(position.x + size.x / 2, position.y + size.y);
-  }
-
-  EntityMiniMapMarker _marker = EntityMiniMapMarker();
-  EntityMiniMapMarker get marker => _marker;
-  set marker(EntityMiniMapMarker value) => _marker = value;
-
-  void Function(EntityOnMiniMap entity)? _onRemovedFromLevel;
-
-  /// Callback that will be called when the entity is removed from the game.
-  set onRemovedFromLevel(void Function(EntityOnMiniMap entity) function) => _onRemovedFromLevel = function;
-
   @override
   void onRemove() {
     _onRemovedFromLevel?.call(this);
     super.onRemove();
   }
+
+  /// World-space position where the mini map marker should be rendered.
+  ///
+  /// - If a collision rect exists: hitbox bottom-center (feels grounded on platforms).
+  /// - Fallback: component bottom-center.
+  Vector2 get markerPosition {
+    final rect = _collisionRect();
+    if (rect != null) return offsetToVector(rect.bottomCenter);
+
+    // fallback: component bottom center
+    return Vector2(position.x + size.x / 2, position.y + size.y);
+  }
+
+  /// World-space position used for occlusion checks against the mini map frame.
+  ///
+  /// - If a collision rect exists: hitbox center (stable for "is inside frame" checks).
+  /// - Fallback: component center.
+  Vector2 get occlusionPosition {
+    final rect = _collisionRect();
+    if (rect != null) return offsetToVector(rect.center);
+
+    // fallback: component center
+    return Vector2(position.x + size.x / 2, position.y + size.y / 2);
+  }
+
+  /// Returns the collision rect in world coordinates if the entity provides one.
+  Rect? _collisionRect() {
+    return switch (this) {
+      EntityCollision(entityHitbox: final hitbox) => hitbox.toAbsoluteRect(),
+      WorldCollision(worldHitbox: final hitbox) => hitbox.toAbsoluteRect(),
+      _ => null,
+    };
+  }
+
+  // y move range
+  Vector2? _yMoveRange;
+  Vector2 get yMoveRange => _yMoveRange ?? Vector2.all(occlusionPosition.y);
+  set yMoveRange(Vector2 range) => _yMoveRange = range;
+
+  // marker
+  EntityMiniMapMarker _marker = EntityMiniMapMarker();
+  EntityMiniMapMarker get marker => _marker;
+  set marker(EntityMiniMapMarker value) => _marker = value;
+
+  // callback that will be called when the entity is removed from the game
+  void Function(EntityOnMiniMap entity)? _onRemovedFromLevel;
+  set onRemovedFromLevel(void Function(EntityOnMiniMap entity) function) => _onRemovedFromLevel = function;
 }
 
+/// Marker style for the player on the mini map.
 enum PlayerMiniMapMarkerType {
   circle,
   triangel;
@@ -47,11 +84,20 @@ enum PlayerMiniMapMarkerType {
       PlayerMiniMapMarkerType.values.firstWhere((c) => c.name == name, orElse: () => defaultMarker);
 }
 
+/// Marker style for various entities on the mini map.
 enum EntityMiniMapMarkerType { circle, square, platform }
 
-enum EntityMiniMapMarkerLayer { aboveForeground, behindForeground }
+/// Defines in which visual layer the entity marker should be rendered.
+///
+/// - `aboveForeground`: marker is drawn on top of the mini map foreground sprite.
+/// - `behindForeground`: marker is drawn below the foreground sprite.
+/// - `none`: entity has no marker on the mini map view, but can still be considered
+///   for arrow hints.
+enum EntityMiniMapMarkerLayer { aboveForeground, behindForeground, none }
 
+/// Configuration object describing how an entity should appear on the mini map.
 class EntityMiniMapMarker {
+  // constructor parameters
   final double size;
   final EntityMiniMapMarkerType type;
   final Color color;

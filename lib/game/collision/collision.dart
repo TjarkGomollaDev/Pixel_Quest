@@ -61,3 +61,7 @@ bool verticalSweptCheck(Rect playerRect, FastCollision other, bool hasHorizontal
   // check whether the block intersected the player hitbox in the last frame, only the y values are checked
   return hasHorizontalIntersection && playerRect.bottom > oldTop && playerRect.top < newBottom;
 }
+
+bool checkRangeIntersection(double rangeMinY, double rangeMaxY, double otherMinY, double otherMaxY) {
+  return rangeMaxY >= otherMinY && rangeMinY <= otherMaxY;
+}

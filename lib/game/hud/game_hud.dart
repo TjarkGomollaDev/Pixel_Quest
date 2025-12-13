@@ -19,13 +19,13 @@ import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
+  // constructor parameters
   final int _totalFruitsCount;
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
   final LevelMetadata _levelMetadata;
-  final List<EntityOnMiniMap> _entitiesAboveForeground;
-  final List<EntityOnMiniMap> _entitiesBehindForeground;
+  final List<EntityOnMiniMap> _miniMapEntities;
 
   GameHud({
     required int totalFruitsCount,
@@ -33,15 +33,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     required double levelWidth,
     required Player player,
     required LevelMetadata levelMetadata,
-    required List<EntityOnMiniMap> entitiesAboveForeground,
-    required List<EntityOnMiniMap> entitiesBehindForeground,
+    required List<EntityOnMiniMap> miniMapEntities,
   }) : _totalFruitsCount = totalFruitsCount,
        _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
        _levelMetadata = levelMetadata,
-       _entitiesAboveForeground = entitiesAboveForeground,
-       _entitiesBehindForeground = entitiesBehindForeground {
+       _miniMapEntities = miniMapEntities {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -233,9 +231,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       player: _player,
       levelMetadata: _levelMetadata,
       levelWidth: _levelWidth,
-      entitiesAboveForeground: _entitiesAboveForeground,
-      entitiesBehindForeground: _entitiesBehindForeground,
+      miniMapEntities: _miniMapEntities,
       position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
+      hudTopRightToScreenTopRightOffset: position,
     );
     add(_miniMap);
   }

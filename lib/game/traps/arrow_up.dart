@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
@@ -40,7 +41,7 @@ class ArrowUp extends PositionComponent
         HasWorldReference<Level>,
         Respawnable,
         EntityCollision,
-        CollisionCallbacks {
+        EntityOnMiniMap {
   // constructor parameters
   final Player _player;
 
@@ -80,6 +81,7 @@ class ArrowUp extends PositionComponent
     priority = GameSettings.collectiblesLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
   }
 
   void _loadAllSpriteAnimations() {

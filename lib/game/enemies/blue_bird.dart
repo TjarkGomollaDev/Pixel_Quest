@@ -120,6 +120,10 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
   void _setUpRange() {
     _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize;
     _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
+
+    // only relevant for mini map not for the actual functionality
+    final startHitboxCenterY = position.y + _hitbox.position.y + _hitbox.height / 2;
+    yMoveRange = Vector2(startHitboxCenterY - _waveAmplitude, startHitboxCenterY + _waveAmplitude);
   }
 
   void _setUpMoveDirection() {

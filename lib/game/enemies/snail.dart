@@ -37,6 +37,7 @@ enum SnailState implements AnimationState {
 
 class Snail extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityCollisionEnd, EntityOnMiniMap, HasGameReference<PixelQuest> {
+  // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
   final bool _isLeft;

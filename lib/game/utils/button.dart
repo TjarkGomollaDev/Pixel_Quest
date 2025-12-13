@@ -400,7 +400,7 @@ enum SpriteBtnType {
   static final Vector2 _btnSizeSmall = Vector2(15, 16);
   static final Vector2 _btnOffset = Vector2.all(2);
 
-  // static size getter
+  // size getter
   static Vector2 get btnSize => _btnSize;
   static Vector2 get btnSizeCorrected => _btnSize - _btnOffset;
   static Vector2 get btnSizeSmall => _btnSizeSmall;

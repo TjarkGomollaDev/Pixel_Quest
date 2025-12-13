@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
@@ -79,9 +80,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // all spawning objects from spawning layer
   final List<PositionComponent> _spawningObjects = [];
 
-  // all spawning objects which should be displayed on the mini map
-  final List<EntityOnMiniMap> _miniMapEntitiesAboveForeground = [];
-  final List<EntityOnMiniMap> _miniMapEntitiesBehindForeground = [];
+  // all spawning objects which are needed in some way for the mini map
+  final List<EntityOnMiniMap> _miniMapEntities = [];
 
   // mini map
   late final PictureRecorder _miniMapRecorder;
@@ -139,7 +139,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   @override
   Future<void> onMount() async {
     _setUpCamera();
-    _addGameHud();
+    // _addGameHud();
+    SchedulerBinding.instance.addPostFrameCallback((_) => _addGameHud());
     _addMobileControls();
     await _hideLoadingOverlay();
     await Future.delayed(Duration(milliseconds: 100));
@@ -487,7 +488,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
             );
 
-            // add the ball from the spiked ball component
+            // add the ball from the spiked ball component to the mini map entities
             _addEntityToMiniMap((spawnObject as SpikedBallComponent).ball);
             break;
           case 'Chicken':
@@ -611,28 +612,19 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             _addCheckpointToMiniMap(gridPosition);
             break;
         }
-        if (spawnObject != null) _spawningObjects.add(spawnObject);
+        if (spawnObject == null) continue;
+
+        // add all spawn objects and, if necessary, add them to the mini map
+        _spawningObjects.add(spawnObject);
+        add(spawnObject);
+        if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
       } catch (e, stack) {
         debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
       }
     }
-
-    // add all spawn objects and, if necessary, add them to the mini map
-    for (var spawnObject in _spawningObjects) {
-      add(spawnObject);
-      if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
-    }
   }
 
-  void _addEntityToMiniMap(EntityOnMiniMap entity) {
-    final list = switch (entity.marker.layer) {
-      EntityMiniMapMarkerLayer.aboveForeground => _miniMapEntitiesAboveForeground,
-      EntityMiniMapMarkerLayer.behindForeground => _miniMapEntitiesBehindForeground,
-    };
-
-    entity.onRemovedFromLevel = list.remove;
-    list.add(entity);
-  }
+  void _addEntityToMiniMap(EntityOnMiniMap entity) => _miniMapEntities.add(entity);
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
 
@@ -664,8 +656,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       levelWidth: _levelMap.width,
       player: _player,
       levelMetadata: levelMetadata,
-      entitiesAboveForeground: _miniMapEntitiesAboveForeground,
-      entitiesBehindForeground: _miniMapEntitiesBehindForeground,
+      miniMapEntities: _miniMapEntities,
     );
     game.camera.viewport.add(_gameHud);
   }

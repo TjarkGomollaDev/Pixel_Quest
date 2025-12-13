@@ -23,11 +23,11 @@ class SpikedBallBall extends PositionComponent
     _setUpMarker();
   }
 
-  // actual hitbox
-  final CircleHitbox _hitbox = CircleHitbox(position: (gridSize - _textureSize) / 2, radius: _textureSize.x / 2);
-
   // size
   static final Vector2 gridSize = Vector2.all(32);
+
+  // actual hitbox
+  final CircleHitbox _hitbox = CircleHitbox(position: (gridSize - _textureSize) / 2, radius: _textureSize.x / 2);
 
   // animation settings
   static final Vector2 _textureSize = Vector2.all(28);

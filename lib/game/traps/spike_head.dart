@@ -136,7 +136,10 @@ class SpikeHead extends PositionComponent
 
   void _setUpActualBorders() {
     _topBorder = _rangeNeg - _hitbox.position.y;
-    _bottomtBorder = _rangePos - height + _hitbox.position.y;
+    _bottomtBorder = _rangePos - _hitbox.position.y - _hitbox.height;
+
+    // only relevant for mini map not for the actual functionality
+    yMoveRange = Vector2(_topBorder + _hitbox.position.y + _hitbox.height / 2, _bottomtBorder + _hitbox.position.y + _hitbox.height / 2);
   }
 
   void _correctingStartPosition() {

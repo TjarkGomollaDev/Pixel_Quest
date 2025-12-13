@@ -7,6 +7,7 @@ import 'package:pixel_adventure/menu/widgets/level_tile.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
+  // constructor parameters
   final String _worldUuid;
   final bool _show;
 

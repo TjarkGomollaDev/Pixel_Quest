@@ -102,8 +102,15 @@ class SawCircleComponent extends PositionComponent with HasGameReference<PixelQu
 
   void _createSingleSaws() {
     _saw1 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[0]);
+
+    // only relevant for mini map not for the actual functionality
+    _saw1.yMoveRange = Vector2(position.y + _path[0].y, position.y + _path[1].y);
+
     if (_doubleSaw) {
       _saw2 = SawCircleSingleSaw(clockwise: _clockwise, player: _player, position: _path[2]);
+
+      // only relevant for mini map not for the actual functionality
+      _saw2!.yMoveRange = Vector2(position.y + _path[0].y, position.y + _path[1].y);
     } else {
       _saw2 = null;
     }

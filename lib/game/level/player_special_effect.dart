@@ -29,6 +29,7 @@ enum PlayerSpecialEffectState implements AnimationState {
 }
 
 class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, HasVisibility {
+  // constructor parameters
   final Player player;
 
   PlayerSpecialEffect({required this.player}) : super(position: Vector2.zero(), size: gridSize);

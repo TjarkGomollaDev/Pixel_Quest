@@ -109,6 +109,9 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
       _rangeNeg = position.y - _offsetNeg * GameSettings.tileSize;
       _rangePos = position.y + _offsetPos * GameSettings.tileSize;
       position.x += width / 2;
+
+      // only relevant for mini map not for the actual functionality
+      yMoveRange = Vector2(_rangeNeg + gridSize.y / 2, _rangePos + gridSize.y / 2);
     } else {
       _rangeNeg = position.x - _offsetNeg * GameSettings.tileSize + width / 2;
       _rangePos = position.x + _offsetPos * GameSettings.tileSize + width / 2;

@@ -30,6 +30,9 @@ class PixelQuest extends FlameGame
   late final StaticCenter staticCenter;
   late final StorageCenter storageCenter;
 
+  // in context with the camera
+  final ({double top, double bottom}) cameraWorldYBounds = (top: GameSettings.mapBorderWidth, bottom: GameSettings.mapBorderWidth);
+
   // factor to convert Flutter pixels in world units
   late final double _worldToScreenScale;
 
@@ -126,7 +129,7 @@ class PixelQuest extends FlameGame
     // camera bounds
     final leftBound = size.x * camera.viewfinder.anchor.x + GameSettings.mapBorderWidth;
     final rightBound = size.x * (1 - camera.viewfinder.anchor.x) + GameSettings.mapBorderWidth;
-    camera.setBounds(Rectangle.fromLTRB(leftBound, GameSettings.mapBorderWidth, mapWidth - rightBound, GameSettings.mapBorderWidth));
+    camera.setBounds(Rectangle.fromLTRB(leftBound, cameraWorldYBounds.top, mapWidth - rightBound, cameraWorldYBounds.bottom));
 
     // viewfinder follows player
     setRefollowForLevelCamera(player);
@@ -144,8 +147,8 @@ class PixelQuest extends FlameGame
   }
 
   void _setUpRouter() {
-    router = createRouter(staticCenter: staticCenter);
-    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(1).uuid);
+    // router = createRouter(staticCenter: staticCenter);
+    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(9).uuid);
     add(router);
   }
 

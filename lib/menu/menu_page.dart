@@ -16,6 +16,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
+  // subscription on storage center
   StreamSubscription? _sub;
 
   // static content
@@ -40,6 +41,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   // animation event triggers
   NewStarsStorageEvent? _pendingWorldStorageEvent;
 
+  // flag for animation when world is changing
   bool _isChangingWorld = false;
 
   @override

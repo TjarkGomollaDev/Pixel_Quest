@@ -98,6 +98,12 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   void _createSpikedBall() {
     _radiusToCenterOfSpikedBall = _radius - SpikedBallBall.gridSize.x / 2;
     _spikedBall = SpikedBallBall(player: _player);
+
+    // only relevant for mini map not for the actual functionality
+    _spikedBall.yMoveRange = Vector2(
+      position.y + _spikedBall.position.y + _spikedBall.height / 2,
+      position.y + height - _spikedBall.position.y - _spikedBall.height / 2,
+    );
   }
 
   SpikedBallBall get ball => _spikedBall;

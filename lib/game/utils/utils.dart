@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -52,3 +53,5 @@ void addSpriteRow({
 mixin Respawnable on PositionComponent {
   void onRespawn();
 }
+
+Vector2 offsetToVector(Offset offset) => Vector2(offset.dx, offset.dy);

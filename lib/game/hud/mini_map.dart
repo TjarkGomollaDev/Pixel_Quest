@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini_map_arrow_layer.dart';
 import 'package:pixel_adventure/game/hud/mini_map_view.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
@@ -11,47 +13,65 @@ import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-/// A container component for displaying the mini map with a decorative frame.
-/// All actual drawing and calculations are handled by MiniMapView.
-/// MiniMap only adjusts the `MiniMapView` to account
-/// for frame borders and optical alignment.
+/// A HUD container component that displays the mini map inside a decorative frame.
 ///
-/// Responsibilities:
-/// - scale and offset the mini map view to hide borders in the source sprite
-/// - provide a fixed target size for the HUD element
-/// - add a border sprite for visual decoration
-/// - delegate all actual rendering to `MiniMapView`
+/// MiniMap itself is mostly a composition and layout component:
+/// - It creates and positions the [`MiniMapView`] which performs all actual rendering of the map.
+/// - Scale and offset the [`MiniMapView`] to hide borders in the source sprite
+/// - It adds a decorative frame sprite on top.
+/// - It manages UI buttons (hide/show + manual scroll).
+/// - It provides an [`MiniMapArrowLayer`] below the frame to hint at entities
+///   that are currently obscured by the mini map.
+///
+/// Entity management:
+/// - MiniMap receives a single list of entities that can appear on the mini map.
+/// - It splits this list into sublists for:
+///   - markers above the foreground,
+///   - markers behind the foreground,
+///   - arrow candidates (only entities that *could* be obscured by the mini map based on `yMoveRange`).
+///
+/// Important:
+/// - MiniMap does not perform any map drawing logic; this lives in [`MiniMapView`].
+/// - Arrow rendering is handled by [`MiniMapArrowLayer`].
 class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final Sprite _miniMapSprite;
   final double _levelWidth;
   final Player _player;
   final LevelMetadata _levelMetadata;
-  final List<EntityOnMiniMap> _entitiesAboveForeground;
-  final List<EntityOnMiniMap> _entitiesBehindForeground;
+  final List<EntityOnMiniMap> _miniMapEntities;
+  final Vector2 _hudTopRightToScreenTopRightOffset;
 
   MiniMap({
     required Sprite miniMapSprite,
     required double levelWidth,
     required Player player,
     required LevelMetadata levelMetadata,
-    required List<EntityOnMiniMap> entitiesAboveForeground,
-    required List<EntityOnMiniMap> entitiesBehindForeground,
+    required List<EntityOnMiniMap> miniMapEntities,
     required super.position,
-  }) : _miniMapSprite = miniMapSprite,
+    required Vector2 hudTopRightToScreenTopRightOffset,
+  }) : _hudTopRightToScreenTopRightOffset = hudTopRightToScreenTopRightOffset,
+       _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
        _levelMetadata = levelMetadata,
-       _entitiesAboveForeground = entitiesAboveForeground,
-       _entitiesBehindForeground = entitiesBehindForeground {
-    size = miniMapTargetSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
+       _miniMapEntities = miniMapEntities {
+    size = miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
+
+    // optical adjustment to compensate for the protruding ends of the frame
+    position.y -= _frameOverhangAdjust;
   }
+
+  // splitting the original list of passed entities into sublists
+  final List<EntityOnMiniMap> _entitiesAboveForeground = [];
+  final List<EntityOnMiniMap> _entitiesBehindForeground = [];
+  final List<EntityOnMiniMap> _arrowCandidates = [];
 
   // renders the actual mini map
   late final MiniMapView _miniMapView;
 
-  // the target size represents the size of the mini map view, so the size of the inside of the frame
-  static final Vector2 miniMapTargetSize = Vector2(96, 48); // [Adjustable]
+  // the target view size represents the size of the mini map view, so the size of the inside of the frame
+  static final Vector2 miniMapTargetViewSize = Vector2(96, 48); // [Adjustable]
 
   // image of the frame
   late final VisibleSpriteComponent _frame;
@@ -66,15 +86,21 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   late final SpriteBtn _scrollRightBtn;
 
   // btn margin and spacing
-  static const double _btnLeftMargin = 4;
-  static const double _btnSpacing = 3;
+  static const double _btnLeftMargin = 4; // [Adjustable]
+  static const double _btnSpacing = 3; // [Adjustable]
+
+  // arrow layer
+  static const double _arrowLayerSpacing = 1; // [Adjustable]
+  late final MiniMapArrowLayer _arrowLayer;
 
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
-    _setUpMiniMap();
+    _splitEntities();
+    _setUpMiniMapView();
     _setUpFrame();
     _setUpBtns();
+    _setUpArrowLayer();
     return super.onLoad();
   }
 
@@ -89,6 +115,49 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     anchor = Anchor.topRight;
   }
 
+  /// Splits the passed entity list into:
+  /// - layer lists for [`MiniMapView`],
+  /// - a filtered list of arrow candidates for [`MiniMapArrowLayer`].
+  ///
+  /// This also wires `onRemovedFromLevel` such that entities remove themselves
+  /// from every list they were registered in, keeping references consistent.
+  void _splitEntities() {
+    // y range in which entities can be obscured by the mini map
+    final rangeTop = game.cameraWorldYBounds.top + frameTopLeftToScreenTopRightOffset.y;
+    final rangeBottom = rangeTop + frameSize.y;
+
+    for (final entity in _miniMapEntities) {
+      final membershipLists = [_miniMapEntities];
+
+      // in which layer of the mini map view should the entity appear
+      final layerList = switch (entity.marker.layer) {
+        EntityMiniMapMarkerLayer.aboveForeground => _entitiesAboveForeground,
+        EntityMiniMapMarkerLayer.behindForeground => _entitiesBehindForeground,
+        EntityMiniMapMarkerLayer.none => null,
+      };
+      if (layerList != null) {
+        layerList.add(entity);
+        membershipLists.add(layerList);
+      }
+
+      // arrow candidates where the arrow layer must be checked to see if they are obscured by the mini map,
+      // in reality, you could simply pass the entire list _miniMapEntities to the arrow layer,
+      // however, we can sort out the entities in beforehand, which, due to their yMoveRange,
+      // can never be obscured by the mini map anyway, it saves us arrow layer performance later on
+      if (checkRangeIntersection(entity.yMoveRange.x, entity.yMoveRange.y, rangeTop, rangeBottom)) {
+        _arrowCandidates.add(entity);
+        membershipLists.add(_arrowCandidates);
+      }
+
+      // when the entity disappears from the level, it should automatically remove itself from the corresponding lists
+      entity.onRemovedFromLevel = (removed) {
+        for (final list in membershipLists) {
+          list.remove(removed);
+        }
+      };
+    }
+  }
+
   /// Adds a decorative frame around the mini map.
   ///
   /// Loads the frame sprite and adds it as a child component.
@@ -99,9 +168,6 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       sprite: loadSprite(game, 'HUD/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
     );
     add(_frame);
-
-    // optical adjustment to compensate for the protruding ends of the frame
-    position.y -= _frameOverhangAdjust;
   }
 
   /// Sets up the MiniMap View.
@@ -111,7 +177,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// behind the frame. The Y scale is calculated to remove top/bottom borders,
   /// and the X scale is increased proportionally to preserve aspect ratio and
   /// hide left/right borders without stretching the sprite.
-  void _setUpMiniMap() {
+  void _setUpMiniMapView() {
     Vector2 targetSize;
     Vector2 viewPosition;
 
@@ -120,17 +186,17 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       final verticalScale = _miniMapSprite.srcSize.y / (_miniMapSprite.srcSize.y - 2);
 
       // compute scaled height and extra pixels added by scaling
-      final scaledHeight = miniMapTargetSize.y * verticalScale;
-      final extraHeight = scaledHeight - miniMapTargetSize.y;
+      final scaledHeight = miniMapTargetViewSize.y * verticalScale;
+      final extraHeight = scaledHeight - miniMapTargetViewSize.y;
 
       // scale width proportionally so left/right borders also disappear without distortion
-      final scaledWidth = miniMapTargetSize.x + extraHeight;
+      final scaledWidth = miniMapTargetViewSize.x + extraHeight;
 
       // scaled target size and an offset so that the view remains centered
       targetSize = Vector2(scaledWidth, scaledHeight);
-      viewPosition = Vector2.all(_frameBorderWidth) + (miniMapTargetSize - targetSize) / 2;
+      viewPosition = Vector2.all(_frameBorderWidth) + (miniMapTargetViewSize - targetSize) / 2;
     } else {
-      targetSize = miniMapTargetSize;
+      targetSize = miniMapTargetViewSize;
       viewPosition = Vector2.all(_frameBorderWidth);
     }
 
@@ -147,6 +213,10 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     add(_miniMapView);
   }
 
+  /// Adds hide/show toggle and manual scroll buttons.
+  ///
+  /// Manual scroll temporarily disables the auto-follow mode of [`MiniMapView`]
+  /// until the player moves again.
   void _setUpBtns() {
     _hideBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.downSmall,
@@ -176,16 +246,41 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     addAll([_hideBtn, _scrollRightBtn, _scrollLeftBtn]);
   }
 
+  /// Adds the arrow hint bar below the mini map frame.
+  ///
+  /// The arrow layer receives only pre-filtered arrow candidates.
+  void _setUpArrowLayer() {
+    _arrowLayer = MiniMapArrowLayer(
+      miniMap: this,
+      arrowCandidates: _arrowCandidates,
+      position: Vector2(_frameOverhangAdjust, miniMapTargetViewSize.y + _frameBorderWidth * 2 + _arrowLayerSpacing),
+    );
+    add(_arrowLayer);
+  }
+
+  /// Shows the mini map.
   Future<void> _show() async {
     _miniMapView.show();
     _frame.show();
+    _arrowLayer.show();
     await Future.wait([_scrollLeftBtn.animatedShow(), _scrollRightBtn.animatedShow(delay: 0.15)]);
   }
 
+  /// Hides the mini map.
   Future<void> _hide() async {
     _miniMapView.hide();
     _frame.hide();
+    _arrowLayer.hide();
     await Future.wait([_scrollLeftBtn.animatedHide(delay: 0.15), _scrollRightBtn.animatedHide()]);
     _miniMapView.deactivateScrollMode();
   }
+
+  /// Size of the mini map with frame and without overhang.
+  static Vector2 get frameSize => miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2 - _frameOverhangAdjust * 2);
+
+  /// Offset from the frame's top-left corner to the screen top-right.
+  Vector2 get frameTopLeftToScreenTopRightOffset => Vector2(
+    _hudTopRightToScreenTopRightOffset.x + size.x - _frameOverhangAdjust,
+    _hudTopRightToScreenTopRightOffset.y + position.y + _frameOverhangAdjust,
+  );
 }

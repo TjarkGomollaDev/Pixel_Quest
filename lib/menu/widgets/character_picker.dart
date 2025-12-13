@@ -12,6 +12,7 @@ import 'package:pixel_adventure/menu/widgets/menu_dummy_character.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest> {
+  // constructor parameters
   final InputBlocker _inputBlocker;
   final Vector2 _spotlightCenter;
 

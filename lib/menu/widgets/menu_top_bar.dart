@@ -13,6 +13,7 @@ import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
+  // constructor parameters
   final int _startWorldIndex;
 
   MenuTopBar({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {

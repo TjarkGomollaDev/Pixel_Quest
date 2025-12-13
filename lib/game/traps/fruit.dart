@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
@@ -34,7 +35,8 @@ enum FruitName { Apple, Bananas, Cherries, Kiwi, Melon, Orange, Pineapple, Straw
 /// animation before disappearing from the level. Once collected, it increments
 /// the player's fruit counter and is no longer visible in the game world.
 /// Each fruit type is defined by its name and has its own idle animation.
-class Fruit extends SpriteAnimationGroupComponent with EntityCollision, HasGameReference<PixelQuest>, HasWorldReference<Level> {
+class Fruit extends SpriteAnimationGroupComponent
+    with HasGameReference<PixelQuest>, HasWorldReference<Level>, EntityCollision, EntityOnMiniMap {
   // constructor parameters
   final String _name;
   final bool _collectible;
@@ -81,6 +83,7 @@ class Fruit extends SpriteAnimationGroupComponent with EntityCollision, HasGameR
     if (_collectible) {
       _hitbox.collisionType = CollisionType.passive;
       add(_hitbox);
+      marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
     } else {
       anchor = Anchor.center;
     }
