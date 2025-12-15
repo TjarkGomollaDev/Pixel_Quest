@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
@@ -190,6 +191,9 @@ class Mushroom extends SpriteAnimationGroupComponent with EntityCollision, Entit
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      game.audioCenter.playSound(SoundEffect.enemieHit);
+
+      // play hit animation and then remove from level
       current = MushroomState.hit;
       animationTickers![MushroomState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
@@ -100,6 +101,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
   Future<void> hitTrap() async {
     if (_isFireActivated) return;
     _isFireActivated = true;
+    game.audioCenter.playSound(SoundEffect.pressurePlate);
     current = FireTrapState.hit;
     await animationTickers![FireTrapState.hit]!.completed;
     await Future.delayed(_fireDelayAfterHit);

@@ -7,11 +7,12 @@ import 'package:pixel_adventure/pixel_quest.dart';
 
 class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest> {
   // constructor parameters
-  final Ghost owner; // has to be public
+  final Ghost _owner; // has to be public
   final bool _spawnOnLeftSide;
 
-  GhostParticle({required this.owner, required bool spawnOnLeftSide, required super.position})
-    : _spawnOnLeftSide = spawnOnLeftSide,
+  GhostParticle({required Ghost owner, required bool spawnOnLeftSide, required super.position})
+    : _owner = owner,
+      _spawnOnLeftSide = spawnOnLeftSide,
       super(size: gridSize);
 
   // size
@@ -45,4 +46,6 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
     if (_spawnOnLeftSide) flipHorizontallyAroundCenter();
     animationTicker!.completed.then((_) => removeFromParent());
   }
+
+  Ghost get owner => _owner;
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
@@ -110,6 +111,7 @@ class Fruit extends SpriteAnimationGroupComponent
     if (!_isCollected) {
       _isCollected = true;
       world.increaseFruitsCount();
+      game.audioCenter.playSound(SoundEffect.collected);
       current = FruitState.collected;
       animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
     }

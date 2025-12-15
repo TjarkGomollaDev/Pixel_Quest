@@ -4,6 +4,7 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -77,7 +78,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// - `_executing == false` (only true when async callback returns a Future)
 ///
 /// These rules **also apply during hold mode**, ensuring full consistency.
-mixin _BaseBtn on PositionComponent, TapCallbacks {
+mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks {
   // the assigned callback for the button
   late FutureOr<void> Function() _onPressed;
 
@@ -115,12 +116,13 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
     if (!_holdMode) {
       // single tap logic below
       _tapLocked = true;
-      Future.delayed(const Duration(milliseconds: 80), () => _tapLocked = false);
+      Future.delayed(const Duration(milliseconds: 200), () => _tapLocked = false);
       final result = _callOnPressed();
       if (result is Future) {
         _executing = true;
         result.whenComplete(() => _executing = false);
       }
+      game.audioCenter.playSound(SoundEffect.tap);
     } else {
       _isHeld = false;
     }
@@ -319,7 +321,7 @@ mixin _BaseBtn on PositionComponent, TapCallbacks {
 /// - show/hide and animated show/hide via scale effects
 ///
 /// Optionally, a custom TextStyle can be provided.
-class TextBtn extends PositionComponent with TapCallbacks, HasVisibility, _BaseBtn {
+class TextBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
   // constructor parameters
   final String _text;
   final TextStyle? _textStyle;

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
@@ -55,23 +55,22 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
     _setUpSubscription();
-    debugPrint('load');
     return super.onLoad();
   }
 
   @override
   void onMount() {
-    debugPrint('mount');
     resumeMenu();
     game.setUpCameraForMenu();
     _checkForNewAnimationEvents();
+    game.audioCenter.playBackgroundMusic(BackgroundMusic.menu);
     super.onMount();
   }
 
   @override
   void onRemove() {
-    debugPrint('remove');
     pauseMenu();
+    game.audioCenter.stopBackgroundMusic();
     super.onRemove();
   }
 
@@ -84,7 +83,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _setUpSubscription() {
     _sub ??= game.storageCenter.onDataChanged.listen((event) {
       if (event is NewStarsStorageEvent) {
-        _menuTopBar.updateStarsCount(index: _getWorldIndex(event.worldUuid), stars: event.totalStars);
         _pendingWorldStorageEvent = event;
       }
     });
@@ -105,7 +103,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
       stars: _pendingWorldStorageEvent!.newStars,
     );
     await Future.delayed(Duration(milliseconds: 200));
-    await _menuTopBar.starsCountAnimation(_pendingWorldStorageEvent!.newStars);
+    await _menuTopBar.starsCountAnimation(
+      index: _getWorldIndex(_pendingWorldStorageEvent!.worldUuid),
+      newStars: _pendingWorldStorageEvent!.newStars,
+      totalStars: _pendingWorldStorageEvent!.totalStars,
+    );
     _pendingWorldStorageEvent = null;
   }
 

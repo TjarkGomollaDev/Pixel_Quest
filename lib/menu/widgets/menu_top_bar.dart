@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/settings_notifier.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/utils/volume.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -64,11 +64,11 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
     // general
     anchor = Anchor.topLeft;
-    SettingsNotifier.instance.addListenerFor(SettingsEvent.volume, _onSettingsChanged);
+    SettingsNotifier.instance.addListenerFor(SettingsEvent.sound, _onSettingsChanged);
   }
 
   void dispose() {
-    SettingsNotifier.instance.removeListenerFor(SettingsEvent.volume, _onSettingsChanged);
+    SettingsNotifier.instance.removeListenerFor(SettingsEvent.sound, _onSettingsChanged);
   }
 
   void _setUpStarsCount() {
@@ -118,29 +118,30 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     // settings btn
     _settingsBtn = SpriteBtn.fromType(type: SpriteBtnType.settings, onPressed: () {}, position: _achievementsBtn.position + btnOffset);
 
-    // volume toggle btn
+    // sound state toggle btn
     _volumeBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.volumeOn,
       type_2: SpriteBtnType.volumeOff,
-      onPressed: () => switchVolume(game: game, soundsEnabled: false),
-      onPressed_2: () => switchVolume(game: game),
+      onPressed: () => game.audioCenter.toggleSound(SoundState.off),
+      onPressed_2: () => game.audioCenter.toggleSound(SoundState.on),
       position: _settingsBtn.position + btnOffset,
-      initialState: game.storageCenter.settings.soundsEnabled,
+      initialState: game.audioCenter.soundState.enabled,
     );
 
     addAll([_achievementsBtn, _settingsBtn, _volumeBtn]);
   }
 
-  void _onSettingsChanged() => _volumeBtn.setState(game.storageCenter.settings.soundsEnabled);
+  void _onSettingsChanged() => _volumeBtn.setState(game.audioCenter.soundState.enabled);
 
-  void updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';
+  void _updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';
 
   void showStarsCount(int index) => _worldStarsCounts[index].show();
 
   void hideStarsCount(int index) => _worldStarsCounts[index].hide();
 
-  Future<void> starsCountAnimation(int count) async {
-    for (var i = 0; i < count; i++) {
+  Future<void> starsCountAnimation({required int index, required int newStars, required int totalStars}) async {
+    for (var i = 0; i < newStars; i++) {
+      _updateStarsCount(index: index, stars: totalStars - newStars + i + 1);
       await _animatedStar.fallTo(_starItem.position);
       await Future.delayed(Duration(milliseconds: 50));
     }

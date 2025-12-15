@@ -4,7 +4,6 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/enemies/ghost_particle.dart';
 import 'package:pixel_adventure/game/enemies/slime_particle.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -155,9 +154,6 @@ class Slime extends PositionComponent
     // after changing the direction, we need to adjust the borders and overwrite the x position
     _updateActualBorders();
     position.x = _moveDirection == 1 ? _leftBorder : _rightBorder;
-
-    // delete all remaining particles
-    game.world.children.whereType<GhostParticle>().where((p) => p.owner == this).forEach((p) => p.removeFromParent());
   }
 
   void _startParticleTimer() {
@@ -187,8 +183,8 @@ class Slime extends PositionComponent
     );
     final particlePosition = position + particleOffset;
 
-    final ghostParticle = SlimeParticle(spawnOnLeftSide: spawnOnLeftSide, player: _player, position: particlePosition);
-    game.world.add(ghostParticle);
+    final slimeParticle = SlimeParticle(owner: this, spawnOnLeftSide: spawnOnLeftSide, player: _player, position: particlePosition);
+    game.world.add(slimeParticle);
   }
 
   @override

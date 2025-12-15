@@ -5,7 +5,6 @@ import 'package:flame/events.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
@@ -139,8 +138,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   @override
   Future<void> onMount() async {
     _setUpCamera();
-    // _addGameHud();
-    SchedulerBinding.instance.addPostFrameCallback((_) => _addGameHud());
+    _addGameHud();
     _addMobileControls();
     await _hideLoadingOverlay();
     await Future.delayed(Duration(milliseconds: 100));
@@ -152,6 +150,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   Future<void> onRemove() async {
     _removeGameHud();
     if (GameSettings.showMobileControls) _removeMobileControls();
+    game.audioCenter.stopBackgroundMusic();
     return super.onRemove();
   }
 
@@ -237,8 +236,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     );
     final position = Vector2.all(GameSettings.mapBorderWidth != 0 ? GameSettings.tileSize : 0);
     bool isInitialized = false;
-    BackgroundTileColor? color;
-    if (backgroundType != null) {
+    if (backgroundType != null && backgroundType.isNotEmpty) {
       for (var szene in Szene.values) {
         if (szene.fileName == backgroundType) {
           _levelBackground = BackgroundSzene(szene: szene, position: position, size: size);
@@ -249,14 +247,17 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       if (!isInitialized) {
         for (var tileColor in BackgroundTileColor.values) {
           if (tileColor.name == backgroundType) {
-            color = tileColor;
+            _levelBackground = BackgroundColored(color: tileColor, position: position, size: size);
             break;
           }
         }
       }
-    }
-    if (!isInitialized) {
-      _levelBackground = BackgroundColored(color: color ?? BackgroundTileColor.Gray, position: position, size: size);
+    } else {
+      _levelBackground = BackgroundSzene(
+        szene: game.staticCenter.getWorld(levelMetadata.worldUuid).backgroundSzene,
+        position: position,
+        size: size,
+      );
     }
     _levelBackground.priority = GameSettings.backgroundLayerLevel;
     add(_levelBackground);

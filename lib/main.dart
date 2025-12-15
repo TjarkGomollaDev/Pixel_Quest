@@ -4,7 +4,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:pixel_adventure/extensions/build_context.dart';
+import 'package:pixel_adventure/splash/flutter%20extensions/build_context.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/splash/splash_screen.dart';
 

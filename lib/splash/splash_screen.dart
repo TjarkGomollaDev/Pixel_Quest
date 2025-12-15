@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/extensions/build_context.dart';
+import 'package:pixel_adventure/splash/flutter%20extensions/build_context.dart';
 import 'package:pixel_adventure/splash/widgets/animated_stars.dart';
 import 'package:pixel_adventure/splash/widgets/developer_logo.dart';
 import 'package:pixel_adventure/splash/widgets/splash_content.dart';

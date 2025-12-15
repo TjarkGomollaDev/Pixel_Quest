@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum SettingsEvent { volume }
+enum SettingsEvent { sound }
 
 /// A lightweight event-based settings notifier.
 ///

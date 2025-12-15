@@ -15,6 +15,7 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
 import 'package:pixel_adventure/router.dart';
@@ -29,6 +30,9 @@ class PixelQuest extends FlameGame
   // general data that is used throughout the app and is loaded once when the app is launched
   late final StaticCenter staticCenter;
   late final StorageCenter storageCenter;
+
+  // handles everything related to audio in the game
+  late final AudioCenter audioCenter;
 
   // in context with the camera
   final ({double top, double bottom}) cameraWorldYBounds = (top: GameSettings.mapBorderWidth, bottom: GameSettings.mapBorderWidth);
@@ -54,8 +58,7 @@ class PixelQuest extends FlameGame
   @override
   Future<void> onLoad() async {
     _startTime = DateTime.now();
-    staticCenter = await StaticCenter.init();
-    storageCenter = await StorageCenter.init(staticCenter: staticCenter);
+    await _loadAllCenters();
     await _loadAllImagesIntoCache();
     _setUpCameraDefault();
     _setUpSafePadding();
@@ -100,6 +103,12 @@ class PixelQuest extends FlameGame
   void onDispose() {
     ((router.routes[RouteNames.menu] as WorldRoute?)?.world as MenuPage?)?.dispose();
     super.onDispose();
+  }
+
+  Future<void> _loadAllCenters() async {
+    staticCenter = await StaticCenter.init();
+    storageCenter = await StorageCenter.init(staticCenter: staticCenter);
+    audioCenter = await AudioCenter.init(storageCenter: storageCenter);
   }
 
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();

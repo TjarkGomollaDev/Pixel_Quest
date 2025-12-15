@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -89,6 +90,8 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
       _player.position.y -= 1;
 
       _player.bounceUp(jumpForce: _bounceHeight);
+      game.audioCenter.playSound(SoundEffect.jumpBoost);
+
       animationGroupComponent.current = TrampolineState.jump;
       await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
       animationGroupComponent.current = TrampolineState.idle;

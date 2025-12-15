@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -99,6 +100,8 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     reached = true;
     current = CheckpointState.flagOut;
     _player.reachedCheckpoint(_playerRespawn);
+    game.audioCenter.playSound(SoundEffect.checkpoint);
+
     await animationTickers![CheckpointState.flagOut]!.completed;
     current = CheckpointState.flagIdle;
   }

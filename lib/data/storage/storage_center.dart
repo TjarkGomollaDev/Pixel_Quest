@@ -1,22 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/settings_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/world_entity.dart';
+import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/level/player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class StorageEvent {
   const StorageEvent();
-}
-
-class LevelStorageEvent extends StorageEvent {
-  final String levelUuid;
-  final String worldUuid;
-
-  const LevelStorageEvent({required this.levelUuid, required this.worldUuid});
 }
 
 class NewStarsStorageEvent extends StorageEvent {
@@ -29,6 +25,7 @@ class NewStarsStorageEvent extends StorageEvent {
 }
 
 class StorageCenter {
+  // constructor parameters
   final SharedPreferences _prefs;
   final StaticCenter _staticCenter;
 
@@ -75,7 +72,6 @@ class StorageCenter {
     final json = jsonEncode(data.toMap());
     await _prefs.setString(data.uuid, json);
     _cacheLevelData[data.uuid] = data;
-    _onDataChanged.add(LevelStorageEvent(levelUuid: data.uuid, worldUuid: worldUuid));
 
     // update world data
     final starDiff = data.starDifference(storedData);
@@ -151,11 +147,29 @@ class StorageCenter {
     _cacheWorldData.clear();
   }
 
-  Future<void> saveSettings(SettingsEntity data) async {
+  Future<void> _saveSettings(SettingsEntity data) async {
     final json = jsonEncode(data.toMap());
     await _prefs.setString(_storageKeyUserSettings, json);
     _cacheSettings = data;
   }
+
+  Future<void> updateSettings({
+    SoundState? soundState,
+    double? sfxVolume,
+    double? musicVolume,
+    PlayerCharacter? character,
+    PlayerMiniMapMarkerType? playerMarker,
+    int? worldSkin,
+  }) async => await _saveSettings(
+    settings.copyWith(
+      soundState: soundState,
+      sfxVolume: sfxVolume,
+      musicVolume: musicVolume,
+      character: character,
+      playerMarker: playerMarker,
+      worldSkin: worldSkin,
+    ),
+  );
 
   void _loadSettings() {
     final json = _prefs.getString(_storageKeyUserSettings);

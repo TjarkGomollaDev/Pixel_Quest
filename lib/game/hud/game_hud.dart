@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini_map.dart';
@@ -13,7 +14,6 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/volume.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
@@ -111,14 +111,14 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       position: btnBasePosition,
     );
 
-    // volume btn
+    // sound state toggle btn
     _volumeBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.volumeOn,
       type_2: SpriteBtnType.volumeOff,
-      onPressed: () => switchVolume(game: game, soundsEnabled: false),
-      onPressed_2: () => switchVolume(game: game),
+      onPressed: () => game.audioCenter.toggleSound(SoundState.off),
+      onPressed_2: () => game.audioCenter.toggleSound(SoundState.on),
       position: _menuBtn.position + btnOffset,
-      initialState: game.storageCenter.settings.soundsEnabled,
+      initialState: game.audioCenter.soundState.enabled,
     );
 
     // pause btn

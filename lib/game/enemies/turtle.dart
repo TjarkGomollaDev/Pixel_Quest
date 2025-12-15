@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
@@ -138,6 +139,9 @@ class Turtle extends PositionComponent
     if (!_spikesAreOut && collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      game.audioCenter.playSound(SoundEffect.enemieHit);
+
+      // play hit animation and then remove from level
       animationGroupComponent.animationTickers![TurtleState.spikesOut]?.onComplete?.call();
       animationGroupComponent.animationTickers![TurtleState.spikesIn]?.onComplete?.call();
       animationGroupComponent.current = TurtleState.hit;

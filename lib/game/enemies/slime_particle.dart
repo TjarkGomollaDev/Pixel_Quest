@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -10,10 +11,15 @@ import 'package:pixel_adventure/pixel_quest.dart';
 
 class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
   // constructor parameters
-  final bool spawnOnLeftSide;
-  final Player player;
+  final Slime _owner;
+  final Player _player;
+  final bool _spawnOnLeftSide;
 
-  SlimeParticle({required this.spawnOnLeftSide, required this.player, required super.position}) : super(size: gridSize);
+  SlimeParticle({required Slime owner, required bool spawnOnLeftSide, required Player player, required super.position})
+    : _owner = owner,
+      _spawnOnLeftSide = spawnOnLeftSide,
+      _player = player,
+      super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(16);
@@ -49,7 +55,7 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
 
   Future<void> _loadAndPlayAnimationOneTime() async {
     animation = loadSpriteAnimation(game, _path, _amount, GameSettings.stepTime, _textureSize, loop: false);
-    if (!spawnOnLeftSide) flipHorizontallyAroundCenter();
+    if (!_spawnOnLeftSide) flipHorizontallyAroundCenter();
 
     // stop animation at first frame
     animationTicker?.currentIndex = 0;
@@ -62,8 +68,10 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
   }
 
   @override
-  void onEntityCollision(CollisionSide collisionSide) => player.collidedWithEnemy(collisionSide);
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
+
+  Slime get owner => _owner;
 }

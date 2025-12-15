@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -93,7 +94,10 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
       MoveEffect.to(
         target,
         EffectController(duration: flyDuration, curve: Curves.easeOutBack),
-        onComplete: () => completer.complete(),
+        onComplete: () {
+          game.audioCenter.playSound(SoundEffect.star);
+          completer.complete();
+        },
       ),
     ]);
 
@@ -103,6 +107,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
   Future<void> fallTo(Vector2 target, {double fallDuration = 0.4}) async {
     final startPosition = position.clone();
     final completer = Completer<void>();
+    game.audioCenter.playSound(SoundEffect.collected);
     add(
       SequenceEffect(
         [
@@ -122,7 +127,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
 
   Future<void> popIn({double duration = 0.6}) async {
     final completer = Completer<void>();
-
+    game.audioCenter.playSound(SoundEffect.star);
     add(
       SequenceEffect([
         ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.6, curve: Curves.easeOutBack)),

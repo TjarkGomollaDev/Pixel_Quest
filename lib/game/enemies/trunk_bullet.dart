@@ -54,9 +54,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
   void update(double dt) {
     if (_spawnProtectionFrames > 0) {
       _spawnProtectionFrames--;
-      if (_spawnProtectionFrames == 0) {
-        opacity = 1;
-      }
+      if (_spawnProtectionFrames == 0) opacity = 1;
     } else {
       _move(dt);
     }

@@ -38,22 +38,22 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.7798,
+            "scale": 0.3816,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 3663.7599384457553,
-                "y": 159.65632213388045
+                "x": 1983.7526205450736,
+                "y": 511.0062893081763
             }
         },
         "Level_03.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.6183,
+            "scale": 0.4159,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 464.17596635937247,
-                "y": 168.2031376354521
+                "x": 3854.2918970906467,
+                "y": 175.52296225054113
             }
         },
         "Level_04.tmx": {
@@ -63,19 +63,19 @@
             "scale": 0.9426,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 3599.618077657543,
-                "y": 159.66475705495435
+                "x": 4075.960110333121,
+                "y": 207.9354975599406
             }
         },
         "Level_05.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.8453,
+            "scale": 0.9028,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1830.1194842067903,
-                "y": 171.53673252099844
+                "x": 204.9180327868852,
+                "y": 321.22286220646873
             }
         },
         "Level_11.tmx": {
@@ -93,22 +93,22 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.1738,
-            "selectedLayer": 1,
+            "scale": 1.2103,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 373.9989776793321,
-                "y": 54.52376895552908
+                "x": 228.86887548541685,
+                "y": 141.28728414442702
             }
         },
         "Level_2-01.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 2.3141,
-            "selectedLayer": 1,
+            "scale": 1.1963,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 333.6070178471112,
-                "y": 163.77857482390564
+                "x": 246.5936637967065,
+                "y": 143.7766446543509
             }
         },
         "Level_Tile.tmx": {

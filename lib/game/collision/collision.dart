@@ -4,23 +4,17 @@ import 'package:flame/components.dart';
 // ignore: constant_identifier_names
 enum CollisionSide { Top, Right, Bottom, Left, None, Any }
 
-double calculateOverlapX(Rect playerRect, Rect otherRect) {
-  return (playerRect.center.dx < otherRect.center.dx) ? (playerRect.right - otherRect.left) : (otherRect.right - playerRect.left);
-}
+double calculateOverlapX(Rect playerRect, Rect otherRect) =>
+    (playerRect.center.dx < otherRect.center.dx) ? (playerRect.right - otherRect.left) : (otherRect.right - playerRect.left);
 
-double calculateOverlapY(Rect playerRect, Rect otherRect) {
-  return (playerRect.center.dy < otherRect.center.dy) ? (playerRect.bottom - otherRect.top) : (otherRect.bottom - playerRect.top);
-}
+double calculateOverlapY(Rect playerRect, Rect otherRect) =>
+    (playerRect.center.dy < otherRect.center.dy) ? (playerRect.bottom - otherRect.top) : (otherRect.bottom - playerRect.top);
 
 // check whether the y ranges overlap → otherwise no horizontal collision
-bool checkVerticalIntersection(Rect playerRect, Rect otherRect) {
-  return playerRect.top < otherRect.bottom && playerRect.bottom > otherRect.top;
-}
+bool checkVerticalIntersection(Rect playerRect, Rect otherRect) => playerRect.top < otherRect.bottom && playerRect.bottom > otherRect.top;
 
 // check whether the x ranges overlap → otherwise no vertical collision
-bool checkHorizontalIntersection(Rect playerRect, Rect otherRect) {
-  return playerRect.left < otherRect.right && playerRect.right > otherRect.left;
-}
+bool checkHorizontalIntersection(Rect playerRect, Rect otherRect) => playerRect.left < otherRect.right && playerRect.right > otherRect.left;
 
 CollisionSide resolveAABBCollision(
   Rect playerRect,
@@ -62,6 +56,5 @@ bool verticalSweptCheck(Rect playerRect, FastCollision other, bool hasHorizontal
   return hasHorizontalIntersection && playerRect.bottom > oldTop && playerRect.top < newBottom;
 }
 
-bool checkRangeIntersection(double rangeMinY, double rangeMaxY, double otherMinY, double otherMaxY) {
-  return rangeMaxY >= otherMinY && rangeMinY <= otherMaxY;
-}
+bool checkRangeIntersection(double rangeMinY, double rangeMaxY, double otherMinY, double otherMaxY) =>
+    rangeMaxY >= otherMinY && rangeMinY <= otherMaxY;

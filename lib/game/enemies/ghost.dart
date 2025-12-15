@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/ghost_particle.dart';
@@ -242,6 +243,9 @@ class Ghost extends PositionComponent
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
+      game.audioCenter.playSound(SoundEffect.enemieHit);
+
+      // play hit animation and then remove from level
       animationGroupComponent.current = GhostState.hit;
       animationGroupComponent.animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
     } else {

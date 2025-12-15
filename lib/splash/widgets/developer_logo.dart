@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/extensions/int_double_extensions.dart';
+import 'package:pixel_adventure/splash/flutter%20extensions/int_double_extensions.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DeveloperLogo extends StatefulWidget {

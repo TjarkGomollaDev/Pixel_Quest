@@ -20,6 +20,7 @@ import 'package:pixel_adventure/game/traps/fire_trap.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
@@ -49,11 +50,9 @@ enum PlayerCharacter {
   virtualGuy('Virtual Guy');
 
   final String fileName;
-
   const PlayerCharacter(this.fileName);
 
   static const PlayerCharacter defaultCharacter = PlayerCharacter.maskDude;
-
   static PlayerCharacter fromName(String name) => PlayerCharacter.values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
 }
 
@@ -196,10 +195,7 @@ class Player extends SpriteAnimationGroupComponent
       if (_spawnProtection) return super.onCollision(intersectionPoints, other);
       if (other is EntityCollision) onEntityCollision(other);
     } else if (_levelStart && other is Start) {
-      _levelStart = false;
-      isWorldCollisionActive = true;
-      _spawnProtection = false;
-      onWorldCollision(other);
+      _landOnStartPlatform(other);
     }
     super.onCollision(intersectionPoints, other);
   }
@@ -323,6 +319,14 @@ class Player extends SpriteAnimationGroupComponent
     if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopWorldCollision(top, other);
   }
 
+  void _landOnStartPlatform(WorldCollision other) {
+    _levelStart = false;
+    isWorldCollisionActive = true;
+    _spawnProtection = false;
+    game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
+    onWorldCollision(other);
+  }
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -430,6 +434,7 @@ class Player extends SpriteAnimationGroupComponent
     position.y += velocity.y * dt;
     isOnGround = false;
     hasJumped = false;
+    game.audioCenter.playSound(SoundEffect.jump);
   }
 
   void _playerDoubleJump(double dt) {
@@ -438,6 +443,7 @@ class Player extends SpriteAnimationGroupComponent
     isOnGround = false;
     hasDoubleJumped = false;
     current = PlayerState.doubleJump;
+    game.audioCenter.playSound(SoundEffect.doubleJump);
   }
 
   void _applyGravity(double dt) {
@@ -448,6 +454,7 @@ class Player extends SpriteAnimationGroupComponent
 
   Future<void> spawnInLevel() async {
     // play appearing animation
+    game.audioCenter.playSound(SoundEffect.appearing);
     await _effect.playAppearing(_spawnPosition);
     _isPlayerStateActive = true;
     _isGravityActive = true;
@@ -487,11 +494,12 @@ class Player extends SpriteAnimationGroupComponent
     world.saveData();
 
     // delays are not functional, but purely for a more visually appealing result
-    final delays = [200, 800, 80, 620, 120, 600, 400, 200];
+    final delays = [200, 800, 80, 620, 120, 600, 400, 300];
     int delayIndex = 0;
 
     // player moves to the horizontal center of the finish
     await _waitUntilPlayerIsAtFinishCenter(finish.toAbsoluteRect().center.dx);
+    _updateHitboxEdges();
 
     // spotlight animation
     world.removeGameHudOnFinish();
@@ -499,6 +507,7 @@ class Player extends SpriteAnimationGroupComponent
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
     world.add(spotlight);
     await spotlight.focusOnTarget();
+    game.audioCenter.playBackgroundMusic(BackgroundMusic.win);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // star positions
@@ -535,6 +544,7 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // jump animation
+    game.audioCenter.playSound(SoundEffect.jump);
     bounceUp(jumpForce: 320);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
     current = PlayerState.doubleJump;
@@ -544,6 +554,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // player disapperaing animation
     isVisible = false;
+    game.audioCenter.playSound(SoundEffect.disappearing);
     await _effect.playDisappearing(scale.x > 0 ? position : position - Vector2(width, 0));
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
@@ -554,6 +565,7 @@ class Player extends SpriteAnimationGroupComponent
     for (var e in stars) {
       e.fadeOut();
     }
+    game.audioCenter.stopBackgroundMusic();
     await spotlight.shrinkToBlack();
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
@@ -573,6 +585,8 @@ class Player extends SpriteAnimationGroupComponent
     respawnNotifier.notifyRespawn();
 
     // play death effects
+    game.audioCenter.playSound(SoundEffect.playerHit);
+    game.audioCenter.playSound(SoundEffect.playerDeath);
     _effect.playFlashScreen();
     _effect.shakeCamera();
     current = PlayerState.hit;

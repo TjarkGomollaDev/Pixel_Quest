@@ -85,8 +85,9 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
     _levelBtn = SpriteBtn(
       path: 'Menu/Levels/${_levelMetadata.btnFileName}.png',
       onPressed: () async {
-        await game.showLoadingOverlay(_levelMetadata);
+        // game.audioCenter.stopBackgroundMusic();
         game.router.pushReplacementNamed(_levelMetadata.uuid);
+        await game.showLoadingOverlay(_levelMetadata);
       },
       position: Vector2(_center.x, size.y - 17 / 2 - _btnMarginBottom),
     );
