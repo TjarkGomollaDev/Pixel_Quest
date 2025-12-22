@@ -1,6 +1,5 @@
 import 'package:flame_audio/flame_audio.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
-import 'package:pixel_adventure/game/utils/settings_notifier.dart';
 
 enum SoundEffect {
   appearing('appearing'),
@@ -47,7 +46,7 @@ enum SoundState {
   off;
 
   bool get enabled => this == SoundState.on;
-  static const SoundState defaultState = SoundState.on;
+  static const SoundState defaultState = SoundState.off;
   static SoundState fromName(String name) => SoundState.values.firstWhere((s) => s.name == name, orElse: () => defaultState);
 }
 
@@ -56,6 +55,14 @@ class AudioCenter {
   final StorageCenter _storageCenter;
 
   AudioCenter._(this._storageCenter);
+
+  static Future<AudioCenter> init({required StorageCenter storageCenter}) async {
+    final audioCenter = AudioCenter._(storageCenter);
+    await audioCenter._loadData();
+    await audioCenter._createPools();
+    FlameAudio.bgm.initialize();
+    return audioCenter;
+  }
 
   // data
   late SoundState _soundState;
@@ -71,14 +78,6 @@ class AudioCenter {
 
   // audio pools for extremely quick firing, repetitive or simultaneous sounds
   final Map<SoundEffect, AudioPool> _pools = {};
-
-  static Future<AudioCenter> init({required StorageCenter storageCenter}) async {
-    final audioCenter = AudioCenter._(storageCenter);
-    await audioCenter._loadData();
-    await audioCenter._createPools();
-    FlameAudio.bgm.initialize();
-    return audioCenter;
-  }
 
   Future<void> _loadData() async {
     final files = [...SoundEffect.values.map((s) => s.path), ...BackgroundMusic.values.map((m) => m.path)];
@@ -110,10 +109,9 @@ class AudioCenter {
 
   void playSound(SoundEffect sound) {
     if (_effectiveSfxVolume == 0) return;
-
     final pool = _pools[sound];
     if (pool != null) {
-      pool.start();
+      pool.start(volume: _sfxVolume);
     } else {
       FlameAudio.play(sound.path, volume: _sfxVolume);
     }
@@ -131,29 +129,23 @@ class AudioCenter {
   Future<void> toggleSound(SoundState soundState) async {
     _soundState = soundState;
 
-    // notify other sound btns
-    SettingsNotifier.instance.notify(SettingsEvent.sound);
-
-    // change bgm sound state
+    // update current BGM volume without restarting
     await _applyBgmVolume();
 
-    // update in storage center
     await _storageCenter.updateSettings(soundState: soundState);
   }
 
   Future<void> setSfxVolume(double volume) async {
     _sfxVolume = volume;
-
-    // no global sfx channel in FlameAudio, we apply per-play
     await _storageCenter.updateSettings(sfxVolume: _sfxVolume);
   }
 
-  Future<void> setMusicVolume(double volume) async {
+  Future<void> setMusicVolume(double volume, {bool automaticSave = true}) async {
     _musicVolume = volume;
 
     // update current BGM volume without restarting
     await _applyBgmVolume();
 
-    await _storageCenter.updateSettings(musicVolume: _musicVolume);
+    if (automaticSave) await _storageCenter.updateSettings(musicVolume: _musicVolume);
   }
 }

@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
@@ -38,13 +38,16 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
     required List<EntityOnMiniMap> entitiesAboveForeground,
     required List<EntityOnMiniMap> entitiesBehindForeground,
     required super.position,
+    bool show = true,
   }) : _spriteForeground = sprite,
        _levelWidth = levelWidth,
        _targetSize = targetSize,
        _player = player,
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground,
-       super(size: targetSize);
+       super(size: targetSize) {
+    if (!show) hide();
+  }
 
   // internal horizontal offset in mini map coordinates used to "scroll" the map when the player moves
   double _offsetX = 0;
@@ -77,7 +80,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   late final Paint _backgroundPaint;
 
   // player marker
-  late final PlayerMiniMapMarkerType _playerMarker; // [Adjustable]
+  static const PlayerMiniMapMarkerType _playerMarker = PlayerMiniMapMarkerType.triangel; // [Adjustable]
   late final Paint _playerMarkerPaint;
   late final double _playerMarkerSize;
 
@@ -149,7 +152,6 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
 
   /// Initializes marker sizes and paints for the player and all entity markers.
   void _setUpMarker() {
-    _playerMarker = game.storageCenter.settings.playerMarker;
     _playerMarkerPaint = Paint()..color = AppTheme.playerMarker;
     _playerMarkerSize = _player.hitboxSize.y * _worldToMiniMapScale;
     _entityMarkerPaint = Paint();

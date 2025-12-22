@@ -3,9 +3,9 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini_map_arrow_layer.dart';
-import 'package:pixel_adventure/game/hud/mini_map_view.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map_arrow_layer.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map_view.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -41,6 +41,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   final LevelMetadata _levelMetadata;
   final List<EntityOnMiniMap> _miniMapEntities;
   final Vector2 _hudTopRightToScreenTopRightOffset;
+  final bool _inistialState;
 
   MiniMap({
     required Sprite miniMapSprite,
@@ -50,12 +51,14 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     required List<EntityOnMiniMap> miniMapEntities,
     required super.position,
     required Vector2 hudTopRightToScreenTopRightOffset,
+    bool show = true,
   }) : _hudTopRightToScreenTopRightOffset = hudTopRightToScreenTopRightOffset,
        _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
        _levelMetadata = levelMetadata,
-       _miniMapEntities = miniMapEntities {
+       _miniMapEntities = miniMapEntities,
+       _inistialState = show {
     size = miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
 
     // optical adjustment to compensate for the protruding ends of the frame
@@ -166,6 +169,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   void _setUpFrame() {
     _frame = VisibleSpriteComponent(
       sprite: loadSprite(game, 'HUD/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
+      show: _inistialState,
     );
     add(_frame);
   }
@@ -208,6 +212,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       entitiesAboveForeground: _entitiesAboveForeground,
       entitiesBehindForeground: _entitiesBehindForeground,
       position: viewPosition,
+      show: _inistialState,
     );
 
     add(_miniMapView);
@@ -221,12 +226,13 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     _hideBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.downSmall,
       type_2: SpriteBtnType.upSmall,
-      onPressed: _hide,
-      onPressed_2: _show,
+      onPressed: _hideAnimated,
+      onPressed_2: _showAnimated,
       position: Vector2(
         size.x - SpriteBtnType.btnSizeSmallCorrected.x / 2,
         SpriteBtnType.btnSizeSmallCorrected.y / 2 + _frameOverhangAdjust,
       ),
+      initialState: _inistialState,
     );
 
     _scrollRightBtn = SpriteBtn.fromType(
@@ -234,6 +240,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       onPressed: () => _miniMapView.scrollManual(1),
       holdMode: true,
       position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtnType.btnSizeSmallCorrected.y / 2),
+      show: _inistialState,
     );
 
     _scrollLeftBtn = SpriteBtn.fromType(
@@ -241,6 +248,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       onPressed: () => _miniMapView.scrollManual(-1),
       holdMode: true,
       position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtnType.btnSizeSmallCorrected.y - _btnSpacing),
+      show: _inistialState,
     );
 
     addAll([_hideBtn, _scrollRightBtn, _scrollLeftBtn]);
@@ -254,12 +262,13 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       miniMap: this,
       arrowCandidates: _arrowCandidates,
       position: Vector2(_frameOverhangAdjust, miniMapTargetViewSize.y + _frameBorderWidth * 2 + _arrowLayerSpacing),
+      show: _inistialState,
     );
     add(_arrowLayer);
   }
 
   /// Shows the mini map.
-  Future<void> _show() async {
+  Future<void> _showAnimated() async {
     _miniMapView.show();
     _frame.show();
     _arrowLayer.show();
@@ -267,7 +276,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   /// Hides the mini map.
-  Future<void> _hide() async {
+  Future<void> _hideAnimated() async {
     _miniMapView.hide();
     _frame.hide();
     _arrowLayer.hide();

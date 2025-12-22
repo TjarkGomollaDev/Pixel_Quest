@@ -8,7 +8,5 @@ class FastStartAccelerateCurve extends Curve {
 
 class JumpFallCurve extends Curve {
   @override
-  double transform(double t) {
-    return pow(t, 1.8).toDouble();
-  }
+  double transform(double t) => pow(t, 1.8).toDouble();
 }

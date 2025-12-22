@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -105,7 +106,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     if (!_canReceiveTap) return;
     scale = _maxScale;
     if (_holdMode) _isHeld = true;
-
+    game.audioCenter.playSound(SoundEffect.tap);
     super.onTapDown(event);
   }
 
@@ -122,11 +123,9 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
         _executing = true;
         result.whenComplete(() => _executing = false);
       }
-      game.audioCenter.playSound(SoundEffect.tap);
     } else {
       _isHeld = false;
     }
-
     super.onTapUp(event);
   }
 
@@ -135,7 +134,6 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     if (!_canReceiveTap) return;
     scale = _normalScale;
     if (_holdMode) _isHeld = false;
-
     super.onTapCancel(event);
   }
 
@@ -156,20 +154,12 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     _onPressed = onPressed;
     if (!show) hide();
     _holdMode = holdMode;
-    _initialSetup();
+    anchor = Anchor.center;
   }
 
   /// Sets the original (intended) size of the button.
   /// MUST be called in `onLoad()` where the true size is finally available.
   void _setUpOriginalSize(Vector2 size) => _originalSize = size;
-
-  void _initialSetup() {
-    // debug
-    debugColor = AppTheme.transparent;
-
-    // general
-    anchor = Anchor.center;
-  }
 
   /// Sets scale to normal.
   void setNormalScale() => scale = _normalScale;
@@ -328,7 +318,7 @@ class TextBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
 
   TextBtn({
     required String text,
-    required void Function() onPressed,
+    required FutureOr<void> Function() onPressed,
     required super.position,
     bool show = true,
     bool holdMode = false,
@@ -350,10 +340,8 @@ class TextBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
   void _setUpText() {
     _textComponent = TextComponent(
       text: _text,
-      anchor: Anchor(0.5, 0.38),
-      textRenderer: TextPaint(
-        style: _textStyle ?? const TextStyle(fontFamily: 'Pixel Font', fontSize: 18, color: AppTheme.ingameText),
-      ),
+      anchor: Anchor.center,
+      textRenderer: TextPaint(style: _textStyle ?? AppTheme.textBtnStandard),
     );
     add(_textComponent);
 
@@ -390,7 +378,11 @@ enum SpriteBtnType {
   upSmall('Up Small'),
   downSmall('Down Small'),
   previousSmall('Previous Small'),
-  nextSmall('Next Small');
+  nextSmall('Next Small'),
+
+  // blank
+  blankOn('Blank On'),
+  blankOff('Blank Off');
 
   // path
   static const String _basePath = 'Menu/Buttons/';
@@ -400,6 +392,7 @@ enum SpriteBtnType {
   // size
   static final Vector2 _btnSize = Vector2(21, 22);
   static final Vector2 _btnSizeSmall = Vector2(15, 16);
+  static final Vector2 _btnSizeBlank = Vector2(15, 72);
   static final Vector2 _btnOffset = Vector2.all(2);
 
   // size getter
@@ -407,6 +400,8 @@ enum SpriteBtnType {
   static Vector2 get btnSizeCorrected => _btnSize - _btnOffset;
   static Vector2 get btnSizeSmall => _btnSizeSmall;
   static Vector2 get btnSizeSmallCorrected => _btnSizeSmall - _btnOffset;
+  static Vector2 get btnSizeBlank => _btnSizeBlank;
+  static Vector2 get btnSizeBlankCorrected => _btnSizeBlank - _btnOffset;
 
   final String fileName;
   const SpriteBtnType(this.fileName);
@@ -425,6 +420,7 @@ enum SpriteBtnType {
 class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
   // constructor parameters
   final String _path;
+  final String? _textOnBtn;
 
   SpriteBtn({
     required String path,
@@ -432,7 +428,9 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
     required super.position,
     bool show = true,
     bool holdMode = false,
-  }) : _path = path {
+    String? textOnBtn,
+  }) : _path = path,
+       _textOnBtn = textOnBtn {
     _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: holdMode);
   }
 
@@ -442,13 +440,31 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
     required Vector2 position,
     bool show = true,
     bool holdMode = false,
-  }) : this(path: type.path, onPressed: onPressed, position: position, show: show, holdMode: holdMode);
+    String? textOnBtn,
+  }) : this(path: type.path, onPressed: onPressed, position: position, show: show, holdMode: holdMode, textOnBtn: textOnBtn);
+
+  // text
+  TextComponent? _textComponent;
 
   @override
   FutureOr<void> onLoad() {
     _loadSprite();
+    _addTextOnBtn();
     _setUpOriginalSize(sprite!.srcSize);
     return super.onLoad();
+  }
+
+  void _addTextOnBtn() {
+    if (_textOnBtn == null) return;
+    _textComponent = TextComponent(
+      text: _textOnBtn,
+      position: size / 2,
+      anchor: Anchor(0.5, 0.42),
+      textRenderer: TextPaint(
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText),
+      ),
+    );
+    add(_textComponent!);
   }
 
   void _loadSprite() => sprite = loadSprite(game, _path);
@@ -468,7 +484,7 @@ class SpriteToggleBtn extends SpriteBtn {
   // constructor parameters
   final String _path_2;
   final FutureOr<void> Function() _onPressed_2;
-  bool _toggleState;
+  String? _textOnBtn_2;
 
   SpriteToggleBtn({
     required super.path,
@@ -477,9 +493,12 @@ class SpriteToggleBtn extends SpriteBtn {
     required FutureOr<void> Function() onPressed_2,
     required super.position,
     bool initialState = true,
+    super.textOnBtn,
+    String? textOnBtn_2,
   }) : _path_2 = path_2,
        _onPressed_2 = onPressed_2,
-       _toggleState = initialState;
+       _toggleState = initialState,
+       _textOnBtn_2 = textOnBtn_2;
 
   SpriteToggleBtn.fromType({
     required SpriteBtnType type,
@@ -488,6 +507,8 @@ class SpriteToggleBtn extends SpriteBtn {
     required FutureOr<void> Function() onPressed_2,
     required Vector2 position,
     bool initialState = true,
+    String? textOnBtn,
+    String? textOnBtn_2,
   }) : this(
          path: type.path,
          path_2: type_2.path,
@@ -495,7 +516,12 @@ class SpriteToggleBtn extends SpriteBtn {
          onPressed_2: onPressed_2,
          position: position,
          initialState: initialState,
+         textOnBtn: textOnBtn,
+         textOnBtn_2: textOnBtn_2,
        );
+
+  // toggle state
+  bool _toggleState;
 
   // sprite that is displayed depending on the toggle state
   late final Sprite _sprite;
@@ -509,14 +535,32 @@ class SpriteToggleBtn extends SpriteBtn {
   }
 
   @override
+  void _addTextOnBtn() {
+    if (_textOnBtn == null && _textOnBtn_2 == null) return;
+    _textComponent = TextComponent(
+      text: '',
+      position: size / 2,
+      anchor: Anchor(0.5, 0.42),
+      textRenderer: TextPaint(
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText),
+      ),
+    );
+    add(_textComponent!);
+    _setTextToState();
+  }
+
+  @override
   FutureOr<void> _callOnPressed() => triggerToggle();
 
   void _setSpriteToState() => sprite = _toggleState ? _sprite : _sprite_2;
+
+  void _setTextToState() => _textComponent?.text = _toggleState ? (_textOnBtn ?? '') : (_textOnBtn_2 ?? '');
 
   /// Switches the sprite and triggers the corresponding action.
   FutureOr<void> triggerToggle() {
     _toggleState = !_toggleState;
     _setSpriteToState();
+    _setTextToState();
     if (_toggleState) return _onPressed_2();
     return _onPressed();
   }
@@ -526,6 +570,7 @@ class SpriteToggleBtn extends SpriteBtn {
     if (value == _toggleState) return;
     _toggleState = value;
     _setSpriteToState();
+    _setTextToState();
   }
 }
 
@@ -542,4 +587,177 @@ FutureOr<void> Function() nonBlocking(Future<void> Function() asyncFn) {
   return () {
     asyncFn(); // fire-and-forget
   };
+}
+
+class RadioOption {
+  // constructor parameters
+  final String text;
+  final FutureOr<void> Function() onSelected;
+
+  const RadioOption({required this.text, required this.onSelected});
+}
+
+class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
+  // constructor parameters
+  final String _text;
+  final TextStyle? _textStyle;
+
+  _RadioBtn({
+    required String text,
+    required super.size,
+    required FutureOr<void> Function() onPressed,
+    required super.position,
+    TextStyle? textStyle,
+    bool show = true,
+  }) : _text = text,
+       _textStyle = textStyle {
+    _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: false);
+  }
+
+  // text
+  late final TextComponent _textComponent;
+
+  @override
+  FutureOr<void> onLoad() {
+    _setUpText();
+    _setUpOriginalSize(size);
+    return super.onLoad();
+  }
+
+  void _setUpText() {
+    _textComponent = TextComponent(
+      text: _text,
+      position: size / 2,
+      anchor: Anchor.center,
+      textRenderer: TextPaint(style: _textStyle ?? AppTheme.dialogTextStandard),
+    );
+    add(_textComponent);
+  }
+}
+
+class RadioComponent extends PositionComponent {
+  // constructor parameters
+  final List<RadioOption> _options;
+  final Vector2 _optionSize;
+  final double _spacingBetweenOptions;
+  final TextStyle? _textStyle;
+  final int _initialIndex;
+  final bool _triggerInitialOnSelected;
+  final double _outlineCornerLength;
+  final double _outlineStrokeWidth;
+  final Color _outlineColor;
+
+  RadioComponent({
+    required List<RadioOption> options,
+    Vector2? optionSize,
+    double spacingBetweenOptions = 6,
+    super.position,
+    TextStyle? textStyle,
+    int initialIndex = 0,
+    bool triggerInitialOnSelected = false,
+    super.anchor = Anchor.topLeft,
+    double outlineCornerLength = 5,
+    double outlineStrokeWidth = 1,
+    Color outlineColor = AppTheme.ingameText,
+  }) : _outlineColor = outlineColor,
+       _outlineStrokeWidth = outlineStrokeWidth,
+       _outlineCornerLength = outlineCornerLength,
+       _triggerInitialOnSelected = triggerInitialOnSelected,
+       _initialIndex = initialIndex,
+       _textStyle = textStyle,
+       _spacingBetweenOptions = spacingBetweenOptions,
+       _optionSize = optionSize ?? defaultSize,
+       _options = options,
+       assert(options.isNotEmpty, 'RadioComponent needs at least 1 option') {
+    // calculate size of the component
+    size = Vector2(_optionSize.x * _options.length + _spacingBetweenOptions * (_options.length - 1), _optionSize.y);
+  }
+
+  // default size
+  static final Vector2 defaultSize = Vector2(52, 20);
+
+  // internal
+  final List<_RadioBtn> _btns = [];
+  final List<Vector2> _centerOfIndex = [];
+  late final CornerOutline _outline;
+
+  // index
+  int _selectedIndex = 0;
+  int get selectedIndex => _selectedIndex;
+
+  // animation settings
+  static const double _switchOutlineDuration = 0.18; // [Adjustable]
+
+  @override
+  FutureOr<void> onLoad() {
+    _setUpRadioBtns();
+    _setUpOutline();
+    if (_triggerInitialOnSelected) _options[_selectedIndex].onSelected();
+    return super.onLoad();
+  }
+
+  void _setUpRadioBtns() {
+    _selectedIndex = _initialIndex.clamp(0, _options.length - 1);
+    for (var i = 0; i < _options.length; i++) {
+      // calculate center
+      final center = Vector2(_optionSize.x / 2 + i * (_optionSize.x + _spacingBetweenOptions), _optionSize.y / 2);
+      _centerOfIndex.add(center);
+
+      // create radio btns
+      final btn = _RadioBtn(
+        text: _options[i].text,
+        size: _optionSize,
+        position: _centerOfIndex[i],
+        textStyle: _textStyle,
+        onPressed: () => _select(i),
+      );
+      _btns.add(btn);
+      add(btn);
+    }
+  }
+
+  void _setUpOutline() {
+    _outline = CornerOutline(
+      size: _optionSize,
+      cornerLength: _outlineCornerLength,
+      strokeWidth: _outlineStrokeWidth,
+      color: _outlineColor,
+      anchor: Anchor.center,
+      position: _centerOfIndex[_selectedIndex],
+    );
+    add(_outline);
+  }
+
+  FutureOr<void> _select(int index) async {
+    if (index == _selectedIndex) return;
+
+    // lock all buttons while the function is running
+    for (var btn in _btns) {
+      btn._executing = true;
+    }
+    _selectedIndex = index;
+    _animateOutlineTo(index);
+    await _options[index].onSelected();
+    for (final btn in _btns) {
+      btn._executing = false;
+    }
+  }
+
+  FutureOr<void> setSelectedIndex(int index, {bool triggerCallback = false}) {
+    if (triggerCallback) return _select(index);
+    if (index == _selectedIndex) return null;
+    _selectedIndex = index;
+    _animateOutlineTo(index);
+  }
+
+  void _animateOutlineTo(int index) {
+    // remove any running effects on the outline so we don't stack animations
+    for (final e in _outline.children.whereType<Effect>().toList()) {
+      e.removeFromParent();
+    }
+
+    // animate outline to target center
+    final targetCenter = _centerOfIndex[index];
+    _outline.add(MoveEffect.to(targetCenter, EffectController(duration: _switchOutlineDuration, curve: Curves.easeOutCubic)));
+  }
 }

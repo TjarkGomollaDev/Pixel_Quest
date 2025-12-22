@@ -14,7 +14,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
 class PauseRoute extends Route with HasGameReference<PixelQuest> {
-  PauseRoute() : super(PausePage.new, transparent: true);
+  PauseRoute() : super(_PausePage.new, transparent: true);
 
   @override
   void onPush(Route? previousRoute) {
@@ -33,7 +33,7 @@ class PauseRoute extends Route with HasGameReference<PixelQuest> {
   }
 }
 
-class PausePage extends Component with HasGameReference<PixelQuest> {
+class _PausePage extends Component with HasGameReference<PixelQuest> {
   // pause container
   late final PositionComponent _pauseContainer;
 
@@ -101,7 +101,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
 
     // outline
     _pauseOutline = CornerOutline(
-      size: _pauseBg.size + Vector2.all(16),
+      size: _pauseBg.size + Vector2.all(22),
       cornerLength: 16,
       strokeWidth: 5,
       color: AppTheme.ingameText,
@@ -114,6 +114,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
       text: 'Settings',
       onPressed: () {
         _stopShowAnimation();
+        game.router.pushNamed(RouteNames.settings);
       },
       position: Vector2(0, 20),
     );
@@ -132,7 +133,7 @@ class PausePage extends Component with HasGameReference<PixelQuest> {
       text: 'Menu',
       onPressed: () {
         _stopShowAnimation();
-        if (game.router.currentRoute is PauseRoute) game.router.pop();
+        game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
       },
       position: _achievementsBtn.position + Vector2(0, _btnSpacing),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
@@ -7,8 +8,8 @@ import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/settings_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/world_entity.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/utils/jump_btn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class StorageEvent {
@@ -34,7 +35,7 @@ class StorageCenter {
   static Future<StorageCenter> init({required StaticCenter staticCenter}) async {
     final prefs = await SharedPreferences.getInstance();
     final dataCenter = StorageCenter._(prefs, staticCenter);
-    await dataCenter.clearSettings(); // for testing
+    // await dataCenter.clearSettings(); // for testing
     await dataCenter.clearAllLevels(); // for testing
     await dataCenter.clearAllWorlds(); // for testing
     dataCenter._loadAllLevels();
@@ -157,17 +158,17 @@ class StorageCenter {
     SoundState? soundState,
     double? sfxVolume,
     double? musicVolume,
+    JoystickSetup? joystickSetup,
+    bool? showMiniMapAtStart,
     PlayerCharacter? character,
-    PlayerMiniMapMarkerType? playerMarker,
-    int? worldSkin,
   }) async => await _saveSettings(
     settings.copyWith(
       soundState: soundState,
       sfxVolume: sfxVolume,
       musicVolume: musicVolume,
+      joystickSetup: joystickSetup,
+      showMiniMapAtStart: showMiniMapAtStart,
       character: character,
-      playerMarker: playerMarker,
-      worldSkin: worldSkin,
     ),
   );
 

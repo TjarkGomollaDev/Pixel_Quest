@@ -18,7 +18,7 @@ import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/enemies/snail.dart';
 import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/jump_btn.dart';

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 class RRectComponent extends PositionComponent with HasVisibility {
   final double borderRadius;
-  final Color? color;
+  Color? color;
 
-  RRectComponent({this.color, required super.size, required super.position, this.borderRadius = 0, super.anchor, bool show = true}) {
+  RRectComponent({this.color, required super.size, super.position, this.borderRadius = 0, super.anchor, bool show = true}) {
     if (!show) hide();
   }
 

@@ -2,15 +2,14 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/settings_notifier.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/router.dart';
 
 class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
@@ -29,7 +28,6 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   // btns
   late final SpriteBtn _achievementsBtn;
   late final SpriteBtn _settingsBtn;
-  late final SpriteToggleBtn _volumeBtn;
 
   // spacing
   final double _btnSpacing = 4;
@@ -64,12 +62,9 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
     // general
     anchor = Anchor.topLeft;
-    SettingsNotifier.instance.addListenerFor(SettingsEvent.sound, _onSettingsChanged);
   }
 
-  void dispose() {
-    SettingsNotifier.instance.removeListenerFor(SettingsEvent.sound, _onSettingsChanged);
-  }
+  void dispose() {}
 
   void _setUpStarsCount() {
     // star background
@@ -109,29 +104,21 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSize.x * 2.5 - _btnSpacing * 2, _verticalCenter);
+    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSize.x * 1.5 - _btnSpacing, _verticalCenter);
     final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
 
     // achievements btn
     _achievementsBtn = SpriteBtn.fromType(type: SpriteBtnType.leaderboard, onPressed: () {}, position: btnBasePosition);
 
     // settings btn
-    _settingsBtn = SpriteBtn.fromType(type: SpriteBtnType.settings, onPressed: () {}, position: _achievementsBtn.position + btnOffset);
-
-    // sound state toggle btn
-    _volumeBtn = SpriteToggleBtn.fromType(
-      type: SpriteBtnType.volumeOn,
-      type_2: SpriteBtnType.volumeOff,
-      onPressed: () => game.audioCenter.toggleSound(SoundState.off),
-      onPressed_2: () => game.audioCenter.toggleSound(SoundState.on),
-      position: _settingsBtn.position + btnOffset,
-      initialState: game.audioCenter.soundState.enabled,
+    _settingsBtn = SpriteBtn.fromType(
+      type: SpriteBtnType.settings,
+      onPressed: () => game.router.pushNamed(RouteNames.settings),
+      position: _achievementsBtn.position + btnOffset,
     );
 
-    addAll([_achievementsBtn, _settingsBtn, _volumeBtn]);
+    addAll([_achievementsBtn, _settingsBtn]);
   }
-
-  void _onSettingsChanged() => _volumeBtn.setState(game.audioCenter.soundState.enabled);
 
   void _updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';
 

@@ -5,6 +5,15 @@ import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
+enum JoystickSetup {
+  left,
+  right;
+
+  bool get isLeft => this == JoystickSetup.left;
+  static const JoystickSetup defaultSetup = JoystickSetup.left;
+  static JoystickSetup fromName(String name) => JoystickSetup.values.firstWhere((s) => s.name == name, orElse: () => defaultSetup);
+}
+
 class JumpBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks {
   final Player player;
 

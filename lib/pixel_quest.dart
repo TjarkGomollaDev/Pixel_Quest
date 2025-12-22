@@ -38,7 +38,7 @@ class PixelQuest extends FlameGame
   final ({double top, double bottom}) cameraWorldYBounds = (top: GameSettings.mapBorderWidth, bottom: GameSettings.mapBorderWidth);
 
   // factor to convert Flutter pixels in world units
-  late final double _worldToScreenScale;
+  late final double worldToScreenScale;
 
   // padding that depends on the device and is converted to the pixel size of the game
   late final GameSafePadding safePadding;
@@ -122,7 +122,7 @@ class PixelQuest extends FlameGame
     add(camera);
 
     // calculate scale factor
-    _worldToScreenScale = camera.viewport.size.y / size.y;
+    worldToScreenScale = camera.viewport.size.y / size.y;
   }
 
   void setUpCameraForMenu() {
@@ -148,16 +148,16 @@ class PixelQuest extends FlameGame
 
   void _setUpSafePadding() {
     safePadding = GameSafePadding(
-      top: _flutterSafePadding.top / _worldToScreenScale,
-      bottom: _flutterSafePadding.bottom / _worldToScreenScale,
-      left: _flutterSafePadding.left / _worldToScreenScale,
-      right: _flutterSafePadding.right / _worldToScreenScale,
+      top: _flutterSafePadding.top / worldToScreenScale,
+      bottom: _flutterSafePadding.bottom / worldToScreenScale,
+      left: _flutterSafePadding.left / worldToScreenScale,
+      right: _flutterSafePadding.right / worldToScreenScale,
     );
   }
 
   void _setUpRouter() {
-    // router = createRouter(staticCenter: staticCenter);
-    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(9).uuid);
+    router = createRouter(staticCenter: staticCenter);
+    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(9).uuid);
     add(router);
   }
 
@@ -182,7 +182,7 @@ class PixelQuest extends FlameGame
   }
 
   void _setUpLoadingOverlay() {
-    loadingOverlay = LoadingOverlay(screenToWorldScale: _worldToScreenScale, safePadding: safePadding, size: camera.viewport.size);
+    loadingOverlay = LoadingOverlay(screenToWorldScale: worldToScreenScale, safePadding: safePadding, size: camera.viewport.size);
 
     // important that it is explicitly added to the router
     router.add(loadingOverlay);

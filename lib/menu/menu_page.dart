@@ -14,6 +14,7 @@ import 'package:pixel_adventure/menu/widgets/level_grid.dart';
 import 'package:pixel_adventure/menu/widgets/menu_top_bar.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
+import 'package:pixel_adventure/router.dart';
 
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   // subscription on storage center
@@ -64,6 +65,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     game.setUpCameraForMenu();
     _checkForNewAnimationEvents();
     game.audioCenter.playBackgroundMusic(BackgroundMusic.menu);
+    game.router.pushNamed(RouteNames.settings);
     super.onMount();
   }
 

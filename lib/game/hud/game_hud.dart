@@ -3,10 +3,9 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/hud/pause_route.dart';
@@ -51,7 +50,6 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   // btns
   late final SpriteBtn _menuBtn;
-  late final SpriteToggleBtn _volumeBtn;
   late final SpriteToggleBtn _pauseBtn;
   late final SpriteBtn _restartBtn;
 
@@ -111,29 +109,19 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       position: btnBasePosition,
     );
 
-    // sound state toggle btn
-    _volumeBtn = SpriteToggleBtn.fromType(
-      type: SpriteBtnType.volumeOn,
-      type_2: SpriteBtnType.volumeOff,
-      onPressed: () => game.audioCenter.toggleSound(SoundState.off),
-      onPressed_2: () => game.audioCenter.toggleSound(SoundState.on),
-      position: _menuBtn.position + btnOffset,
-      initialState: game.audioCenter.soundState.enabled,
-    );
-
     // pause btn
     _pauseBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.pause,
       type_2: SpriteBtnType.play,
       onPressed: () => game.router.pushNamed(RouteNames.pause),
       onPressed_2: () => game.router.pop(),
-      position: _volumeBtn.position + btnOffset,
+      position: _menuBtn.position + btnOffset,
     );
 
     // restart the level btn
     _restartBtn = SpriteBtn.fromType(type: SpriteBtnType.restart, onPressed: _restartLevel, position: _pauseBtn.position + btnOffset);
 
-    addAll([_menuBtn, _volumeBtn, _pauseBtn, _restartBtn]);
+    addAll([_menuBtn, _pauseBtn, _restartBtn]);
   }
 
   void _restartLevel() {
@@ -234,6 +222,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       miniMapEntities: _miniMapEntities,
       position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
       hudTopRightToScreenTopRightOffset: position,
+      show: game.storageCenter.settings.showMiniMapAtStart,
     );
     add(_miniMap);
   }

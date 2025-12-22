@@ -1,17 +1,18 @@
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 
 class CornerOutline extends PositionComponent {
+  // constructor parameters
   final double cornerLength;
   final double strokeWidth;
   final Color color;
 
   CornerOutline({
     required Vector2 size,
-    required this.cornerLength,
-    this.strokeWidth = 2.0,
-    this.color = Colors.white,
+    this.cornerLength = 6,
+    this.strokeWidth = 2,
+    this.color = AppTheme.ingameText,
     super.anchor,
     super.position,
   }) {
@@ -30,51 +31,28 @@ class CornerOutline extends PositionComponent {
     final w = size.x;
     final h = size.y;
 
+    // clamp so we never draw outside even if cornerLength is too large
+    final cl = cornerLength.clamp(0, (w < h ? w : h) / 2);
+
+    final left = halfStroke;
+    final top = halfStroke;
+    final right = w - halfStroke;
+    final bottom = h - halfStroke;
+
     // top left
-    canvas.drawLine(Offset(-halfStroke, 0), Offset(cornerLength, 0), paint); // horizontal
-    canvas.drawLine(Offset(0, -halfStroke), Offset(0, cornerLength), paint); // vertical
+    canvas.drawLine(Offset(0, top), Offset(left + cl, top), paint); // horizontal
+    canvas.drawLine(Offset(left, 0), Offset(left, top + cl), paint); // vertical
 
     // top right
-    canvas.drawLine(Offset(w - cornerLength, 0), Offset(w + halfStroke, 0), paint); // horizontal
-    canvas.drawLine(Offset(w, -halfStroke), Offset(w, cornerLength), paint); // vertical
+    canvas.drawLine(Offset(right - cl, top), Offset(w, top), paint); // horizontal
+    canvas.drawLine(Offset(right, 0), Offset(right, top + cl), paint); // vertical
 
     // bottom left
-    canvas.drawLine(Offset(-halfStroke, h), Offset(cornerLength, h), paint); // horizontal
-    canvas.drawLine(Offset(0, h - cornerLength), Offset(0, h + halfStroke), paint); // vertical
+    canvas.drawLine(Offset(0, bottom), Offset(left + cl, bottom), paint); // horizontal
+    canvas.drawLine(Offset(left, bottom - cl), Offset(left, h), paint); // vertical
 
     // bottom right
-    canvas.drawLine(Offset(w - cornerLength, h), Offset(w + halfStroke, h), paint); // horizontal
-    canvas.drawLine(Offset(w, h - cornerLength), Offset(w, h + halfStroke), paint); // vertical
-  }
-}
-
-class DraggableCornerOutline extends CornerOutline with DragCallbacks {
-  final VoidCallback? onSwipeRight;
-  final VoidCallback? onSwipeLeft;
-  static const double minVelocity = 100;
-
-  DraggableCornerOutline({
-    required super.size,
-    required super.cornerLength,
-    required super.strokeWidth,
-    required super.color,
-    required super.anchor,
-    required super.position,
-    this.onSwipeRight,
-    this.onSwipeLeft,
-  });
-
-  @override
-  void onDragEnd(DragEndEvent event) {
-    final v = event.velocity;
-    if (v.length < minVelocity) return;
-    if (v.x.abs() > v.y.abs()) {
-      if (v.x > 0) {
-        onSwipeLeft?.call();
-      } else {
-        onSwipeRight?.call();
-      }
-    }
-    super.onDragEnd(event);
+    canvas.drawLine(Offset(right - cl, bottom), Offset(w, bottom), paint); // horizontal
+    canvas.drawLine(Offset(right, bottom - cl), Offset(right, h), paint); // vertical
   }
 }

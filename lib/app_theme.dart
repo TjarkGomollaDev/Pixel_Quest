@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 abstract class AppTheme {
@@ -65,12 +66,13 @@ abstract class AppTheme {
   static const debugColorParticleHitbox = grayLight1;
   static const debugColorWorldBlock = mintDark;
 
-  // ingame text
+  // ingame
   static const ingameText = white;
   static final ingameTextShimmer = Color.fromRGBO(114, 114, 114, 1);
   static final starColor = Color.fromRGBO(255, 255, 85, 1);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
+  static final overlayBlur = black.withAlpha(140);
 
   // colors for mini map
   static const brickBlock = Color.fromRGBO(207, 76, 94, 1);
@@ -93,4 +95,16 @@ abstract class AppTheme {
   static const playerMarker = redDark;
   static const entityMarkerStandard = white;
   static const entityMarkerSpecial = grayLight4;
+
+  // #### ALL COLORS ###########################################
+  static const TextStyle dialogTextStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText, height: 1.4);
+  static const TextStyle dialogHeadingStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 9, color: AppTheme.ingameText, height: 1.8);
+  static const TextStyle textBtnStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 10, color: AppTheme.ingameText, height: 1.4);
+
+  static const double dialogTextStandardHeight = 8;
+  static const double textBtnStandardHeight = 17;
+}
+
+extension TextStyleExtension on TextStyle {
+  TextPaint get asTextPaint => TextPaint(style: this);
 }

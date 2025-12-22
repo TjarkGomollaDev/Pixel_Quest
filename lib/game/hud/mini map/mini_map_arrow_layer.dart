@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/hud/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 /// A thin bar placed below the mini map frame that draws upward-pointing
@@ -24,10 +24,11 @@ class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQue
   final MiniMap _miniMap;
   final List<EntityOnMiniMap> _arrowCandidates;
 
-  MiniMapArrowLayer({required MiniMap miniMap, required List<EntityOnMiniMap> arrowCandidates, required super.position})
+  MiniMapArrowLayer({required MiniMap miniMap, required List<EntityOnMiniMap> arrowCandidates, required super.position, bool show = true})
     : _miniMap = miniMap,
       _arrowCandidates = arrowCandidates {
     size = Vector2(_frameSize.x, _arrowSize.y);
+    if (!show) hide();
   }
 
   // arrow settings
