@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
@@ -12,11 +13,15 @@ import 'package:pixel_adventure/game/utils/slider.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class SettingsRoute extends Route {
-  SettingsRoute()
-    : super(
-        () => DialogPage(content: _SettingsContent(), titleText: 'Settings', contentSize: _SettingsContent.contentSize),
-        transparent: true,
-      );
+  SettingsRoute() : super(() => _SettingsDialog(), transparent: true);
+}
+
+class _SettingsDialog extends Component with HasGameReference<PixelQuest> {
+  @override
+  FutureOr<void> onLoad() {
+    add(DialogPage(content: _SettingsContent(), titleText: game.l10n.settingsTitle, contentSize: _SettingsContent.contentSize));
+    return super.onLoad();
+  }
 }
 
 class _SettingsContent extends PositionComponent with HasGameReference<PixelQuest> {
@@ -41,7 +46,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
   late final Slider _sfxSlider;
 
   // language settings
-  late int _languageIndex;
+  late final int _languageIndex;
   late final TextComponent _languageText;
   late final RadioComponent _languageSelector;
 
@@ -65,7 +70,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
   void _setUpAudioSettings() {
     // music text
     _musicVolumeText = TextComponent(
-      text: 'Music Volume',
+      text: game.l10n.settingsLabelMusicVolume,
       anchor: Anchor.topCenter,
       position: Vector2(size.x / 2, 0),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -83,7 +88,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
 
     // sfx text
     _sfxVolumeText = TextComponent(
-      text: 'SFX Volume',
+      text: game.l10n.settingsLabelSfxVolume,
       anchor: Anchor.topCenter,
       position: _musicSlider.position + Vector2(0, _musicSlider.size.y + DialogContainer.spacingBetweenSections),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -110,7 +115,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
       options: [
         RadioOption(
-          text: 'On',
+          text: game.l10n.settingsOptionOn,
           onSelected: () {
             _sfxSlider.enable();
             _musicSlider.enable();
@@ -118,7 +123,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
           },
         ),
         RadioOption(
-          text: 'Off',
+          text: game.l10n.settingsOptionOff,
           onSelected: () {
             _sfxSlider.disable();
             _musicSlider.disable();
@@ -130,7 +135,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
 
     // sound state text
     _soundStateText = TextComponent(
-      text: 'Main Volume:',
+      text: game.l10n.settingsLabelMainVolume,
       anchor: Anchor.centerLeft,
       position: Vector2(0, _soundStateSelector.position.y + _soundStateSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -140,7 +145,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
   }
 
   void _setUpLanguageSettings() {
-    _languageIndex = 0;
+    _languageIndex = game.l10n.localeName == 'en' ? 0 : 1;
 
     // language selector
     _languageSelector = RadioComponent(
@@ -150,14 +155,20 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: _languageIndex,
       options: [
-        RadioOption(text: 'English', onSelected: () => _confirmLanguageChange(0, 'English')),
-        RadioOption(text: 'German', onSelected: () => _confirmLanguageChange(1, 'German')),
+        RadioOption(
+          text: game.l10n.settingsOptionEnglish,
+          onSelected: () => _confirmLanguageChange(const Locale('en'), game.l10n.settingsOptionEnglish),
+        ),
+        RadioOption(
+          text: game.l10n.settingsOptionGerman,
+          onSelected: () => _confirmLanguageChange(const Locale('de'), game.l10n.settingsOptionGerman),
+        ),
       ],
     );
 
     // language text
     _languageText = TextComponent(
-      text: 'Language:',
+      text: game.l10n.settingsLabelLanguage,
       anchor: Anchor.centerLeft,
       position: Vector2(0, _languageSelector.position.y + _languageSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -176,11 +187,11 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       initialIndex: game.storageCenter.settings.joystickSetup.isLeft ? 0 : 1,
       options: [
         RadioOption(
-          text: 'Left',
+          text: game.l10n.settingsOptionLeft,
           onSelected: nonBlocking(() => game.storageCenter.updateSettings(joystickSetup: JoystickSetup.left)),
         ),
         RadioOption(
-          text: 'Right',
+          text: game.l10n.settingsOptionRight,
           onSelected: nonBlocking(() => game.storageCenter.updateSettings(joystickSetup: JoystickSetup.right)),
         ),
       ],
@@ -188,7 +199,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
 
     // control text
     _controlText = TextComponent(
-      text: 'Joystick:',
+      text: game.l10n.settingsLabelJoystick,
       anchor: Anchor.centerLeft,
       position: Vector2(0, _controlSelector.position.y + _controlSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -206,14 +217,20 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: game.storageCenter.settings.showMiniMapAtStart ? 0 : 1,
       options: [
-        RadioOption(text: 'Show', onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: true))),
-        RadioOption(text: 'Hide', onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: false))),
+        RadioOption(
+          text: game.l10n.settingsOptionShow,
+          onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: true)),
+        ),
+        RadioOption(
+          text: game.l10n.settingsOptionHide,
+          onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: false)),
+        ),
       ],
     );
 
     // mini map text
     _miniMapText = TextComponent(
-      text: 'Mini Map:',
+      text: game.l10n.settingsLabelMiniMap,
       anchor: Anchor.centerLeft,
       position: Vector2(0, _miniMapSelector.position.y + _miniMapSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
@@ -222,15 +239,17 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     addAll([_miniMapSelector, _miniMapText]);
   }
 
-  void _confirmLanguageChange(int newIndex, String langName) {
+  void _confirmLanguageChange(Locale newLocale, String langName) {
     game.router
-        .pushAndWait(ConfirmRoute(titleText: 'Language', message: 'Are you sure that you want to change the language to  $langName?'))
+        .pushAndWait(ConfirmRoute(titleText: game.l10n.settingsConfirmLanguageTitle, message: game.l10n.settingsConfirmLanguage(langName)))
         .then((confirmed) {
           if (!confirmed) {
             _languageSelector.setSelectedIndex(_languageIndex);
             return;
           }
-          _languageIndex = newIndex;
+
+          // restart app with new language
+          game.requestLocale(newLocale);
         });
   }
 }

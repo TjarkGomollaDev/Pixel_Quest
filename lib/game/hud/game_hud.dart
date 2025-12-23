@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flame/text.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -166,11 +165,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // count text
     _fruitsCount = TextComponent(
       text: '0/$_totalFruitsCount',
-      anchor: Anchor(0, 0.32),
+      anchor: Anchor.centerLeft,
       position: Vector2(_fruitBg.position.x + _fruitBg.size.x + _counterTextMarginLeft, _verticalCenter),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
-      ),
+      textRenderer: AppTheme.hudText.asTextPaint,
     );
 
     addAll([_fruitBg, _fruitItem, _fruitsCount]);
@@ -197,11 +194,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // count text
     _deathCount = TextComponent(
       text: '0',
-      anchor: Anchor(0, 0.32),
+      anchor: Anchor.centerLeft,
       position: Vector2(_deathBg.position.x + _deathBg.size.x + _counterTextMarginLeft, _verticalCenter),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
-      ),
+      textRenderer: AppTheme.hudText.asTextPaint,
     );
 
     addAll([_deathBg, _deathItem, _deathCount]);

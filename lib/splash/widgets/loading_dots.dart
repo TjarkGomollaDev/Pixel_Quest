@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingDots extends StatefulWidget {
+  // constructor parameters
   final TextStyle textStyle;
   final double dotSpacing;
   final double jumpHeight;

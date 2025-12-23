@@ -7,9 +7,8 @@ import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
-  LoadingDummyCharacter({required double worldToScreenScale, required Vector2 screenSize}) {
-    // since we are not in a flame world but on a normal route, we have to scale
-    size = DummyCharacter.gridSize * worldToScreenScale;
+  LoadingDummyCharacter({required Vector2 screenSize}) {
+    size = DummyCharacter.gridSize;
 
     // position points
     _startPosition = Vector2(screenSize.x / 2, -size.y);

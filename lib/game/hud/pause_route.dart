@@ -3,7 +3,6 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flame/rendering.dart';
-import 'package:flame/text.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/level.dart';
@@ -34,7 +33,8 @@ class PauseRoute extends Route with HasGameReference<PixelQuest> {
 }
 
 class _PausePage extends Component with HasGameReference<PixelQuest> {
-  // pause container
+  // container
+  late final PositionComponent _root;
   late final PositionComponent _pauseContainer;
 
   // pause label
@@ -51,59 +51,63 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
   final List<TextBtn> _btns = [];
 
   // btn spacing
-  static const double _btnSpacing = 44;
+  static const double _btnSpacing = 30; // [Adjustable]
+
+  // animation can be enabled and disabled
+  static const bool animationEnabled = false; // [Adjustable]
 
   // flag to avoid resetting button animations multiple times
   bool _btnAnimationsStopped = false;
 
   @override
-  bool containsLocalPoint(Vector2 point) => false;
-
-  @override
   Future<void> onLoad() async {
+    _setUpRoot();
     _setUpPauseContainer();
   }
 
   @override
   void onMount() {
-    _startShowAnimation();
+    if (animationEnabled) _startShowAnimation();
     super.onMount();
   }
 
   @override
   void onRemove() {
-    _stopShowAnimation();
-    _btnAnimationsStopped = false;
+    if (animationEnabled) {
+      _stopShowAnimation();
+      _btnAnimationsStopped = false;
+    }
     super.onRemove();
   }
 
+  void _setUpRoot() {
+    _root = PositionComponent(size: game.size)..scale = Vector2.all(game.worldToScreenScale);
+    add(_root);
+  }
+
   void _setUpPauseContainer() {
-    _pauseContainer = PositionComponent(position: game.canvasSize / 2, anchor: Anchor.center);
+    // pause text
+    _pauseText = TextComponent(
+      text: game.l10n.pauseTitel.toUpperCase(),
+      position: Vector2(0, -40),
+      anchor: Anchor.center,
+      textRenderer: AppTheme.pausedHeading.asTextPaint,
+    );
 
     // text background
     _pauseBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 4,
-      position: Vector2(0, -60),
-      size: Vector2(210, 60),
+      position: _pauseText.position,
+      size: Vector2(_pauseText.size.x + 40, 40),
       anchor: Anchor.center,
-    );
-
-    // paused text
-    _pauseText = TextComponent(
-      text: 'PAUSED',
-      position: _pauseBg.position,
-      anchor: Anchor(0.48, 0.32),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 28, color: AppTheme.ingameText, height: 1),
-      ),
     );
 
     // outline
     _pauseOutline = CornerOutline(
-      size: _pauseBg.size + Vector2.all(22),
-      cornerLength: 16,
-      strokeWidth: 5,
+      size: _pauseBg.size + Vector2.all(16),
+      cornerLength: 12,
+      strokeWidth: 3.5,
       color: AppTheme.ingameText,
       anchor: Anchor.center,
       position: _pauseText.position,
@@ -111,28 +115,28 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
 
     // settings btn
     _settingsBtn = TextBtn(
-      text: 'Settings',
+      text: game.l10n.pauseButtonSettigns,
       onPressed: () {
-        _stopShowAnimation();
+        if (animationEnabled) _stopShowAnimation();
         game.router.pushNamed(RouteNames.settings);
       },
-      position: Vector2(0, 20),
+      position: Vector2(0, 14),
     );
 
     // achievements btn
     _achievementsBtn = TextBtn(
-      text: 'Achievements',
+      text: game.l10n.pauseButtonAchievements,
       onPressed: () {
-        _stopShowAnimation();
+        if (animationEnabled) _stopShowAnimation();
       },
       position: _settingsBtn.position + Vector2(0, _btnSpacing),
     );
 
     // menu btn
     _menuBtn = TextBtn(
-      text: 'Menu',
+      text: game.l10n.pauseButtonMenu,
       onPressed: () {
-        _stopShowAnimation();
+        if (animationEnabled) _stopShowAnimation();
         game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
       },
@@ -140,8 +144,9 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
     );
 
     _btns.addAll([_settingsBtn, _achievementsBtn, _menuBtn]);
+    _pauseContainer = PositionComponent(position: _root.size / 2, anchor: Anchor.center);
     _pauseContainer.addAll([_pauseBg, _pauseText, _pauseOutline, _settingsBtn, _achievementsBtn, _menuBtn]);
-    add(_pauseContainer);
+    _root.add(_pauseContainer);
   }
 
   /// Stops all running button animations and resets scale.

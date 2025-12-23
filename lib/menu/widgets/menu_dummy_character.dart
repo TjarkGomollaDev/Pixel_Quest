@@ -29,8 +29,8 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
 
   // height of the jump animation
   static const double _jumpHeight = 42; // [Adjustable]
-  static late final double _jumpUpDuration;
-  static late final double _jumpDownDuration;
+  late final double _jumpUpDuration;
+  late final double _jumpDownDuration;
 
   @override
   FutureOr<void> onLoad() {

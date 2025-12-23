@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
@@ -76,21 +75,20 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpTitle() {
+    _title = TextComponent(
+      text: game.l10n.characterPickerTitle,
+      anchor: Anchor.center,
+      textRenderer: AppTheme.characterPickerHeading.asTextPaint,
+    );
+
     _titelBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       position: _dummy.position + Vector2(0, -38),
-      size: Vector2(58, 15),
+      size: Vector2(_title.size.x + 15, 15),
       anchor: Anchor.center,
     );
-    _title = TextComponent(
-      text: 'Your Player',
-      anchor: Anchor(0.5, 0.32),
-      position: _titelBg.position,
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText, height: 1),
-      ),
-    );
+    _title.position = _titelBg.position;
 
     addAll([_titelBg, _title]);
   }
@@ -101,7 +99,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       onPressed: () async {
         if (_isSpotlightActive) return;
         _isSpotlightActive = true;
-        _inputBlocker.activate();
+        _inputBlocker.enable();
         await _spotlight.focusOnTarget();
         _showSpotlightContent();
       },
@@ -116,7 +114,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       onPressed: () async {
         if (!_isSpotlightActive) return;
         _isSpotlightActive = false;
-        _inputBlocker.deactivate();
+        _inputBlocker.disable();
         _hideSpotlightContent();
         await _spotlight.expandToFull();
       },

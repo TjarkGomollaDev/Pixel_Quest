@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
@@ -78,18 +77,15 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
     // star item
     _starItem = Star(position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter), size: Vector2.all(16));
-
     addAll([_starBg, _starItem]);
 
     // world star counts text
     for (var world in game.staticCenter.allWorlds) {
       final text = VisibleTextComponent(
         text: '${game.storageCenter.getWorld(world.uuid).stars}/48',
-        anchor: Anchor(0, 0.32),
+        anchor: Anchor.centerLeft,
         position: Vector2(_starBg.position.x + _starBg.size.x + _counterTextMarginLeft, _verticalCenter),
-        textRenderer: TextPaint(
-          style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 1),
-        ),
+        textRenderer: AppTheme.hudText.asTextPaint,
         show: world.index == _startWorldIndex,
       );
       add(text);

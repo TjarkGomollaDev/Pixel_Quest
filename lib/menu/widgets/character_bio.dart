@@ -4,6 +4,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/l10n/app_localizations_extensions.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
 class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
@@ -24,6 +25,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
 
   // spacing
   static const double _verticalSpacing = 11; // [Adjustable]
+  static const double _horizontalSpacing = 3.5; // [Adjustable]
 
   // typing speed in ms
   static const int _charDelay = 50; // [Adjustable]
@@ -50,14 +52,14 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
     final startY = size.y / 2;
 
     // set up labeels
-    _nameTextLabel = _createTextComponent('Name:  ', Vector2(0, startY - _verticalSpacing));
-    _originTextLabel = _createTextComponent('Origin:  ', Vector2(0, startY));
-    _abilityTextLabel = _createTextComponent('Ability:  ', Vector2(0, startY + _verticalSpacing));
+    _nameTextLabel = _createTextComponent(game.l10n.characterPickerLabelName, Vector2(0, startY - _verticalSpacing));
+    _originTextLabel = _createTextComponent(game.l10n.characterPickerLabelOrigin, Vector2(0, startY));
+    _abilityTextLabel = _createTextComponent(game.l10n.characterPickerLabelAbility, Vector2(0, startY + _verticalSpacing));
 
     // set up values
-    _nameTextValue = _createTextComponent('', _nameTextLabel.position + Vector2(_nameTextLabel.size.x, 0));
-    _originTextValue = _createTextComponent('', _originTextLabel.position + Vector2(_originTextLabel.size.x, 0));
-    _abilityTextValue = _createTextComponent('', _abilityTextLabel.position + Vector2(_abilityTextLabel.size.x, 0));
+    _nameTextValue = _createTextComponent('', _nameTextLabel.position + Vector2(_nameTextLabel.size.x + _horizontalSpacing, 0));
+    _originTextValue = _createTextComponent('', _originTextLabel.position + Vector2(_originTextLabel.size.x + _horizontalSpacing, 0));
+    _abilityTextValue = _createTextComponent('', _abilityTextLabel.position + Vector2(_abilityTextLabel.size.x + _horizontalSpacing, 0));
 
     addAll([_nameTextLabel, _originTextLabel, _abilityTextLabel, _nameTextValue, _originTextValue, _abilityTextValue]);
 
@@ -65,20 +67,11 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
     setCharacterBio(game.storageCenter.settings.character, animation: false);
   }
 
-  TextComponent _createTextComponent(String text, Vector2 position) {
-    return TextComponent(
-      text: text,
-      position: position,
-      anchor: Anchor.centerLeft,
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 5, color: AppTheme.ingameText, height: 1),
-      ),
-    );
-  }
+  TextComponent _createTextComponent(String text, Vector2 position) =>
+      TextComponent(text: text, position: position, anchor: Anchor.centerLeft, textRenderer: AppTheme.characterPickerText.asTextPaint);
 
   Future<void> setCharacterBio(PlayerCharacter character, {bool animation = true}) async {
-    final data = game.staticCenter.allCharacters[character];
-    if (data == null) return;
+    final data = game.l10n.bioForCharacter(character);
 
     // cancel any currently running typing animation
     _typingId++;

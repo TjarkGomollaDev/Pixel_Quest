@@ -17,15 +17,28 @@ import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
 import 'package:pixel_adventure/router.dart';
 
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
   // constructor parameters
+  final AppLocalizations _l10n;
+  final void Function(Locale locale) _requestLocaleChange;
   final EdgeInsets _flutterSafePadding;
 
-  PixelQuest({required EdgeInsets safeScreenPadding}) : _flutterSafePadding = safeScreenPadding;
+  PixelQuest({
+    required AppLocalizations l10n,
+    required void Function(Locale locale) requestLocaleChange,
+    required EdgeInsets safeScreenPadding,
+  }) : _l10n = l10n,
+       _requestLocaleChange = requestLocaleChange,
+       _flutterSafePadding = safeScreenPadding;
+
+  // getter
+  AppLocalizations get l10n => _l10n;
+  void Function(Locale locale) get requestLocale => _requestLocaleChange;
 
   // general data that is used throughout the app and is loaded once when the app is launched
   late final StaticCenter staticCenter;
@@ -182,7 +195,7 @@ class PixelQuest extends FlameGame
   }
 
   void _setUpLoadingOverlay() {
-    loadingOverlay = LoadingOverlay(screenToWorldScale: worldToScreenScale, safePadding: safePadding, size: camera.viewport.size);
+    loadingOverlay = LoadingOverlay(screenToWorldScale: worldToScreenScale, safePadding: safePadding, size: size);
 
     // important that it is explicitly added to the router
     router.add(loadingOverlay);

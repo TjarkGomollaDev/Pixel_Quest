@@ -27,7 +27,7 @@ class BackgroundSzene extends ParallaxComponent with HasVisibility {
   final bool _show;
   final Vector2 _baseVelocity;
 
-  BackgroundSzene({required Szene szene, required super.position, required super.size, Vector2? baseVelocity, bool show = true})
+  BackgroundSzene({required Szene szene, super.position, super.size, Vector2? baseVelocity, bool show = true})
     : _szene = szene,
       _baseVelocity = baseVelocity ?? GameSettings.parallaxBaseVelocityLevel,
       _show = show;

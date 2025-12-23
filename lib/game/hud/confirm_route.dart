@@ -5,6 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
+import 'package:pixel_adventure/pixel_quest.dart';
 
 class ConfirmRoute extends ValueRoute<bool> {
   // constructor parameters
@@ -28,7 +29,7 @@ class ConfirmRoute extends ValueRoute<bool> {
   }
 }
 
-class _ConfirmContent extends PositionComponent {
+class _ConfirmContent extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final String titleText;
   final String message;
@@ -44,26 +45,45 @@ class _ConfirmContent extends PositionComponent {
     AppTheme.dialogTextStandardHeight * 2 + DialogContainer.spacingBetweenSectionsXL + AppTheme.textBtnStandardHeight,
   );
 
+  // spacing
+  static const double _buttonSpacing = 80;
+
   @override
   Future<void> onLoad() async {
+    _setUpContent();
+    return super.onLoad();
+  }
+
+  void _setUpContent() {
+    final centerX = size.x / 2;
+
+    // user message
     final message = TextBoxComponent(
       text: this.message,
       anchor: Anchor.topCenter,
-      position: Vector2(size.x / 2, 0),
+      position: Vector2(centerX, 0),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
       boxConfig: TextBoxConfig(maxWidth: size.x, margins: EdgeInsets.zero),
       align: Anchor.topCenter,
     );
+
+    // cancel btn
     final cancel = TextBtn(
-      text: 'Cancel',
+      text: game.l10n.settingsOptionCancel,
       position: Vector2(
-        size.x / 3,
+        centerX - _buttonSpacing / 2,
         message.position.y + message.size.y + DialogContainer.spacingBetweenSectionsXL + AppTheme.textBtnStandardHeight / 2,
       ),
       onPressed: onCancel,
     );
-    final confirm = TextBtn(text: 'Accept', position: Vector2(size.x / 3 * 2, cancel.position.y), onPressed: onConfirm);
+
+    // confirm btn
+    final confirm = TextBtn(
+      text: game.l10n.settingsOptionConfirm,
+      position: Vector2(centerX + _buttonSpacing / 2, cancel.position.y),
+      onPressed: onConfirm,
+    );
+
     addAll([message, cancel, confirm]);
-    return super.onLoad();
   }
 }

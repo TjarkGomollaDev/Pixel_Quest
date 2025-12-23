@@ -1,0 +1,63 @@
+{
+  "settingsTitle": "Einstellungen",
+  "settingsLabelMusicVolume": "Musiklautstärke",
+  "settingsLabelSfxVolume": "SFX-Lautstärke",
+  "settingsLabelMainVolume": "Lautstärke:",
+  "settingsLabelLanguage": "Sprache:",
+  "settingsLabelJoystick": "Joystick:",
+  "settingsLabelMiniMap": "Minikarte:",
+
+  "settingsOptionOn": "An",
+  "settingsOptionOff": "Aus",
+  "settingsOptionLeft": "Links",
+  "settingsOptionRight": "Rechts",
+  "settingsOptionShow": "Anzeigen",
+  "settingsOptionHide": "Ausblenden",
+  "settingsOptionCancel": "Abbrechen",
+  "settingsOptionConfirm": "Bestätigen",
+  "settingsOptionEnglish": "Englisch",
+  "settingsOptionGerman": "Deutsch",
+
+  "settingsConfirmLanguageTitle": "Sprache",
+  "settingsConfirmLanguage": "Möchtest du die Sprache wirklich auf {language} ändern?",
+  "@settingsConfirmLanguage": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+
+  "loadingGame": "Spiel wird geladen",
+  "loadingLevel": "Erstelle Level {level}.{world}",
+  "@loadingLevel" : {
+    "placeholders": {
+      "world": { "type": "int" },
+      "level": { "type": "int" }
+    }
+  },
+
+  "pauseTitel": "Pausiert",
+  "pauseButtonSettigns": "Einstellungen",
+  "pauseButtonAchievements": "Erungenschaften",
+  "pauseButtonMenu": "Menü",
+
+  "characterPickerTitle": "Charakter",
+  "characterPickerLabelName": "Name:",
+  "characterPickerLabelOrigin": "Herkunft:",
+  "characterPickerLabelAbility": "Fähigkeit:",
+
+  "characterName_maskDude": "Mojo",
+  "characterOrigin_maskDude": "Banana River",
+  "characterAbility_maskDude": "Affenschrei",
+
+  "characterName_ninjaFrog": "Croakashi",
+  "characterOrigin_ninjaFrog": "Kyoto Swamp",
+  "characterAbility_ninjaFrog": "Wirbelangriff",
+
+  "characterName_pinkMan": "Popstar P",
+  "characterOrigin_pinkMan": "Pink Hills",
+  "characterAbility_pinkMan": "Disco Dash",
+
+  "characterName_virtualGuy": "Gl1tch.exe",
+  "characterOrigin_virtualGuy": "The Cloud",
+  "characterAbility_virtualGuy": "Hack-Angriff"
+}

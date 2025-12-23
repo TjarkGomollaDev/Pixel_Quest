@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/splash/flutter%20extensions/int_double_extensions.dart';
 import 'package:pixel_adventure/splash/widgets/loading_dots.dart';
 import 'animated_stars.dart';
 
 class SplashContent extends StatelessWidget {
+  // constructor parameters
   final GlobalKey<AnimatedStarsState> starsKey;
+  final AppLocalizations l10n;
 
-  const SplashContent({super.key, required this.starsKey});
+  const SplashContent({super.key, required this.starsKey, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +38,9 @@ class SplashContent extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        'Loading Game',
-                        style: TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.ingameText),
-                      ),
+                      Text(l10n.loadingGame, style: AppTheme.splashText),
                       8.widthSizedBox,
-                      LoadingDots(
-                        textStyle: TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.ingameText),
-                      ),
+                      LoadingDots(textStyle: AppTheme.splashText),
                     ],
                   ),
                 );

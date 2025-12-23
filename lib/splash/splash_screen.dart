@@ -1,13 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/splash/flutter%20extensions/build_context.dart';
 import 'package:pixel_adventure/splash/widgets/animated_stars.dart';
 import 'package:pixel_adventure/splash/widgets/developer_logo.dart';
 import 'package:pixel_adventure/splash/widgets/splash_content.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final AppLocalizations l10n;
+
+  const SplashScreen({super.key, required this.l10n});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -53,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
           top: context.sizeOf.height * 0.25,
           left: 0,
           right: 0,
-          child: SplashContent(starsKey: _starsKey),
+          child: SplashContent(starsKey: _starsKey, l10n: widget.l10n),
         ),
         // developer logo
         Positioned(
