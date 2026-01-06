@@ -6,6 +6,7 @@ import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -85,9 +86,10 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
     _levelBtn = SpriteBtn(
       path: 'Menu/Levels/${_levelMetadata.btnFileName}.png',
       onPressed: () async {
-        // game.audioCenter.stopBackgroundMusic();
+        game.audioCenter.stopBackgroundMusic();
+        unawaited(game.showLoadingOverlay(_levelMetadata));
+        await yieldFrame();
         game.router.pushReplacementNamed(_levelMetadata.uuid);
-        await game.showLoadingOverlay(_levelMetadata);
       },
       position: Vector2(_center.x, size.y - 17 / 2 - _btnMarginBottom),
     );

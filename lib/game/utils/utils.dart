@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'dart:ui';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -55,3 +55,13 @@ mixin Respawnable on PositionComponent {
 }
 
 Vector2 offsetToVector(Offset offset) => Vector2(offset.dx, offset.dy);
+
+/// Yields execution to Flutter for a frame.
+///
+/// Calling this allows the main isolate to briefly return control to the
+/// Flutter engine so it can render pending frames or process UI updates.
+///
+/// This is useful when performing heavy synchronous work in multiple steps.
+/// By yielding between chunks, the UI remains responsive and avoids visible
+/// stutter or frame drops.
+Future<void> yieldFrame() => WidgetsBinding.instance.endOfFrame;

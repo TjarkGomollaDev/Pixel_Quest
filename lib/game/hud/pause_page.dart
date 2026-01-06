@@ -12,8 +12,8 @@ import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
-class PauseRoute extends Route with HasGameReference<PixelQuest> {
-  PauseRoute() : super(_PausePage.new, transparent: true);
+class PausePage extends Route {
+  PausePage() : super(_PauseContent.new, transparent: true);
 
   @override
   void onPush(Route? previousRoute) {
@@ -32,7 +32,7 @@ class PauseRoute extends Route with HasGameReference<PixelQuest> {
   }
 }
 
-class _PausePage extends Component with HasGameReference<PixelQuest> {
+class _PauseContent extends Component with HasGameReference<PixelQuest> {
   // container
   late final PositionComponent _root;
   late final PositionComponent _pauseContainer;
@@ -44,7 +44,6 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
 
   // text btns
   late final TextBtn _settingsBtn;
-  late final TextBtn _achievementsBtn;
   late final TextBtn _menuBtn;
 
   // list for btn animations
@@ -89,7 +88,7 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
     // pause text
     _pauseText = TextComponent(
       text: game.l10n.pauseTitel.toUpperCase(),
-      position: Vector2(0, -40),
+      position: Vector2(0, -30),
       anchor: Anchor.center,
       textRenderer: AppTheme.pausedHeading.asTextPaint,
     );
@@ -120,16 +119,7 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
         if (animationEnabled) _stopShowAnimation();
         game.router.pushNamed(RouteNames.settings);
       },
-      position: Vector2(0, 14),
-    );
-
-    // achievements btn
-    _achievementsBtn = TextBtn(
-      text: game.l10n.pauseButtonAchievements,
-      onPressed: () {
-        if (animationEnabled) _stopShowAnimation();
-      },
-      position: _settingsBtn.position + Vector2(0, _btnSpacing),
+      position: Vector2(0, 24),
     );
 
     // menu btn
@@ -140,12 +130,12 @@ class _PausePage extends Component with HasGameReference<PixelQuest> {
         game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
       },
-      position: _achievementsBtn.position + Vector2(0, _btnSpacing),
+      position: _settingsBtn.position + Vector2(0, _btnSpacing),
     );
 
-    _btns.addAll([_settingsBtn, _achievementsBtn, _menuBtn]);
+    _btns.addAll([_settingsBtn, _menuBtn]);
     _pauseContainer = PositionComponent(position: _root.size / 2, anchor: Anchor.center);
-    _pauseContainer.addAll([_pauseBg, _pauseText, _pauseOutline, _settingsBtn, _achievementsBtn, _menuBtn]);
+    _pauseContainer.addAll([_pauseBg, _pauseText, _pauseOutline, _settingsBtn, _menuBtn]);
     _root.add(_pauseContainer);
   }
 

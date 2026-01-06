@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/hud/confirm_route.dart';
+import 'package:pixel_adventure/settings/confirm_page.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
@@ -12,8 +12,8 @@ import 'package:pixel_adventure/game/utils/jump_btn.dart';
 import 'package:pixel_adventure/game/utils/slider.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class SettingsRoute extends Route {
-  SettingsRoute() : super(() => _SettingsDialog(), transparent: true);
+class SettingsPage extends Route {
+  SettingsPage() : super(() => _SettingsDialog(), transparent: true);
 }
 
 class _SettingsDialog extends Component with HasGameReference<PixelQuest> {
@@ -241,7 +241,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
 
   void _confirmLanguageChange(Locale newLocale, String langName) {
     game.router
-        .pushAndWait(ConfirmRoute(titleText: game.l10n.settingsConfirmLanguageTitle, message: game.l10n.settingsConfirmLanguage(langName)))
+        .pushAndWait(ConfirmPage(titleText: game.l10n.settingsConfirmLanguageTitle, message: game.l10n.settingsConfirmLanguage(langName)))
         .then((confirmed) {
           if (!confirmed) {
             _languageSelector.setSelectedIndex(_languageIndex);

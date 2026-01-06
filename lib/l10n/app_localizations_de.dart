@@ -72,7 +72,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String loadingLevel(int world, int level) {
-    return 'Erstelle Level $level.$world';
+    return 'Erstelle Level $world.$level';
   }
 
   @override
@@ -80,9 +80,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pauseButtonSettigns => 'Einstellungen';
-
-  @override
-  String get pauseButtonAchievements => 'Erungenschaften';
 
   @override
   String get pauseButtonMenu => 'Menü';

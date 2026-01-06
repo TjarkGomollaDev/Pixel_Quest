@@ -25,7 +25,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   late final double _verticalCenter;
 
   // btns
-  late final SpriteBtn _achievementsBtn;
+  late final SpriteBtn _shopBtn;
   late final SpriteBtn _settingsBtn;
 
   // spacing
@@ -103,17 +103,21 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSize.x * 1.5 - _btnSpacing, _verticalCenter);
     final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
 
-    // achievements btn
-    _achievementsBtn = SpriteBtn.fromType(type: SpriteBtnType.leaderboard, onPressed: () {}, position: btnBasePosition);
+    // shop btn
+    _shopBtn = SpriteBtn.fromType(
+      type: SpriteBtnType.dollar,
+      onPressed: () => game.router.pushNamed(RouteNames.shop),
+      position: btnBasePosition,
+    );
 
     // settings btn
     _settingsBtn = SpriteBtn.fromType(
       type: SpriteBtnType.settings,
       onPressed: () => game.router.pushNamed(RouteNames.settings),
-      position: _achievementsBtn.position + btnOffset,
+      position: _shopBtn.position + btnOffset,
     );
 
-    addAll([_achievementsBtn, _settingsBtn]);
+    addAll([_shopBtn, _settingsBtn]);
   }
 
   void _updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';

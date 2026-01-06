@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/game/level/background_szene.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
+import 'package:pixel_adventure/game/utils/dots_indicator.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -34,9 +36,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   // world index
   late int _currentWorldIndex;
+  late final DotsIndicator _dotsIndicator;
 
   // spacing
   static const double _levelGridChangeWorldBtnsSpacing = 22;
+  static const double _levelGridDotsIndicatorSpacing = 14;
 
   // animation event triggers
   NewStarsStorageEvent? _pendingWorldStorageEvent;
@@ -54,6 +58,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpMenuTopBar();
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
+    _setUpDotsIndicator();
     _setUpSubscription();
     return super.onLoad();
   }
@@ -203,6 +208,17 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     addAll([_blockerWhenSpotlight, _characterPicker]);
   }
 
+  void _setUpDotsIndicator() {
+    _dotsIndicator = DotsIndicator(
+      dotCount: 2,
+      backgroundColor: AppTheme.tileBlur,
+      position:
+          _worldLevelGrids[0].position +
+          Vector2(_worldLevelGrids[0].size.x / 2, _worldLevelGrids[0].size.y + _levelGridDotsIndicatorSpacing),
+    );
+    add(_dotsIndicator);
+  }
+
   void _changeWorld(int direction) async {
     if (_isChangingWorld) return;
     final oldIndex = _currentWorldIndex;
@@ -217,6 +233,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   Future<void> _updateContent(int oldIndex, int newIndex) async {
     _isChangingWorld = true;
+    _dotsIndicator.activeIndex = newIndex;
     _worldBackgrounds[oldIndex].hide();
     _worldBackgrounds[newIndex].show();
     _worldForegrounds[oldIndex].hide();

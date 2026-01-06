@@ -16,6 +16,7 @@ import 'package:pixel_adventure/game/level/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/position_provider.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_adventure/game/utils/warm_up.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/menu/menu_page.dart';
@@ -68,6 +69,8 @@ class PixelQuest extends FlameGame
   // timestamp used to measure loading time and used in conjunction with the splash screen
   late final DateTime _startTime;
 
+  static const double maxDt = 1 / 60;
+
   @override
   Future<void> onLoad() async {
     _startTime = DateTime.now();
@@ -76,9 +79,8 @@ class PixelQuest extends FlameGame
     _setUpCameraDefault();
     _setUpSafePadding();
     _setUpRouter();
-    await Level.warmUp(levelMetadata: staticCenter.allLevelsInOneWorldByIndex(0).first);
-    await _createMiniMapBackgroundPattern();
     _setUpLoadingOverlay();
+    await _createMiniMapBackgroundPattern();
 
     // await Future.delayed(Duration(seconds: 3000));
     // final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
@@ -89,21 +91,17 @@ class PixelQuest extends FlameGame
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final currentRoute = router.currentRoute;
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if (currentRoute is WorldRoute && currentRoute.world is Level) return (currentRoute.world as Level).pauseLevel();
-      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).pauseMenu();
-    } else if (state == AppLifecycleState.resumed) {
-      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).resumeMenu();
-    }
-    super.didChangeAppLifecycleState(state);
+  void update(double dt) {
+    super.update(dt > maxDt ? maxDt : dt);
   }
 
   @override
   Future<void> onMount() async {
     WidgetsBinding.instance.addObserver(this);
     super.onMount();
+
+    // after super.onMount
+    add(WarmUpRunner());
   }
 
   @override
@@ -116,6 +114,18 @@ class PixelQuest extends FlameGame
   void onDispose() {
     ((router.routes[RouteNames.menu] as WorldRoute?)?.world as MenuPage?)?.dispose();
     super.onDispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final currentRoute = router.currentRoute;
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      if (currentRoute is WorldRoute && currentRoute.world is Level) return (currentRoute.world as Level).pauseLevel();
+      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).pauseMenu();
+    } else if (state == AppLifecycleState.resumed) {
+      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).resumeMenu();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   Future<void> _loadAllCenters() async {

@@ -4,7 +4,6 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/menu/widgets/character_bio.dart';
 import 'package:pixel_adventure/menu/widgets/menu_dummy_character.dart';
@@ -23,8 +22,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
 
   // character picker
   late final MenuDummyCharacter _dummy;
-  late final RRectComponent _titelBg;
-  late final TextComponent _title;
   late final SpriteBtn _editBtn;
 
   // spotlight
@@ -44,7 +41,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     _initialSetup();
     _setUpCharacterBio();
     _setUpDummyCharacter();
-    _setUpTitle();
     _setUpEditBtn();
     _setUpCloseBtn();
     _setUpCharacterChangeBtns();
@@ -72,25 +68,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   void _setUpDummyCharacter() {
     _dummy = MenuDummyCharacter(defaultPosition: _spotlightCenter, characterBio: _characterBio);
     add(_dummy);
-  }
-
-  void _setUpTitle() {
-    _title = TextComponent(
-      text: game.l10n.characterPickerTitle,
-      anchor: Anchor.center,
-      textRenderer: AppTheme.characterPickerHeading.asTextPaint,
-    );
-
-    _titelBg = RRectComponent(
-      color: AppTheme.tileBlur,
-      borderRadius: 2,
-      position: _dummy.position + Vector2(0, -38),
-      size: Vector2(_title.size.x + 15, 15),
-      anchor: Anchor.center,
-    );
-    _title.position = _titelBg.position;
-
-    addAll([_titelBg, _title]);
   }
 
   void _setUpEditBtn() {
@@ -146,6 +123,17 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     addAll([_previousCharacterBtn, _nextCharacterBtn]);
+
+    // final radio = RadioComponent(
+    //   position: _characterBio.position + Vector2(0, _characterBio.size.y / 2),
+    //   options: [
+    //     RadioOption(text: 'Mojo', onSelected: () {}),
+    //     RadioOption(text: 'Croko', onSelected: () {}),
+    //     RadioOption(text: 'Popstar P', onSelected: () {}),
+    //     RadioOption(text: 'Glitch', onSelected: () {}),
+    //   ],
+    // )..priority = GameSettings.spotlightAnimationContentLayer;
+    // add(radio);
   }
 
   void _setUpSpotlight() {

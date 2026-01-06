@@ -27,7 +27,7 @@
   },
 
   "loadingGame": "Spiel wird geladen",
-  "loadingLevel": "Erstelle Level {level}.{world}",
+  "loadingLevel": "Erstelle Level {world}.{level}",
   "@loadingLevel" : {
     "placeholders": {
       "world": { "type": "int" },
@@ -37,7 +37,6 @@
 
   "pauseTitel": "Pausiert",
   "pauseButtonSettigns": "Einstellungen",
-  "pauseButtonAchievements": "Erungenschaften",
   "pauseButtonMenu": "Menü",
 
   "characterPickerTitle": "Charakter",

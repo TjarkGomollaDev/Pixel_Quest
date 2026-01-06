@@ -85,7 +85,7 @@ class Player extends SpriteAnimationGroupComponent
   static const String _pathEnd = ' (32x32).png';
 
   // gravity
-  final double _gravity = 9.8;
+  final double _gravity = 570;
   final double _jumpForce = 310;
   final double _doubleJumpForce = 250;
   final double _terminalVelocity = 300;
@@ -299,6 +299,7 @@ class Player extends SpriteAnimationGroupComponent
     } else {
       position.y = blockBottom - _hitbox.position.y;
       velocity.y = 0;
+
       // reset can double jump if the player hits their head
       canDoubleJump = false;
       if (other is MovingPlatform && other.isVertical && other.moveDirection == 1) position.y += 1;
@@ -324,6 +325,7 @@ class Player extends SpriteAnimationGroupComponent
     isWorldCollisionActive = true;
     _spawnProtection = false;
     game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
+    world.showGameHud();
     onWorldCollision(other);
   }
 
@@ -431,7 +433,6 @@ class Player extends SpriteAnimationGroupComponent
 
   void _playerJump(double dt) {
     velocity.y = -_jumpForce;
-    position.y += velocity.y * dt;
     isOnGround = false;
     hasJumped = false;
     game.audioCenter.playSound(SoundEffect.jump);
@@ -439,7 +440,6 @@ class Player extends SpriteAnimationGroupComponent
 
   void _playerDoubleJump(double dt) {
     velocity.y = -_doubleJumpForce;
-    position.y += velocity.y * dt;
     isOnGround = false;
     hasDoubleJumped = false;
     current = PlayerState.doubleJump;
@@ -447,7 +447,7 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _applyGravity(double dt) {
-    velocity.y += _gravity;
+    velocity.y += _gravity * dt;
     velocity.y = velocity.y.clamp(double.negativeInfinity, _terminalVelocity);
     position.y += velocity.y * dt;
   }
@@ -494,7 +494,7 @@ class Player extends SpriteAnimationGroupComponent
     world.saveData();
 
     // delays are not functional, but purely for a more visually appealing result
-    final delays = [200, 800, 80, 620, 120, 600, 400, 300];
+    final delays = [200, 800, 80, 620, 120, 600, 400, 320];
     int delayIndex = 0;
 
     // player moves to the horizontal center of the finish
@@ -567,7 +567,7 @@ class Player extends SpriteAnimationGroupComponent
     }
     game.audioCenter.stopBackgroundMusic();
     await spotlight.shrinkToBlack();
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
+    await _delayAnimation(delays[delayIndex]);
 
     // level official finished, go back to menu
     game.router.pushReplacementNamed(RouteNames.menu);

@@ -7,12 +7,12 @@ import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class ConfirmRoute extends ValueRoute<bool> {
+class ConfirmPage extends ValueRoute<bool> {
   // constructor parameters
   final String titleText;
   final String message;
 
-  ConfirmRoute({required this.titleText, required this.message}) : super(value: false, transparent: true);
+  ConfirmPage({required this.titleText, required this.message}) : super(value: false, transparent: true);
 
   @override
   Component build() {

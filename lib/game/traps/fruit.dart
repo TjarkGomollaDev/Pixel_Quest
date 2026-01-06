@@ -40,18 +40,14 @@ class Fruit extends SpriteAnimationGroupComponent
     with HasGameReference<PixelQuest>, HasWorldReference<Level>, EntityCollision, EntityOnMiniMap {
   // constructor parameters
   final String _name;
-  final bool _collectible;
 
-  Fruit({required String name, required super.position, bool collectible = true})
-    : _name = name,
-      _collectible = collectible,
-      super(size: gridSize);
+  Fruit({required String name, required super.position}) : _name = name, super(size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(32);
 
-  // hitbox
-  late final RectangleHitbox _hitbox;
+  // actual hitbox
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
 
   // animation settings
   static final Vector2 _textureSize = Vector2.all(32);
@@ -69,25 +65,18 @@ class Fruit extends SpriteAnimationGroupComponent
   }
 
   void _initialSetup() {
-    // hitbox
-    if (_collectible) _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
-
     // debug
-    if (GameSettings.customDebug && _collectible) {
+    if (GameSettings.customDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
-      if (_collectible) _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
+      _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;
     }
 
     // general
     priority = GameSettings.collectiblesLayerLevel;
-    if (_collectible) {
-      _hitbox.collisionType = CollisionType.passive;
-      add(_hitbox);
-      marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
-    } else {
-      anchor = Anchor.center;
-    }
+    _hitbox.collisionType = CollisionType.passive;
+    add(_hitbox);
+    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
   }
 
   void _loadAllSpriteAnimations() {
@@ -100,10 +89,6 @@ class Fruit extends SpriteAnimationGroupComponent
             : loadAnimation(state),
     };
     current = FruitState.idle;
-    if (!_collectible) {
-      animationTicker?.currentIndex = 0;
-      animationTicker?.paused = true;
-    }
   }
 
   @override

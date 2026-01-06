@@ -370,6 +370,7 @@ enum SpriteBtnType {
   settings('Settings'),
   volumeOn('Volume On'),
   volumeOff('Volume Off'),
+  dollar('Dollar'),
 
   // small size
   closeSmall('Close Small'),
@@ -495,6 +496,7 @@ class SpriteToggleBtn extends SpriteBtn {
     bool initialState = true,
     super.textOnBtn,
     String? textOnBtn_2,
+    super.show = true,
   }) : _path_2 = path_2,
        _onPressed_2 = onPressed_2,
        _toggleState = initialState,
@@ -509,6 +511,7 @@ class SpriteToggleBtn extends SpriteBtn {
     bool initialState = true,
     String? textOnBtn,
     String? textOnBtn_2,
+    bool show = true,
   }) : this(
          path: type.path,
          path_2: type_2.path,
@@ -518,6 +521,7 @@ class SpriteToggleBtn extends SpriteBtn {
          initialState: initialState,
          textOnBtn: textOnBtn,
          textOnBtn_2: textOnBtn_2,
+         show: show,
        );
 
   // toggle state

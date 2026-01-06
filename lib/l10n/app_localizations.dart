@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @loadingLevel.
   ///
   /// In en, this message translates to:
-  /// **'Building stage {level}.{world}'**
+  /// **'Building stage {world}.{level}'**
   String loadingLevel(int world, int level);
 
   /// No description provided for @pauseTitel.
@@ -235,12 +235,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get pauseButtonSettigns;
-
-  /// No description provided for @pauseButtonAchievements.
-  ///
-  /// In en, this message translates to:
-  /// **'Achievement'**
-  String get pauseButtonAchievements;
 
   /// No description provided for @pauseButtonMenu.
   ///

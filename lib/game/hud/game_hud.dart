@@ -7,12 +7,12 @@ import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/hud/pause_route.dart';
+import 'package:pixel_adventure/game/hud/pause_page.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
@@ -24,6 +24,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   final Player _player;
   final LevelMetadata _levelMetadata;
   final List<EntityOnMiniMap> _miniMapEntities;
+  final bool _showAtStart;
 
   GameHud({
     required int totalFruitsCount,
@@ -32,12 +33,14 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     required Player player,
     required LevelMetadata levelMetadata,
     required List<EntityOnMiniMap> miniMapEntities,
+    bool show = false,
   }) : _totalFruitsCount = totalFruitsCount,
        _miniMapSprite = miniMapSprite,
        _levelWidth = levelWidth,
        _player = player,
        _levelMetadata = levelMetadata,
-       _miniMapEntities = miniMapEntities {
+       _miniMapEntities = miniMapEntities,
+       _showAtStart = show {
     final minLeft = game.safePadding.minLeft(40);
     size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
     position = Vector2(minLeft, 10);
@@ -57,17 +60,17 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   // fruits count
   late final RRectComponent _fruitBg;
-  late final Fruit _fruitItem;
-  late final TextComponent _fruitsCount;
+  late final VisibleSpriteComponent _fruitItem;
+  late final VisibleTextComponent _fruitsCount;
 
   // death count
   late final RRectComponent _deathBg;
-  late final SpriteComponent _deathItem;
-  late final TextComponent _deathCount;
+  late final VisibleSpriteComponent _deathItem;
+  late final VisibleTextComponent _deathCount;
 
   // count settings
   static const double _bgSize = 19;
-  static const double _spacingBetweenElements = 20;
+  static const double _spacingBetweenElements = 16;
   static const double _counterTextMarginLeft = 4;
 
   // mini map
@@ -75,22 +78,11 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _setUpBtns();
     _setUpFruitsCount();
     _setUpDeathCount();
     _setUpMiniMap();
     return super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
   }
 
   void _setUpBtns() {
@@ -102,10 +94,11 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _menuBtn = SpriteBtn.fromType(
       type: SpriteBtnType.levels,
       onPressed: () {
-        if (game.router.currentRoute is PauseRoute) game.router.pop();
+        if (game.router.currentRoute is PausePage) game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
       },
       position: btnBasePosition,
+      show: _showAtStart,
     );
 
     // pause btn
@@ -115,10 +108,16 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       onPressed: () => game.router.pushNamed(RouteNames.pause),
       onPressed_2: () => game.router.pop(),
       position: _menuBtn.position + btnOffset,
+      show: _showAtStart,
     );
 
     // restart the level btn
-    _restartBtn = SpriteBtn.fromType(type: SpriteBtnType.restart, onPressed: _restartLevel, position: _pauseBtn.position + btnOffset);
+    _restartBtn = SpriteBtn.fromType(
+      type: SpriteBtnType.restart,
+      onPressed: _restartLevel,
+      position: _pauseBtn.position + btnOffset,
+      show: _showAtStart,
+    );
 
     addAll([_menuBtn, _pauseBtn, _restartBtn]);
   }
@@ -130,7 +129,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     switch (currentRoute) {
       case WorldRoute():
         levelRoute = currentRoute;
-      case PauseRoute():
+      case PausePage():
         final previousRoute = game.router.previousRoute;
         if (previousRoute is WorldRoute) {
           game.router.pop();
@@ -150,24 +149,28 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_restartBtn.position.x + _restartBtn.size.x + _spacingBetweenElements, _verticalCenter),
+      position: Vector2(_restartBtn.position.x + SpriteBtnType.btnSize.x / 2 + _spacingBetweenElements, _verticalCenter),
       size: Vector2.all(_bgSize),
       anchor: Anchor.centerLeft,
+      show: _showAtStart,
     );
 
     // fruit item
-    _fruitItem = Fruit(
-      name: FruitName.Apple.name,
+    _fruitItem = VisibleSpriteComponent(
+      sprite: loadSprite(game, 'Other/Apple.png'),
       position: Vector2(_fruitBg.position.x + _fruitBg.size.x / 2, _verticalCenter + 2),
-      collectible: false,
+      size: Vector2.all(32),
+      anchor: Anchor.center,
+      show: _showAtStart,
     );
 
     // count text
-    _fruitsCount = TextComponent(
+    _fruitsCount = VisibleTextComponent(
       text: '0/$_totalFruitsCount',
       anchor: Anchor.centerLeft,
       position: Vector2(_fruitBg.position.x + _fruitBg.size.x + _counterTextMarginLeft, _verticalCenter),
       textRenderer: AppTheme.hudText.asTextPaint,
+      show: _showAtStart,
     );
 
     addAll([_fruitBg, _fruitItem, _fruitsCount]);
@@ -178,35 +181,32 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _spacingBetweenElements * 4 / 5, _verticalCenter),
+      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _spacingBetweenElements, _verticalCenter),
       size: Vector2.all(_bgSize),
       anchor: Anchor.centerLeft,
+      show: _showAtStart,
     );
 
     // death item
-    _deathItem = SpriteComponent(
+    _deathItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Bone.png'),
       position: Vector2(_deathBg.position.x + _deathBg.size.x / 2, _verticalCenter),
       size: Vector2.all(32),
       anchor: Anchor.center,
+      show: _showAtStart,
     );
 
     // count text
-    _deathCount = TextComponent(
+    _deathCount = VisibleTextComponent(
       text: '0',
       anchor: Anchor.centerLeft,
       position: Vector2(_deathBg.position.x + _deathBg.size.x + _counterTextMarginLeft, _verticalCenter),
       textRenderer: AppTheme.hudText.asTextPaint,
+      show: _showAtStart,
     );
 
     addAll([_deathBg, _deathItem, _deathCount]);
   }
-
-  void updateFruitCount(int collected) => _fruitsCount.text = '$collected/$_totalFruitsCount';
-
-  void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
-
-  void togglePlayButton() => _pauseBtn.triggerToggle();
 
   void _setUpMiniMap() {
     _miniMap = MiniMap(
@@ -217,8 +217,28 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       miniMapEntities: _miniMapEntities,
       position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
       hudTopRightToScreenTopRightOffset: position,
-      show: game.storageCenter.settings.showMiniMapAtStart,
+      initialState: game.storageCenter.settings.showMiniMapAtStart,
+      show: _showAtStart,
     );
     add(_miniMap);
   }
+
+  void show() {
+    _menuBtn.show();
+    _pauseBtn.show();
+    _restartBtn.show();
+    _fruitBg.show();
+    _fruitItem.show();
+    _fruitsCount.show();
+    _deathBg.show();
+    _deathItem.show();
+    _deathCount.show();
+    _miniMap.show();
+  }
+
+  void updateFruitCount(int collected) => _fruitsCount.text = '$collected/$_totalFruitsCount';
+
+  void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
+
+  void togglePlayButton() => _pauseBtn.triggerToggle();
 }

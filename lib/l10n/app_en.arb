@@ -27,7 +27,7 @@
   },
 
   "loadingGame": "Loading Game",
-  "loadingLevel": "Building stage {level}.{world}",
+  "loadingLevel": "Building stage {world}.{level}",
   "@loadingLevel" : {
     "placeholders": {
       "world": { "type": "int" },
@@ -37,7 +37,6 @@
 
   "pauseTitel": "Paused",
   "pauseButtonSettigns": "Settings",
-  "pauseButtonAchievements": "Achievement",
   "pauseButtonMenu": "Menu",
 
   "characterPickerTitle": "Character",

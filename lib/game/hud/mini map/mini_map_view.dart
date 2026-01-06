@@ -80,6 +80,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   late final Paint _backgroundPaint;
 
   // player marker
+  final Path _trianglePath = Path();
   static const PlayerMiniMapMarkerType _playerMarker = PlayerMiniMapMarkerType.triangel; // [Adjustable]
   late final Paint _playerMarkerPaint;
   late final double _playerMarkerSize;
@@ -198,14 +199,14 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   /// Draws a triangle player marker.
   void _renderTrianglePlayerMarker(Canvas canvas, double x, double y) {
     final facingRight = _player.scale.x > 0;
-
-    final triangle = Path()
+    _trianglePath.reset();
+    _trianglePath
       ..moveTo(x + (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y)
       ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y - _playerMarkerSize / 2)
       ..lineTo(x - (facingRight ? _playerMarkerSize / 2 : -_playerMarkerSize / 2), y + _playerMarkerSize / 2)
       ..close();
 
-    canvas.drawPath(triangle, _playerMarkerPaint);
+    canvas.drawPath(_trianglePath, _playerMarkerPaint);
   }
 
   /// Draws all markers for a given list of entities.

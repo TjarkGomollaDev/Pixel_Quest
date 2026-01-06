@@ -110,27 +110,14 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // timestamp used to measure loading time and used in conjunction with the loading overlay
   late final DateTime _startTime;
 
-  /// Pre-warms the Tiled loading pipeline to prevent the initial stutter
-  /// that occurs when opening the first level after app launch.
-  ///
-  /// Tiled and Flame perform heavy one-time initialization on the first
-  /// `TiledComponent.load()` call. Invoking this method during startup
-  /// runs that cost upfront, ensuring smooth level loading without
-  /// frame drops.
-  ///
-  /// This does not add a level to the world; it simply triggers the
-  /// internal Tiled warm-up.
-  static Future<void> warmUp({required LevelMetadata levelMetadata}) async =>
-      await TiledComponent.load('${levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize));
-
   @override
   Future<void> onLoad() async {
     _startTime = DateTime.now();
     _initialSetup();
     await _loadLevelMap();
     await _startMiniMapRecording();
-    _addBackgroundLayer();
-    _addSpawningLayer();
+    await _addBackgroundLayer();
+    await _addSpawningLayer();
     await _endMiniMapRecording();
     return super.onLoad();
   }
@@ -141,7 +128,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _addGameHud();
     _addMobileControls();
     await _hideLoadingOverlay();
+
+    // delay for visual reasons only
     await Future.delayed(Duration(milliseconds: 100));
+
+    // this method triggers the level start
     _player.spawnInLevel();
     super.onMount();
   }
@@ -173,6 +164,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _levelMap = await TiledComponent.load('${levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
       ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
+    await yieldFrame();
   }
 
   Future<void> _startMiniMapRecording() async {
@@ -220,11 +212,11 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _readyMadeMiniMapForground = Sprite(image);
   }
 
-  void _addBackgroundLayer() {
+  Future<void> _addBackgroundLayer() async {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
       _addBackground(backgroundLayer);
-      _addWorldCollisions(backgroundLayer);
+      await _addWorldCollisions(backgroundLayer);
     }
   }
 
@@ -307,7 +299,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   ///
   /// This reduces the number of collision checks
   /// and improves runtime performance significantly.
-  void _addWorldCollisions(TileLayer backgroundLayer) {
+  Future<void> _addWorldCollisions(TileLayer backgroundLayer) async {
     _addWorldBorders();
 
     // y axis range of map
@@ -321,8 +313,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     // visited tiles
     final visited = List.generate(_levelMap.tileMap.map.height, (_) => List.filled(_levelMap.tileMap.map.width, false));
 
-    for (var y = yStart; y < yEnd; y++) {
-      for (var x = xStart; x < xEnd; x++) {
+    for (int y = yStart; y < yEnd; y++) {
+      for (int x = xStart; x < xEnd; x++) {
         // skip already processed tiles
         if (visited[y][x]) continue;
 
@@ -378,7 +370,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             size: isPlatform ? Vector2(w * GameSettings.tileSize, 5) : Vector2(w * GameSettings.tileSize, h * GameSettings.tileSize),
           ),
         );
+
+        if ((x % 50) == 0) await yieldFrame();
       }
+      await yieldFrame();
     }
     addAll(_collisionBlocks);
   }
@@ -407,7 +402,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _collisionBlocks.addAll(borders);
   }
 
-  void _addSpawningLayer() {
+  Future<void> _addSpawningLayer() async {
     final spawnPointsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Spawning');
     if (spawnPointsLayer == null) return;
 
@@ -425,6 +420,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     }
 
     // all other objects are created
+    int i = 0;
     for (var spawnPoint in spawnPointsLayer.objects) {
       try {
         final gridPosition = snapVectorToGrid(spawnPoint.position);
@@ -619,6 +615,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         _spawningObjects.add(spawnObject);
         add(spawnObject);
         if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
+
+        if ((++i % 10) == 0) await yieldFrame();
       } catch (e, stack) {
         debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
       }
@@ -668,6 +666,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void removeGameHudOnFinish() => _removeGameHud();
+
+  void showGameHud() => _gameHud.show();
 
   void increaseFruitsCount() => _gameHud.updateFruitCount(++playerFruitsCount);
 

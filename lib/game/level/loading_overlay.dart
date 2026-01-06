@@ -10,6 +10,7 @@ import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -184,5 +185,21 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _stageInfoText.hide();
     await _animatedHide();
     _inputBlocker.disable();
+  }
+
+  Future<void> warmUp(LevelMetadata levelMetadata) async {
+    _updateStageInfo(levelMetadata);
+    _inputBlocker.disable();
+
+    final prevVisible = isVisible;
+    final prevOpacity = _opacity;
+
+    isVisible = true;
+    _opacity = 0.001;
+
+    await yieldFrame();
+
+    _opacity = prevOpacity;
+    isVisible = prevVisible;
   }
 }

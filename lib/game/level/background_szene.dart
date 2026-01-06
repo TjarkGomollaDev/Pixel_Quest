@@ -57,14 +57,4 @@ class BackgroundSzene extends ParallaxComponent with HasVisibility {
 
   void show() => isVisible = true;
   void hide() => isVisible = false;
-
-  @override
-  void update(double dt) {
-    if (!isVisible || parallax == null) return super.update(dt);
-
-    // small dt clamping to prevent stuttering
-    final cappedDt = dt > maxDt ? maxDt : dt;
-    parallax!.update(cappedDt);
-    super.update(cappedDt);
-  }
 }
