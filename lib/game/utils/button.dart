@@ -106,7 +106,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     if (!_canReceiveTap) return;
     scale = _maxScale;
     if (_holdMode) _isHeld = true;
-    game.audioCenter.playSound(SoundEffect.tap);
+    game.audioCenter.playSound(Sfx.tap, SfxType.ui);
     super.onTapDown(event);
   }
 

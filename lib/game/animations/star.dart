@@ -95,7 +95,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
         target,
         EffectController(duration: flyDuration, curve: Curves.easeOutBack),
         onComplete: () {
-          game.audioCenter.playSound(SoundEffect.star);
+          game.audioCenter.playSound(Sfx.star, SfxType.level);
           completer.complete();
         },
       ),
@@ -107,7 +107,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
   Future<void> fallTo(Vector2 target, {double fallDuration = 0.4}) async {
     final startPosition = position.clone();
     final completer = Completer<void>();
-    game.audioCenter.playSound(SoundEffect.collected);
+    game.audioCenter.playSound(Sfx.collected, SfxType.level);
     add(
       SequenceEffect(
         [
@@ -127,7 +127,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
 
   Future<void> popIn({double duration = 0.6}) async {
     final completer = Completer<void>();
-    game.audioCenter.playSound(SoundEffect.star);
+    game.audioCenter.playSound(Sfx.star, SfxType.level);
     add(
       SequenceEffect([
         ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.6, curve: Curves.easeOutBack)),

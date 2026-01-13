@@ -23,6 +23,9 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
   static const int _amount = 4;
   static const String _path = 'Enemies/Ghost/Ghost Particles (16x16).png';
 
+  // getter
+  Ghost get owner => _owner;
+
   @override
   Future<void> onLoad() async {
     _initialSetup();
@@ -46,6 +49,4 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
     if (_spawnOnLeftSide) flipHorizontallyAroundCenter();
     animationTicker!.completed.then((_) => removeFromParent());
   }
-
-  Ghost get owner => _owner;
 }

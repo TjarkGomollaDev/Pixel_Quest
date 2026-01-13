@@ -101,7 +101,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       position: _sfxVolumeText.position + Vector2(0, _sfxVolumeText.size.y + DialogContainer.headlineMarginBottom),
       onChanged: (value) {
         game.audioCenter.setSfxVolume(value);
-        game.audioCenter.playSound(SoundEffect.collected);
+        game.audioCenter.playSound(Sfx.collected, SfxType.ui);
       },
       enabled: game.audioCenter.soundState.enabled,
     );

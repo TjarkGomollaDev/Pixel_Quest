@@ -64,6 +64,9 @@ class SawCircleComponent extends PositionComponent with HasGameReference<PixelQu
   // movement
   final double _moveSpeed = 60; // [Adjustable]
 
+  // getter
+  List<SawCircleSingleSaw?> get singleSaws => [_saw1, _saw2];
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
@@ -115,8 +118,6 @@ class SawCircleComponent extends PositionComponent with HasGameReference<PixelQu
       _saw2 = null;
     }
   }
-
-  List<SawCircleSingleSaw?> getSingleSaws() => [_saw1, _saw2];
 
   void _addSingleSaws() {
     add(_saw1);

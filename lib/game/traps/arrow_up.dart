@@ -70,6 +70,32 @@ class ArrowUp extends PositionComponent
     return super.onLoad();
   }
 
+  @override
+  void onRespawn() {
+    animationGroupComponent.current = ArrowUpState.idle;
+    _isCollected = false;
+  }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (!_isCollected) {
+      _isCollected = true;
+      _player.bounceUp(jumpForce: _bounceHeight);
+      game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
+      animationGroupComponent.current = ArrowUpState.hit;
+      animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() {
+        world.queueForRespawn(this);
+        removeFromParent();
+      });
+    }
+  }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -90,30 +116,4 @@ class ArrowUp extends PositionComponent
     final animations = {for (var state in ArrowUpState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ArrowUpState.idle, isBottomCenter: false);
   }
-
-  @override
-  void onRespawn() {
-    animationGroupComponent.current = ArrowUpState.idle;
-    _isCollected = false;
-  }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (!_isCollected) {
-      _isCollected = true;
-      _player.bounceUp(jumpForce: _bounceHeight);
-      game.audioCenter.playSound(SoundEffect.jumpBoost);
-      animationGroupComponent.current = ArrowUpState.hit;
-      animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() {
-        world.queueForRespawn(this);
-        removeFromParent();
-      });
-    }
-  }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

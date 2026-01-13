@@ -173,7 +173,7 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
     if (_animationEnabled) _clearAnimationLoop();
 
     // change animations for new character
-    game.audioCenter.playSound(SoundEffect.changeCharacter);
+    game.audioCenter.playSound(Sfx.changeCharacter, SfxType.ui);
     animations = allCharacterAnimations[character];
     current = PlayerState.idle;
 

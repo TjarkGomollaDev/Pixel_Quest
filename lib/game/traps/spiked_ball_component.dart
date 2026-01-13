@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
+import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -50,7 +50,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   late final Vector2 _centerPoint;
 
   // spiked ball
-  late final SpikedBallBall _spikedBall;
+  late final SpikedBall _spikedBall;
   late final double _radiusToCenterOfSpikedBall;
 
   // list of all chain elements
@@ -66,6 +66,9 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   late final double _scaledSpeed;
   late double _angle;
   late double _time;
+
+  // getter
+  SpikedBall get ball => _spikedBall;
 
   @override
   FutureOr<void> onLoad() {
@@ -92,12 +95,12 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
 
     // general
     priority = GameSettings.trapBehindLayerLevel;
-    _centerPoint = Vector2(size.x / 2, SpikedBallBall.gridSize.x / 2);
+    _centerPoint = Vector2(size.x / 2, SpikedBall.gridSize.x / 2);
   }
 
   void _createSpikedBall() {
-    _radiusToCenterOfSpikedBall = _radius - SpikedBallBall.gridSize.x / 2;
-    _spikedBall = SpikedBallBall(player: _player);
+    _radiusToCenterOfSpikedBall = _radius - SpikedBall.gridSize.x / 2;
+    _spikedBall = SpikedBall(player: _player);
 
     // only relevant for mini map not for the actual functionality
     _spikedBall.yMoveRange = Vector2(
@@ -105,8 +108,6 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
       position.y + height - _spikedBall.position.y - _spikedBall.height / 2,
     );
   }
-
-  SpikedBallBall get ball => _spikedBall;
 
   void _setUpHalfArc() {
     // convert deg to rad
@@ -129,7 +130,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   }
 
   void _setUpChain() {
-    final count = (_radius - GameSettings.tileSize / 2 - SpikedBallBall.gridSize.x) / GameSettings.tileSize * 2 + 1;
+    final count = (_radius - GameSettings.tileSize / 2 - SpikedBall.gridSize.x) / GameSettings.tileSize * 2 + 1;
     final baseRadius = GameSettings.tileSize / 2;
     final chainSprite = loadSprite(game, _pathChain);
     for (var i = 0; i < count; i++) {

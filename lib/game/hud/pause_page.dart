@@ -12,7 +12,7 @@ import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
-class PausePage extends Route {
+class PausePage extends Route with HasGameReference<PixelQuest> {
   PausePage() : super(_PauseContent.new, transparent: true);
 
   @override
@@ -20,6 +20,7 @@ class PausePage extends Route {
     if (previousRoute is WorldRoute && previousRoute.world is DecoratedWorld) {
       (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
       (previousRoute.world as DecoratedWorld).timeScale = 0;
+      unawaited(game.audioCenter.pauseAllLoops());
     }
   }
 
@@ -28,6 +29,7 @@ class PausePage extends Route {
     if (nextRoute is WorldRoute && nextRoute.world is DecoratedWorld) {
       (nextRoute.world as DecoratedWorld).decorator = null;
       (nextRoute.world as DecoratedWorld).timeScale = 1;
+      unawaited(game.audioCenter.resumeAllLoops());
     }
   }
 }

@@ -97,6 +97,25 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (_gotStomped) return;
+    if (collisionSide == CollisionSide.Top) {
+      _gotStomped = true;
+      _player.bounceUp();
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+
+      // play hit animation and then remove from level
+      current = BlueBirdState.hit;
+      animationTickers![BlueBirdState.hit]!.completed.then((_) => removeFromParent());
+    } else {
+      _player.collidedWithEnemy(collisionSide);
+    }
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -189,23 +208,4 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
     // calculate current speed
     return _moveSpeed * _speedFactor;
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
-      _gotStomped = true;
-      _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
-
-      // play hit animation and then remove from level
-      current = BlueBirdState.hit;
-      animationTickers![BlueBirdState.hit]!.completed.then((_) => removeFromParent());
-    } else {
-      _player.collidedWithEnemy(collisionSide);
-    }
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

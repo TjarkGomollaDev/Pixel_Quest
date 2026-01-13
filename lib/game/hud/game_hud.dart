@@ -123,6 +123,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _restartLevel() {
+    unawaited(game.audioCenter.muteGameSfx());
     final currentRoute = game.router.currentRoute;
     WorldRoute? levelRoute;
 

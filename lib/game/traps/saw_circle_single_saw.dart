@@ -52,6 +52,12 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, 
     return super.onLoad();
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -76,10 +82,4 @@ class SawCircleSingleSaw extends SpriteAnimationComponent with EntityCollision, 
     animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);
     if (_clockwise) flipHorizontally();
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

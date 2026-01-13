@@ -61,6 +61,30 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
     return super.onLoad();
   }
 
+  @override
+  Future<void> onEntityCollision(CollisionSide collisionSide) async {
+    if (!_bounced) {
+      _bounced = true;
+
+      // is needed, because otherwise the ground collision may reset the y velocity directly back to 0 before the player can even jump off
+      _player.position.y -= 1;
+
+      _player.bounceUp(jumpForce: _bounceHeight);
+      game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
+
+      animationGroupComponent.current = TrampolineState.jump;
+      await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
+      animationGroupComponent.current = TrampolineState.idle;
+      _bounced = false;
+    }
+  }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -80,28 +104,4 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
     final animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TrampolineState.idle);
   }
-
-  @override
-  Future<void> onEntityCollision(CollisionSide collisionSide) async {
-    if (!_bounced) {
-      _bounced = true;
-
-      // is needed, because otherwise the ground collision may reset the y velocity directly back to 0 before the player can even jump off
-      _player.position.y -= 1;
-
-      _player.bounceUp(jumpForce: _bounceHeight);
-      game.audioCenter.playSound(SoundEffect.jumpBoost);
-
-      animationGroupComponent.current = TrampolineState.jump;
-      await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
-      animationGroupComponent.current = TrampolineState.idle;
-      _bounced = false;
-    }
-  }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

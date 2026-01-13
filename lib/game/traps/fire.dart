@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/level/player.dart';
@@ -20,7 +22,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 ///
 /// The fire itself does not move, but acts as a passive collision area
 /// that can interact with the [Player].
-class Fire extends PositionComponent with EntityCollision, HasGameReference<PixelQuest> {
+class Fire extends PositionComponent with EntityCollision, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
   int _side;
   final Player _player;
@@ -46,8 +48,15 @@ class Fire extends PositionComponent with EntityCollision, HasGameReference<Pixe
     return super.onLoad();
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _normalizeDimensions() {
     if (_side > 4 || _side < 1) _side = 1;
+
     // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
     if (_side.isOdd) {
       height = GameSettings.tileSize;
@@ -71,16 +80,11 @@ class Fire extends PositionComponent with EntityCollision, HasGameReference<Pixe
     priority = GameSettings.trapBehindLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    configureAmbientLoop(loop: LoopSfx.fire, hitbox: _hitbox);
   }
 
   void _loadSpriteAnimation() {
     final animation = loadSpriteAnimation(game, _path, _amount, GameSettings.stepTime, _textureSize);
     addSpriteRow(game: game, side: _side, count: _count, parent: this, animation: animation);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

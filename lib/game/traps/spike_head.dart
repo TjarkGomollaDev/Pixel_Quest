@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -93,6 +95,12 @@ class SpikeHead extends PositionComponent
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => RectangleHitbox(position: position + _hitbox.position, size: _hitbox.size);
+
   void _setUpHitbox() {
     _hitbox = CompositeHitbox(
       position: Vector2(10, 10),
@@ -169,6 +177,7 @@ class SpikeHead extends PositionComponent
     } else {
       hitAnimation = SpikeHeadState.bottomHit;
       _moveSpeed = _moveSpeedUp;
+      game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(entityHitbox), SfxType.game);
     }
     _moveDirection = newDirection;
     animationGroupComponent.current = hitAnimation;
@@ -181,10 +190,4 @@ class SpikeHead extends PositionComponent
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => RectangleHitbox(position: position + _hitbox.position, size: _hitbox.size);
 }

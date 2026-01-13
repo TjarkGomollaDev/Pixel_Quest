@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/enemies/plant_bullet.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -53,8 +54,11 @@ class Plant extends PositionComponent
   static const String _path = 'Enemies/Plant/';
   static const String _pathEnd = ' (44x42).png';
 
+  // start sound frame
+  static const int _startShotSoundFrame = 4;
+
   // attack
-  double _timeSinceLastAttack = 0.0;
+  double _timeSinceLastAttack = 0;
   bool _isAttacking = false;
   final _timeUntilNextAttack = 5; // [Adjustable]
   final _delayBetweenDoubleShot = Duration(milliseconds: 500); // [Adjustable]
@@ -74,10 +78,30 @@ class Plant extends PositionComponent
     if (_gotStomped) return super.update(dt);
     if (!_isAttacking) {
       _timeSinceLastAttack += dt;
-      if (_timeSinceLastAttack >= _timeUntilNextAttack) _startAttack();
+      if (_timeSinceLastAttack >= _timeUntilNextAttack) unawaited(_startAttack());
     }
     super.update(dt);
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (_gotStomped) return;
+    if (collisionSide == CollisionSide.Top) {
+      _gotStomped = true;
+      _player.bounceUp();
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+
+      // play hit animation and then remove from level
+      animationGroupComponent.animationTickers![PlantState.attack]?.onComplete?.call();
+      animationGroupComponent.current = PlantState.hit;
+      animationGroupComponent.animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
+    }
+
+    // the plant itself can not kill the player, only its bullet
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -105,26 +129,33 @@ class Plant extends PositionComponent
     _isAttacking = true;
 
     // first attack
-    animationGroupComponent.current = PlantState.attack;
-    await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
-    if (_gotStomped) return;
-    _spawnBullet();
-    animationGroupComponent.current = PlantState.idle;
+    if (!await _attack()) return;
 
     // second attack
     if (_doubleShot) {
       await Future.delayed(_delayBetweenDoubleShot);
-      if (_gotStomped) return;
-      animationGroupComponent.current = PlantState.attack;
-      await animationGroupComponent.animationTickers![PlantState.attack]!.completed;
-      if (_gotStomped) return;
-      _spawnBullet();
-      animationGroupComponent.current = PlantState.idle;
+      if (!await _attack()) return;
     }
 
     // end attack modus
     _isAttacking = false;
     _timeSinceLastAttack = 0;
+  }
+
+  Future<bool> _attack() async {
+    animationGroupComponent.current = PlantState.attack;
+    final ticker = animationGroupComponent.animationTickers![PlantState.attack]!;
+    ticker.onFrame = (frame) {
+      if (frame == _startShotSoundFrame) {
+        game.audioCenter.playSoundIf(Sfx.enemieShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+        ticker.onFrame = null;
+      }
+    };
+    await ticker.completed;
+    if (_gotStomped) return false;
+    _spawnBullet();
+    animationGroupComponent.current = PlantState.idle;
+    return true;
   }
 
   void _spawnBullet() {
@@ -138,24 +169,4 @@ class Plant extends PositionComponent
     final bullet = PlantBullet(isLeft: _isLeft, player: _player, position: bulletPosition);
     game.world.add(bullet);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
-      _gotStomped = true;
-      _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
-
-      // play hit animation and then remove from level
-      animationGroupComponent.animationTickers![PlantState.attack]?.onComplete?.call();
-      animationGroupComponent.current = PlantState.hit;
-      animationGroupComponent.animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
-    }
-
-    // the plant itself cannot kill the player, only its bullet
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

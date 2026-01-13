@@ -45,6 +45,12 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
     return super.onLoad();
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -86,10 +92,4 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
     final sprite = loadSprite(game, _path);
     addSpriteRow(game: game, side: _side, count: _count, parent: this, sprite: sprite);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

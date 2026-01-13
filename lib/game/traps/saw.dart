@@ -82,6 +82,12 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -179,10 +185,4 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
     final newPositionX = position.x + _moveDirection * _moveSpeed * dt;
     position.x = newPositionX.clamp(_rangeNeg, _rangePos);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

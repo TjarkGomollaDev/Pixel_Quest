@@ -195,7 +195,7 @@ class Player extends SpriteAnimationGroupComponent
       if (_spawnProtection) return super.onCollision(intersectionPoints, other);
       if (other is EntityCollision) onEntityCollision(other);
     } else if (_levelStart && other is Start) {
-      _landOnStartPlatform(other);
+      _landedOnPlatformStartLevel(other);
     }
     super.onCollision(intersectionPoints, other);
   }
@@ -213,7 +213,7 @@ class Player extends SpriteAnimationGroupComponent
     if (!(hasVerticalIntersection && hasHorizontalIntersection)) return;
 
     // if the exact side is not required, we can simply pass "Any" as the collision side and save ourselves computing costs
-    if (other.collisionType == EntityCollisionType.Any) return other.onEntityCollision(CollisionSide.Any);
+    if (other.collisionType == EntityCollisionType.any) return other.onEntityCollision(CollisionSide.Any);
 
     // overlap calculation
     final overlapX = calculateOverlapX(playerRect, otherRect);
@@ -320,11 +320,12 @@ class Player extends SpriteAnimationGroupComponent
     if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopWorldCollision(top, other);
   }
 
-  void _landOnStartPlatform(WorldCollision other) {
+  void _landedOnPlatformStartLevel(WorldCollision other) {
     _levelStart = false;
     isWorldCollisionActive = true;
     _spawnProtection = false;
     game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
+    game.audioCenter.unmuteGameSfx();
     world.showGameHud();
     onWorldCollision(other);
   }
@@ -435,7 +436,7 @@ class Player extends SpriteAnimationGroupComponent
     velocity.y = -_jumpForce;
     isOnGround = false;
     hasJumped = false;
-    game.audioCenter.playSound(SoundEffect.jump);
+    game.audioCenter.playSound(Sfx.jump, SfxType.player);
   }
 
   void _playerDoubleJump(double dt) {
@@ -443,7 +444,7 @@ class Player extends SpriteAnimationGroupComponent
     isOnGround = false;
     hasDoubleJumped = false;
     current = PlayerState.doubleJump;
-    game.audioCenter.playSound(SoundEffect.doubleJump);
+    game.audioCenter.playSound(Sfx.doubleJump, SfxType.player);
   }
 
   void _applyGravity(double dt) {
@@ -454,7 +455,7 @@ class Player extends SpriteAnimationGroupComponent
 
   Future<void> spawnInLevel() async {
     // play appearing animation
-    game.audioCenter.playSound(SoundEffect.appearing);
+    game.audioCenter.playSound(Sfx.appearing, SfxType.level);
     await _effect.playAppearing(_spawnPosition);
     _isPlayerStateActive = true;
     _isGravityActive = true;
@@ -491,7 +492,7 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> reachedFinish(ShapeHitbox finish) async {
     _horizontalMovement = 0;
     _spawnProtection = true;
-    world.saveData();
+    unawaited(world.saveData());
 
     // delays are not functional, but purely for a more visually appealing result
     final delays = [200, 800, 80, 620, 120, 600, 400, 320];
@@ -503,6 +504,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // spotlight animation
     world.removeGameHudOnFinish();
+    unawaited(game.audioCenter.muteGameSfx());
     final playerCenter = hitbox.center.toVector2();
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
     world.add(spotlight);
@@ -544,7 +546,7 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // jump animation
-    game.audioCenter.playSound(SoundEffect.jump);
+    game.audioCenter.playSound(Sfx.jump, SfxType.player);
     bounceUp(jumpForce: 320);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
     current = PlayerState.doubleJump;
@@ -554,7 +556,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // player disapperaing animation
     isVisible = false;
-    game.audioCenter.playSound(SoundEffect.disappearing);
+    game.audioCenter.playSound(Sfx.disappearing, SfxType.level);
     await _effect.playDisappearing(scale.x > 0 ? position : position - Vector2(width, 0));
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
@@ -585,8 +587,8 @@ class Player extends SpriteAnimationGroupComponent
     respawnNotifier.notifyRespawn();
 
     // play death effects
-    game.audioCenter.playSound(SoundEffect.playerHit);
-    game.audioCenter.playSound(SoundEffect.playerDeath);
+    game.audioCenter.playSound(Sfx.playerHit, SfxType.player);
+    game.audioCenter.playSound(Sfx.playerDeath, SfxType.player);
     _effect.playFlashScreen();
     _effect.shakeCamera();
     current = PlayerState.hit;

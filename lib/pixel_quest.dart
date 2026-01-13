@@ -6,6 +6,7 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route, Image;
+import 'package:pixel_adventure/data/audio/ambient_loop_manager.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
@@ -47,6 +48,7 @@ class PixelQuest extends FlameGame
 
   // handles everything related to audio in the game
   late final AudioCenter audioCenter;
+  late final AmbientLoopManager ambientLoops;
 
   // in context with the camera
   final ({double top, double bottom}) cameraWorldYBounds = (top: GameSettings.mapBorderWidth, bottom: GameSettings.mapBorderWidth);
@@ -113,6 +115,7 @@ class PixelQuest extends FlameGame
   @override
   void onDispose() {
     ((router.routes[RouteNames.menu] as WorldRoute?)?.world as MenuPage?)?.dispose();
+    ambientLoops.dispose();
     super.onDispose();
   }
 
@@ -132,6 +135,7 @@ class PixelQuest extends FlameGame
     staticCenter = await StaticCenter.init();
     storageCenter = await StorageCenter.init(staticCenter: staticCenter);
     audioCenter = await AudioCenter.init(storageCenter: storageCenter);
+    ambientLoops = AmbientLoopManager(audioCenter: audioCenter);
   }
 
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
@@ -213,5 +217,6 @@ class PixelQuest extends FlameGame
 
   Future<void> showLoadingOverlay(LevelMetadata levelMetadata) async => await loadingOverlay.showOverlay(levelMetadata);
 
-  Future<void> hideLoadingOverlay() async => await loadingOverlay.hideOverlay();
+  Future<void> hideLoadingOverlay({VoidCallback? onAfterDummyFallOut}) async =>
+      await loadingOverlay.hideOverlay(onAfterDummyFallOut: onAfterDummyFallOut);
 }

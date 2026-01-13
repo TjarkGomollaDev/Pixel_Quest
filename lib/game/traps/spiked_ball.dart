@@ -12,12 +12,12 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-class SpikedBallBall extends PositionComponent
+class SpikedBall extends PositionComponent
     with FixedGridOriginalSizeSprite, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final Player _player;
 
-  SpikedBallBall({required Player player}) : _player = player, super(position: Vector2.zero(), size: gridSize) {
+  SpikedBall({required Player player}) : _player = player, super(position: Vector2.zero(), size: gridSize) {
     // marker is set here because the ball is not added directly to the level,
     // but via the parent SpikedBallComponent, and we need direct access before onLoad()
     _setUpMarker();
@@ -39,6 +39,12 @@ class SpikedBallBall extends PositionComponent
     _loadSprite();
     return super.onLoad();
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -62,10 +68,4 @@ class SpikedBallBall extends PositionComponent
     // rotate so that there is no spike at the top
     spriteComponent.angle += pi / 8;
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

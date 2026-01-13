@@ -77,7 +77,7 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
     current = FinishState.pressed;
     _player.reachedFinish(_hitbox);
     game.audioCenter.stopBackgroundMusic();
-    game.audioCenter.playSound(SoundEffect.finish);
+    game.audioCenter.playSound(Sfx.finish, SfxType.level);
 
     await animationTickers![FinishState.pressed]!.completed;
     current = FinishState.idle;

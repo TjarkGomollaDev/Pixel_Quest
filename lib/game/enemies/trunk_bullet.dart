@@ -56,7 +56,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
       _spawnProtectionFrames--;
       if (_spawnProtectionFrames == 0) opacity = 1;
     } else {
-      _move(dt);
+      _movement(dt);
     }
     super.update(dt);
   }
@@ -66,6 +66,15 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
     if (despawnTypes.any((type) => other.runtimeType == type)) _despawn();
     super.onCollisionStart(intersectionPoints, other);
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    _despawn();
+    _player.collidedWithEnemy(collisionSide);
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -87,16 +96,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
     if (_moveDirection == 1) flipHorizontallyAroundCenter();
   }
 
-  void _move(double dt) => position.x += _moveDirection * _moveSpeed * dt;
+  void _movement(double dt) => position.x += _moveDirection * _moveSpeed * dt;
 
   void _despawn() => removeFromParent();
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    _despawn();
-    _player.collidedWithEnemy(collisionSide);
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

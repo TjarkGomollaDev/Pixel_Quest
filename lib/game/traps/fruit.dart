@@ -64,6 +64,23 @@ class Fruit extends SpriteAnimationGroupComponent
     return super.onLoad();
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (!_isCollected) {
+      _isCollected = true;
+      world.increaseFruitsCount();
+      game.audioCenter.playSound(Sfx.collected, SfxType.game);
+      current = FruitState.collected;
+      animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
+    }
+  }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -90,21 +107,4 @@ class Fruit extends SpriteAnimationGroupComponent
     };
     current = FruitState.idle;
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (!_isCollected) {
-      _isCollected = true;
-      world.increaseFruitsCount();
-      game.audioCenter.playSound(SoundEffect.collected);
-      current = FruitState.collected;
-      animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
-    }
-  }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

@@ -81,11 +81,14 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   // player on top
   bool _playerOnTop = false;
 
+  // getter
+  int get moveDirection => _moveDirection;
+  bool get isVertical => _isVertical;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
-    _correctingPosition();
     _setUpRange();
     _setUpMoveDirection();
     return super.onLoad();
@@ -102,6 +105,12 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     _player.respawnNotifier.removeListener(onWorldCollisionEnd);
     super.onRemove();
   }
+
+  @override
+  void onWorldCollisionEnd() => _playerOnTop = false;
+
+  @override
+  ShapeHitbox get worldHitbox => _hitbox;
 
   // we return top left instead of bottom center, and we have to take _correctingPosition() into account
   @override
@@ -129,9 +138,10 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     current = MovingPlatformState.on;
   }
 
-  void _correctingPosition() => position.y -= _hitbox.position.y;
-
   void _setUpRange() {
+    // correcting position
+    position.y -= _hitbox.position.y;
+
     if (_isVertical) {
       _rangeNeg = position.y - _offsetNeg * GameSettings.tileSize;
       _rangePos = position.y + _offsetPos * GameSettings.tileSize;
@@ -200,14 +210,4 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     if (_playerOnTop) return;
     _playerOnTop = true;
   }
-
-  @override
-  void onWorldCollisionEnd() => _playerOnTop = false;
-
-  @override
-  ShapeHitbox get worldHitbox => _hitbox;
-
-  int get moveDirection => _moveDirection;
-
-  bool get isVertical => _isVertical;
 }

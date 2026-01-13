@@ -62,6 +62,7 @@ class _GameWrapperState extends State<GameWrapper> {
       _removingGameForOneFrame = true;
       _game = null;
     });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       setState(() => _removingGameForOneFrame = false);

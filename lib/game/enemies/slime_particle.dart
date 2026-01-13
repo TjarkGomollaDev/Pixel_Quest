@@ -32,12 +32,21 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
   static const int _amount = 4;
   static const String _path = 'Enemies/Slime/Particles (16x16).png';
 
+  // getter
+  Slime get owner => _owner;
+
   @override
   Future<void> onLoad() async {
     _initialSetup();
     _loadAndPlayAnimationOneTime();
     await super.onLoad();
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -66,12 +75,4 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
     animationTicker?.paused = false;
     animationTicker!.completed.then((_) => removeFromParent());
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => _player.collidedWithEnemy(collisionSide);
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
-
-  Slime get owner => _owner;
 }

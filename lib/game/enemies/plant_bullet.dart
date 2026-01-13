@@ -51,7 +51,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   @override
   void update(double dt) {
-    _move(dt);
+    _movement(dt);
     super.update(dt);
   }
 
@@ -60,6 +60,15 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
     if (despawnTypes.any((type) => other.runtimeType == type)) _despawn();
     super.onCollisionStart(intersectionPoints, other);
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    _despawn();
+    _player.collidedWithEnemy(collisionSide);
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -77,16 +86,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   void _loadSprite() => sprite = loadSprite(game, _path);
 
-  void _move(double dt) => position.x += _moveDirection * _moveSpeed * dt;
+  void _movement(double dt) => position.x += _moveDirection * _moveSpeed * dt;
 
   void _despawn() => removeFromParent();
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    _despawn();
-    _player.collidedWithEnemy(collisionSide);
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

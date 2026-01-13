@@ -159,6 +159,26 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (_gotStomped) return;
+    if (collisionSide == CollisionSide.Top) {
+      _gotStomped = true;
+      _player.bounceUp();
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+
+      // play hit animation and then remove from level
+      animationTickers![TrunkState.attack]?.onComplete?.call();
+      current = TrunkState.hit;
+      animationTickers![TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
+    } else {
+      _player.collidedWithEnemy(collisionSide);
+    }
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -326,24 +346,4 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     final bullet = TrunkBullet(isLeft: isLeft, player: _player, position: bulletPosition);
     game.world.add(bullet);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
-      _gotStomped = true;
-      _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
-
-      // play hit animation and then remove from level
-      animationTickers![TrunkState.attack]?.onComplete?.call();
-      current = TrunkState.hit;
-      animationTickers![TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
-    } else {
-      _player.collidedWithEnemy(collisionSide);
-    }
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

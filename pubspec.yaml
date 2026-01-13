@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/audio/music/
     - assets/audio/effects/
+    - assets/audio/loop-effects/
     - assets/tiles/
     - assets/data/
     - assets/images/Terrain/

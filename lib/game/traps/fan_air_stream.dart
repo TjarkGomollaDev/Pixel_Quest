@@ -151,7 +151,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   void onEntityCollisionEnd() => _playerInStream = false;
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
+  EntityCollisionType get collisionType => EntityCollisionType.any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

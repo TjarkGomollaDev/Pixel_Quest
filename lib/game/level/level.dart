@@ -39,7 +39,7 @@ import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/saw_circle_component.dart';
 import 'package:pixel_adventure/game/traps/spike_head.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball_component.dart';
-import 'package:pixel_adventure/game/traps/spiked_ball_ball.dart';
+import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
@@ -112,7 +112,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   @override
   Future<void> onLoad() async {
-    _startTime = DateTime.now();
     _initialSetup();
     await _loadLevelMap();
     await _startMiniMapRecording();
@@ -142,6 +141,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _removeGameHud();
     if (GameSettings.showMobileControls) _removeMobileControls();
     game.audioCenter.stopBackgroundMusic();
+    game.audioCenter.muteGameSfx();
     return super.onRemove();
   }
 
@@ -158,6 +158,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     }
 
     // general
+    timeScale = 0;
+    _startTime = DateTime.now();
   }
 
   Future<void> _loadLevelMap() async {
@@ -463,7 +465,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             );
 
             // add the single saws from the saw circle component to the mini map entities
-            for (var singleSaw in (spawnObject as SawCircleComponent).getSingleSaws()) {
+            for (var singleSaw in (spawnObject as SawCircleComponent).singleSaws) {
               if (singleSaw != null) _addEntityToMiniMap(singleSaw);
             }
             break;
@@ -480,9 +482,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
               swingArcDeg: swingArcDec,
               swingSpeed: swingSpeed,
               startLeft: startLeft,
-              position:
-                  gridPosition - Vector2(radius - GameSettings.tileSize / 2, SpikedBallBall.gridSize.x / 2 - GameSettings.tileSize / 2),
-              size: Vector2(radius * 2, radius + SpikedBallBall.gridSize.x / 2),
+              position: gridPosition - Vector2(radius - GameSettings.tileSize / 2, SpikedBall.gridSize.x / 2 - GameSettings.tileSize / 2),
+              size: Vector2(radius * 2, radius + SpikedBall.gridSize.x / 2),
             );
 
             // add the ball from the spiked ball component to the mini map entities
@@ -594,7 +595,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             break;
           case 'Turtle':
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
-            spawnObject = Turtle(isLeft: isLeft, player: _player, position: gridPosition);
+            final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
+            spawnObject = Turtle(isLeft: isLeft, delay: delay, player: _player, position: gridPosition);
             break;
           case 'Spikes':
             final side = spawnPoint.properties.getValue<int?>('side') ?? GameSettings.sideDefault;
@@ -677,7 +679,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
     final delayMs = 1400;
     if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-    await game.hideLoadingOverlay();
+    await game.hideLoadingOverlay(onAfterDummyFallOut: () => timeScale = 1);
   }
 
   void queueForRespawn(Respawnable item) {

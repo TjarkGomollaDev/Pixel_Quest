@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -117,6 +118,25 @@ class Snail extends PositionComponent
     }
     super.update(dt);
   }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (!_snailGotStomped) {
+      _playerHasLeftCollision = false;
+      unawaited(_handleSnailStomp(collisionSide));
+    } else if (!_shellGotKicked && _playerHasLeftCollision) {
+      _playerHasLeftCollision = false;
+      _handleShellKick(collisionSide);
+    } else if (!_shellGotStomped && _playerHasLeftCollision) {
+      _handleShellStomp(collisionSide);
+    }
+  }
+
+  @override
+  void onEntityCollisionEnd() => _playerHasLeftCollision = true;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
@@ -228,8 +248,7 @@ class Snail extends PositionComponent
   }
 
   void _changeShellDirection(double newDirection) {
-    _shellWallHit();
-    animationGroupComponent.current = SnailState.shellWallHit;
+    unawaited(_shellWallHitAnimation());
     _shellMoveDirection = newDirection;
     flipHorizontallyAroundCenter();
 
@@ -238,35 +257,20 @@ class Snail extends PositionComponent
     position.x = _shellMoveDirection == 1 ? _leftBorder : _rightBorder;
   }
 
-  Future<void> _shellWallHit() async {
+  Future<void> _shellWallHitAnimation() async {
+    game.audioCenter.playSoundIf(Sfx.enemieWallHit, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     animationGroupComponent.current = SnailState.shellWallHit;
     await animationGroupComponent.animationTickers![SnailState.shellWallHit]!.completed;
     animationGroupComponent.current = SnailState.shellSpin;
   }
 
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (!_snailGotStomped) {
-      _playerHasLeftCollision = false;
-      _handleSnailStomp(collisionSide);
-    } else if (!_shellGotKicked && _playerHasLeftCollision) {
-      _playerHasLeftCollision = false;
-      _handleShellKick(collisionSide);
-    } else if (!_shellGotStomped && _playerHasLeftCollision) {
-      _handleShellStomp(collisionSide);
-    }
-  }
-
-  @override
-  void onEntityCollisionEnd() => _playerHasLeftCollision = true;
-
   Future<void> _handleSnailStomp(CollisionSide collisionSide) async {
     if (collisionSide == CollisionSide.Top) {
       _snailGotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
 
       // play hit animation
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       animationGroupComponent.current = SnailState.snailHit;
       await animationGroupComponent.animationTickers![SnailState.snailHit]!.completed;
       if (_shellGotStomped) return;
@@ -306,13 +310,14 @@ class Snail extends PositionComponent
     // flip shell if direction changes and update borders
     if (_shellMoveDirection != _moveDirection) flipHorizontallyAroundCenter();
     _updateActualBorders();
+    game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
   }
 
   void _handleShellStomp(CollisionSide collisionSide) {
     if (collisionSide == CollisionSide.Top) {
       _shellGotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
       animationGroupComponent.animationTickers![SnailState.snailHit]?.onComplete?.call();
@@ -322,7 +327,4 @@ class Snail extends PositionComponent
       _player.collidedWithEnemy(collisionSide);
     }
   }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

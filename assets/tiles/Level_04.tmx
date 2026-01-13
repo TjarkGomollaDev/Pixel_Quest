@@ -219,11 +219,13 @@
   </object>
   <object id="147" name="Turtle" type="Turtle" x="2624" y="80" width="48" height="32">
    <properties>
+    <property name="delay" type="float" value="0"/>
     <property name="isLeft" type="bool" value="true"/>
    </properties>
   </object>
   <object id="148" name="Turtle" type="Turtle" x="2704" y="160" width="48" height="32">
    <properties>
+    <property name="delay" type="float" value="1"/>
     <property name="isLeft" type="bool" value="true"/>
    </properties>
   </object>

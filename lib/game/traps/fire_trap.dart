@@ -69,6 +69,9 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
     return super.onLoad();
   }
 
+  @override
+  ShapeHitbox get worldHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -101,20 +104,24 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
   Future<void> hitTrap() async {
     if (_isFireActivated) return;
     _isFireActivated = true;
-    game.audioCenter.playSound(SoundEffect.pressurePlate);
+
+    // hit pressure plate
+    game.audioCenter.playSound(Sfx.pressurePlate, SfxType.game);
     current = FireTrapState.hit;
     await animationTickers![FireTrapState.hit]!.completed;
+
+    // fire on
     await Future.delayed(_fireDelayAfterHit);
     _isDamageOn = true;
+    game.audioCenter.playSound(Sfx.jetFlame, SfxType.game);
     current = FireTrapState.on;
+
+    // fire off
     await Future.delayed(_fireDuration);
     current = FireTrapState.off;
     _isDamageOn = false;
     _isFireActivated = false;
   }
-
-  @override
-  ShapeHitbox get worldHitbox => _hitbox;
 }
 
 class _FireTrapEntityCollider extends PositionComponent with EntityCollision, CollisionCallbacks {
@@ -128,19 +135,25 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
 
   @override
   FutureOr<void> onLoad() {
+    _initialSetup();
+    return super.onLoad();
+  }
+
+  @override
+  void onEntityCollision(CollisionSide collisionSide) => onCollide(collisionSide);
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
+  void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }
+
+    // general
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
-    return super.onLoad();
   }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) => onCollide(collisionSide);
 }

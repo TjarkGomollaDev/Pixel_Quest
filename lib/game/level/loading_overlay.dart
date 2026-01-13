@@ -176,10 +176,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     await _dummy.fallIn();
   }
 
-  Future<void> hideOverlay() async {
+  Future<void> hideOverlay({VoidCallback? onAfterDummyFallOut}) async {
     if (!_isShown) return;
     _isShown = false;
     await _dummy.fallOut();
+    onAfterDummyFallOut?.call();
     _particleTimer.pause();
     _stageInfoBg.hide();
     _stageInfoText.hide();

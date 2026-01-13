@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -99,6 +101,12 @@ class RockHead extends PositionComponent
     super.update(dt);
   }
 
+  @override
+  ShapeHitbox get worldHitbox => _hitbox;
+
+  @override
+  double get previousY => _previousY;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -139,10 +147,6 @@ class RockHead extends PositionComponent
     _moveSpeed = _moveSpeedDown;
   }
 
-  // void _calculateYRange() {
-  //   final v = Vector2(_topBorder +  _hitbox.height / 2, _bottomtBorder - _hitbox.center)
-  // }
-
   void _movement(double dt) {
     // change move direction if we reached the borders
     if (position.y >= _bottomtBorder && _moveDirection != -1) {
@@ -166,6 +170,7 @@ class RockHead extends PositionComponent
     } else {
       hitAnimation = RockHeadState.bottomHit;
       _moveSpeed = _moveSpeedUp;
+      game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     }
     _moveDirection = newDirection;
     animationGroupComponent.current = hitAnimation;
@@ -178,10 +183,4 @@ class RockHead extends PositionComponent
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }
-
-  @override
-  ShapeHitbox get worldHitbox => _hitbox;
-
-  @override
-  double get previousY => _previousY;
 }

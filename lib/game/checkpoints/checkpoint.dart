@@ -100,14 +100,14 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     reached = true;
     current = CheckpointState.flagOut;
     _player.reachedCheckpoint(_playerRespawn);
-    game.audioCenter.playSound(SoundEffect.checkpoint);
+    game.audioCenter.playSound(Sfx.checkpoint, SfxType.level);
 
     await animationTickers![CheckpointState.flagOut]!.completed;
     current = CheckpointState.flagIdle;
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.Any;
+  EntityCollisionType get collisionType => EntityCollisionType.any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;

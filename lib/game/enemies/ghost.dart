@@ -116,6 +116,25 @@ class Ghost extends PositionComponent
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (_gotStomped || !_isVisible) return;
+    if (collisionSide == CollisionSide.Top) {
+      _gotStomped = true;
+      _player.bounceUp();
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+
+      // play hit animation and then remove from level
+      animationGroupComponent.current = GhostState.hit;
+      animationGroupComponent.animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
+    } else {
+      _player.collidedWithEnemy(collisionSide);
+    }
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -236,23 +255,4 @@ class Ghost extends PositionComponent
       game.world.add(ghostParticle);
     }
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (_gotStomped || !_isVisible) return;
-    if (collisionSide == CollisionSide.Top) {
-      _gotStomped = true;
-      _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
-
-      // play hit animation and then remove from level
-      animationGroupComponent.current = GhostState.hit;
-      animationGroupComponent.animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
-    } else {
-      _player.collidedWithEnemy(collisionSide);
-    }
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

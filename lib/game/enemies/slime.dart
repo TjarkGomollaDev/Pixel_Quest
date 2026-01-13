@@ -97,6 +97,25 @@ class Slime extends PositionComponent
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    if (_gotStomped) return;
+    if (collisionSide == CollisionSide.Top) {
+      _gotStomped = true;
+      _player.bounceUp();
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+
+      // play hit animation and then remove from level
+      animationGroupComponent.current = SlimeState.hit;
+      animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
+    } else {
+      _player.collidedWithEnemy(collisionSide);
+    }
+  }
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebug) {
@@ -187,23 +206,4 @@ class Slime extends PositionComponent
     final slimeParticle = SlimeParticle(owner: this, spawnOnLeftSide: spawnOnLeftSide, player: _player, position: particlePosition);
     game.world.add(slimeParticle);
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
-      _gotStomped = true;
-      _player.bounceUp();
-      game.audioCenter.playSound(SoundEffect.enemieHit);
-
-      // play hit animation and then remove from level
-      animationGroupComponent.current = SlimeState.hit;
-      animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
-    } else {
-      _player.collidedWithEnemy(collisionSide);
-    }
-  }
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }
