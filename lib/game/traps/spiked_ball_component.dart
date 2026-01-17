@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';

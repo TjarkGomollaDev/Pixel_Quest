@@ -7,8 +7,8 @@ import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/settings_entity.dart';
 import 'package:pixel_adventure/data/storage/entities/world_entity.dart';
-import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils/jump_btn.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class StorageEvent {
@@ -20,8 +20,15 @@ class NewStarsStorageEvent extends StorageEvent {
   final String levelUuid;
   final int totalStars;
   final int newStars;
+  final int levelStars;
 
-  const NewStarsStorageEvent({required this.worldUuid, required this.levelUuid, required this.totalStars, required this.newStars});
+  const NewStarsStorageEvent({
+    required this.worldUuid,
+    required this.levelUuid,
+    required this.totalStars,
+    required this.newStars,
+    required this.levelStars,
+  });
 }
 
 class StorageCenter {
@@ -79,7 +86,13 @@ class StorageCenter {
       final updatedWorld = _cacheWorldData[worldUuid]!.copyWithIncreasedStars(starDiff);
       await saveWorld(updatedWorld, starDiff);
       _onDataChanged.add(
-        NewStarsStorageEvent(worldUuid: worldUuid, levelUuid: data.uuid, totalStars: updatedWorld.stars, newStars: starDiff),
+        NewStarsStorageEvent(
+          worldUuid: worldUuid,
+          levelUuid: data.uuid,
+          totalStars: updatedWorld.stars,
+          newStars: starDiff,
+          levelStars: data.stars,
+        ),
       );
     }
   }

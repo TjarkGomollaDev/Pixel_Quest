@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/debug.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -21,7 +23,7 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// The saw continuously animates while moving and flips direction
 /// once reaching the end of its range. It acts as a passive collision area
 /// that can interact with the [Player].
-class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
+class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -106,6 +108,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
       color: AppTheme.entityMarkerSpecial,
       layer: EntityMiniMapMarkerLayer.behindForeground,
     );
+    configureAmbientLoop(loop: LoopSfx.saw, hitbox: _hitbox);
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);

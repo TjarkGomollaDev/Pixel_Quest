@@ -5,7 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -67,7 +67,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
       _bounced = true;
 
       // is needed, because otherwise the ground collision may reset the y velocity directly back to 0 before the player can even jump off
-      _player.position.y -= 1;
+      _player.adjustPostion(y: -1);
 
       _player.bounceUp(jumpForce: _bounceHeight);
       game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);

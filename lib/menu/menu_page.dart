@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
-import 'package:pixel_adventure/game/level/background_szene.dart';
+import 'package:pixel_adventure/game/utils/background_parallax.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dots_indicator.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
@@ -29,7 +29,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   late final SpriteBtn _nextWorldBtn;
 
   // worlds content
-  final List<BackgroundSzene> _worldBackgrounds = [];
+  final List<BackgroundParallax> _worldBackgrounds = [];
   final List<VisibleSpriteComponent> _worldForegrounds = [];
   final List<VisibleSpriteComponent> _worldTitles = [];
   final List<LevelGrid> _worldLevelGrids = [];
@@ -42,8 +42,10 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   static const double _levelGridChangeWorldBtnsSpacing = 22;
   static const double _levelGridDotsIndicatorSpacing = 14;
 
-  // animation event triggers
-  NewStarsStorageEvent? _pendingWorldStorageEvent;
+  // animation event for new stars
+  NewStarsStorageEvent? _pendingNewStarsEvent;
+  int _animationGuard = 0;
+  bool _menuActive = false;
 
   // flag for animation when world is changing
   bool _isChangingWorld = false;
@@ -65,15 +67,19 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   @override
   void onMount() {
+    _menuActive = true;
     resumeMenu();
     game.setUpCameraForMenu();
-    _checkForNewAnimationEvents();
+    unawaited(_checkForNewStarsEvent());
     game.audioCenter.playBackgroundMusic(BackgroundMusic.menu);
     super.onMount();
   }
 
   @override
   void onRemove() {
+    _menuActive = false;
+    _animationGuard++;
+    _abortNewStarsAnimationAndSync();
     pauseMenu();
     game.audioCenter.stopBackgroundMusic();
     super.onRemove();
@@ -88,32 +94,10 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _setUpSubscription() {
     _sub ??= game.storageCenter.onDataChanged.listen((event) {
       if (event is NewStarsStorageEvent) {
-        _pendingWorldStorageEvent = event;
+        _pendingNewStarsEvent = event;
+        if (_menuActive && !_isChangingWorld) unawaited(_checkForNewStarsEvent());
       }
     });
-  }
-
-  int _getWorldIndex(String worldUuid) {
-    if (worldUuid == game.staticCenter.allWorlds[_currentWorldIndex].uuid) return _currentWorldIndex;
-
-    // fallback
-    return game.staticCenter.allWorlds.getIndexByUUID(worldUuid);
-  }
-
-  Future<void> _checkForNewAnimationEvents() async {
-    if (_pendingWorldStorageEvent == null) return;
-    await Future.delayed(Duration(milliseconds: 800));
-    await _worldLevelGrids[_getWorldIndex(_pendingWorldStorageEvent!.worldUuid)].addNewStarsInTile(
-      levelUuid: _pendingWorldStorageEvent!.levelUuid,
-      stars: _pendingWorldStorageEvent!.newStars,
-    );
-    await Future.delayed(Duration(milliseconds: 200));
-    await _menuTopBar.starsCountAnimation(
-      index: _getWorldIndex(_pendingWorldStorageEvent!.worldUuid),
-      newStars: _pendingWorldStorageEvent!.newStars,
-      totalStars: _pendingWorldStorageEvent!.totalStars,
-    );
-    _pendingWorldStorageEvent = null;
   }
 
   void _setUpCurrentWorldIndex() =>
@@ -121,7 +105,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _setUpWorldBackgrounds() {
     for (var world in game.staticCenter.allWorlds) {
-      final background = BackgroundSzene(
+      final background = BackgroundParallax.szene(
         szene: world.backgroundSzene,
         position: Vector2.zero(),
         size: game.size,
@@ -232,6 +216,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   Future<void> _updateContent(int oldIndex, int newIndex) async {
+    // abort possible new stars animations
+    _animationGuard++;
+    _abortNewStarsAnimationAndSync();
+
+    // update content
     _isChangingWorld = true;
     _dotsIndicator.activeIndex = newIndex;
     _worldBackgrounds[oldIndex].hide();
@@ -255,5 +244,66 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void resumeMenu() {
     timeScale = 1;
     _characterPicker.resume();
+  }
+
+  int _getWorldIndex(String worldUuid) {
+    if (worldUuid == game.staticCenter.allWorlds[_currentWorldIndex].uuid) return _currentWorldIndex;
+
+    // fallback
+    return game.staticCenter.allWorlds.getIndexByUUID(worldUuid);
+  }
+
+  bool _shouldContinue(int guardSnapshot, NewStarsStorageEvent eventSnapshot) {
+    if (!_menuActive) return false;
+    if (!isMounted) return false;
+    if (_animationGuard != guardSnapshot) return false;
+    if (_pendingNewStarsEvent != eventSnapshot) return false;
+    return true;
+  }
+
+  Future<void> _checkForNewStarsEvent() async {
+    // capture current event and gurad
+    final eventSnapshot = _pendingNewStarsEvent;
+    if (eventSnapshot == null) return;
+    final guardSnapshot = _animationGuard;
+    final worldIndex = _getWorldIndex(eventSnapshot.worldUuid);
+
+    // visual delay + continue check
+    await Future.delayed(Duration(milliseconds: 800));
+    if (!_shouldContinue(guardSnapshot, eventSnapshot)) return;
+
+    // new stars in single level tile animation + continue check
+    await _worldLevelGrids[worldIndex].newStarsInTileAnimation(levelUuid: eventSnapshot.levelUuid, newStars: eventSnapshot.newStars);
+    if (!_shouldContinue(guardSnapshot, eventSnapshot)) return;
+
+    // visual delay + continue check
+    await Future.delayed(Duration(milliseconds: 200));
+    if (!_shouldContinue(guardSnapshot, eventSnapshot)) return;
+
+    // new stars in total count animation + continue check
+    await _menuTopBar.starsCountAnimation(index: worldIndex, newStars: eventSnapshot.newStars, totalStars: eventSnapshot.totalStars);
+    if (!_shouldContinue(guardSnapshot, eventSnapshot)) return;
+
+    // animation has been run through completely and the event has thus been processed
+    _pendingNewStarsEvent = null;
+  }
+
+  void _abortNewStarsAnimationAndSync() {
+    // capture current event
+    final eventSnapshot = _pendingNewStarsEvent;
+    if (eventSnapshot == null) return;
+
+    final worldIndex = _getWorldIndex(eventSnapshot.worldUuid);
+
+    // stop any running animations so nothing resumes later
+    _worldLevelGrids[worldIndex].cancelNewStarsInTileAnimation(levelUuid: eventSnapshot.levelUuid);
+    _menuTopBar.cancelStarsCountAnimation();
+
+    // sync UI to final values
+    _worldLevelGrids[worldIndex].setStarsInTile(levelUuid: eventSnapshot.levelUuid, stars: eventSnapshot.levelStars);
+    _menuTopBar.setStarsCount(index: worldIndex, totalStars: eventSnapshot.totalStars);
+
+    // clear pending event
+    _pendingNewStarsEvent = null;
   }
 }

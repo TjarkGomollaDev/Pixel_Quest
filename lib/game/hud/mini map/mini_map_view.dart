@@ -4,7 +4,7 @@ import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
@@ -99,13 +99,12 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
 
   @override
   void update(double dt) {
-    final playerX = _player.hitbox.center.dx;
+    final playerX = _player.hitboxAbsoluteRect.center.dx;
 
     // detect if the player moved horizontally, if that is the case automatic follow mode should re-activate
     if ((playerX - _lastPlayerX).abs() > 0.1) _manualScrollActive = false;
     if (!_manualScrollActive) _setWorldOffset(playerX * _worldToMiniMapScale - _halfTargetWidth);
     _lastPlayerX = playerX;
-
     super.update(dt);
   }
 
@@ -154,7 +153,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   /// Initializes marker sizes and paints for the player and all entity markers.
   void _setUpMarker() {
     _playerMarkerPaint = Paint()..color = AppTheme.playerMarker;
-    _playerMarkerSize = _player.hitboxSize.y * _worldToMiniMapScale;
+    _playerMarkerSize = _player.hitboxLocalSize.y * _worldToMiniMapScale;
     _entityMarkerPaint = Paint();
     _entityMarkerPlatformSize = Vector2(2, 1) * _spriteToMiniMapScale;
   }
@@ -183,8 +182,8 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
 
   /// Renders the player marker in the mini map using the chosen marker style.
   void _renderPlayerMarker(Canvas canvas) {
-    final x = _player.hitbox.center.dx * _worldToMiniMapScale;
-    final y = _player.hitbox.center.dy * _worldToMiniMapScale;
+    final x = _player.hitboxAbsoluteRect.center.dx * _worldToMiniMapScale;
+    final y = _player.hitboxAbsoluteRect.center.dy * _worldToMiniMapScale;
 
     return switch (_playerMarker) {
       PlayerMiniMapMarkerType.circle => _renderCirclePlayerMarker(canvas, x, y),

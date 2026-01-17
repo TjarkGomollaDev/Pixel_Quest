@@ -20,6 +20,7 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
     if (previousRoute is WorldRoute && previousRoute.world is DecoratedWorld) {
       (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
       (previousRoute.world as DecoratedWorld).timeScale = 0;
+      (previousRoute.world as Level).hideMobildControls();
       unawaited(game.audioCenter.pauseAllLoops());
     }
   }
@@ -29,6 +30,7 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
     if (nextRoute is WorldRoute && nextRoute.world is DecoratedWorld) {
       (nextRoute.world as DecoratedWorld).decorator = null;
       (nextRoute.world as DecoratedWorld).timeScale = 1;
+      (nextRoute.world as Level).showMobileControls();
       unawaited(game.audioCenter.resumeAllLoops());
     }
   }

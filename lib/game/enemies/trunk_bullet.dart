@@ -6,7 +6,7 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';

@@ -38,6 +38,8 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   // animation star
   late final Star _animatedStar;
+  late final Vector2 _animatedStarStart;
+  int _starsCountToken = 0;
 
   // count settings
   static const double _bgSize = 19;
@@ -76,7 +78,11 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // star item
-    _starItem = Star(position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter), size: Vector2.all(16));
+    _starItem = Star(
+      variant: StarVariant.filled,
+      position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter),
+      size: Vector2.all(16),
+    );
     addAll([_starBg, _starItem]);
 
     // world star counts text
@@ -94,7 +100,8 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _setUpAnimatedStar() {
-    _animatedStar = Star(position: Vector2(_starItem.position.x, -position.y - _starItem.size.y / 2), size: _starItem.size);
+    _animatedStarStart = Vector2(_starItem.position.x, -position.y - _starItem.size.y / 2);
+    _animatedStar = Star(variant: StarVariant.filled, position: _animatedStarStart, size: _starItem.size);
     add(_animatedStar);
   }
 
@@ -126,11 +133,21 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void hideStarsCount(int index) => _worldStarsCounts[index].hide();
 
+  void setStarsCount({required int index, required int totalStars}) => _updateStarsCount(index: index, stars: totalStars);
+
   Future<void> starsCountAnimation({required int index, required int newStars, required int totalStars}) async {
+    final token = ++_starsCountToken;
     for (var i = 0; i < newStars; i++) {
+      if (token != _starsCountToken) return;
       _updateStarsCount(index: index, stars: totalStars - newStars + i + 1);
       await _animatedStar.fallTo(_starItem.position);
+      if (token != _starsCountToken) return;
       await Future.delayed(Duration(milliseconds: 50));
     }
+  }
+
+  void cancelStarsCountAnimation() {
+    _starsCountToken++;
+    _animatedStar.cancelAnimations();
   }
 }

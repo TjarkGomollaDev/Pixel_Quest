@@ -5,7 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -90,13 +90,13 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
   }
 
   void _setUpRespawn() => _playerRespawn = Vector2(
-    position.x + _hitbox.position.x + _hitbox.width - _player.hitboxPosition.x + _offset,
+    position.x + _hitbox.position.x + _hitbox.width - _player.hitboxLocalPosition.x + _offset,
     position.y + height - _player.height,
   );
 
   @override
   Future<void> onEntityCollision(CollisionSide collisionSide) async {
-    if (reached || _playerRespawn.x < _player.startPosition.x) return;
+    if (reached || _playerRespawn.x < _player.respawnPosition.x) return;
     reached = true;
     current = CheckpointState.flagOut;
     _player.reachedCheckpoint(_playerRespawn);

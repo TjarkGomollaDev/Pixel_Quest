@@ -10,11 +10,13 @@ import 'package:pixel_adventure/pixel_quest.dart';
 /// except for a circular area around a target center. Can animate
 /// shrinking the circle to reveal or hide the world.
 class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
+  // constructor parameters
   final Vector2 targetCenter;
   final double targetRadius;
 
   Spotlight({required this.targetCenter, this.targetRadius = 50});
 
+  // spotlight radius
   late double radius;
 
   @override

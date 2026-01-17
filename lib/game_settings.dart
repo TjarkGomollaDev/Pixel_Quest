@@ -4,21 +4,24 @@ abstract class GameSettings {
   // custom debug mode
   static const bool customDebug = false;
 
-  // mobile
-  static const bool showMobileControls = false;
+  // mobile cotrols
+  static const bool showMobileControls = true;
+  static const double joystickRadius = 32;
+  static const double knobRadius = 14;
+  static const double jumpBtnRadius = 18;
 
   // tiled map dimensions
   static const double tileSize = 16;
   static const double mapHeight = 320;
   static const double mapBorderWidth = tileSize / 2;
+  static const bool hasBorder = mapBorderWidth != 0;
 
   // animation settings
   static const double stepTime = 0.05;
   static const double finishSpotlightAnimationRadius = 60;
 
-  // margin HUD elements
-  static const double hudMargin = 32;
-  static const double hudMobileControlsSize = 64;
+  // hud
+  static const double hudVerticalMargin = 10;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -35,7 +38,6 @@ abstract class GameSettings {
   static const int spotlightAnimationContentLayer = 19;
   static const int playerLayerLevel = 20;
   static const int hudElementsLayer = 30;
-
   static const int chracterPicker = 10;
 
   // default spawn values
@@ -59,7 +61,9 @@ abstract class GameSettings {
   static const int spikedBallSwingArcDec = 170;
   static const int spikedBallSwingSpeed = 320;
 
-  // parallax background
+  // background
   static final Vector2 parallaxBaseVelocityLevel = Vector2(0.5, 0);
   static final Vector2 parallaxBaseVelocityLoadingOverlay = Vector2(10, 0);
+  static final Vector2 coloredBaseVelocity = Vector2(0, 40);
+  static final Vector2 velocityMultiplierDelta = Vector2(1.8, 0);
 }

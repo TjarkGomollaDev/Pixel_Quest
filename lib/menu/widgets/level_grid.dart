@@ -90,5 +90,10 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Has
     return completer.future;
   }
 
-  Future<void> addNewStarsInTile({required String levelUuid, required int stars}) async => await _grid[levelUuid]?.addNewStars(stars);
+  void setStarsInTile({required String levelUuid, required int stars}) => _grid[levelUuid]?.setStars(stars);
+
+  Future<void> newStarsInTileAnimation({required String levelUuid, required int newStars}) async =>
+      await _grid[levelUuid]?.newStarsAnimation(newStars);
+
+  void cancelNewStarsInTileAnimation({required String levelUuid}) => _grid[levelUuid]?.cancelNewStarsAnimation();
 }

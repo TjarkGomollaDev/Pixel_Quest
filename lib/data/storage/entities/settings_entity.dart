@@ -1,6 +1,6 @@
 import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/utils/jump_btn.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
 
 double _clamp01(double value) => value.toDouble().clamp(0, 1);
 

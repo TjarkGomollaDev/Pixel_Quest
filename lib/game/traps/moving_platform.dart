@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -178,7 +178,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     // movement
     final moveY = (position.y + _moveDirection * _moveSpeed * dt).clamp(_rangeNeg, _rangePos) - position.y;
     position.y += moveY;
-    if (_playerOnTop) _player.position.y += moveY;
+    if (_playerOnTop) _player.adjustPostion(y: moveY);
   }
 
   // moves the saw horizontally and changes direction if the end of the range is reached
@@ -194,7 +194,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     // movement
     final moveX = (position.x + _moveDirection * _moveSpeed * dt).clamp(_leftBorder, _rightBorder) - position.x;
     position.x += moveX;
-    if (_playerOnTop) _player.position.x += moveX;
+    if (_playerOnTop) _player.adjustPostion(x: moveX);
   }
 
   void _changeDirection(int newDirection) {

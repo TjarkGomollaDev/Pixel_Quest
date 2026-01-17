@@ -1,4 +1,4 @@
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/l10n/app_localizations.dart';
 
 typedef CharacterBioStrings = ({String name, String origin, String ability});

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:pixel_adventure/game/level/background_szene.dart';
+import 'package:pixel_adventure/game/utils/background_parallax.dart';
 
 enum LevelBaseBlock {
   gras,
@@ -19,7 +19,7 @@ class WorldMetadata {
   final String titleFileName;
   final String foregroundFileName;
   final String miniMapFrameFileName;
-  final Szene backgroundSzene;
+  final BackgroundSzene backgroundSzene;
   final LevelBaseBlock baseBlock;
 
   const WorldMetadata._({
@@ -41,7 +41,7 @@ class WorldMetadata {
       titleFileName: map['titleFileName'] as String,
       foregroundFileName: map['foregroundFileName'] as String,
       miniMapFrameFileName: map['miniMapFrameFileName'] as String,
-      backgroundSzene: Szene.fromName(map['backgroundSzene'] as String),
+      backgroundSzene: BackgroundSzene.fromName(map['backgroundSzene'] as String),
       baseBlock: LevelBaseBlock.fromName(map['baseBlock'] as String),
     );
   }

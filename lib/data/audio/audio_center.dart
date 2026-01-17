@@ -220,7 +220,7 @@ class AudioCenter {
 
       // start the loop, with a fade-in if desired
       final initialVolume = fadeIn ? 0.0 : _sfxVolume;
-      final player = await FlameAudio.loop(loop.path, volume: initialVolume);
+      final player = await FlameAudio.loop(loop.path, volume: initialVolume, audioContext: AudioContext());
 
       // if the sound has been muted in the meantime, the player can be deleted immediately
       if (token != _loopGlobalToken || !_wantLoop(loop) || effectiveSfxVolume == 0 || _gameSfxMuted) {
@@ -264,7 +264,7 @@ class AudioCenter {
   }
 
   Future<void> _fadeOutThenMaybeDispose(LoopSfx loop, AudioPlayer expectedPlayer) async {
-    await _fadeLoopTo(loop, 0.0, _loopFadeOutDuration);
+    await _fadeLoopTo(loop, 0, _loopFadeOutDuration);
 
     // if it became desired again, keep it
     if (_wantLoop(loop)) return;

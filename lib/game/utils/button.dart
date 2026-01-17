@@ -101,9 +101,13 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   bool _holdMode = false;
   bool _isHeld = false;
 
+  // tap down is required before tap up
+  bool _hadTapDown = false;
+
   @override
   void onTapDown(TapDownEvent event) {
     if (!_canReceiveTap) return;
+    _hadTapDown = true;
     scale = _maxScale;
     if (_holdMode) _isHeld = true;
     game.audioCenter.playSound(Sfx.tap, SfxType.ui);
@@ -112,6 +116,9 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
 
   @override
   void onTapUp(TapUpEvent event) {
+    if (!_hadTapDown) return;
+    _hadTapDown = false;
+
     if (!_canReceiveTap) return;
     scale = _normalScale;
     if (!_holdMode) {
@@ -131,6 +138,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
 
   @override
   void onTapCancel(TapCancelEvent event) {
+    _hadTapDown = false;
     if (!_canReceiveTap) return;
     scale = _normalScale;
     if (_holdMode) _isHeld = false;

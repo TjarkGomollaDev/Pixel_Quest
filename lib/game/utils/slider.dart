@@ -27,10 +27,10 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
   static final double defaultHeight = _SliderThumb._thumbSize.y;
 
   // styling
-  static const double _trackHeight = 6;
-  static const Color _trackColorEnabled = AppTheme.grayLight3;
-  static const Color _trackColorDisabled = AppTheme.grayDark1;
-  static const Color _fillColor = AppTheme.greenDark;
+  static const double _trackHeight = 6; // [Adjustable]
+  static const Color _trackColorEnabled = AppTheme.grayLight3; // [Adjustable]
+  static const Color _trackColorDisabled = AppTheme.grayDark1; // [Adjustable]
+  static const Color _fillColor = AppTheme.greenDark; // [Adjustable]
 
   // layer
   late final RRectComponent _track;
@@ -77,6 +77,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
   @override
   bool onTapDown(TapDownEvent event) {
     if (!_enabled) return true;
+
     // ignore tap on thumb
     if (_thumb.toRect().contains(Offset(event.localPosition.x, event.localPosition.y))) return true;
 
@@ -151,14 +152,9 @@ class _SliderThumb extends PositionComponent {
   _SliderThumb({super.position}) : super(size: _thumbSize, anchor: Anchor.center);
 
   // styling
-  static final Vector2 _thumbSize = Vector2(8, 12);
-  static const Color _thumbColor = AppTheme.grayDark3;
-  static const Color _lineColor = AppTheme.grayDark6;
-
-  // layer
-  late final RRectComponent _bg;
-  late final RRectComponent _upperLine;
-  late final RRectComponent _lowerLine;
+  static final Vector2 _thumbSize = Vector2(8, 12); // [Adjustable]
+  static const Color _thumbColor = AppTheme.grayDark3; // [Adjustable]
+  static const Color _lineColor = AppTheme.grayDark6; // [Adjustable]
 
   @override
   Future<void> onLoad() async {
@@ -168,24 +164,24 @@ class _SliderThumb extends PositionComponent {
 
   void _setUpThumb() {
     // background
-    _bg = RRectComponent(size: size, anchor: Anchor.topLeft, borderRadius: 3, color: _thumbColor);
+    final bg = RRectComponent(size: size, anchor: Anchor.topLeft, borderRadius: 3, color: _thumbColor);
 
     // lines
-    _upperLine = RRectComponent(
+    final upperLine = RRectComponent(
       color: _lineColor,
       size: Vector2(size.x - 4, 1),
       position: Vector2(size.x / 2, 2 / 5 * size.y),
       borderRadius: 2,
       anchor: Anchor.center,
     );
-    _lowerLine = RRectComponent(
+    final lowerLine = RRectComponent(
       color: _lineColor,
-      size: _upperLine.size,
+      size: upperLine.size,
       position: Vector2(size.x / 2, 3 / 5 * size.y),
-      borderRadius: _upperLine.borderRadius,
-      anchor: _upperLine.anchor,
+      borderRadius: upperLine.borderRadius,
+      anchor: upperLine.anchor,
     );
 
-    addAll([_bg, _upperLine, _lowerLine]);
+    addAll([bg, upperLine, lowerLine]);
   }
 }

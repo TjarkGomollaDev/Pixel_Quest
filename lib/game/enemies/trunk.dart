@@ -8,8 +8,9 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/trunk_bullet.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -335,6 +336,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     current = TrunkState.attack;
     await animationTickers![TrunkState.attack]!.completed;
     if (!_isShooting || _gotStomped) return;
+    game.audioCenter.playSoundIf(Sfx.enemieShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     _spawnBullet();
     current = TrunkState.idle;
   }

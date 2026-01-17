@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/l10n/app_localizations_extensions.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 

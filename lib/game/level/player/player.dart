@@ -5,7 +5,6 @@ import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -15,12 +14,13 @@ import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/level/player_special_effect.dart';
+import 'package:pixel_adventure/game/level/player/player_effects.dart';
 import 'package:pixel_adventure/game/traps/fire_trap.dart';
 import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
@@ -57,14 +57,13 @@ enum PlayerCharacter {
 }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameReference<PixelQuest>, HasWorldReference<Level>, KeyboardHandler, CollisionCallbacks, HasVisibility {
+    with HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks, HasVisibility {
   // constructor parameters
   final PlayerCharacter _character;
-  Vector2 _startPosition;
 
   Player({PlayerCharacter character = PlayerCharacter.maskDude, required Vector2 startPosition})
     : _character = character,
-      _startPosition = startPosition,
+      _respawnPosition = startPosition,
       super(position: startPosition, size: gridSize);
 
   // size
@@ -73,7 +72,7 @@ class Player extends SpriteAnimationGroupComponent
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(9, 4), size: Vector2(14, 28));
 
-  // these are the correct x and y values for the player hitbox, the x values are cleaned up from the horizontal flip
+  // these are the correct x and y values for the player hitbox in absolute space, the x values are cleaned up from the horizontal flip
   late double hitboxLeft;
   late double hitboxRight;
   late double hitboxTop;
@@ -84,50 +83,50 @@ class Player extends SpriteAnimationGroupComponent
   static const String _path = 'Main Characters/';
   static const String _pathEnd = ' (32x32).png';
 
+  // special effects object for the player
+  late final PlayerEffects _effect;
+
   // gravity
-  final double _gravity = 570;
-  final double _jumpForce = 310;
-  final double _doubleJumpForce = 250;
-  final double _terminalVelocity = 300;
-  bool isOnGround = false;
+  final double _gravity = 570; // [Adjustable]
+  final double _jumpForce = 310; // [Adjustable]
+  final double _doubleJumpForce = 250; // [Adjustable]
+  final double _terminalVelocity = 300; // [Adjustable]
+  bool _isOnGround = false;
 
   // movement
-  double _horizontalMovement = 0;
-  final double _moveSpeed = 100;
-  Vector2 velocity = Vector2.zero();
+  double _moveX = 0; // -1, 0, or 1
+  final double _moveSpeed = 100; // [Adjustable]
+  Vector2 _velocity = Vector2.zero();
 
   // jump
-  bool hasJumped = false;
-
-  // double jump
-  bool canDoubleJump = true;
-  bool hasDoubleJumped = false;
+  bool _hasJumped = false;
+  bool _hasDoubleJumped = false;
+  bool _canDoubleJump = true;
 
   // if true all collisions are deactivated, only the world collision is always on
-  bool _spawnProtection = true;
+  bool _isSpawnProtectionActive = true;
 
   // if true the world collision is also deactivated
-  bool isWorldCollisionActive = false;
+  bool _isWorldCollisionActive = false;
 
-  // if the true the player state is not automatically updated
-  bool _isPlayerStateActive = false;
+  // if true the player state is not automatically updated
+  bool _isAnimationStateActive = false;
 
   // if true gravity is active
   bool _isGravityActive = false;
 
-  // special effect
-  late final PlayerSpecialEffect _effect;
+  // true until the player lands on the start platform and the level officially begins
+  bool _isLevelStarting = true;
 
-  // spawn position
-  late final Vector2 _spawnPosition;
-  final double _spawnDropFall = 60;
+  // the player is reset to this position when he dies, changes when a new checkpoint is reached
+  Vector2 _respawnPosition;
 
-  // joystick for mobile
-  JoystickComponent? _joystick;
-  JoystickDirection _lastJoystickDirection = JoystickDirection.idle;
+  // spawn position when the player appears in level and falls down onto the start platform
+  late final Vector2 _spawnInLevelPosition;
+  final double _spawnInLevelFallHeight = 60; // [Adjustable]
 
-  // respawn notifier
-  final PlayerRespawnNotifier respawnNotifier = PlayerRespawnNotifier();
+  // listeners are notified if the player dies and respawns
+  final PlayerRespawnNotifier _respawnNotifier = PlayerRespawnNotifier();
 
   // completer to detect when the player is back on the ground
   Completer<void>? _isOnGroundCompleter;
@@ -136,13 +135,21 @@ class Player extends SpriteAnimationGroupComponent
   Completer<void>? _isAtXCompleter;
   double? _targetX;
 
-  bool _levelStart = true;
+  // getter
+  Vector2 get respawnPosition => _respawnPosition;
+  PlayerRespawnNotifier get respawnNotifier => _respawnNotifier;
+
+  // getter hitbox related
+  Vector2 get hitboxLocalPosition => _hitbox.position;
+  Vector2 get hitboxLocalSize => _hitbox.size;
+  Vector2 get hitboxAbsolutePosition => Vector2(hitboxLeft, hitboxTop);
+  Rect get hitboxAbsoluteRect => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
 
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
-    _updateHitboxEdges();
+    _setUpSpecialEffects();
     _setUpSpawnPosition();
     return super.onLoad();
   }
@@ -150,60 +157,38 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void update(double dt) {
     _updateHitboxEdges(); // must be done before updatePlayerMovement, important for world collision
-    _updatePlayerMovement(dt);
-    if (_isGravityActive) _applyGravity(dt);
-    if (_isPlayerStateActive) _updatePlayerState();
-    if (!_spawnProtection && _joystick != null) updateJoystick();
-    if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && isOnGround) _isOnGroundCompleter!.complete();
-    if (_isAtXCompleter != null && !_isAtXCompleter!.isCompleted && _targetX == null) _isAtXCompleter!.complete();
+    _applyInput();
+    _updateMovement(dt);
+    _updateGravity(dt);
+    unawaited(_updateAnimationState());
+    _checkCompleter();
     super.update(dt);
   }
 
   @override
-  bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (_spawnProtection || (game.world as DecoratedWorld).timeScale == 0) return false;
-
-    _horizontalMovement = 0;
-    final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA) || keysPressed.contains(LogicalKeyboardKey.arrowLeft);
-    final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD) || keysPressed.contains(LogicalKeyboardKey.arrowRight);
-    _horizontalMovement += isLeftKeyPressed ? -1 : 0;
-    _horizontalMovement += isRightKeyPressed ? 1 : 0;
-
-    // only set to true once when the space bar is actually pressed again
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space && isOnGround) {
-      hasJumped = true;
-    } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space && !hasDoubleJumped && canDoubleJump) {
-      hasDoubleJumped = true;
-      canDoubleJump = false;
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (_isWorldCollisionActive) {
+      if (other is WorldCollision) onWorldCollision(other);
+      if (_isSpawnProtectionActive) return super.onCollision(intersectionPoints, other);
+      if (other is EntityCollision) onEntityCollision(other);
+    } else if (_isLevelStarting && other is Start) {
+      _landedOnStartPlatform(other);
     }
-
-    return super.onKeyEvent(event, keysPressed);
+    super.onCollision(intersectionPoints, other);
   }
 
   @override
   void onCollisionEnd(PositionComponent other) {
-    if (_spawnProtection) return super.onCollisionEnd(other);
+    if (_isSpawnProtectionActive) return super.onCollisionEnd(other);
     if (other is WorldCollisionEnd) other.onWorldCollisionEnd();
     if (other is EntityCollisionEnd) other.onEntityCollisionEnd();
     super.onCollisionEnd(other);
   }
 
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (isWorldCollisionActive) {
-      if (other is WorldCollision) onWorldCollision(other);
-      if (_spawnProtection) return super.onCollision(intersectionPoints, other);
-      if (other is EntityCollision) onEntityCollision(other);
-    } else if (_levelStart && other is Start) {
-      _landedOnPlatformStartLevel(other);
-    }
-    super.onCollision(intersectionPoints, other);
-  }
-
   void onEntityCollision(EntityCollision other) {
     // two rects
     final otherRect = other.entityHitbox.toAbsoluteRect();
-    final playerRect = hitbox;
+    final playerRect = hitboxAbsoluteRect;
 
     // intersection check
     final hasVerticalIntersection = checkVerticalIntersection(playerRect, otherRect);
@@ -236,7 +221,7 @@ class Player extends SpriteAnimationGroupComponent
   void onWorldCollision(WorldCollision other) {
     // two rects
     final worldBlockRect = other.worldHitbox.toAbsoluteRect();
-    final playerRect = hitbox;
+    final playerRect = hitboxAbsoluteRect;
 
     // intersection check
     final hasVerticalIntersection = checkVerticalIntersection(playerRect, worldBlockRect);
@@ -285,48 +270,48 @@ class Player extends SpriteAnimationGroupComponent
 
   void _resolveTopWorldCollision(double blockTop, WorldCollision other) {
     position.y = blockTop - _hitbox.position.y - _hitbox.height;
-    velocity.y = 0;
-    isOnGround = true;
-    canDoubleJump = true;
+    _velocity.y = 0;
+    _isOnGround = true;
+    _canDoubleJump = true;
     if (other is MovingPlatform) other.playerOnTop();
     if (other is Finish) other.reachedFinish();
     if (other is FireTrap) other.hitTrap();
   }
 
   void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
-    if (isOnGround) {
+    if (_isOnGround) {
       _respawn(CollisionSide.Bottom);
     } else {
       position.y = blockBottom - _hitbox.position.y;
-      velocity.y = 0;
+      _velocity.y = 0;
 
       // reset can double jump if the player hits their head
-      canDoubleJump = false;
+      _canDoubleJump = false;
       if (other is MovingPlatform && other.isVertical && other.moveDirection == 1) position.y += 1;
     }
   }
 
   void _resolveLeftWorldCollision(double blockLeft) {
     position.x = (scale.x < 0) ? blockLeft + _hitbox.position.x : blockLeft - _hitbox.position.x - _hitbox.width;
-    velocity.x = 0;
+    _velocity.x = 0;
   }
 
   void _resolveRightWorldCollision(double blockRight) {
     position.x = (scale.x < 0) ? blockRight + _hitbox.position.x + _hitbox.width : blockRight - _hitbox.position.x;
-    velocity.x = 0;
+    _velocity.x = 0;
   }
 
   void _resolveOneWayTopCollision(double playerBottom, double top, bool hasHorizontalIntersection, WorldCollision other) {
-    if ((velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopWorldCollision(top, other);
+    if ((_velocity.y > 0 && playerBottom <= top && hasHorizontalIntersection)) _resolveTopWorldCollision(top, other);
   }
 
-  void _landedOnPlatformStartLevel(WorldCollision other) {
-    _levelStart = false;
-    isWorldCollisionActive = true;
-    _spawnProtection = false;
+  void _landedOnStartPlatform(WorldCollision other) {
+    _isLevelStarting = false;
+    _isWorldCollisionActive = true;
+    _isSpawnProtectionActive = false;
     game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
     game.audioCenter.unmuteGameSfx();
-    world.showGameHud();
+    world.showOverlayOnStart();
     onWorldCollision(other);
   }
 
@@ -342,28 +327,6 @@ class Player extends SpriteAnimationGroupComponent
     add(_hitbox);
   }
 
-  void setJoystick(JoystickComponent joystick) => _joystick = joystick;
-
-  void updateJoystick() {
-    if (_joystick!.direction == _lastJoystickDirection) return;
-    _lastJoystickDirection = _joystick!.direction;
-    switch (_joystick!.direction) {
-      case JoystickDirection.left:
-      case JoystickDirection.upLeft:
-      case JoystickDirection.downLeft:
-        _horizontalMovement = -1;
-        break;
-      case JoystickDirection.right:
-      case JoystickDirection.upRight:
-      case JoystickDirection.downRight:
-        _horizontalMovement = 1;
-        break;
-      case JoystickDirection.idle:
-        _horizontalMovement = 0;
-      default:
-    }
-  }
-
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<PlayerState>(
       game,
@@ -376,122 +339,159 @@ class Player extends SpriteAnimationGroupComponent
     current = PlayerState.idle;
   }
 
-  void _setUpSpawnPosition() {
-    isVisible = false;
-    _spawnPosition = _startPosition - Vector2(0, _spawnDropFall);
-    position = _spawnPosition;
-    _effect = PlayerSpecialEffect(player: this);
+  void _setUpSpecialEffects() {
+    _effect = PlayerEffects(player: this);
     world.add(_effect);
   }
 
-  Future<void> _updatePlayerState() async {
+  void _setUpSpawnPosition() {
+    isVisible = false;
+    _spawnInLevelPosition = _respawnPosition - Vector2(0, _spawnInLevelFallHeight);
+    position = _spawnInLevelPosition;
+  }
+
+  void _updateHitboxEdges() {
+    hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
+    hitboxRight = hitboxLeft + _hitbox.width;
+    hitboxTop = position.y + _hitbox.position.y;
+    hitboxBottom = hitboxTop + _hitbox.height;
+  }
+
+  void _applyInput() {
+    if (_isSpawnProtectionActive || (game.world as DecoratedWorld).timeScale == 0) return;
+
+    // horizontal movement handling
+    _moveX = world.playerInput.moveX;
+
+    // jump handling
+    if (world.playerInput.jumped && _isOnGround) {
+      _hasJumped = true;
+    } else if (world.playerInput.jumped && !_hasDoubleJumped && _canDoubleJump) {
+      _hasDoubleJumped = true;
+      _canDoubleJump = false;
+    }
+
+    world.playerInput.clearInput();
+  }
+
+  void _updateMovement(double dt) {
+    // update vertical movement, meaning jump and gravity
+    if (_hasJumped && _isOnGround) {
+      _playerJump(dt);
+    } else if (_hasDoubleJumped && !_hasJumped) {
+      _playerDoubleJump(dt);
+    }
+    if (_velocity.y > _gravity) _isOnGround = false;
+
+    // update horizontal movement
+    _velocity.x = _moveX * _moveSpeed;
+    if (_isAtXCompleter != null && _targetX != null) {
+      if (_moveX == 1) {
+        position.x = (position.x + _velocity.x * dt).clamp(double.negativeInfinity, _targetX!);
+      } else if (_moveX == -1) {
+        position.x = (position.x + _velocity.x * dt).clamp(_targetX!, double.infinity);
+      }
+      if (position.x == _targetX) {
+        _moveX = 0;
+        _targetX = null;
+      }
+    } else {
+      position.x += _velocity.x * dt;
+    }
+  }
+
+  void _playerJump(double dt) {
+    _velocity.y = -_jumpForce;
+    _isOnGround = false;
+    _hasJumped = false;
+    game.audioCenter.playSound(Sfx.jump, SfxType.player);
+  }
+
+  void _playerDoubleJump(double dt) {
+    _velocity.y = -_doubleJumpForce;
+    _isOnGround = false;
+    _hasDoubleJumped = false;
+    current = PlayerState.doubleJump;
+    game.audioCenter.playSound(Sfx.doubleJump, SfxType.player);
+  }
+
+  void _updateGravity(double dt) {
+    if (!_isGravityActive) return;
+    _velocity.y += _gravity * dt;
+    _velocity.y = _velocity.y.clamp(double.negativeInfinity, _terminalVelocity);
+    position.y += _velocity.y * dt;
+  }
+
+  Future<void> _updateAnimationState() async {
+    if (!_isAnimationStateActive) return;
+
     // wait if double jump animation is currently running
     if (current == PlayerState.doubleJump) {
       await animationTickers![PlayerState.doubleJump]!.completed;
 
       // prevents race condition during respawn
-      if (!_isPlayerStateActive) return;
+      if (!_isAnimationStateActive) return;
     }
 
     // flip when facing another direction
-    if (velocity.x < 0 && scale.x > 0) {
+    if (_velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
-    } else if (velocity.x > 0 && scale.x < 0) {
+    } else if (_velocity.x > 0 && scale.x < 0) {
       flipHorizontallyAroundCenter();
     }
 
     // update state
     PlayerState playerState = PlayerState.idle;
-    if (velocity.x > 0 || velocity.x < 0 && isOnGround) playerState = PlayerState.run;
-    if (velocity.y > 0 && !isOnGround) playerState = PlayerState.fall;
-    if (velocity.y < 0 && !isOnGround) playerState = PlayerState.jump;
+    if (_velocity.x > 0 || _velocity.x < 0 && _isOnGround) playerState = PlayerState.run;
+    if (_velocity.y > 0 && !_isOnGround) playerState = PlayerState.fall;
+    if (_velocity.y < 0 && !_isOnGround) playerState = PlayerState.jump;
     current = playerState;
   }
 
-  void _updatePlayerMovement(double dt) {
-    if (hasJumped && isOnGround) {
-      _playerJump(dt);
-    } else if (hasDoubleJumped && !hasJumped) {
-      _playerDoubleJump(dt);
-    }
-    if (velocity.y > _gravity) isOnGround = false;
-
-    velocity.x = _horizontalMovement * _moveSpeed;
-    if (_isAtXCompleter != null && _targetX != null) {
-      if (_horizontalMovement == 1) {
-        position.x = (position.x + velocity.x * dt).clamp(double.negativeInfinity, _targetX!);
-      } else if (_horizontalMovement == -1) {
-        position.x = (position.x + velocity.x * dt).clamp(_targetX!, double.infinity);
-      }
-      if (position.x == _targetX) {
-        _horizontalMovement = 0;
-        _targetX = null;
-      }
-    } else {
-      position.x += velocity.x * dt;
-    }
-  }
-
-  void _playerJump(double dt) {
-    velocity.y = -_jumpForce;
-    isOnGround = false;
-    hasJumped = false;
-    game.audioCenter.playSound(Sfx.jump, SfxType.player);
-  }
-
-  void _playerDoubleJump(double dt) {
-    velocity.y = -_doubleJumpForce;
-    isOnGround = false;
-    hasDoubleJumped = false;
-    current = PlayerState.doubleJump;
-    game.audioCenter.playSound(Sfx.doubleJump, SfxType.player);
-  }
-
-  void _applyGravity(double dt) {
-    velocity.y += _gravity * dt;
-    velocity.y = velocity.y.clamp(double.negativeInfinity, _terminalVelocity);
-    position.y += velocity.y * dt;
+  void _checkCompleter() {
+    if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && _isOnGround) _isOnGroundCompleter!.complete();
+    if (_isAtXCompleter != null && !_isAtXCompleter!.isCompleted && _targetX == null) _isAtXCompleter!.complete();
   }
 
   Future<void> spawnInLevel() async {
     // play appearing animation
     game.audioCenter.playSound(Sfx.appearing, SfxType.level);
-    await _effect.playAppearing(_spawnPosition);
-    _isPlayerStateActive = true;
+    await _effect.playAppearing(_spawnInLevelPosition);
+    _isAnimationStateActive = true;
     _isGravityActive = true;
     isVisible = true;
 
-    // spawn protection is deactivated as soon as the player lands on the starting platform, take a look at onCollision
+    // spawn protection is deactivated as soon as the player lands on the start platform, take a look at onCollision
   }
 
   Future<void> _waitUntilPlayerIsOnGround() {
     _isOnGroundCompleter = Completer<void>();
-    return _isOnGroundCompleter!.future;
+    return _isOnGroundCompleter!.future.whenComplete(() => _updateHitboxEdges());
   }
 
-  Future<void> _waitUntilPlayerIsAtFinishCenter(double newTargetX) {
-    if (hitbox.center.dx < newTargetX) {
+  Future<void> _waitUntilPlayerIsAtX(double newTargetX) {
+    if (hitboxAbsoluteRect.center.dx < newTargetX) {
       if (scale.x < 0) flipHorizontallyAroundCenter();
-      _horizontalMovement = 1;
+      _moveX = 1;
       _targetX = newTargetX - _hitbox.position.x - _hitbox.width / 2;
-    } else if (hitbox.center.dx > newTargetX) {
+    } else if (hitboxAbsoluteRect.center.dx > newTargetX) {
       if (scale.x > 0) flipHorizontallyAroundCenter();
-      _horizontalMovement = -1;
+      _moveX = -1;
       _targetX = newTargetX + width - _hitbox.position.x - _hitbox.width / 2;
     } else {
       return Future.value();
     }
     _isAtXCompleter = Completer<void>();
-    return _isAtXCompleter!.future;
+    return _isAtXCompleter!.future.whenComplete(() => _updateHitboxEdges());
   }
 
-  void reachedCheckpoint(Vector2 checkpointPosition) => _startPosition = checkpointPosition;
+  void reachedCheckpoint(Vector2 checkpointPosition) => _respawnPosition = checkpointPosition;
 
   Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
 
   Future<void> reachedFinish(ShapeHitbox finish) async {
-    _horizontalMovement = 0;
-    _spawnProtection = true;
+    _moveX = 0;
+    _isSpawnProtectionActive = true;
     unawaited(world.saveData());
 
     // delays are not functional, but purely for a more visually appealing result
@@ -499,13 +499,12 @@ class Player extends SpriteAnimationGroupComponent
     int delayIndex = 0;
 
     // player moves to the horizontal center of the finish
-    await _waitUntilPlayerIsAtFinishCenter(finish.toAbsoluteRect().center.dx);
-    _updateHitboxEdges();
+    await _waitUntilPlayerIsAtX(finish.toAbsoluteRect().center.dx);
 
     // spotlight animation
-    world.removeGameHudOnFinish();
+    world.removeOverlaysOnFinish();
     unawaited(game.audioCenter.muteGameSfx());
-    final playerCenter = hitbox.center.toVector2();
+    final playerCenter = hitboxAbsoluteRect.center.toVector2();
     final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
     world.add(spotlight);
     await spotlight.focusOnTarget();
@@ -515,20 +514,21 @@ class Player extends SpriteAnimationGroupComponent
     // star positions
     final starRadius = GameSettings.finishSpotlightAnimationRadius * 1.5;
     final starPositions = calculateStarPositions(playerCenter, starRadius);
-    final List<OutlineStar> outlineStars = [];
+    final outlineStars = [];
     final stars = [];
 
     // outline stars
     for (var position in starPositions) {
-      final outlineStar = OutlineStar(position: position, spawnSizeZero: true);
+      final outlineStar = Star(variant: StarVariant.outline, position: position, spawnSizeZero: true);
+      world.add(outlineStar);
       outlineStars.add(outlineStar);
+      unawaited(outlineStar.scaleIn());
     }
-    world.addAll(outlineStars);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // earned stars
     for (var i = 0; i < world.earnedStars; i++) {
-      final star = Star(position: playerCenter, spawnSizeZero: true);
+      final star = Star(variant: StarVariant.filled, position: playerCenter, spawnSizeZero: true);
       world.add(star);
       stars.add(star);
 
@@ -562,10 +562,10 @@ class Player extends SpriteAnimationGroupComponent
 
     // fade stars out and shrink light circle to zero
     for (var e in outlineStars) {
-      e.fadeOut();
+      unawaited(e.fadeOut());
     }
     for (var e in stars) {
-      e.fadeOut();
+      unawaited(e.fadeOut());
     }
     game.audioCenter.stopBackgroundMusic();
     await spotlight.shrinkToBlack();
@@ -577,12 +577,12 @@ class Player extends SpriteAnimationGroupComponent
 
   void _respawn(CollisionSide collisionSide) async {
     // hit
-    _spawnProtection = true;
+    _isSpawnProtectionActive = true;
     _isGravityActive = false;
-    _isPlayerStateActive = false;
-    isWorldCollisionActive = false;
-    _horizontalMovement = 0;
-    velocity = Vector2.zero();
+    _isAnimationStateActive = false;
+    _isWorldCollisionActive = false;
+    _moveX = 0;
+    _velocity = Vector2.zero();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
     respawnNotifier.notifyRespawn();
 
@@ -597,39 +597,32 @@ class Player extends SpriteAnimationGroupComponent
     isVisible = false;
 
     // respawn
-    position = _startPosition;
+    position = _respawnPosition;
     scale.x = 1;
     world.playerRespawn();
 
     // a frame must be maintained before visible again, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      world.playerInput.clearInput();
       isVisible = true;
-      _spawnProtection = false;
-      _isPlayerStateActive = true;
+      _isSpawnProtectionActive = false;
+      _isAnimationStateActive = true;
       _isGravityActive = true;
-      isWorldCollisionActive = true;
+      _isWorldCollisionActive = true;
     });
   }
 
   void collidedWithEnemy(CollisionSide collisionSide) => _respawn(collisionSide);
 
   void bounceUp({double jumpForce = 260, bool resetDoubleJump = true}) {
-    velocity.y = -jumpForce;
-    isOnGround = false;
-    if (resetDoubleJump) canDoubleJump = true;
+    _velocity.y = -jumpForce;
+    _isOnGround = false;
+    if (resetDoubleJump) _canDoubleJump = true;
   }
 
-  void _updateHitboxEdges() {
-    hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
-    hitboxRight = hitboxLeft + _hitbox.width;
-    hitboxTop = position.y + _hitbox.position.y;
-    hitboxBottom = hitboxTop + _hitbox.height;
-  }
+  void activateDoubleJump() => _canDoubleJump = true;
 
-  Rect get hitbox => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
-  Vector2 get hitboxPosition => _hitbox.position;
-  Vector2 get startPosition => _startPosition;
-  Vector2 get hitboxSize => _hitbox.size;
+  void adjustPostion({double? x, double? y}) => position += Vector2(x ?? 0, y ?? 0);
 }
 
 class PlayerRespawnNotifier extends ChangeNotifier {

@@ -5,14 +5,14 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/hud/pause_page.dart';
 import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 import 'package:pixel_adventure/router.dart';
 
@@ -42,8 +42,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
        _miniMapEntities = miniMapEntities,
        _showAtStart = show {
     final minLeft = game.safePadding.minLeft(40);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
-    position = Vector2(minLeft, 10);
+    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), SpriteBtnType.btnSizeCorrected.y);
+    position = Vector2(minLeft, GameSettings.mapBorderWidth + GameSettings.hudVerticalMargin);
     _verticalCenter = size.y / 2;
   }
 
@@ -56,7 +56,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   late final SpriteBtn _restartBtn;
 
   // btn spacing
-  static const double _btnSpacing = 4;
+  static const double _btnSpacing = 6; // [Adjustable]
 
   // fruits count
   late final RRectComponent _fruitBg;
@@ -70,8 +70,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   // count settings
   static const double _bgSize = 19;
-  static const double _spacingBetweenElements = 16;
-  static const double _counterTextMarginLeft = 4;
+  static const double _spacingBetweenElements = 16; // [Adjustable]
+  static const double _counterTextMarginLeft = 4; // [Adjustable]
 
   // mini map
   late final MiniMap _miniMap;
@@ -87,8 +87,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(SpriteBtnType.btnSize.x / 2, _verticalCenter);
-    final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(SpriteBtnType.btnSizeCorrected.x / 2, _verticalCenter);
+    final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + _btnSpacing, 0);
 
     // menu btn
     _menuBtn = SpriteBtn.fromType(
@@ -150,7 +150,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_restartBtn.position.x + SpriteBtnType.btnSize.x / 2 + _spacingBetweenElements, _verticalCenter),
+      position: Vector2(_restartBtn.position.x + SpriteBtnType.btnSizeCorrected.x / 2 + _spacingBetweenElements, _verticalCenter),
       size: Vector2.all(_bgSize),
       anchor: Anchor.centerLeft,
       show: _showAtStart,

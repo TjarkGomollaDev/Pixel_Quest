@@ -11,11 +11,11 @@ import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/level/loading_overlay.dart';
-import 'package:pixel_adventure/game/level/player.dart';
-import 'package:pixel_adventure/game/level/tile_id_helper.dart';
+import 'package:pixel_adventure/game/level/loading/loading_overlay.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/utils/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
-import 'package:pixel_adventure/game/utils/position_provider.dart';
+import 'package:pixel_adventure/game/level/player/player_hitbox_position_provider.dart.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/warm_up.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -155,7 +155,7 @@ class PixelQuest extends FlameGame
   void setUpCameraForMenu() {
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.setBounds(Rectangle.fromLTRB(0, 0, size.x, size.y));
-    camera.follow(StaticPositionProvider.topLeft);
+    camera.follow(PositionComponent());
   }
 
   void setUpCameraForLevel(double mapWidth, Player player) {

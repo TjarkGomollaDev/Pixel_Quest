@@ -6,14 +6,14 @@ import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
-enum PlayerSpecialEffectState implements AnimationState {
+enum PlayerEffectState implements AnimationState {
   appearing('Appearing', 7, loop: false, special: true),
   disappearing('Disappearing', 7, loop: false, special: true);
 
@@ -25,14 +25,14 @@ enum PlayerSpecialEffectState implements AnimationState {
   final bool loop;
   final bool special;
 
-  const PlayerSpecialEffectState(this.fileName, this.amount, {this.loop = true, this.special = false});
+  const PlayerEffectState(this.fileName, this.amount, {this.loop = true, this.special = false});
 }
 
-class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, HasVisibility {
+class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, HasVisibility {
   // constructor parameters
   final Player player;
 
-  PlayerSpecialEffect({required this.player}) : super(position: Vector2.zero(), size: gridSize);
+  PlayerEffects({required this.player}) : super(position: Vector2.zero(), size: gridSize);
 
   // size
   static final Vector2 gridSize = Vector2.all(96);
@@ -51,24 +51,24 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlayerSpecialEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in PlayerSpecialEffectState.values) state: loadAnimation(state)};
+    final loadAnimation = spriteAnimationWrapper<PlayerEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in PlayerEffectState.values) state: loadAnimation(state)};
     isVisible = false;
   }
 
   Future<void> playAppearing(Vector2 effectPosition) async {
     position = effectPosition - _offset;
     isVisible = true;
-    current = PlayerSpecialEffectState.appearing;
-    await animationTickers![PlayerSpecialEffectState.appearing]!.completed;
+    current = PlayerEffectState.appearing;
+    await animationTickers![PlayerEffectState.appearing]!.completed;
     isVisible = false;
   }
 
   Future<void> playDisappearing(Vector2 effectPosition) async {
     position = effectPosition - _offset;
     isVisible = true;
-    current = PlayerSpecialEffectState.disappearing;
-    await animationTickers![PlayerSpecialEffectState.disappearing]!.completed;
+    current = PlayerEffectState.disappearing;
+    await animationTickers![PlayerEffectState.disappearing]!.completed;
     isVisible = false;
   }
 
@@ -95,6 +95,15 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
       await Future.delayed(Duration(milliseconds: (duration * 1000).toInt()));
     }
     game.camera.moveTo(originalPos);
+  }
+
+  Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
+    if (collisionSide == CollisionSide.Left || collisionSide == CollisionSide.Right) {
+      await _deathOnHorizontalCollision(collisionSide);
+    } else {
+      await _deathOnVerticalCollision(collisionSide);
+    }
+    player.angle = 0;
   }
 
   static final _offsetControlPoint = Vector2(40, 120);
@@ -169,14 +178,5 @@ class PlayerSpecialEffect extends SpriteAnimationGroupComponent with HasGameRefe
     }
 
     return completer.future;
-  }
-
-  Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
-    if (collisionSide == CollisionSide.Left || collisionSide == CollisionSide.Right) {
-      await _deathOnHorizontalCollision(collisionSide);
-    } else {
-      await _deathOnVerticalCollision(collisionSide);
-    }
-    player.angle = 0;
   }
 }

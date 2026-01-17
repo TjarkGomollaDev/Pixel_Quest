@@ -7,8 +7,9 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/slime_particle.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game_settings.dart';
@@ -194,6 +195,9 @@ class Slime extends PositionComponent
   }
 
   void _spawnSlimeParticles() {
+    // camera culling
+    if (!game.isEntityInVisibleWorldRectX(_hitbox)) return;
+
     final spawnOnLeftSide = _moveDirection == 1;
     final particleOffset = Vector2(
       spawnOnLeftSide

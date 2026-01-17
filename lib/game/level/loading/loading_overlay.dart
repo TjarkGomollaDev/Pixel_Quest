@@ -4,8 +4,8 @@ import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/level/background_szene.dart';
-import 'package:pixel_adventure/game/level/loading_dummy_character.dart';
+import 'package:pixel_adventure/game/utils/background_parallax.dart';
+import 'package:pixel_adventure/game/level/loading/loading_dummy_character.dart';
 import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
@@ -31,7 +31,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   // components
   late final PositionComponent _root;
   late final InputBlocker _inputBlocker;
-  late final BackgroundSzene _background;
+  late final BackgroundParallax _background;
   late final LoadingDummyCharacter _dummy;
 
   // particle for dummy character
@@ -88,7 +88,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   void _hide() => isVisible = false;
 
   Future<void> _animatedHide({double duration = 0.8, double targetScale = 5}) {
-    final completer = Completer();
+    final completer = Completer<void>();
     final scaleEffect = ScaleEffect.to(Vector2.all(targetScale), EffectController(duration: duration, curve: Curves.easeInQuad));
     final opacityEffect = OpacityEffect.to(
       0,
@@ -116,7 +116,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   void _setUpBackground() {
-    _background = BackgroundSzene(szene: Szene.szene3, size: size, baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay);
+    _background = BackgroundParallax.szene(
+      szene: BackgroundSzene.szene3,
+      baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay,
+      size: size,
+    );
     _root.add(_background);
   }
 

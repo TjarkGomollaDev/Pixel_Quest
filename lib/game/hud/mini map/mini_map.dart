@@ -6,7 +6,7 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map_arrow_layer.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map_view.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
@@ -171,7 +171,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// ends of the frame so that it visually aligns with the mini map view.
   void _setUpFrame() {
     _frame = VisibleSpriteComponent(
-      sprite: loadSprite(game, 'HUD/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
+      sprite: loadSprite(game, 'Mini Map/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
       show: _showAtStart ? _inistialState : false,
     );
     add(_frame);
@@ -188,7 +188,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     Vector2 targetSize;
     Vector2 viewPosition;
 
-    if (GameSettings.mapBorderWidth != 0) {
+    if (GameSettings.hasBorder) {
       // calculate vertical scale to hide top and bottom borders
       final verticalScale = _miniMapSprite.srcSize.y / (_miniMapSprite.srcSize.y - 2);
 

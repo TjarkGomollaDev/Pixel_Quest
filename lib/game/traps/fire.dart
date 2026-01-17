@@ -6,7 +6,7 @@ import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';

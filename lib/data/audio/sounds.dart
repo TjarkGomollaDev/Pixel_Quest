@@ -33,11 +33,12 @@ enum Sfx {
 }
 
 enum LoopSfx {
+  saw('saw'),
   fire('fire');
 
   // path
   static const String _basePath = 'loop-effects/';
-  static const String _pathEnd = '.mp3';
+  static const String _pathEnd = '.m4a';
   String get path => _basePath + fileName + _pathEnd;
 
   final String fileName;

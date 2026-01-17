@@ -5,8 +5,9 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
+import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game_settings.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
 
@@ -109,6 +110,10 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   void _startParticleTimer() => _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true);
 
   void _spawnParticle() {
+    // camera culling
+    if (!game.isEntityInVisibleWorldRectX(_hitbox)) return;
+
+    // create new particle
     final particle = FanAirParticle(
       streamTop: 0,
       streamLeft: 0,
@@ -144,7 +149,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     _playerInStream = true;
-    _player.canDoubleJump = true;
+    _player.activateDoubleJump();
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:pixel_adventure/game/level/player.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/pixel_quest.dart';
@@ -83,7 +83,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   Future<void> _fallEffect(Vector2 targetPosition, double duration) {
-    final completer = Completer();
+    final completer = Completer<void>();
     final fallEffect = MoveEffect.to(
       targetPosition,
       EffectController(duration: duration, curve: JumpFallCurve()),
@@ -96,7 +96,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
 
   void _startHoverLoop() {
     _isHovering = true;
-    _hoverCompleter = Completer();
+    _hoverCompleter = Completer<void>();
     _runHoverLoop();
   }
 
@@ -119,7 +119,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   Future<void> _moveTo(Vector2 target) {
-    final completer = Completer();
+    final completer = Completer<void>();
     final effect = MoveEffect.to(target, EffectController(duration: _swingTimePointToPoint), onComplete: () => completer.complete());
     add(effect);
 
