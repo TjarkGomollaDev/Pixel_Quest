@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 /// Loads a single [Sprite] from the given asset [path] in the [game]'s cache.
 ///

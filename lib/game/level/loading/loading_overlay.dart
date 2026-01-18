@@ -12,8 +12,8 @@ import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility implements OpacityProvider {
   // constructor parameters

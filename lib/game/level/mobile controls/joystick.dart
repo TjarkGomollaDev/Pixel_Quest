@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player/player_input.dart';
 import 'package:pixel_adventure/game/utils/arrow_indicator.dart';
-import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
 
 class Joystick extends PositionComponent with HasVisibility {
   // constructor parameters
@@ -33,7 +33,17 @@ class Joystick extends PositionComponent with HasVisibility {
 
   void _setUpComponent() {
     _joystick = JoystickComponent(
-      knob: CircleComponent(radius: GameSettings.knobRadius, paint: Paint()..color = AppTheme.ingameText),
+      knob: CircleComponent(
+        radius: GameSettings.knobRadius,
+        paint: Paint()
+          ..shader =
+              const RadialGradient(
+                colors: [AppTheme.ingameText, AppTheme.ingameText, Color.fromARGB(255, 176, 176, 178)],
+                stops: [0.0, 0.8, 1.0],
+              ).createShader(
+                Rect.fromCircle(center: Offset(GameSettings.knobRadius, GameSettings.knobRadius), radius: GameSettings.knobRadius),
+              ),
+      ),
       background: _JoystickBackground(),
       anchor: Anchor.topLeft,
     );
@@ -68,7 +78,7 @@ class _JoystickBackground extends PositionComponent {
 
   // styling
   static final Color _bgColor = AppTheme.tileBlur; // [Adjustable]
-  static const Color _arrowColor = AppTheme.grayLight5; // [Adjustable]
+  static const Color _arrowColor = AppTheme.grayLight6; // [Adjustable]
   static final Vector2 _arrowSize = Vector2(5, 6); // [Adjustable]
   static const double _arrowDistanceFromCenter = 0.7; // [Adjustable]
 

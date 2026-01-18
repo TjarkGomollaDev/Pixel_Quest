@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbacks {
   // constructor parameters

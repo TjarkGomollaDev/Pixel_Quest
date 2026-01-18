@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -10,8 +9,8 @@ import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 /// A HUD container component that displays the mini map inside a decorative frame.
 ///
@@ -63,6 +62,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
        _inistialState = initialState,
        _showAtStart = show {
     size = miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
+    anchor = Anchor.topRight;
 
     // optical adjustment to compensate for the protruding ends of the frame
     position.y -= _frameOverhangAdjust;
@@ -101,24 +101,12 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _splitEntities();
     _setUpMiniMapView();
     _setUpFrame();
     _setUpBtns();
     _setUpArrowLayer();
     return super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
-    anchor = Anchor.topRight;
   }
 
   /// Splits the passed entity list into:

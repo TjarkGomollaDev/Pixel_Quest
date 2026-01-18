@@ -201,4 +201,8 @@ class StorageCenter {
   Future<void> clearSettings() async {
     await _prefs.remove(_storageKeyUserSettings);
   }
+
+  void dispose() {
+    _onDataChanged.close();
+  }
 }

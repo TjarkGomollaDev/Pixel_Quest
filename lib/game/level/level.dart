@@ -44,8 +44,9 @@ import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
 class DecoratedWorld extends World with HasTimeScale {
   PaintDecorator? decorator;
@@ -75,9 +76,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // all collision blocks from background layer
   final List<WorldBlock> _collisionBlocks = [];
 
-  // all spawning objects from spawning layer
-  final List<PositionComponent> _spawningObjects = [];
-
   // all spawning objects which are needed in some way for the mini map
   final List<EntityOnMiniMap> _miniMapEntities = [];
 
@@ -95,13 +93,13 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // overlays
   late final GameHud _gameHud;
   late final MobileControls? _mobileControls;
-  late final FpsTextComponent? _fpsText;
+  late final VisibleFpsTextComponent? _fpsDisplay;
 
   // counts
-  int totalFruitsCount = 0;
-  int playerFruitsCount = 0;
-  int deathCount = 0;
-  int earnedStars = 0;
+  int _totalFruitsCount = 0;
+  int _playerFruitsCount = 0;
+  int _deathCount = 0;
+  int _earnedStars = 0;
 
   // respawnables
   final List<Respawnable> _pendingRespawnables = [];
@@ -111,6 +109,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   // getter
   PlayerInput get playerInput => _playerInput;
+  int get earnedStars => _earnedStars;
 
   @override
   Future<void> onLoad() async {
@@ -128,6 +127,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _setUpCamera();
     _addGameHud();
     _addMobileControls();
+    _addFpsDisplay();
     await _hideLoadingOverlayAndStart();
     super.onMount();
   }
@@ -136,7 +136,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   Future<void> onRemove() async {
     _removeGameHud();
     _removeMobileControls();
-    if (_fpsText != null && _fpsText.isMounted) game.camera.viewport.remove(_fpsText);
+    _removeFpsDisplay();
     game.audioCenter.stopBackgroundMusic();
     game.audioCenter.muteGameSfx();
     _playerInput.clearInput();
@@ -145,12 +145,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
-      _fpsText = FpsTextComponent(position: Vector2(game.size.x, 0) + Vector2(-30, 10), anchor: Anchor.topRight);
-      game.camera.viewport.add(_fpsText!);
-    } else {
-      _fpsText = null;
-    }
 
     // general
     timeScale = 0;
@@ -436,7 +430,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
             final fruitName = spawnPoint.name;
             final safeName = FruitName.values.map((e) => e.name).contains(fruitName) ? fruitName : FruitName.Apple.name;
             spawnObject = Fruit(name: safeName, position: gridPosition);
-            totalFruitsCount++;
+            _totalFruitsCount++;
             break;
           case 'ArrowUp':
             spawnObject = ArrowUp(player: _player, position: gridPosition);
@@ -618,7 +612,6 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         if (spawnObject == null) continue;
 
         // add all spawn objects and, if necessary, add them to the mini map
-        _spawningObjects.add(spawnObject);
         add(spawnObject);
         if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
 
@@ -633,22 +626,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
 
-  void _addMobileControls() {
-    if (!GameSettings.showMobileControls) return _mobileControls = null;
-    _mobileControls = MobileControls(playerInput: _playerInput);
-    game.camera.viewport.add(_mobileControls!);
-  }
-
-  void _removeMobileControls() {
-    if (_mobileControls != null && _mobileControls.isMounted) game.camera.viewport.remove(_mobileControls);
-  }
-
-  void showMobileControls() => _mobileControls?.show();
-  void hideMobildControls() => _mobileControls?.hide();
-
   void _addGameHud() {
     _gameHud = GameHud(
-      totalFruitsCount: totalFruitsCount,
+      totalFruitsCount: _totalFruitsCount,
       miniMapSprite: _readyMadeMiniMapForground,
       levelWidth: _levelMap.width,
       player: _player,
@@ -662,19 +642,51 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     if (_gameHud.isMounted) game.camera.viewport.remove(_gameHud);
   }
 
+  void _addMobileControls() {
+    if (!GameSettings.showMobileControls) return _mobileControls = null;
+    _mobileControls = MobileControls(playerInput: _playerInput);
+    game.camera.viewport.add(_mobileControls!);
+  }
+
+  void _removeMobileControls() {
+    if (_mobileControls != null && _mobileControls.isMounted) game.camera.viewport.remove(_mobileControls);
+  }
+
+  void _addFpsDisplay() {
+    if (!GameSettings.customDebug) return _fpsDisplay = null;
+    _fpsDisplay = VisibleFpsTextComponent(position: _gameHud.position + Vector2(0, _gameHud.size.y), show: false);
+    game.camera.viewport.add(_fpsDisplay!);
+  }
+
+  void _removeFpsDisplay() {
+    if (_fpsDisplay != null && _fpsDisplay.isMounted) game.camera.viewport.remove(_fpsDisplay);
+  }
+
   void showOverlayOnStart() {
-    showMobileControls();
     _gameHud.show();
+    showOverlayOnResume();
+    _fpsDisplay?.show();
   }
 
   void removeOverlaysOnFinish() {
-    _removeMobileControls();
     _removeGameHud();
+    _removeMobileControls();
+    _removeFpsDisplay();
   }
 
-  void increaseFruitsCount() => _gameHud.updateFruitCount(++playerFruitsCount);
+  void hideOverlayOnPause() {
+    _mobileControls?.hide();
+    _fpsDisplay?.hide();
+  }
 
-  void _increaseDeathCount() => _gameHud.updateDeathCount(++deathCount);
+  void showOverlayOnResume() {
+    _mobileControls?.show();
+    _fpsDisplay?.show();
+  }
+
+  void increaseFruitsCount() => _gameHud.updateFruitCount(++_playerFruitsCount);
+
+  void _increaseDeathCount() => _gameHud.updateDeathCount(++_deathCount);
 
   Future<void> _hideLoadingOverlayAndStart() async {
     final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
@@ -709,12 +721,12 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _calculateEarnedStars() {
-    if (playerFruitsCount >= totalFruitsCount) {
-      earnedStars = 3;
-    } else if (playerFruitsCount >= totalFruitsCount ~/ 2) {
-      earnedStars = 2;
+    if (_playerFruitsCount >= _totalFruitsCount) {
+      _earnedStars = 3;
+    } else if (_playerFruitsCount >= _totalFruitsCount ~/ 2) {
+      _earnedStars = 2;
     } else {
-      earnedStars = 1;
+      _earnedStars = 1;
     }
   }
 
@@ -723,10 +735,10 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     await game.storageCenter.saveLevel(
       data: LevelEntity(
         uuid: levelMetadata.uuid,
-        stars: earnedStars,
-        totalFruits: totalFruitsCount,
-        earnedFruits: playerFruitsCount,
-        deaths: deathCount,
+        stars: _earnedStars,
+        totalFruits: _totalFruitsCount,
+        earnedFruits: _playerFruitsCount,
+        deaths: _deathCount,
       ),
       worldUuid: levelMetadata.worldUuid,
     );

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
@@ -13,6 +12,7 @@ import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player/player_effects.dart';
 import 'package:pixel_adventure/game/traps/fire_trap.dart';
@@ -21,9 +21,9 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
-import 'package:pixel_adventure/router.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/game_router.dart';
 
 enum PlayerState implements AnimationState {
   idle('Idle', 11),
@@ -61,7 +61,7 @@ class Player extends SpriteAnimationGroupComponent
   // constructor parameters
   final PlayerCharacter _character;
 
-  Player({PlayerCharacter character = PlayerCharacter.maskDude, required Vector2 startPosition})
+  Player({PlayerCharacter character = PlayerCharacter.defaultCharacter, required Vector2 startPosition})
     : _character = character,
       _respawnPosition = startPosition,
       super(position: startPosition, size: gridSize);
@@ -73,10 +73,10 @@ class Player extends SpriteAnimationGroupComponent
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(9, 4), size: Vector2(14, 28));
 
   // these are the correct x and y values for the player hitbox in absolute space, the x values are cleaned up from the horizontal flip
-  late double hitboxLeft;
-  late double hitboxRight;
-  late double hitboxTop;
-  late double hitboxBottom;
+  late double _hitboxLeft;
+  late double _hitboxRight;
+  late double _hitboxTop;
+  late double _hitboxBottom;
 
   // animation settings
   static final Vector2 _textureSize = Vector2(32, 32);
@@ -125,9 +125,6 @@ class Player extends SpriteAnimationGroupComponent
   late final Vector2 _spawnInLevelPosition;
   final double _spawnInLevelFallHeight = 60; // [Adjustable]
 
-  // listeners are notified if the player dies and respawns
-  final PlayerRespawnNotifier _respawnNotifier = PlayerRespawnNotifier();
-
   // completer to detect when the player is back on the ground
   Completer<void>? _isOnGroundCompleter;
 
@@ -135,15 +132,16 @@ class Player extends SpriteAnimationGroupComponent
   Completer<void>? _isAtXCompleter;
   double? _targetX;
 
-  // getter
-  Vector2 get respawnPosition => _respawnPosition;
-  PlayerRespawnNotifier get respawnNotifier => _respawnNotifier;
-
   // getter hitbox related
+  Vector2 get respawnPosition => _respawnPosition;
   Vector2 get hitboxLocalPosition => _hitbox.position;
   Vector2 get hitboxLocalSize => _hitbox.size;
-  Vector2 get hitboxAbsolutePosition => Vector2(hitboxLeft, hitboxTop);
-  Rect get hitboxAbsoluteRect => Rect.fromLTRB(hitboxLeft, hitboxTop, hitboxRight, hitboxBottom);
+  Vector2 get hitboxAbsolutePosition => Vector2(_hitboxLeft, _hitboxTop);
+  Rect get hitboxAbsoluteRect => Rect.fromLTRB(_hitboxLeft, _hitboxTop, _hitboxRight, _hitboxBottom);
+  double get hitboxAbsoluteLeft => _hitboxLeft;
+  double get hitboxAbsoluteRight => _hitboxRight;
+  double get hitboxAbsoluteTop => _hitboxTop;
+  double get hitboxAbsoluteBottom => _hitboxBottom;
 
   @override
   FutureOr<void> onLoad() {
@@ -151,6 +149,7 @@ class Player extends SpriteAnimationGroupComponent
     _loadAllSpriteAnimations();
     _setUpSpecialEffects();
     _setUpSpawnPosition();
+    _updateHitboxEdges();
     return super.onLoad();
   }
 
@@ -351,10 +350,10 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updateHitboxEdges() {
-    hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
-    hitboxRight = hitboxLeft + _hitbox.width;
-    hitboxTop = position.y + _hitbox.position.y;
-    hitboxBottom = hitboxTop + _hitbox.height;
+    _hitboxLeft = (scale.x > 0) ? position.x + _hitbox.position.x : position.x - width + _hitbox.position.x;
+    _hitboxRight = _hitboxLeft + _hitbox.width;
+    _hitboxTop = position.y + _hitbox.position.y;
+    _hitboxBottom = _hitboxTop + _hitbox.height;
   }
 
   void _applyInput() {
@@ -584,7 +583,7 @@ class Player extends SpriteAnimationGroupComponent
     _moveX = 0;
     _velocity = Vector2.zero();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
-    respawnNotifier.notifyRespawn();
+    GameEventBus.instance.emit(PlayerRespawned());
 
     // play death effects
     game.audioCenter.playSound(Sfx.playerHit, SfxType.player);
@@ -623,8 +622,4 @@ class Player extends SpriteAnimationGroupComponent
   void activateDoubleJump() => _canDoubleJump = true;
 
   void adjustPostion({double? x, double? y}) => position += Vector2(x ?? 0, y ?? 0);
-}
-
-class PlayerRespawnNotifier extends ChangeNotifier {
-  void notifyRespawn() => notifyListeners();
 }

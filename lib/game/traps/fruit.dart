@@ -10,8 +10,8 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum FruitState implements AnimationState {
   idle('Idle', 17),

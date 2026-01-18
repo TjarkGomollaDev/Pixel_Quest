@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:pixel_adventure/l10n/app_localizations.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/splash/flutter%20extensions/build_context.dart';
 import 'package:pixel_adventure/splash/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';

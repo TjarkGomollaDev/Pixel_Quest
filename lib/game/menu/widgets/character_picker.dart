@@ -4,10 +4,10 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/widgets/character_bio.dart';
-import 'package:pixel_adventure/menu/widgets/menu_dummy_character.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/menu/widgets/character_bio.dart';
+import 'package:pixel_adventure/game/menu/widgets/menu_dummy_character.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
@@ -18,6 +18,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     : _inputBlocker = inputBlocker,
       _spotlightCenter = spotlightCenter {
     size = game.size;
+    priority = GameSettings.chracterPicker;
   }
 
   // character picker
@@ -38,7 +39,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _setUpCharacterBio();
     _setUpDummyCharacter();
     _setUpEditBtn();
@@ -46,17 +46,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     _setUpCharacterChangeBtns();
     _setUpSpotlight();
     return super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
-    priority = GameSettings.chracterPicker;
   }
 
   void _setUpCharacterBio() {

@@ -3,12 +3,13 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum MovingPlatformState implements AnimationState {
   off('Off', 1),
@@ -81,6 +82,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   // player on top
   bool _playerOnTop = false;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   // getter
   int get moveDirection => _moveDirection;
   bool get isVertical => _isVertical;
@@ -88,6 +92,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
+    _addSubscription();
     _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
@@ -95,15 +100,15 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   }
 
   @override
-  void update(double dt) {
-    _isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
-    super.update(dt);
+  void onRemove() {
+    _removeSubscription();
+    super.onRemove();
   }
 
   @override
-  void onRemove() {
-    _player.respawnNotifier.removeListener(onWorldCollisionEnd);
-    super.onRemove();
+  void update(double dt) {
+    _isVertical ? _moveVertical(dt) : _moveHorizontal(dt);
+    super.update(dt);
   }
 
   @override
@@ -126,10 +131,18 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _player.respawnNotifier.addListener(onWorldCollisionEnd);
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
     marker = EntityMiniMapMarker(type: EntityMiniMapMarkerType.platform, color: AppTheme.entityMarkerSpecial);
+  }
+
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onWorldCollisionEnd());
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
   }
 
   void _loadAllSpriteAnimations() {

@@ -6,9 +6,9 @@ import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
-import 'package:pixel_adventure/router.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/game_router.dart';
 
 class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
@@ -47,22 +47,10 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _setUpBtns();
     _setUpStarsCount();
     _setUpAnimatedStar();
     return super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
-    anchor = Anchor.topLeft;
   }
 
   void dispose() {}

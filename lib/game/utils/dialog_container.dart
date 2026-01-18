@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class DialogContainer extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters

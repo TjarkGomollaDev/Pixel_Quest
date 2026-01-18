@@ -11,8 +11,8 @@ import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum ChickenState implements AnimationState {
   idle('Idle', 13),
@@ -160,17 +160,13 @@ class Chicken extends PositionComponent
     // camera culling
     if (!game.isEntityInVisibleWorldRectX(_hitbox)) return;
 
-    // get player hitbox positions
-    final playerHitboxLeft = _player.hitboxLeft;
-    final playerHitboxRight = _player.hitboxRight;
-
     // first, we check whether the player is within the range in which the chicken can move
-    if (!_playerInRange(playerHitboxLeft, playerHitboxRight, _player.hitboxBottom)) return;
+    if (!_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom)) return;
 
     // secondly, now that we know the player is in range, we check whether he is to the left or right of the chicken
-    if (playerHitboxRight < _hitboxLeft) {
+    if (_player.hitboxAbsoluteRight < _hitboxLeft) {
       _moveDirection = -1;
-    } else if (playerHitboxLeft > _hitboxRight) {
+    } else if (_player.hitboxAbsoluteLeft > _hitboxRight) {
       _moveDirection = 1;
     }
 

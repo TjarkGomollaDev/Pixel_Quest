@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/utils/background_parallax.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dots_indicator.dart';
@@ -10,17 +11,13 @@ import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/menu/widgets/character_picker.dart';
-import 'package:pixel_adventure/menu/widgets/level_grid.dart';
-import 'package:pixel_adventure/menu/widgets/menu_top_bar.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
-import 'package:pixel_adventure/data/storage/storage_center.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/menu/widgets/character_picker.dart';
+import 'package:pixel_adventure/game/menu/widgets/level_grid.dart';
+import 'package:pixel_adventure/game/menu/widgets/menu_top_bar.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
-  // subscription on storage center
-  StreamSubscription? _sub;
-
   // static content
   late final MenuTopBar _menuTopBar;
   late final CharacterPicker _characterPicker;
@@ -43,15 +40,19 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   static const double _levelGridDotsIndicatorSpacing = 14;
 
   // animation event for new stars
-  NewStarsStorageEvent? _pendingNewStarsEvent;
+  NewStarsEarned? _pendingNewStarsEarnedEvent;
   int _animationGuard = 0;
   bool _menuActive = false;
 
   // flag for animation when world is changing
   bool _isChangingWorld = false;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   @override
   FutureOr<void> onLoad() {
+    _addSubscription();
     _setUpCurrentWorldIndex();
     _setUpWorldBackgrounds();
     _setUpWorldForegrounds();
@@ -61,7 +62,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpChangeWorldBtns();
     _setUpCharacterPicker();
     _setUpDotsIndicator();
-    _setUpSubscription();
     return super.onLoad();
   }
 
@@ -86,18 +86,17 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void dispose() {
-    _sub?.cancel();
-    _sub = null;
+    _removeSubscription();
     _menuTopBar.dispose();
   }
 
-  void _setUpSubscription() {
-    _sub ??= game.storageCenter.onDataChanged.listen((event) {
-      if (event is NewStarsStorageEvent) {
-        _pendingNewStarsEvent = event;
-        if (_menuActive && !_isChangingWorld) unawaited(_checkForNewStarsEvent());
-      }
-    });
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<NewStarsEarned>((event) => _pendingNewStarsEarnedEvent = event);
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
   }
 
   void _setUpCurrentWorldIndex() =>
@@ -253,17 +252,17 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     return game.staticCenter.allWorlds.getIndexByUUID(worldUuid);
   }
 
-  bool _shouldContinue(int guardSnapshot, NewStarsStorageEvent eventSnapshot) {
+  bool _shouldContinue(int guardSnapshot, NewStarsEarned eventSnapshot) {
     if (!_menuActive) return false;
     if (!isMounted) return false;
     if (_animationGuard != guardSnapshot) return false;
-    if (_pendingNewStarsEvent != eventSnapshot) return false;
+    if (_pendingNewStarsEarnedEvent != eventSnapshot) return false;
     return true;
   }
 
   Future<void> _checkForNewStarsEvent() async {
     // capture current event and gurad
-    final eventSnapshot = _pendingNewStarsEvent;
+    final eventSnapshot = _pendingNewStarsEarnedEvent;
     if (eventSnapshot == null) return;
     final guardSnapshot = _animationGuard;
     final worldIndex = _getWorldIndex(eventSnapshot.worldUuid);
@@ -285,12 +284,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     if (!_shouldContinue(guardSnapshot, eventSnapshot)) return;
 
     // animation has been run through completely and the event has thus been processed
-    _pendingNewStarsEvent = null;
+    _pendingNewStarsEarnedEvent = null;
   }
 
   void _abortNewStarsAnimationAndSync() {
     // capture current event
-    final eventSnapshot = _pendingNewStarsEvent;
+    final eventSnapshot = _pendingNewStarsEarnedEvent;
     if (eventSnapshot == null) return;
 
     final worldIndex = _getWorldIndex(eventSnapshot.worldUuid);
@@ -304,6 +303,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _menuTopBar.setStarsCount(index: worldIndex, totalStars: eventSnapshot.totalStars);
 
     // clear pending event
-    _pendingNewStarsEvent = null;
+    _pendingNewStarsEarnedEvent = null;
   }
 }

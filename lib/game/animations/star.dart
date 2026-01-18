@@ -2,11 +2,10 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum StarVariant { filled, outline }
 
@@ -17,8 +16,11 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
 
   Star({required StarVariant variant, super.position, Vector2? size, bool spawnSizeZero = false})
     : _variant = variant,
-      _spawnSizeZero = spawnSizeZero,
-      super(size: size ?? defaultSize);
+      _spawnSizeZero = spawnSizeZero {
+    this.size = size ?? defaultSize;
+    priority = GameSettings.spotlightAnimationContentLayer;
+    anchor = Anchor.center;
+  }
 
   // size
   static final Vector2 defaultSize = Vector2.all(24);
@@ -41,20 +43,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
 
   @override
   Future<void> onLoad() async {
-    _initialSetup();
     _loadSprite();
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorTrap;
-    }
-
-    // general
-    priority = GameSettings.spotlightAnimationContentLayer;
-    anchor = Anchor.center;
   }
 
   void _loadSprite() {

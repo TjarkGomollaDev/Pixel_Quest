@@ -61,7 +61,7 @@
     <property name="offsetPos" type="float" value="1"/>
    </properties>
   </object>
-  <object id="130" name="Spikes" type="Spikes" x="80" y="32" width="32" height="16">
+  <object id="130" name="Spikes" type="Spikes" x="16" y="112" width="32" height="16">
    <properties>
     <property name="side" type="int" value="1"/>
    </properties>

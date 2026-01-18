@@ -5,7 +5,7 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
 /// A purely visual mini map component that renders a horizontal slice of the level.
@@ -48,7 +48,6 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
        super(size: targetSize) {
     if (!show) hide();
   }
-
   // internal horizontal offset in mini map coordinates used to "scroll" the map when the player moves
   double _offsetX = 0;
 

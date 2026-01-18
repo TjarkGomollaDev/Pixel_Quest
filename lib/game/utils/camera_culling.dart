@@ -1,5 +1,5 @@
 import 'package:flame/collisions.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 extension CameraVisibility on PixelQuest {
   bool isEntityInVisibleWorldRectX(ShapeHitbox hitbox, {double buffer = 0}) {

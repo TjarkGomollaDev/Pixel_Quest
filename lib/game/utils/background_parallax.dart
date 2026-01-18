@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/painting.dart';
-import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
 
 enum BackgroundSzene {
   szene1('Szene 1', 4),

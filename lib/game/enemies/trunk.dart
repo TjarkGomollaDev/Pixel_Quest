@@ -12,8 +12,8 @@ import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum TrunkState implements AnimationState {
   idle('Idle', 18),
@@ -303,14 +303,15 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
 
   bool _checkIsPlayerBefore() {
     // checks whether the player is positioned in front of the trunk, relative to its current move direction
-    return (_moveDirection == -1 && _hitboxLeft > _player.hitboxRight) || (_moveDirection == 1 && _player.hitboxLeft > _hitboxRight);
+    return (_moveDirection == -1 && _hitboxLeft > _player.hitboxAbsoluteRight) ||
+        (_moveDirection == 1 && _player.hitboxAbsoluteLeft > _hitboxRight);
   }
 
   bool _checkIsPlayerInRange({double? extended}) {
-    return _player.hitboxRight >= _attackRangeNeg &&
-        _player.hitboxLeft <= _attackRangePos &&
-        _player.hitboxBottom >= position.y + _hitbox.position.y + (extended ?? 0) &&
-        _player.hitboxTop <= position.y + height;
+    return _player.hitboxAbsoluteRight >= _attackRangeNeg &&
+        _player.hitboxAbsoluteLeft <= _attackRangePos &&
+        _player.hitboxAbsoluteBottom >= position.y + _hitbox.position.y + (extended ?? 0) &&
+        _player.hitboxAbsoluteTop <= position.y + height;
   }
 
   bool _checkAttack() => (_checkIsPlayerBefore() && _checkIsPlayerInRange(extended: -_extendRangeDefault));

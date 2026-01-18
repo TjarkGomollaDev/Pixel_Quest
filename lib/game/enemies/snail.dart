@@ -6,14 +6,15 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum SnailState implements AnimationState {
   // snail
@@ -99,13 +100,23 @@ class Snail extends PositionComponent
   // collision
   bool _playerHasLeftCollision = true;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
+    _addSubscription();
     _loadAllSpriteAnimations();
     _setUpRange();
     _setUpMoveDirection();
     return super.onLoad();
+  }
+
+  @override
+  void onRemove() {
+    _removeSubscription();
+    super.onRemove();
   }
 
   @override
@@ -152,7 +163,16 @@ class Snail extends PositionComponent
     _hitbox.collisionType = CollisionType.passive;
     _shellHitbox.collisionType = CollisionType.passive;
     add(_hitbox);
-    _player.respawnNotifier.addListener(onEntityCollisionEnd);
+    GameEventBus;
+  }
+
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
   }
 
   void _loadAllSpriteAnimations() {
@@ -299,7 +319,7 @@ class Snail extends PositionComponent
       case CollisionSide.Top:
         final shellLeft = scale.x > 0 ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
         final shellCenter = shellLeft + _hitbox.width / 2;
-        final playerCenter = (_player.hitboxLeft + _player.hitboxRight) / 2;
+        final playerCenter = (_player.hitboxAbsoluteLeft + _player.hitboxAbsoluteRight) / 2;
         _shellMoveDirection = playerCenter >= shellCenter ? -1 : 1;
         _player.bounceUp();
         break;

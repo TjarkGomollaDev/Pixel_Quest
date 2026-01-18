@@ -4,12 +4,13 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 /// Invisible component representing the fan's air stream.
 ///
@@ -67,13 +68,23 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   final double _durationFanOn = 5; // [Adjustable]
   bool _isFanOn = true;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   @override
   FutureOr<void> onLoad() {
     _initialSetup();
+    _addSubscription();
     _setUpParticle();
     _startParticleTimer();
     if (!_alwaysOn) _startSwitchMode();
     return super.onLoad();
+  }
+
+  @override
+  void onRemove() {
+    _removeSubscription();
+    super.onRemove();
   }
 
   @override
@@ -82,12 +93,6 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _particleTimer.update(dt);
     if (!_alwaysOn) _fanTimer!.update(dt);
     super.update(dt);
-  }
-
-  @override
-  void onRemove() {
-    _player.respawnNotifier.removeListener(onEntityCollisionEnd);
-    super.onRemove();
   }
 
   void _initialSetup() {
@@ -102,7 +107,15 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     priority = GameSettings.trapLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
-    _player.respawnNotifier.addListener(onEntityCollisionEnd);
+  }
+
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
   }
 
   void _setUpParticle() => _particleBasePosition = Vector2((size.x - _baseWidth) / 2, size.y);

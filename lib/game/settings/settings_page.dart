@@ -4,14 +4,14 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
-import 'package:pixel_adventure/game/utils/settings_notifier.dart';
-import 'package:pixel_adventure/settings/confirm_page.dart';
+import 'package:pixel_adventure/game/settings/confirm_page.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/game/utils/slider.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class SettingsPage extends Route {
   SettingsPage() : super(() => _SettingsDialog(), transparent: true);
@@ -252,6 +252,6 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
 
   void _controlSettingChanged(JoystickSetup setup) {
     unawaited(game.storageCenter.updateSettings(joystickSetup: setup));
-    SettingsNotifier.instance.notify(ControlSettingsChanged(setup));
+    GameEventBus.instance.emit(ControlSettingsChanged(setup));
   }
 }

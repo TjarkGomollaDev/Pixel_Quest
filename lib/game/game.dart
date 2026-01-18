@@ -10,6 +10,7 @@ import 'package:pixel_adventure/data/audio/ambient_loop_manager.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/loading/loading_overlay.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
@@ -18,10 +19,10 @@ import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/level/player/player_hitbox_position_provider.dart.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/warm_up.dart';
-import 'package:pixel_adventure/game_settings.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/l10n/app_localizations.dart';
-import 'package:pixel_adventure/menu/menu_page.dart';
-import 'package:pixel_adventure/router.dart';
+import 'package:pixel_adventure/game/menu/menu_page.dart';
+import 'package:pixel_adventure/game/game_router.dart';
 
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
@@ -73,11 +74,15 @@ class PixelQuest extends FlameGame
 
   static const double maxDt = 1 / 60;
 
+  // bridge to convert events from storage layer into game events
+  StreamSubscription? _storageBridgeSub;
+
   @override
   Future<void> onLoad() async {
     _startTime = DateTime.now();
     await _loadAllCenters();
     await _loadAllImagesIntoCache();
+    _addStorageEventBridge();
     _setUpCameraDefault();
     _setUpSafePadding();
     _setUpRouter();
@@ -93,21 +98,15 @@ class PixelQuest extends FlameGame
   }
 
   @override
-  void update(double dt) {
-    super.update(dt > maxDt ? maxDt : dt);
-  }
-
-  @override
   Future<void> onMount() async {
     WidgetsBinding.instance.addObserver(this);
     super.onMount();
-
-    // after super.onMount
-    add(WarmUpRunner());
+    add(WarmUpRunner()); // must be added after super.onMount
   }
 
   @override
   void onRemove() {
+    _removeStorageEventBridge();
     WidgetsBinding.instance.removeObserver(this);
     super.onRemove();
   }
@@ -115,8 +114,14 @@ class PixelQuest extends FlameGame
   @override
   void onDispose() {
     ((router.routes[RouteNames.menu] as WorldRoute?)?.world as MenuPage?)?.dispose();
+    storageCenter.dispose();
     ambientLoops.dispose();
     super.onDispose();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt > maxDt ? maxDt : dt);
   }
 
   @override
@@ -139,6 +144,27 @@ class PixelQuest extends FlameGame
   }
 
   Future<void> _loadAllImagesIntoCache() async => await images.loadAllImages();
+
+  void _addStorageEventBridge() {
+    _storageBridgeSub = storageCenter.onDataChanged.listen((event) {
+      if (event is NewStarsStorageEvent) {
+        GameEventBus.instance.emit(
+          NewStarsEarned(
+            worldUuid: event.worldUuid,
+            levelUuid: event.levelUuid,
+            totalStars: event.totalStars,
+            newStars: event.newStars,
+            levelStars: event.levelStars,
+          ),
+        );
+      }
+    });
+  }
+
+  void _removeStorageEventBridge() {
+    _storageBridgeSub?.cancel();
+    _storageBridgeSub = null;
+  }
 
   void _setUpCameraDefault() {
     final fixedHeight = GameSettings.mapHeight - GameSettings.mapBorderWidth * 2;

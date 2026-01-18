@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/joystick.dart';
 import 'package:pixel_adventure/game/level/player/player_input.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/jump_btn.dart';
-import 'package:pixel_adventure/game/utils/settings_notifier.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 enum JoystickSetup {
   left,
@@ -34,12 +34,12 @@ class MobileControls extends PositionComponent with HasGameReference<PixelQuest>
   // setup
   late JoystickSetup _currentSetup;
 
-  // notifier
-  late final SettingsSubscription _sub;
+  // subscription for game events
+  GameSubscription? _sub;
 
   @override
   FutureOr<void> onLoad() {
-    _setUpSubscription();
+    _addSubscription();
     _setUpJoystick();
     _setUpJumpBtn();
     _setUpLayout();
@@ -48,14 +48,17 @@ class MobileControls extends PositionComponent with HasGameReference<PixelQuest>
 
   @override
   void onRemove() {
-    _sub.cancel();
+    _removeSubscription();
     super.onRemove();
   }
 
-  void _setUpSubscription() {
-    _sub = SettingsNotifier.instance.listen<ControlSettingsChanged>((event) {
-      _applyLayout(event.setup);
-    });
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<ControlSettingsChanged>((event) => _applyLayout(event.setup));
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
   }
 
   void _setUpJoystick() {

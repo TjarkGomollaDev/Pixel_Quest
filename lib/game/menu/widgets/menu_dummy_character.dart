@@ -6,8 +6,8 @@ import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
-import 'package:pixel_adventure/menu/widgets/character_bio.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/menu/widgets/character_bio.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
   // constructor parameters

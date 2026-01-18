@@ -12,9 +12,9 @@ import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
-import 'package:pixel_adventure/router.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/game_router.dart';
 
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters

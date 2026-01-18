@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game_settings.dart';
-import 'package:pixel_adventure/pixel_quest.dart';
+import 'package:pixel_adventure/game/game.dart';
 
 class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, HasPaint implements OpacityProvider {
   // constructor parameters
@@ -17,6 +15,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   LevelTile({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata, super(size: tileSize) {
     _center = size / 2;
+    anchor = Anchor.center;
   }
 
   // center of the module
@@ -46,7 +45,6 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   @override
   FutureOr<void> onLoad() {
-    _initialSetup();
     _setUpTileBg();
     _setUpBtn();
     _setUpStars();
@@ -64,17 +62,6 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
       outlineStar.opacity = value;
     }
     super.opacity = value;
-  }
-
-  void _initialSetup() {
-    // debug
-    if (GameSettings.customDebug) {
-      debugMode = true;
-      debugColor = AppTheme.debugColorMenu;
-    }
-
-    // general
-    anchor = Anchor.center;
   }
 
   void _setUpTileBg() {
