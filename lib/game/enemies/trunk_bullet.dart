@@ -10,11 +10,12 @@ import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
+import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, DebugOutlineOnly {
   // constructor parameters
   final bool _isLeft;
   final Player _player;
@@ -28,7 +29,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
   static final Vector2 gridSize = Vector2.all(16);
 
   // actual hitbox
-  final CircleHitbox _hitbox = CircleHitbox(position: Vector2(4, 4), radius: 4);
+  final DebugCircleHitbox _hitbox = DebugCircleHitbox(position: Vector2(4, 4), radius: 4);
 
   // animation settings
   static const String _path = 'Enemies/Trunk/Bullet.png';
@@ -80,8 +81,8 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
     // debug
     if (GameSettings.customDebug) {
       debugMode = true;
-      debugColor = AppTheme.debugColorEnemie;
-      _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
+      debugColor = AppTheme.debugColorParticle;
+      _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
     }
 
     // general

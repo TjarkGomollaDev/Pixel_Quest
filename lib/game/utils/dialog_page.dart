@@ -16,6 +16,7 @@ class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbac
       _content = content,
       _contentSize = contentSize;
 
+  // components
   late final PositionComponent _root;
   late final RectangleComponent _blurLayer;
   late final DialogContainer _dialogContainer;

@@ -10,11 +10,12 @@ import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
+import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks {
+class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, DebugOutlineOnly {
   // constructor parameters
   final bool _isLeft;
   final Player _player;
@@ -30,7 +31,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
   static const double hitboxRadius = 4;
 
   // actual hitbox
-  final CircleHitbox _hitbox = CircleHitbox(position: hitboxOffset, radius: hitboxRadius);
+  final DebugCircleHitbox _hitbox = DebugCircleHitbox(position: hitboxOffset, radius: hitboxRadius);
 
   // animation settings
   static const String _path = 'Enemies/Plant/Bullet (16x16).png';

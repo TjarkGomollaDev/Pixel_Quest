@@ -122,7 +122,6 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     final completer = Completer<void>();
     final effect = MoveEffect.to(target, EffectController(duration: _swingTimePointToPoint), onComplete: () => completer.complete());
     add(effect);
-
     return completer.future;
   }
 }

@@ -57,11 +57,17 @@ class PlayerInput extends Component with KeyboardHandler {
     }
   }
 
-  void _combineMoveX() => _moveX = (_keyboardMoveX != 0) ? _keyboardMoveX : _joystickMoveX;
+  void _combineMoveX() {
+    _moveX = (_keyboardMoveX != 0) ? _keyboardMoveX : _joystickMoveX;
+  }
 
-  void jumpPressed() => _jumped = true;
+  void jumpPressed() {
+    _jumped = true;
+  }
 
-  void clearInput() => _jumped = false;
+  void clearInput() {
+    _jumped = false;
+  }
 
   void attachJoystick(JoystickComponent joystick) {
     _joystick = joystick;

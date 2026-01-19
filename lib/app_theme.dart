@@ -62,8 +62,8 @@ abstract class AppTheme {
   static const debugColorCollectiblesHitbox = redLight;
   static const debugColorPlayerHitbox = black;
   static const debugColorMenu = purpleDark;
-  static const debugColorParticle = grayDark2;
-  static const debugColorParticleHitbox = grayLight1;
+  static const debugColorParticle = grayDark6;
+  static const debugColorParticleHitbox = redLight;
   static const debugColorWorldBlock = mintDark;
 
   // ingame

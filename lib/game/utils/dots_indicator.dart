@@ -44,7 +44,11 @@ class DotsIndicator extends PositionComponent {
 
   // active index
   int _activeIndex;
+
+  // getter
   int get activeIndex => _activeIndex;
+
+  // setter
   set activeIndex(int index) => _activeIndex = index.clamp(0, _dotCount - 1);
 
   void _computeSize() {

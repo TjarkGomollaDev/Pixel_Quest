@@ -18,10 +18,14 @@ abstract class GameSettings {
 
   // animation settings
   static const double stepTime = 0.05;
-  static const double finishSpotlightAnimationRadius = 60;
 
   // hud
   static const double hudVerticalMargin = 10;
+  static const double hudHorizontalMargin = 40;
+  static const double hudBtnSpacing = 7;
+  static const double hudBtnTextSpacing = 4;
+  static const double hudSectionSpacing = 16;
+  static const double hudBgTileSize = 19;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;
@@ -61,7 +65,7 @@ abstract class GameSettings {
   static const int spikedBallSwingArcDec = 170;
   static const int spikedBallSwingSpeed = 320;
 
-  // background
+  // parallax background
   static final Vector2 parallaxBaseVelocityLevel = Vector2(0.5, 0);
   static final Vector2 parallaxBaseVelocityLoadingOverlay = Vector2(10, 0);
   static final Vector2 coloredBaseVelocity = Vector2(0, 40);

@@ -319,7 +319,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
 /// - show/hide and animated show/hide via scale effects
 ///
 /// Optionally, a custom TextStyle can be provided.
-class TextBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
+class TextBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, _BaseBtn {
   // constructor parameters
   final String _text;
   final TextStyle? _textStyle;
@@ -426,7 +426,7 @@ enum SpriteBtnType {
 ///
 /// The sprite is loaded from the provided [path]. For predefined menu buttons,
 /// use [SpriteBtn.fromType] with a [SpriteBtnType] value.
-class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
+class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCallbacks, _BaseBtn {
   // constructor parameters
   final String _path;
   final String? _textOnBtn;
@@ -609,7 +609,7 @@ class RadioOption {
   const RadioOption({required this.text, required this.onSelected});
 }
 
-class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility, _BaseBtn {
+class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, _BaseBtn {
   // constructor parameters
   final String _text;
   final TextStyle? _textStyle;

@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/painting.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
 enum BackgroundSzene {
   szene1('Szene 1', 4),
@@ -36,14 +37,13 @@ enum BackgroundColor {
   static BackgroundColor fromName(String name) => BackgroundColor.values.firstWhere((e) => e.name == name, orElse: () => defaultColor);
 }
 
-class BackgroundParallax extends ParallaxComponent with HasVisibility {
+class BackgroundParallax extends ParallaxComponent with VisibleComponent {
   // constructor parameters
   final List<ParallaxImageData> _layers;
   final Vector2 _baseVelocity;
   final Vector2? _velocityMultiplierDelta;
   final ImageRepeat _repeat;
   final LayerFill _fill;
-  final bool _show;
 
   BackgroundParallax._({
     required List<ParallaxImageData> layers,
@@ -58,8 +58,9 @@ class BackgroundParallax extends ParallaxComponent with HasVisibility {
        _baseVelocity = baseVelocity,
        _velocityMultiplierDelta = velocityMultiplierDelta,
        _repeat = repeat,
-       _fill = fill,
-       _show = show;
+       _fill = fill {
+    initVisibility(show);
+  }
 
   factory BackgroundParallax.szene({
     required BackgroundSzene szene,
@@ -117,9 +118,5 @@ class BackgroundParallax extends ParallaxComponent with HasVisibility {
       repeat: _repeat,
       fill: _fill,
     );
-    _show ? show() : hide();
   }
-
-  void show() => isVisible = true;
-  void hide() => isVisible = false;
 }

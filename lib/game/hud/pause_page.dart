@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
-import 'package:flame/rendering.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/level.dart';
@@ -17,22 +16,18 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
 
   @override
   void onPush(Route? previousRoute) {
-    if (previousRoute is WorldRoute && previousRoute.world is DecoratedWorld) {
-      (previousRoute.world as DecoratedWorld).decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
-      (previousRoute.world as DecoratedWorld).timeScale = 0;
-      (previousRoute.world as Level).hideOverlayOnPause();
-      unawaited(game.audioCenter.pauseAllLoops());
-    }
+    final level = (previousRoute as WorldRoute?)?.world;
+    if (level is! Level) return;
+    level.pauseLevel();
+    unawaited(game.audioCenter.pauseAllLoops());
   }
 
   @override
   void onPop(Route nextRoute) {
-    if (nextRoute is WorldRoute && nextRoute.world is DecoratedWorld) {
-      (nextRoute.world as DecoratedWorld).decorator = null;
-      (nextRoute.world as DecoratedWorld).timeScale = 1;
-      (nextRoute.world as Level).showOverlayOnResume();
-      unawaited(game.audioCenter.resumeAllLoops());
-    }
+    final level = (nextRoute as WorldRoute?)?.world;
+    if (level is! Level) return;
+    level.resumeLevel();
+    unawaited(game.audioCenter.resumeAllLoops());
   }
 }
 

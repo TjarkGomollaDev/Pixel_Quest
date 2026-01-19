@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
@@ -35,7 +34,6 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
 
   // spotlight spacing
   static const double _characterChangeBtnSpacing = 10; // [Adjustable]
-  static const double _spotlightRadius = 60; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -49,7 +47,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpCharacterBio() {
-    _characterBio = CharacterBio(position: _spotlightCenter + Vector2(_spotlightRadius * 1.2, 0), show: false)
+    _characterBio = CharacterBio(position: _spotlightCenter + Vector2(Spotlight.playerTargetRadius * 1.2, 0), show: false)
       ..priority = GameSettings.spotlightAnimationContentLayer;
     add(_characterBio);
   }
@@ -84,7 +82,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
         _hideSpotlightContent();
         await _spotlight.expandToFull();
       },
-      position: _dummy.position + Vector2(_spotlightRadius * 0.9, -_spotlightRadius * 0.9),
+      position: _dummy.position + Vector2(Spotlight.playerTargetRadius * 0.9, -Spotlight.playerTargetRadius * 0.9),
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     add(_closeBtn);
@@ -112,21 +110,10 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     addAll([_previousCharacterBtn, _nextCharacterBtn]);
-
-    // final radio = RadioComponent(
-    //   position: _characterBio.position + Vector2(0, _characterBio.size.y / 2),
-    //   options: [
-    //     RadioOption(text: 'Mojo', onSelected: () {}),
-    //     RadioOption(text: 'Croko', onSelected: () {}),
-    //     RadioOption(text: 'Popstar P', onSelected: () {}),
-    //     RadioOption(text: 'Glitch', onSelected: () {}),
-    //   ],
-    // )..priority = GameSettings.spotlightAnimationContentLayer;
-    // add(radio);
   }
 
   void _setUpSpotlight() {
-    _spotlight = Spotlight(targetCenter: _spotlightCenter, targetRadius: _spotlightRadius);
+    _spotlight = Spotlight(targetCenter: _spotlightCenter);
     add(_spotlight);
   }
 
@@ -144,7 +131,11 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     _previousCharacterBtn.hide();
   }
 
-  void pause() => _dummy.pauseAnimation();
+  void pause() {
+    _dummy.pauseAnimation();
+  }
 
-  void resume() => _dummy.resumeAnimation();
+  void resume() {
+    _dummy.resumeAnimation();
+  }
 }

@@ -6,11 +6,11 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/background_parallax.dart';
 import 'package:pixel_adventure/game/level/loading/loading_dummy_character.dart';
-import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
+import 'package:pixel_adventure/game/traps/air_particle.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/misc_utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
@@ -143,7 +143,10 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
       color: AppTheme.tileBlur,
       borderRadius: 2,
       size: stageInfoBgSize,
-      position: Vector2(_safePadding.minLeft(40) + stageInfoBgSize.x / 2, -20 + size.y - stageInfoBgSize.y / 2),
+      position: Vector2(
+        _safePadding.minLeft(GameSettings.hudHorizontalMargin) + stageInfoBgSize.x / 2,
+        -20 + size.y - stageInfoBgSize.y / 2,
+      ),
       anchor: Anchor.center,
     );
     _stageInfoText.position = _stageInfoBg.position;
@@ -158,7 +161,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   void _spawnParticle() {
     final dummyPosition = _dummy.position.clone();
-    final particle = FanAirParticle(
+    final particle = AirParticle(
       streamTop: 0,
       streamLeft: dummyPosition.x - _widthParticleStream / 2,
       streamRight: dummyPosition.x + _widthParticleStream / 2,

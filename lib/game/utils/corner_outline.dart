@@ -9,15 +9,13 @@ class CornerOutline extends PositionComponent {
   final Color color;
 
   CornerOutline({
-    required Vector2 size,
+    required super.size,
     this.cornerLength = 6,
     this.strokeWidth = 2,
     this.color = AppTheme.ingameText,
     super.anchor,
     super.position,
-  }) {
-    this.size = size;
-  }
+  });
 
   @override
   void render(Canvas canvas) {

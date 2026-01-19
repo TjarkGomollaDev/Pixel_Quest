@@ -12,7 +12,7 @@ mixin VisibleComponent on Component {
   }
 
   void initVisibility(bool show) {
-    if (!show) hide();
+    show ? this.show() : hide();
   }
 
   void show() => isVisible = true;

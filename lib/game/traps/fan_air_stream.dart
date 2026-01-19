@@ -5,7 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/traps/fan_air_particle.dart';
+import 'package:pixel_adventure/game/traps/air_particle.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fan.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
@@ -127,7 +127,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     if (!game.isEntityInVisibleWorldRectX(_hitbox)) return;
 
     // create new particle
-    final particle = FanAirParticle(
+    final particle = AirParticle(
       streamTop: 0,
       streamLeft: 0,
       streamRight: size.x,

@@ -20,10 +20,11 @@ import 'package:pixel_adventure/game/traps/moving_platform.dart';
 import 'package:pixel_adventure/game/utils/animation_state.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/misc_utils.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
 enum PlayerState implements AnimationState {
   idle('Idle', 11),
@@ -57,7 +58,7 @@ enum PlayerCharacter {
 }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks, HasVisibility {
+    with HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks, VisibleComponent {
   // constructor parameters
   final PlayerCharacter _character;
 
@@ -357,7 +358,7 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _applyInput() {
-    if (_isSpawnProtectionActive || (game.world as DecoratedWorld).timeScale == 0) return;
+    if (_isSpawnProtectionActive || world.timeScale == 0) return;
 
     // horizontal movement handling
     _moveX = world.playerInput.moveX;
@@ -484,7 +485,9 @@ class Player extends SpriteAnimationGroupComponent
     return _isAtXCompleter!.future.whenComplete(() => _updateHitboxEdges());
   }
 
-  void reachedCheckpoint(Vector2 checkpointPosition) => _respawnPosition = checkpointPosition;
+  void reachedCheckpoint(Vector2 checkpointPosition) {
+    _respawnPosition = checkpointPosition;
+  }
 
   Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
 
@@ -504,14 +507,14 @@ class Player extends SpriteAnimationGroupComponent
     world.removeOverlaysOnFinish();
     unawaited(game.audioCenter.muteGameSfx());
     final playerCenter = hitboxAbsoluteRect.center.toVector2();
-    final spotlight = Spotlight(targetCenter: playerCenter, targetRadius: GameSettings.finishSpotlightAnimationRadius);
+    final spotlight = Spotlight(targetCenter: playerCenter);
     world.add(spotlight);
     await spotlight.focusOnTarget();
     game.audioCenter.playBackgroundMusic(BackgroundMusic.win);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // star positions
-    final starRadius = GameSettings.finishSpotlightAnimationRadius * 1.5;
+    final starRadius = Spotlight.playerTargetRadius * 1.5;
     final starPositions = calculateStarPositions(playerCenter, starRadius);
     final outlineStars = [];
     final stars = [];
@@ -611,7 +614,9 @@ class Player extends SpriteAnimationGroupComponent
     });
   }
 
-  void collidedWithEnemy(CollisionSide collisionSide) => _respawn(collisionSide);
+  void collidedWithEnemy(CollisionSide collisionSide) {
+    _respawn(collisionSide);
+  }
 
   void bounceUp({double jumpForce = 260, bool resetDoubleJump = true}) {
     _velocity.y = -jumpForce;
@@ -619,7 +624,11 @@ class Player extends SpriteAnimationGroupComponent
     if (resetDoubleJump) _canDoubleJump = true;
   }
 
-  void activateDoubleJump() => _canDoubleJump = true;
+  void activateDoubleJump() {
+    _canDoubleJump = true;
+  }
 
-  void adjustPostion({double? x, double? y}) => position += Vector2(x ?? 0, y ?? 0);
+  void adjustPostion({double? x, double? y}) {
+    position += Vector2(x ?? 0, y ?? 0);
+  }
 }

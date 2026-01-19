@@ -5,11 +5,12 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest> {
+class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final Slime _owner;
   final Player _player;
@@ -25,7 +26,7 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
   static final Vector2 gridSize = Vector2.all(16);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
+  final DebugRectangleHitbox _hitbox = DebugRectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
 
   // animation settings
   static final Vector2 _textureSize = Vector2.all(16);

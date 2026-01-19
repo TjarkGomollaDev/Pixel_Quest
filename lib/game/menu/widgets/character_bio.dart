@@ -4,13 +4,15 @@ import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/l10n/app_localizations_extensions.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
+class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   CharacterBio({required super.position, bool show = true}) {
     size = Vector2(100, 64);
-    if (!show) hide();
+    anchor = Anchor.centerLeft;
+    initVisibility(show);
   }
 
   // text labels
@@ -35,17 +37,8 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
 
   @override
   Future<void> onLoad() async {
-    _initialSetup();
     _setUpBio();
     super.onLoad();
-  }
-
-  void _initialSetup() {
-    // debug
-    debugColor = AppTheme.transparent;
-
-    // general
-    anchor = Anchor.centerLeft;
   }
 
   void _setUpBio() {
@@ -104,10 +97,6 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
       await Future.delayed(const Duration(milliseconds: _charDelay));
     }
   }
-
-  void show() => isVisible = true;
-
-  void hide() => isVisible = false;
 
   Future<void> animatedShow({double duration = 0.4}) async {
     if (isVisible) return;

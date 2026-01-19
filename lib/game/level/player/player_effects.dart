@@ -45,6 +45,14 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
   static const String _path = 'Main Characters/';
   static const String _pathEnd = ' (96x96).png';
 
+  // death animation
+  static const _bufferPlayerOutsideScreen = 20;
+  static final _offsetControlPoint = Vector2(40, 120);
+  static final _hopHeight = 40; // [Adjustable]
+  static const _hopDuration = 0.3; // [Adjustable]
+  static const _msPerPixelHorizontal = 2.6; // [Adjustable]
+  static const _msPerPixelVertical = 2.8; // [Adjustable]
+
   @override
   Future<void> onLoad() async {
     _loadAllSpriteAnimations();
@@ -106,17 +114,6 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     player.angle = 0;
   }
 
-  static final _offsetControlPoint = Vector2(40, 120);
-  static final _hopHeight = 40;
-  static const _hopDuration = 0.3;
-  static const _buffer = 20;
-  static const _msPerPixelHorizontal = 2.6;
-  static const _msPerPixelVertical = 2.8;
-
-  EffectController _deathController(double duration) => EffectController(duration: duration, curve: FastStartAccelerateCurve());
-
-  double _calculateDuration(double verticalDistance, double msPerPixel) => (verticalDistance * msPerPixel) / 1000;
-
   Future<void> _deathOnHorizontalCollision(CollisionSide collisionSide) async {
     final completer = Completer<void>();
 
@@ -125,7 +122,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final controlPointY = player.y - _offsetControlPoint.y;
 
     // end point
-    final endPointY = game.camera.visibleWorldRect.bottom + _buffer;
+    final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
     final verticalDistance = endPointY - controlPointY;
     final endPointX = collisionSide == CollisionSide.Left
         ? controlPointX - (verticalDistance * 0.02)
@@ -156,7 +153,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final completer = Completer<void>();
 
     // end point
-    final endPointY = game.camera.visibleWorldRect.bottom + _buffer;
+    final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
     final verticalDistance = collisionSide == CollisionSide.Top ? endPointY - player.y + _hopHeight : endPointY - player.y;
 
     // duration depends on distance
@@ -179,4 +176,8 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
 
     return completer.future;
   }
+
+  EffectController _deathController(double duration) => EffectController(duration: duration, curve: FastStartAccelerateCurve());
+
+  double _calculateDuration(double verticalDistance, double msPerPixel) => (verticalDistance * msPerPixel) / 1000;
 }

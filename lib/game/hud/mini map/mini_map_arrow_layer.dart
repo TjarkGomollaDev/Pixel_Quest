@@ -5,6 +5,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
 /// A thin bar placed below the mini map frame that draws upward-pointing
 /// triangle markers for entities currently obscured by the mini map.
@@ -19,7 +20,7 @@ import 'package:pixel_adventure/game/game.dart';
 /// - The triangle x coordinate matches the entity occlusion center x.
 /// - The camera moves only horizontally, therefore the frame's top/bottom y
 ///   bounds are precomputed once on load.
-class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
+class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   // constructor parameters
   final MiniMap _miniMap;
   final List<EntityOnMiniMap> _arrowCandidates;
@@ -28,7 +29,7 @@ class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQue
     : _miniMap = miniMap,
       _arrowCandidates = arrowCandidates {
     size = Vector2(_frameSize.x, _arrowSize.y);
-    if (!show) hide();
+    initVisibility(show);
   }
 
   // arrow settings
@@ -91,7 +92,4 @@ class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQue
       ..close();
     canvas.drawPath(triangle, _arrowMarkerPaint);
   }
-
-  void show() => isVisible = true;
-  void hide() => isVisible = false;
 }

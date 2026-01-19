@@ -5,7 +5,7 @@ import 'package:pixel_adventure/game/animations/star.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/misc_utils.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game.dart';
 
@@ -14,12 +14,8 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   final LevelMetadata _levelMetadata;
 
   LevelTile({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata, super(size: tileSize) {
-    _center = size / 2;
     anchor = Anchor.center;
   }
-
-  // center of the module
-  late final Vector2 _center;
 
   // size
   static final Vector2 tileSize = Vector2(54, 38); // [Adjustable]
@@ -27,13 +23,13 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   // background
   late final VisibleSpriteComponent _tileBg;
 
-  // btn
+  // level btn
   late final SpriteBtn _levelBtn;
 
   // stars
   static final Vector2 _starSize = Vector2.all(12); // [Adjustable]
   late final List<Vector2> _starPositions;
-  final List<double> _starAngles = [-0.1, 0, 0.1];
+  final List<double> _starAngles = [-0.1, 0, 0.1]; // [Adjustable]
   final List<Star> _outlineStars = [];
   final List<Star> _stars = [];
   int _newStarsToken = 0;
@@ -66,7 +62,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   void _setUpTileBg() {
     final sprite = loadSprite(game, 'Menu/Worlds/Level_Tile.png');
-    _tileBg = VisibleSpriteComponent(sprite: sprite, anchor: Anchor.center, position: _center);
+    _tileBg = VisibleSpriteComponent(sprite: sprite, anchor: Anchor.center, position: size / 2);
     add(_tileBg);
   }
 
@@ -79,7 +75,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
         await yieldFrame();
         game.router.pushReplacementNamed(_levelMetadata.uuid);
       },
-      position: Vector2(_center.x, size.y - 17 / 2 - _btnMarginBottom),
+      position: Vector2(_tileBg.x, size.y - 17 / 2 - _btnMarginBottom),
     );
     add(_levelBtn);
   }
@@ -87,9 +83,9 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   void _setUpStars() {
     final yPos = _starSize.y / 2 + _starsMarginTop;
     _starPositions = [
-      Vector2(_center.x - _starSize.x - _starSpacingHorizontal, yPos + 2),
-      Vector2(_center.x, yPos),
-      Vector2(_center.x + _starSize.x + _starSpacingHorizontal, yPos + 2),
+      Vector2(_tileBg.x - _starSize.x - _starSpacingHorizontal, yPos + 2),
+      Vector2(_tileBg.x, yPos),
+      Vector2(_tileBg.x + _starSize.x + _starSpacingHorizontal, yPos + 2),
     ];
     _rebuildStars(game.storageCenter.getLevel(_levelMetadata.uuid).stars);
   }

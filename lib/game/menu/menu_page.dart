@@ -36,8 +36,8 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   late final DotsIndicator _dotsIndicator;
 
   // spacing
-  static const double _levelGridChangeWorldBtnsSpacing = 22;
-  static const double _levelGridDotsIndicatorSpacing = 14;
+  static const double _levelGridChangeWorldBtnsSpacing = 22; // [Adjustable]
+  static const double _levelGridDotsIndicatorSpacing = 14; // [Adjustable]
 
   // animation event for new stars
   NewStarsEarned? _pendingNewStarsEarnedEvent;

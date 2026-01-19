@@ -6,6 +6,7 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
 /// A purely visual mini map component that renders a horizontal slice of the level.
@@ -21,7 +22,7 @@ import 'package:vector_math/vector_math_64.dart' as math64;
 /// - rendering entities in two separate layers (behind/above foreground),
 /// - drawing the player marker,
 /// - handling horizontal scrolling based solely on the provided player position.
-class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility {
+class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   // constructor parameters
   final Sprite _spriteForeground;
   final Vector2 _targetSize;
@@ -46,7 +47,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground,
        super(size: targetSize) {
-    if (!show) hide();
+    initVisibility(show);
   }
   // internal horizontal offset in mini map coordinates used to "scroll" the map when the player moves
   double _offsetX = 0;
@@ -242,7 +243,4 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, H
   /// Draws a platform-style rectangular entity marker.
   void _renderEntityPlatformMarker(Canvas canvas, Vector2 position) =>
       canvas.drawRect(Rect.fromLTWH(position.x, position.y, _entityMarkerPlatformSize.x, _entityMarkerPlatformSize.y), _entityMarkerPaint);
-
-  void show() => isVisible = true;
-  void hide() => isVisible = false;
 }

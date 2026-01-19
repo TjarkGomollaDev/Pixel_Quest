@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
@@ -41,22 +42,15 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
        _levelMetadata = levelMetadata,
        _miniMapEntities = miniMapEntities,
        _showAtStart = show {
-    final minLeft = game.safePadding.minLeft(40);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), SpriteBtnType.btnSizeCorrected.y);
+    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMargin);
+    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMargin), SpriteBtnType.btnSizeCorrected.y);
     position = Vector2(minLeft, GameSettings.mapBorderWidth + GameSettings.hudVerticalMargin);
-    _verticalCenter = size.y / 2;
   }
-
-  // vertical center of the module
-  late final double _verticalCenter;
 
   // btns
   late final SpriteBtn _menuBtn;
   late final SpriteToggleBtn _pauseBtn;
   late final SpriteBtn _restartBtn;
-
-  // btn spacing
-  static const double _btnSpacing = 6; // [Adjustable]
 
   // fruits count
   late final RRectComponent _fruitBg;
@@ -68,16 +62,15 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   late final VisibleSpriteComponent _deathItem;
   late final VisibleTextComponent _deathCount;
 
-  // count settings
-  static const double _bgSize = 19;
-  static const double _spacingBetweenElements = 16; // [Adjustable]
-  static const double _counterTextMarginLeft = 4; // [Adjustable]
-
   // mini map
   late final MiniMap _miniMap;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   @override
   FutureOr<void> onLoad() {
+    _addSubscription();
     _setUpBtns();
     _setUpFruitsCount();
     _setUpDeathCount();
@@ -85,10 +78,25 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     return super.onLoad();
   }
 
+  @override
+  void onRemove() {
+    _removeSubscription();
+    super.onRemove();
+  }
+
+  void _addSubscription() {
+    _sub = GameEventBus.instance.listen<PausePageTriggered>((_) => _pauseBtn.triggerToggle());
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
+  }
+
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(SpriteBtnType.btnSizeCorrected.x / 2, _verticalCenter);
-    final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(SpriteBtnType.btnSizeCorrected.x / 2, size.y / 2);
+    final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + GameSettings.hudBtnSpacing, 0);
 
     // menu btn
     _menuBtn = SpriteBtn.fromType(
@@ -122,36 +130,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     addAll([_menuBtn, _pauseBtn, _restartBtn]);
   }
 
-  void _restartLevel() {
-    unawaited(game.audioCenter.muteGameSfx());
-    final currentRoute = game.router.currentRoute;
-    WorldRoute? levelRoute;
-
-    switch (currentRoute) {
-      case WorldRoute():
-        levelRoute = currentRoute;
-      case PausePage():
-        final previousRoute = game.router.previousRoute;
-        if (previousRoute is WorldRoute) {
-          game.router.pop();
-          levelRoute = previousRoute;
-        }
-    }
-
-    if (levelRoute == null) return;
-
-    final levelMetadata = (levelRoute.world as Level).levelMetadata;
-    game.showLoadingOverlay(levelMetadata);
-    game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false), name: levelMetadata.uuid);
-  }
-
   void _setUpFruitsCount() {
     // fruit background
     _fruitBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_restartBtn.position.x + SpriteBtnType.btnSizeCorrected.x / 2 + _spacingBetweenElements, _verticalCenter),
-      size: Vector2.all(_bgSize),
+      position: _restartBtn.position + Vector2(SpriteBtnType.btnSizeCorrected.x / 2 + GameSettings.hudSectionSpacing, 0),
+      size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,
       show: _showAtStart,
     );
@@ -159,7 +144,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // fruit item
     _fruitItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Apple.png'),
-      position: Vector2(_fruitBg.position.x + _fruitBg.size.x / 2, _verticalCenter + 2),
+      position: _fruitBg.position + Vector2(_fruitBg.size.x / 2, 2),
       size: Vector2.all(32),
       anchor: Anchor.center,
       show: _showAtStart,
@@ -169,7 +154,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitsCount = VisibleTextComponent(
       text: '0/$_totalFruitsCount',
       anchor: Anchor.centerLeft,
-      position: Vector2(_fruitBg.position.x + _fruitBg.size.x + _counterTextMarginLeft, _verticalCenter),
+      position: _fruitBg.position + Vector2(_fruitBg.size.x + GameSettings.hudBtnTextSpacing, 0),
       textRenderer: AppTheme.hudText.asTextPaint,
       show: _showAtStart,
     );
@@ -182,8 +167,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(_fruitsCount.position.x + _fruitsCount.size.x + _spacingBetweenElements, _verticalCenter),
-      size: Vector2.all(_bgSize),
+      position: _fruitsCount.position + Vector2(_fruitsCount.size.x + GameSettings.hudSectionSpacing, 0),
+      size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,
       show: _showAtStart,
     );
@@ -191,7 +176,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // death item
     _deathItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Bone.png'),
-      position: Vector2(_deathBg.position.x + _deathBg.size.x / 2, _verticalCenter),
+      position: _deathBg.position + Vector2(_deathBg.size.x / 2, 0),
       size: Vector2.all(32),
       anchor: Anchor.center,
       show: _showAtStart,
@@ -201,7 +186,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathCount = VisibleTextComponent(
       text: '0',
       anchor: Anchor.centerLeft,
-      position: Vector2(_deathBg.position.x + _deathBg.size.x + _counterTextMarginLeft, _verticalCenter),
+      position: _deathBg.position + Vector2(_deathBg.size.x + GameSettings.hudBtnTextSpacing, 0),
       textRenderer: AppTheme.hudText.asTextPaint,
       show: _showAtStart,
     );
@@ -216,7 +201,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       levelMetadata: _levelMetadata,
       levelWidth: _levelWidth,
       miniMapEntities: _miniMapEntities,
-      position: Vector2(size.x, _verticalCenter - _fruitBg.size.y / 2),
+      position: Vector2(size.x, _deathBg.position.y - _deathBg.size.y / 2),
       hudTopRightToScreenTopRightOffset: position,
       initialState: game.storageCenter.settings.showMiniMapAtStart,
       show: _showAtStart,
@@ -237,9 +222,34 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _miniMap.show();
   }
 
-  void updateFruitCount(int collected) => _fruitsCount.text = '$collected/$_totalFruitsCount';
+  void _restartLevel() {
+    // check whether the pause page is currently at the top, if so, it must be popped first
+    switch (game.router.currentRoute) {
+      case WorldRoute():
+        break;
+      case PausePage():
+        if (game.router.previousRoute is WorldRoute) game.router.pop();
+        break;
+      default:
+        // safety check, should never actually occur
+        return;
+    }
 
-  void updateDeathCount(int deaths) => _deathCount.text = deaths.toString();
+    // game sound should be muted immediately
+    unawaited(game.audioCenter.muteGameSfx());
 
-  void togglePlayButton() => _pauseBtn.triggerToggle();
+    // at this point, we deliberately overwrite the existing route in the router by resetting the name,
+    // this is the only way we can force the router to completely reload the level,
+    // otherwise, the existing level would simply be placed on top of the stack without being reloaded
+    game.showLoadingOverlay(_levelMetadata);
+    game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: _levelMetadata), maintainState: false), name: _levelMetadata.uuid);
+  }
+
+  void updateFruitCount(int collected) {
+    _fruitsCount.text = '$collected/$_totalFruitsCount';
+  }
+
+  void updateDeathCount(int deaths) {
+    _deathCount.text = deaths.toString();
+  }
 }

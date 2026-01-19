@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
-class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, HasVisibility {
+class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, VisibleComponent {
   // constructor parameters
   final VoidCallback _onJump;
 
   JumpBtn({required VoidCallback onJump, super.position, bool show = true}) : _onJump = onJump {
     size = Vector2.all(GameSettings.jumpBtnRadius * 2);
-    if (!show) hide();
+    initVisibility(show);
   }
 
   @override
@@ -38,7 +39,4 @@ class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
     );
     addAll([background, text]);
   }
-
-  void show() => isVisible = true;
-  void hide() => isVisible = false;
 }

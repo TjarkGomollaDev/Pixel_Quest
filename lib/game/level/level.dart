@@ -18,6 +18,7 @@ import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/enemies/snail.dart';
 import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
+import 'package:pixel_adventure/game/game_router.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/level/player/player_input.dart';
@@ -43,29 +44,16 @@ import 'package:pixel_adventure/game/traps/spiked_ball.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/traps/trampoline.dart';
 import 'package:pixel_adventure/game/utils/grid.dart';
-import 'package:pixel_adventure/game/utils/utils.dart';
+import 'package:pixel_adventure/game/utils/misc_utils.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 
-class DecoratedWorld extends World with HasTimeScale {
-  PaintDecorator? decorator;
-
-  @override
-  void renderFromCamera(Canvas canvas) {
-    if (decorator == null) {
-      super.renderFromCamera(canvas);
-    } else {
-      decorator!.applyChain(super.renderFromCamera, canvas);
-    }
-  }
-}
-
-class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbacks {
+class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCallbacks {
   // constructor parameters
-  final LevelMetadata levelMetadata;
+  final LevelMetadata _levelMetadata;
 
-  Level({required this.levelMetadata});
+  Level({required LevelMetadata levelMetadata}) : _levelMetadata = levelMetadata;
 
   // level map from Tiled file
   late final TiledComponent _levelMap;
@@ -76,7 +64,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   // all collision blocks from background layer
   final List<WorldBlock> _collisionBlocks = [];
 
-  // all spawning objects which are needed in some way for the mini map
+  // all spawning objects from spawning layer which are needed in some way for the mini map
   final List<EntityOnMiniMap> _miniMapEntities = [];
 
   // mini map
@@ -101,11 +89,18 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
   int _deathCount = 0;
   int _earnedStars = 0;
 
-  // respawnables
+  // there are objects that can be collected by the player, but should reappear when the player respawns
   final List<Respawnable> _pendingRespawnables = [];
+
+  // when the level is paused, it should be rendered with a blur
+  bool _levelPaused = false;
+  PaintDecorator decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
 
   // timestamp used to measure loading time and used in conjunction with the loading overlay
   late final DateTime _startTime;
+
+  // flag we need if we want to load a level directly for testing purposes without going through the menu
+  static bool _debugStartInLevel = false;
 
   // getter
   PlayerInput get playerInput => _playerInput;
@@ -113,22 +108,22 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   @override
   Future<void> onLoad() async {
-    _initialSetup();
+    _startLoading();
     await _loadLevelMap();
     await _startMiniMapRecording();
     await _addBackgroundLayer();
     await _addSpawningLayer();
     await _endMiniMapRecording();
+    _setUpCamera();
     return super.onLoad();
   }
 
   @override
   Future<void> onMount() async {
-    _setUpCamera();
     _addGameHud();
     _addMobileControls();
     _addFpsDisplay();
-    await _hideLoadingOverlayAndStart();
+    await _completeLoading();
     super.onMount();
   }
 
@@ -137,22 +132,43 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _removeGameHud();
     _removeMobileControls();
     _removeFpsDisplay();
-    game.audioCenter.stopBackgroundMusic();
-    game.audioCenter.muteGameSfx();
-    _playerInput.clearInput();
+    _cleanUpLevel();
     return super.onRemove();
   }
 
-  void _initialSetup() {
-    // debug
+  @override
+  void renderFromCamera(Canvas canvas) {
+    if (_levelPaused) return decorator.applyChain(super.renderFromCamera, canvas);
+    super.renderFromCamera(canvas);
+  }
 
-    // general
-    timeScale = 0;
+  void _startLoading() {
     _startTime = DateTime.now();
+    timeScale = 0;
+  }
+
+  Future<void> _completeLoading() async {
+    if (game.router.initialRoute == RouteNames.menu || _debugStartInLevel) {
+      // the overlay should be displayed for a minimum amount of time
+      final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
+      final delayMs = 1400;
+      if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+      await game.hideLoadingOverlay(onAfterDummyFallOut: () => timeScale = 1);
+    } else {
+      // when we start testing directly in a level, we don't want any delays and we don't need to hide any overlays
+      _debugStartInLevel = true;
+      timeScale = 1;
+    }
+
+    // delay for visual reasons only
+    await Future.delayed(Duration(milliseconds: 100));
+
+    // this method spawns the player and initiates the level start
+    _player.spawnInLevel();
   }
 
   Future<void> _loadLevelMap() async {
-    _levelMap = await TiledComponent.load('${levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
+    _levelMap = await TiledComponent.load('${_levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
       ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
     await yieldFrame();
@@ -165,11 +181,17 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
   }
 
+  Future<void> _endMiniMapRecording() async {
+    final picture = _miniMapRecorder.endRecording();
+    final image = await picture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
+    _readyMadeMiniMapForground = Sprite(image);
+  }
+
   void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
     _miniMapPaint.color = getMiniMapColor(
       tileId: tileId,
       isPlatform: isPlatform,
-      baseBlock: game.staticCenter.getWorld(levelMetadata.worldUuid).baseBlock,
+      baseBlock: game.staticCenter.getWorld(_levelMetadata.worldUuid).baseBlock,
     );
     _miniMapCanvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
   }
@@ -196,11 +218,8 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _addPatternToMiniMap(mapPosition, miniMapCheckpointPattern);
   }
 
-  Future<void> _endMiniMapRecording() async {
-    final picture = _miniMapRecorder.endRecording();
-    final image = await picture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
-
-    _readyMadeMiniMapForground = Sprite(image);
+  void _addEntityToMiniMap(EntityOnMiniMap entity) {
+    _miniMapEntities.add(entity);
   }
 
   Future<void> _addBackgroundLayer() async {
@@ -243,7 +262,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     // the background from the world is the default
     if (!isInitialized) {
       _levelBackground = BackgroundParallax.szene(
-        szene: game.staticCenter.getWorld(levelMetadata.worldUuid).backgroundSzene,
+        szene: game.staticCenter.getWorld(_levelMetadata.worldUuid).backgroundSzene,
         position: position,
         size: size,
       );
@@ -611,7 +630,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
         }
         if (spawnObject == null) continue;
 
-        // add all spawn objects and, if necessary, add them to the mini map
+        // add spawn objects to level and, if necessary, add them to the mini map
         add(spawnObject);
         if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
 
@@ -622,9 +641,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     }
   }
 
-  void _addEntityToMiniMap(EntityOnMiniMap entity) => _miniMapEntities.add(entity);
-
-  void _setUpCamera() => game.setUpCameraForLevel(_levelMap.width, _player);
+  void _setUpCamera() {
+    game.setUpCameraForLevel(_levelMap.width, _player);
+  }
 
   void _addGameHud() {
     _gameHud = GameHud(
@@ -632,7 +651,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
       miniMapSprite: _readyMadeMiniMapForground,
       levelWidth: _levelMap.width,
       player: _player,
-      levelMetadata: levelMetadata,
+      levelMetadata: _levelMetadata,
       miniMapEntities: _miniMapEntities,
     );
     game.camera.viewport.add(_gameHud);
@@ -664,7 +683,7 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
 
   void showOverlayOnStart() {
     _gameHud.show();
-    showOverlayOnResume();
+    resumeLevel();
     _fpsDisplay?.show();
   }
 
@@ -674,31 +693,26 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _removeFpsDisplay();
   }
 
-  void hideOverlayOnPause() {
+  void pauseLevel() {
+    timeScale = 0;
+    _levelPaused = true;
     _mobileControls?.hide();
     _fpsDisplay?.hide();
   }
 
-  void showOverlayOnResume() {
+  void resumeLevel() {
+    timeScale = 1;
+    _levelPaused = false;
     _mobileControls?.show();
     _fpsDisplay?.show();
   }
 
-  void increaseFruitsCount() => _gameHud.updateFruitCount(++_playerFruitsCount);
+  void increaseFruitsCount() {
+    _gameHud.updateFruitCount(++_playerFruitsCount);
+  }
 
-  void _increaseDeathCount() => _gameHud.updateDeathCount(++_deathCount);
-
-  Future<void> _hideLoadingOverlayAndStart() async {
-    final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
-    final delayMs = 1400;
-    if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-    await game.hideLoadingOverlay(onAfterDummyFallOut: () => timeScale = 1);
-
-    // delay for visual reasons only
-    await Future.delayed(Duration(milliseconds: 100));
-
-    // this method triggers the level start
-    _player.spawnInLevel();
+  void _increaseDeathCount() {
+    _gameHud.updateDeathCount(++_deathCount);
   }
 
   void queueForRespawn(Respawnable item) {
@@ -720,6 +734,20 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     _increaseDeathCount();
   }
 
+  Future<void> saveData() async {
+    _calculateEarnedStars();
+    await game.storageCenter.saveLevel(
+      data: LevelEntity(
+        uuid: _levelMetadata.uuid,
+        stars: _earnedStars,
+        totalFruits: _totalFruitsCount,
+        earnedFruits: _playerFruitsCount,
+        deaths: _deathCount,
+      ),
+      worldUuid: _levelMetadata.worldUuid,
+    );
+  }
+
   void _calculateEarnedStars() {
     if (_playerFruitsCount >= _totalFruitsCount) {
       _earnedStars = 3;
@@ -730,19 +758,9 @@ class Level extends DecoratedWorld with HasGameReference<PixelQuest>, TapCallbac
     }
   }
 
-  Future<void> saveData() async {
-    _calculateEarnedStars();
-    await game.storageCenter.saveLevel(
-      data: LevelEntity(
-        uuid: levelMetadata.uuid,
-        stars: _earnedStars,
-        totalFruits: _totalFruitsCount,
-        earnedFruits: _playerFruitsCount,
-        deaths: _deathCount,
-      ),
-      worldUuid: levelMetadata.worldUuid,
-    );
+  void _cleanUpLevel() {
+    game.audioCenter.stopBackgroundMusic();
+    game.audioCenter.muteGameSfx();
+    _playerInput.clearInput();
   }
-
-  void pauseLevel() => _gameHud.togglePlayButton();
 }

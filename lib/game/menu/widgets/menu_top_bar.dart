@@ -2,11 +2,10 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/traps/fruit.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 
@@ -15,21 +14,13 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   final int _startWorldIndex;
 
   MenuTopBar({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {
-    final minLeft = game.safePadding.minLeft(40);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(40), Fruit.gridSize.y);
-    position = Vector2(minLeft, 10);
-    _verticalCenter = size.y / 2;
+    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMargin);
+    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMargin), SpriteBtnType.btnSizeCorrected.y);
+    position = Vector2(minLeft, GameSettings.hudVerticalMargin);
   }
-
-  // vertical center of the module
-  late final double _verticalCenter;
-
   // btns
   late final SpriteBtn _shopBtn;
   late final SpriteBtn _settingsBtn;
-
-  // spacing
-  final double _btnSpacing = 4;
 
   // stars count
   late final RRectComponent _starBg;
@@ -41,15 +32,11 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   late final Vector2 _animatedStarStart;
   int _starsCountToken = 0;
 
-  // count settings
-  static const double _bgSize = 19;
-  static const double _counterTextMarginLeft = 4;
-
   @override
   FutureOr<void> onLoad() {
-    _setUpBtns();
     _setUpStarsCount();
     _setUpAnimatedStar();
+    _setUpBtns();
     return super.onLoad();
   }
 
@@ -60,17 +47,13 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     _starBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
-      position: Vector2(0, _verticalCenter),
-      size: Vector2.all(_bgSize),
+      position: Vector2(0, size.y / 2),
+      size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,
     );
 
     // star item
-    _starItem = Star(
-      variant: StarVariant.filled,
-      position: Vector2(_starBg.position.x + _starBg.size.x / 2, _verticalCenter),
-      size: Vector2.all(16),
-    );
+    _starItem = Star(variant: StarVariant.filled, position: _starBg.position + Vector2(_starBg.size.x / 2, 0), size: Vector2.all(16));
     addAll([_starBg, _starItem]);
 
     // world star counts text
@@ -78,7 +61,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
       final text = VisibleTextComponent(
         text: '${game.storageCenter.getWorld(world.uuid).stars}/48',
         anchor: Anchor.centerLeft,
-        position: Vector2(_starBg.position.x + _starBg.size.x + _counterTextMarginLeft, _verticalCenter),
+        position: _starBg.position + Vector2(_starBg.size.x + GameSettings.hudBtnTextSpacing, 0),
         textRenderer: AppTheme.hudText.asTextPaint,
         show: world.index == _startWorldIndex,
       );
@@ -95,8 +78,8 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSize.x * 1.5 - _btnSpacing, _verticalCenter);
-    final btnOffset = Vector2(SpriteBtnType.btnSize.x + _btnSpacing, 0);
+    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSizeCorrected.x * 1.5 - GameSettings.hudBtnSpacing, _starBg.position.y);
+    final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + GameSettings.hudBtnSpacing, 0);
 
     // shop btn
     _shopBtn = SpriteBtn.fromType(
@@ -115,13 +98,21 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     addAll([_shopBtn, _settingsBtn]);
   }
 
-  void _updateStarsCount({required int index, required int stars}) => _worldStarsCounts[index].text = '$stars/48';
+  void _updateStarsCount({required int index, required int stars}) {
+    _worldStarsCounts[index].text = '$stars/48';
+  }
 
-  void showStarsCount(int index) => _worldStarsCounts[index].show();
+  void showStarsCount(int index) {
+    _worldStarsCounts[index].show();
+  }
 
-  void hideStarsCount(int index) => _worldStarsCounts[index].hide();
+  void hideStarsCount(int index) {
+    _worldStarsCounts[index].hide();
+  }
 
-  void setStarsCount({required int index, required int totalStars}) => _updateStarsCount(index: index, stars: totalStars);
+  void setStarsCount({required int index, required int totalStars}) {
+    _updateStarsCount(index: index, stars: totalStars);
+  }
 
   Future<void> starsCountAnimation({required int index, required int newStars, required int totalStars}) async {
     final token = ++_starsCountToken;

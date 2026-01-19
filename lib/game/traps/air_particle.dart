@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest> {
+class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final double _streamTop;
   final double _streamLeft;
@@ -14,7 +15,7 @@ class FanAirParticle extends SpriteComponent with HasGameReference<PixelQuest> {
   final Vector2 _basePosition;
   final double _baseWidth;
 
-  FanAirParticle({
+  AirParticle({
     required double streamTop,
     required double streamLeft,
     required double streamRight,

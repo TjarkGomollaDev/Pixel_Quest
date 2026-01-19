@@ -1,11 +1,12 @@
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/enemies/ghost.dart';
+import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest> {
+class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final Ghost _owner; // has to be public
   final bool _spawnOnLeftSide;

@@ -5,14 +5,15 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/level/player/player_input.dart';
 import 'package:pixel_adventure/game/utils/arrow_indicator.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
-class Joystick extends PositionComponent with HasVisibility {
+class Joystick extends PositionComponent with VisibleComponent {
   // constructor parameters
   final PlayerInput _playerInput;
 
   Joystick({required PlayerInput playerInput, bool show = true}) : _playerInput = playerInput {
     size = Vector2.all(GameSettings.joystickRadius * 2);
-    show ? this.show() : hide();
+    initVisibility(show);
   }
 
   // component
@@ -31,11 +32,24 @@ class Joystick extends PositionComponent with HasVisibility {
     super.onRemove();
   }
 
+  @override
+  void show() {
+    isVisible = true;
+    _attach();
+  }
+
+  @override
+  void hide() {
+    isVisible = false;
+    _detach();
+  }
+
   void _setUpComponent() {
     _joystick = JoystickComponent(
       knob: CircleComponent(
         radius: GameSettings.knobRadius,
         paint: Paint()
+          // white circle with a shader to create a 3D effect
           ..shader =
               const RadialGradient(
                 colors: [AppTheme.ingameText, AppTheme.ingameText, Color.fromARGB(255, 176, 176, 178)],
@@ -60,16 +74,6 @@ class Joystick extends PositionComponent with HasVisibility {
     if (!_attached) return;
     _playerInput.detachJoystick();
     _attached = false;
-  }
-
-  void show() {
-    isVisible = true;
-    _attach();
-  }
-
-  void hide() {
-    isVisible = false;
-    _detach();
   }
 }
 

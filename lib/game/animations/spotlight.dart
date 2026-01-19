@@ -14,7 +14,10 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   final Vector2 targetCenter;
   final double targetRadius;
 
-  Spotlight({required this.targetCenter, this.targetRadius = 50});
+  Spotlight({required this.targetCenter, this.targetRadius = playerTargetRadius});
+
+  // default target radius for player
+  static const double playerTargetRadius = 60;
 
   // spotlight radius
   late double radius;
