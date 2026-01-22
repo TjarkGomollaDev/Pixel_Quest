@@ -2,7 +2,8 @@ import 'package:flame/extensions.dart';
 
 abstract class GameSettings {
   // custom debug mode
-  static const bool customDebug = true;
+  static const bool testMode = true;
+  static const bool customDebugMode = true;
 
   // mobile cotrols
   static const bool showMobileControls = true;
@@ -24,7 +25,7 @@ abstract class GameSettings {
   static const double hudHorizontalMargin = 40;
   static const double hudBtnSpacing = 7;
   static const double hudBtnTextSpacing = 4;
-  static const double hudSectionSpacing = 16;
+  static const double hudSectionSpacing = 18;
   static const double hudBgTileSize = 19;
 
   // in which layers the various objects are rendered

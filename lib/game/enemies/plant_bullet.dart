@@ -41,7 +41,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
   late int _moveDirection;
 
   // list of objects that will destroy the projectile upon collision
-  static const List<Type> despawnTypes = [WorldBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
+  static const List<Type> _despawnTypes = [WorldBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -58,7 +58,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (despawnTypes.any((type) => other.runtimeType == type)) _despawn();
+    if (_despawnTypes.any((type) => other.runtimeType == type)) _despawn();
     super.onCollisionStart(intersectionPoints, other);
   }
 
@@ -73,7 +73,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
@@ -85,9 +85,13 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
     _moveDirection = _isLeft ? -1 : 1;
   }
 
-  void _loadSprite() => sprite = loadSprite(game, _path);
+  void _loadSprite() {
+    sprite = loadSprite(game, _path);
+  }
 
-  void _movement(double dt) => position.x += _moveDirection * _moveSpeed * dt;
+  void _movement(double dt) {
+    position.x += _moveDirection * _moveSpeed * dt;
+  }
 
   void _despawn() => removeFromParent();
 }

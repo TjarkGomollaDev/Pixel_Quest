@@ -42,7 +42,7 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
   static const String _pathEnd = ' (64x64).png';
 
   // reached
-  bool reached = false;
+  bool _reached = false;
 
   @override
   FutureOr<void> onLoad() {
@@ -51,9 +51,12 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
     return super.onLoad();
   }
 
+  @override
+  ShapeHitbox get worldHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = _hitbox.debugColor = AppTheme.debugColorWorldBlock;
@@ -72,17 +75,17 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
   }
 
   Future<void> reachedFinish() async {
-    if (reached) return;
-    reached = true;
-    current = FinishState.pressed;
+    if (_reached) return;
+    _reached = true;
     _player.reachedFinish(_hitbox);
+
+    // finish sound
     game.audioCenter.stopBackgroundMusic();
     game.audioCenter.playSound(Sfx.finish, SfxType.level);
 
+    // play reached finish animation
+    current = FinishState.pressed;
     await animationTickers![FinishState.pressed]!.completed;
     current = FinishState.idle;
   }
-
-  @override
-  ShapeHitbox get worldHitbox => _hitbox;
 }

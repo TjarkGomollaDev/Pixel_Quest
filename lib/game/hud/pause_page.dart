@@ -4,7 +4,7 @@ import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/level.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
@@ -16,18 +16,12 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
 
   @override
   void onPush(Route? previousRoute) {
-    final level = (previousRoute as WorldRoute?)?.world;
-    if (level is! Level) return;
-    level.pauseLevel();
-    unawaited(game.audioCenter.pauseAllLoops());
+    game.eventBus.emit(const LevelLifecycleChanged(Lifecycle.paused));
   }
 
   @override
   void onPop(Route nextRoute) {
-    final level = (nextRoute as WorldRoute?)?.world;
-    if (level is! Level) return;
-    level.resumeLevel();
-    unawaited(game.audioCenter.resumeAllLoops());
+    game.eventBus.emit(const LevelLifecycleChanged(Lifecycle.resumed));
   }
 }
 
@@ -106,7 +100,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
       size: _pauseBg.size + Vector2.all(16),
       cornerLength: 12,
       strokeWidth: 3.5,
-      color: AppTheme.ingameText,
+      color: AppTheme.white,
       anchor: Anchor.center,
       position: _pauseText.position,
     );

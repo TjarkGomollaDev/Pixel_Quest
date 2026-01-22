@@ -95,9 +95,24 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     super.update(dt);
   }
 
+  @override
+  void onEntityCollision(CollisionSide collisionSide) {
+    _playerInStream = true;
+    _player.activateDoubleJump();
+  }
+
+  @override
+  void onEntityCollisionEnd() => _playerInStream = false;
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -110,7 +125,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   }
 
   void _addSubscription() {
-    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
+    _sub = game.eventBus.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
   }
 
   void _removeSubscription() {
@@ -118,9 +133,13 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _sub = null;
   }
 
-  void _setUpParticle() => _particleBasePosition = Vector2((size.x - _baseWidth) / 2, size.y);
+  void _setUpParticle() {
+    _particleBasePosition = Vector2((size.x - _baseWidth) / 2, size.y);
+  }
 
-  void _startParticleTimer() => _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true);
+  void _startParticleTimer() {
+    _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true);
+  }
 
   void _spawnParticle() {
     // camera culling
@@ -137,7 +156,9 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     add(particle);
   }
 
-  void _startSwitchMode() => _fanTimer = Timer(_durationFanOff, onTick: _switchOff);
+  void _startSwitchMode() {
+    _fanTimer = Timer(_durationFanOff, onTick: _switchOff);
+  }
 
   void _switchOn() {
     _particleTimer.start();
@@ -158,19 +179,4 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
       ..onTick = _switchOn
       ..start();
   }
-
-  @override
-  void onEntityCollision(CollisionSide collisionSide) {
-    _playerInStream = true;
-    _player.activateDoubleJump();
-  }
-
-  @override
-  void onEntityCollisionEnd() => _playerInStream = false;
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

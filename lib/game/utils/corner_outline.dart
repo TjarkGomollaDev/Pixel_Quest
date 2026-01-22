@@ -12,7 +12,7 @@ class CornerOutline extends PositionComponent {
     required super.size,
     this.cornerLength = 6,
     this.strokeWidth = 2,
-    this.color = AppTheme.ingameText,
+    this.color = AppTheme.white,
     super.anchor,
     super.position,
   });

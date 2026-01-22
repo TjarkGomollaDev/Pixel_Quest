@@ -119,7 +119,7 @@ class SpikeHead extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -170,6 +170,9 @@ class SpikeHead extends PositionComponent
 
   Future<void> _changeDirection(int newDirection) async {
     _directionChangePending = true;
+    _moveDirection = newDirection;
+
+    // depending on whether we hit the top or bottom, we choose the animation and the new speed
     final SpikeHeadState hitAnimation;
     if (newDirection == 1) {
       hitAnimation = SpikeHeadState.topHit;
@@ -179,7 +182,8 @@ class SpikeHead extends PositionComponent
       _moveSpeed = _moveSpeedUp;
       game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(entityHitbox), SfxType.game);
     }
-    _moveDirection = newDirection;
+
+    // animation sequence
     animationGroupComponent.current = hitAnimation;
     await animationGroupComponent.animationTickers![hitAnimation]!.completed;
     animationGroupComponent.current = SpikeHeadState.idle;

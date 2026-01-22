@@ -37,4 +37,4 @@ const List<List<Color?>> miniMapCheckpointPattern = [
   [AppTheme.woodBlock, null, null, null],
 ];
 
-const List<Color> miniMapBackgroundColors = [AppTheme.skyBlock1, AppTheme.skyBlock2, AppTheme.skyBlock3];
+const List<Color> miniMapBackgroundColors = [AppTheme.skyBlockWorld_1, AppTheme.skyBlockWorld_2, AppTheme.skyBlockWorld_3];

@@ -51,7 +51,7 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;

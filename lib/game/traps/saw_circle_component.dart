@@ -82,7 +82,7 @@ class SawCircleComponent extends PositionComponent with HasGameReference<PixelQu
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }

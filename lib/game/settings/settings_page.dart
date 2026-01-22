@@ -245,13 +245,13 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
             }
 
             // restart app with new language
-            game.requestLocale(newLocale);
+            game.requestLocaleChange(newLocale);
           }),
     );
   }
 
   void _controlSettingChanged(JoystickSetup setup) {
     unawaited(game.storageCenter.updateSettings(joystickSetup: setup));
-    GameEventBus.instance.emit(ControlSettingsChanged(setup));
+    game.eventBus.emit(ControlSettingsChanged(setup));
   }
 }

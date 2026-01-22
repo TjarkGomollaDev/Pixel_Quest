@@ -53,7 +53,7 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -67,6 +67,7 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
 
   void _normalizeDimensions() {
     if (_side > 4 || _side < 1) _side = 1;
+
     // intercept any errors from the tiled world editor, set the height to the tile size and the width to a multiple of the tile size
     if (_side.isOdd) {
       height = GameSettings.tileSize;

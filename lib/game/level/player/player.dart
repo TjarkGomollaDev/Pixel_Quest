@@ -111,7 +111,7 @@ class Player extends SpriteAnimationGroupComponent
   bool _isWorldCollisionActive = false;
 
   // if true the player state is not automatically updated
-  bool _isAnimationStateActive = false;
+  bool _isAnimationStateActive = true;
 
   // if true gravity is active
   bool _isGravityActive = false;
@@ -309,15 +309,13 @@ class Player extends SpriteAnimationGroupComponent
     _isLevelStarting = false;
     _isWorldCollisionActive = true;
     _isSpawnProtectionActive = false;
-    game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
-    game.audioCenter.unmuteGameSfx();
-    world.showOverlayOnStart();
+    world.beginGameplay();
     onWorldCollision(other);
   }
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }
@@ -371,6 +369,7 @@ class Player extends SpriteAnimationGroupComponent
       _canDoubleJump = false;
     }
 
+    // after reading the input, we have to reset it
     world.playerInput.clearInput();
   }
 
@@ -381,7 +380,6 @@ class Player extends SpriteAnimationGroupComponent
     } else if (_hasDoubleJumped && !_hasJumped) {
       _playerDoubleJump(dt);
     }
-    if (_velocity.y > _gravity) _isOnGround = false;
 
     // update horizontal movement
     _velocity.x = _moveX * _moveSpeed;
@@ -402,23 +400,24 @@ class Player extends SpriteAnimationGroupComponent
 
   void _playerJump(double dt) {
     _velocity.y = -_jumpForce;
-    _isOnGround = false;
     _hasJumped = false;
+
+    // jump animation
     game.audioCenter.playSound(Sfx.jump, SfxType.player);
   }
 
   void _playerDoubleJump(double dt) {
     _velocity.y = -_doubleJumpForce;
-    _isOnGround = false;
     _hasDoubleJumped = false;
+
+    // double jump animation
     current = PlayerState.doubleJump;
     game.audioCenter.playSound(Sfx.doubleJump, SfxType.player);
   }
 
   void _updateGravity(double dt) {
     if (!_isGravityActive) return;
-    _velocity.y += _gravity * dt;
-    _velocity.y = _velocity.y.clamp(double.negativeInfinity, _terminalVelocity);
+    _velocity.y = (_velocity.y + _gravity * dt).clamp(double.negativeInfinity, _terminalVelocity);
     position.y += _velocity.y * dt;
   }
 
@@ -440,7 +439,7 @@ class Player extends SpriteAnimationGroupComponent
       flipHorizontallyAroundCenter();
     }
 
-    // update state
+    // update animation state
     PlayerState playerState = PlayerState.idle;
     if (_velocity.x > 0 || _velocity.x < 0 && _isOnGround) playerState = PlayerState.run;
     if (_velocity.y > 0 && !_isOnGround) playerState = PlayerState.fall;
@@ -451,15 +450,19 @@ class Player extends SpriteAnimationGroupComponent
   void _checkCompleter() {
     if (_isOnGroundCompleter != null && !_isOnGroundCompleter!.isCompleted && _isOnGround) _isOnGroundCompleter!.complete();
     if (_isAtXCompleter != null && !_isAtXCompleter!.isCompleted && _targetX == null) _isAtXCompleter!.complete();
+
+    // because the collision system determines whether we are on the ground in each update cycle, we reset the flag at the end of the update
+    _isOnGround = false;
   }
 
-  Future<void> spawnInLevel() async {
+  Future<void> appearInLevel() async {
     // play appearing animation
     game.audioCenter.playSound(Sfx.appearing, SfxType.level);
     await _effect.playAppearing(_spawnInLevelPosition);
-    _isAnimationStateActive = true;
-    _isGravityActive = true;
+
+    // the player should only fall after the appearing animation and after he is visible
     isVisible = true;
+    _isGravityActive = true;
 
     // spawn protection is deactivated as soon as the player lands on the start platform, take a look at onCollision
   }
@@ -494,6 +497,7 @@ class Player extends SpriteAnimationGroupComponent
   Future<void> reachedFinish(ShapeHitbox finish) async {
     _moveX = 0;
     _isSpawnProtectionActive = true;
+    world.endGameplay();
     unawaited(world.saveData());
 
     // delays are not functional, but purely for a more visually appealing result
@@ -504,8 +508,6 @@ class Player extends SpriteAnimationGroupComponent
     await _waitUntilPlayerIsAtX(finish.toAbsoluteRect().center.dx);
 
     // spotlight animation
-    world.removeOverlaysOnFinish();
-    unawaited(game.audioCenter.muteGameSfx());
     final playerCenter = hitboxAbsoluteRect.center.toVector2();
     final spotlight = Spotlight(targetCenter: playerCenter);
     world.add(spotlight);
@@ -586,7 +588,7 @@ class Player extends SpriteAnimationGroupComponent
     _moveX = 0;
     _velocity = Vector2.zero();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
-    GameEventBus.instance.emit(PlayerRespawned());
+    game.eventBus.emit(const PlayerRespawned());
 
     // play death effects
     game.audioCenter.playSound(Sfx.playerHit, SfxType.player);

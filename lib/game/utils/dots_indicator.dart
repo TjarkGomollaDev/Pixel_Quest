@@ -19,7 +19,7 @@ class DotsIndicator extends PositionComponent {
     int startIndex = 0,
     double dotRadius = 2.5,
     double spacing = 4,
-    Color activeColor = AppTheme.ingameText,
+    Color activeColor = AppTheme.white,
     Color inactiveColor = AppTheme.grayDark3,
     Color? backgroundColor = AppTheme.grayLight3,
     double paddingHorizontal = 4,

@@ -109,7 +109,7 @@ class RockHead extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -163,6 +163,9 @@ class RockHead extends PositionComponent
 
   Future<void> _changeDirection(int newDirection) async {
     _directionChangePending = true;
+    _moveDirection = newDirection;
+
+    // depending on whether we hit the top or bottom, we choose the animation and the new speed
     final RockHeadState hitAnimation;
     if (newDirection == 1) {
       hitAnimation = RockHeadState.topHit;
@@ -172,7 +175,8 @@ class RockHead extends PositionComponent
       _moveSpeed = _moveSpeedUp;
       game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     }
-    _moveDirection = newDirection;
+
+    // animation sequence
     animationGroupComponent.current = hitAnimation;
     await animationGroupComponent.animationTickers![hitAnimation]!.completed;
     animationGroupComponent.current = RockHeadState.idle;
@@ -181,6 +185,8 @@ class RockHead extends PositionComponent
     await animationGroupComponent.animationTickers![RockHeadState.blink]!.completed;
     animationGroupComponent.current = RockHeadState.idle;
     await Future.delayed(_delayBlinkBeforeMove);
+
+    // change of direction completed
     _directionChangePending = false;
   }
 }

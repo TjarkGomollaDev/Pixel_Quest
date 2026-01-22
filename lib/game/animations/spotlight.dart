@@ -11,28 +11,28 @@ import 'package:pixel_adventure/game/game.dart';
 /// shrinking the circle to reveal or hide the world.
 class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
-  final Vector2 targetCenter;
-  final double targetRadius;
+  final Vector2 _targetCenter;
+  final double _targetRadius;
 
-  Spotlight({required this.targetCenter, this.targetRadius = playerTargetRadius});
+  Spotlight({required Vector2 targetCenter, double targetRadius = playerTargetRadius})
+    : _targetRadius = targetRadius,
+      _targetCenter = targetCenter;
 
   // default target radius for player
   static const double playerTargetRadius = 60;
 
   // spotlight radius
-  late double radius;
+  late double _radius;
 
   @override
   FutureOr<void> onLoad() {
-    radius = game.size.length;
+    _radius = game.size.length;
     priority = GameSettings.spotlightAnimationLayer;
     return super.onLoad();
   }
 
   @override
   void render(Canvas canvas) {
-    super.render(canvas);
-
     // create a new layer to safely apply the blend mode
     final layerPaint = Paint();
     canvas.saveLayer(Rect.fromLTWH(game.camera.viewfinder.position.x, 0, game.size.x, game.size.y), layerPaint);
@@ -45,9 +45,10 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
     final clearPaint = Paint()
       ..blendMode = BlendMode.clear
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(targetCenter.toOffset(), radius, clearPaint);
+    canvas.drawCircle(_targetCenter.toOffset(), _radius, clearPaint);
 
     canvas.restore();
+    super.render(canvas);
   }
 
   /// Animates the spotlight from full screen to the target radius
@@ -55,15 +56,17 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   Future<void> focusOnTarget({double duration = 2}) {
     final completer = Completer<void>();
 
-    final controller = CurvedEffectController(duration, Curves.easeInOutCubicEmphasized);
+    // add visual effect
     add(
       FunctionEffect<Spotlight>(
         (spotlight, progress) {
           // interpolate from full screen to target radius
-          radius = game.size.length - (game.size.length - targetRadius) * progress;
+          _radius = game.size.length - (game.size.length - _targetRadius) * progress;
         },
-        controller,
-        onComplete: () => completer.complete(),
+        CurvedEffectController(duration, Curves.easeInOutCubicEmphasized),
+        onComplete: () {
+          if (!completer.isCompleted) completer.complete();
+        },
       ),
     );
 
@@ -74,19 +77,20 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   /// effectively revealing the whole screen again.
   Future<void> expandToFull({double duration = 2}) {
     final completer = Completer<void>();
-    final startRadius = radius;
+    final startRadius = _radius;
     final endRadius = game.size.length;
 
-    final controller = CurvedEffectController(duration, Curves.easeInOutCubicEmphasized);
-
+    // add visual effect
     add(
       FunctionEffect<Spotlight>(
         (spotlight, progress) {
           // interpolate from current radius to full screen
-          radius = startRadius + (endRadius - startRadius) * progress;
+          _radius = startRadius + (endRadius - startRadius) * progress;
         },
-        controller,
-        onComplete: () => completer.complete(),
+        CurvedEffectController(duration, Curves.easeInOutCubicEmphasized),
+        onComplete: () {
+          if (!completer.isCompleted) completer.complete();
+        },
       ),
     );
 
@@ -97,17 +101,17 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   /// effectively making the entire screen black over the given duration.
   Future<void> shrinkToBlack({double duration = 0.4}) {
     final completer = Completer<void>();
+    final startRadius = _radius;
 
-    final startRadius = radius;
-    final controller = CurvedEffectController(duration, Curves.easeInOutCubicEmphasized);
+    // add visual effect
     add(
       FunctionEffect<Spotlight>(
         (spotlight, progress) {
-          radius = startRadius * (1 - progress);
+          _radius = startRadius * (1 - progress);
         },
-        controller,
+        CurvedEffectController(duration, Curves.easeInOutCubicEmphasized),
         onComplete: () {
-          completer.complete();
+          if (!completer.isCompleted) completer.complete();
         },
       ),
     );

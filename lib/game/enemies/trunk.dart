@@ -166,9 +166,9 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       animationTickers![TrunkState.attack]?.onComplete?.call();
       current = TrunkState.hit;
       animationTickers![TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
@@ -182,7 +182,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;

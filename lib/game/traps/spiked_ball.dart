@@ -48,7 +48,7 @@ class SpikedBall extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -60,7 +60,9 @@ class SpikedBall extends PositionComponent
     add(_hitbox);
   }
 
-  void _setUpMarker() => marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
+  void _setUpMarker() {
+    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial);
+  }
 
   void _loadSprite() {
     addSpriteComponent(textureSize: _textureSize, sprite: loadSprite(game, _path), isBottomCenter: false);

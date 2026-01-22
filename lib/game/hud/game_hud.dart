@@ -3,7 +3,6 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
@@ -65,32 +64,13 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   // mini map
   late final MiniMap _miniMap;
 
-  // subscription for game events
-  GameSubscription? _sub;
-
   @override
   FutureOr<void> onLoad() {
-    _addSubscription();
     _setUpBtns();
     _setUpFruitsCount();
     _setUpDeathCount();
     _setUpMiniMap();
     return super.onLoad();
-  }
-
-  @override
-  void onRemove() {
-    _removeSubscription();
-    super.onRemove();
-  }
-
-  void _addSubscription() {
-    _sub = GameEventBus.instance.listen<PausePageTriggered>((_) => _pauseBtn.triggerToggle());
-  }
-
-  void _removeSubscription() {
-    _sub?.cancel();
-    _sub = null;
   }
 
   void _setUpBtns() {
@@ -251,5 +231,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
   void updateDeathCount(int deaths) {
     _deathCount.text = deaths.toString();
+  }
+
+  void triggerPause() {
+    _pauseBtn.triggerToggle();
   }
 }

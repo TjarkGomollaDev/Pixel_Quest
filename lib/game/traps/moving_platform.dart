@@ -123,7 +123,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -137,7 +137,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   }
 
   void _addSubscription() {
-    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onWorldCollisionEnd());
+    _sub = game.eventBus.listen<PlayerRespawned>((_) => onWorldCollisionEnd());
   }
 
   void _removeSubscription() {

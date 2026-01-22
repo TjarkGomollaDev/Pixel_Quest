@@ -33,7 +33,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   bool _isSpotlightActive = false;
 
   // spotlight spacing
-  static const double _characterChangeBtnSpacing = 10; // [Adjustable]
+  static const double _characterChangeBtnSpacing = 14; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {

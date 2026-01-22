@@ -74,7 +74,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorWorldBlock;
     }
@@ -126,9 +126,11 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
 class _FireTrapEntityCollider extends PositionComponent with EntityCollision, CollisionCallbacks {
   // constructor parameters
-  final void Function(CollisionSide collisonSide) onCollide;
+  final void Function(CollisionSide collisonSide) _onCollide;
 
-  _FireTrapEntityCollider({required this.onCollide}) : super(position: Vector2.zero(), size: Vector2.all(16));
+  _FireTrapEntityCollider({required void Function(CollisionSide) onCollide})
+    : _onCollide = onCollide,
+      super(position: Vector2.zero(), size: Vector2.all(16));
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2.all(16));
@@ -140,14 +142,14 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
   }
 
   @override
-  void onEntityCollision(CollisionSide collisionSide) => onCollide(collisionSide);
+  void onEntityCollision(CollisionSide collisionSide) => _onCollide(collisionSide);
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }

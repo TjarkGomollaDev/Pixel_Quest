@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -30,7 +31,7 @@ enum SlimeState implements AnimationState {
 }
 
 class Slime extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -104,9 +105,10 @@ class Slime extends PositionComponent
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      stopAmbientLoop();
       animationGroupComponent.current = SlimeState.hit;
       animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
     } else {
@@ -119,7 +121,7 @@ class Slime extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -129,6 +131,7 @@ class Slime extends PositionComponent
     priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    configureAmbientLoop(loop: LoopSfx.slime, hitbox: _hitbox);
   }
 
   void _loadAllSpriteAnimations() {

@@ -56,7 +56,7 @@ class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQue
   }
 
   /// Initializes paint and marker appearance.
-  void _setUpMarker() => _arrowMarkerPaint = Paint()..color = AppTheme.ingameText;
+  void _setUpMarker() => _arrowMarkerPaint = Paint()..color = AppTheme.white;
 
   /// Precomputes values that do not change during gameplay.
   void _setUpPreCalculations() {

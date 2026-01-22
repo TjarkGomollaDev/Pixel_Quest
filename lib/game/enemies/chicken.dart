@@ -88,8 +88,8 @@ class Chicken extends PositionComponent
   @override
   void update(double dt) {
     if (!_gotStomped) {
-      _updateState();
       _movement(dt);
+      _updateState();
     }
     super.update(dt);
   }
@@ -100,9 +100,9 @@ class Chicken extends PositionComponent
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       animationGroupComponent.current = ChickenState.hit;
       animationGroupComponent.animationTickers![ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
@@ -115,7 +115,7 @@ class Chicken extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;

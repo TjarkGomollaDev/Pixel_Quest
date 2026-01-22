@@ -11,7 +11,6 @@ import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/level/loading/loading_overlay.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/tile_id_helper.dart';
@@ -27,25 +26,23 @@ import 'package:pixel_adventure/game/game_router.dart';
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
   // constructor parameters
-  final AppLocalizations _l10n;
-  final void Function(Locale locale) _requestLocaleChange;
+  final AppLocalizations l10n;
+  final void Function(Locale locale) requestLocaleChange;
   final EdgeInsets _flutterSafePadding;
 
-  PixelQuest({
-    required AppLocalizations l10n,
-    required void Function(Locale locale) requestLocaleChange,
-    required EdgeInsets safeScreenPadding,
-  }) : _l10n = l10n,
-       _requestLocaleChange = requestLocaleChange,
-       _flutterSafePadding = safeScreenPadding;
+  PixelQuest({required this.l10n, required this.requestLocaleChange, required EdgeInsets safeScreenPadding})
+    : _flutterSafePadding = safeScreenPadding;
 
   // general data that is used throughout the app and is loaded once when the app is launched
   late final StaticCenter staticCenter;
   late final StorageCenter storageCenter;
-
-  // handles everything related to audio in the game
   late final AudioCenter audioCenter;
+
+  // entities can register with the manager via an emitter if they have ambient sound
   late final AmbientLoopManager ambientLoops;
+
+  // event bus used for all global events within the game
+  late final GameEventBus eventBus;
 
   // in context with the camera
   final ({double top, double bottom}) cameraWorldYBounds = (top: GameSettings.mapBorderWidth, bottom: GameSettings.mapBorderWidth);
@@ -73,16 +70,15 @@ class PixelQuest extends FlameGame
   // bridge to convert events from storage layer into game events
   StreamSubscription? _storageBridgeSub;
 
-  // getter
-  AppLocalizations get l10n => _l10n;
-  void Function(Locale locale) get requestLocale => _requestLocaleChange;
+  bool _isObserverAttached = false;
 
   @override
   Future<void> onLoad() async {
     _startLoading();
-    await _loadAllCenters();
-    await _loadAllImagesIntoCache();
+    await _loadCenters();
+    await _loadImagesIntoCache();
     _addStorageEventBridge();
+    _setUpServices();
     _setUpCameraDefault();
     _setUpSafePadding();
     _setUpRouter();
@@ -94,15 +90,15 @@ class PixelQuest extends FlameGame
 
   @override
   Future<void> onMount() async {
-    WidgetsBinding.instance.addObserver(this);
+    _attachLifecycleObserver();
     super.onMount();
     add(WarmUpRunner()); // must be added after super.onMount
   }
 
   @override
   void onRemove() {
+    _detachLifecycleObserver();
     _removeStorageEventBridge();
-    WidgetsBinding.instance.removeObserver(this);
     super.onRemove();
   }
 
@@ -121,14 +117,30 @@ class PixelQuest extends FlameGame
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final currentRoute = router.currentRoute;
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if (currentRoute is WorldRoute && currentRoute.world is Level) return GameEventBus.instance.emit(PausePageTriggered());
-      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).pauseMenu();
-    } else if (state == AppLifecycleState.resumed) {
-      if (currentRoute is WorldRoute && currentRoute.world is MenuPage) (currentRoute.world as MenuPage).resumeMenu();
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        eventBus.emit(const GameLifecycleChanged(Lifecycle.paused));
+        break;
+      case AppLifecycleState.resumed:
+        eventBus.emit(const GameLifecycleChanged(Lifecycle.resumed));
+        break;
+      default:
+        break;
     }
     super.didChangeAppLifecycleState(state);
+  }
+
+  void _attachLifecycleObserver() {
+    if (_isObserverAttached) return;
+    WidgetsBinding.instance.addObserver(this);
+    _isObserverAttached = true;
+  }
+
+  void _detachLifecycleObserver() {
+    if (!_isObserverAttached) return;
+    WidgetsBinding.instance.removeObserver(this);
+    _isObserverAttached = false;
   }
 
   void _startLoading() {
@@ -136,27 +148,26 @@ class PixelQuest extends FlameGame
   }
 
   Future<void> _completeLoading() async {
-    // await Future.delayed(Duration(seconds: 3000));
-    // final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
-    // final delayMs = 5200;
-    // if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
+    if (GameSettings.testMode) return;
+    final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
+    final delayMs = 5200;
+    if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
   }
 
-  Future<void> _loadAllCenters() async {
+  Future<void> _loadCenters() async {
     staticCenter = await StaticCenter.init();
     storageCenter = await StorageCenter.init(staticCenter: staticCenter);
     audioCenter = await AudioCenter.init(storageCenter: storageCenter);
-    ambientLoops = AmbientLoopManager(audioCenter: audioCenter);
   }
 
-  Future<void> _loadAllImagesIntoCache() async {
+  Future<void> _loadImagesIntoCache() async {
     await images.loadAllImages();
   }
 
   void _addStorageEventBridge() {
     _storageBridgeSub = storageCenter.onDataChanged.listen((event) {
       if (event is NewStarsStorageEvent) {
-        GameEventBus.instance.emit(
+        eventBus.emit(
           NewStarsEarned(
             worldUuid: event.worldUuid,
             levelUuid: event.levelUuid,
@@ -172,6 +183,11 @@ class PixelQuest extends FlameGame
   void _removeStorageEventBridge() {
     _storageBridgeSub?.cancel();
     _storageBridgeSub = null;
+  }
+
+  void _setUpServices() {
+    ambientLoops = AmbientLoopManager(audioCenter: audioCenter);
+    eventBus = GameEventBus();
   }
 
   void _setUpCameraDefault() {
@@ -221,8 +237,23 @@ class PixelQuest extends FlameGame
 
   void _setUpRouter() {
     // router = createRouter(staticCenter: staticCenter);
-    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(9).uuid);
+    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(4).uuid);
     add(router);
+  }
+
+  void _setUpLoadingOverlay() {
+    loadingOverlay = LoadingOverlay(screenToWorldScale: worldToScreenScale, safePadding: safePadding, size: size);
+
+    // important that it is explicitly added to the router
+    router.add(loadingOverlay);
+  }
+
+  Future<void> showLoadingOverlay(LevelMetadata levelMetadata) async {
+    await loadingOverlay.showOverlay(levelMetadata);
+  }
+
+  Future<void> hideLoadingOverlay({VoidCallback? onAfterDummyFallOut}) async {
+    await loadingOverlay.hideOverlay(onAfterDummyFallOut: onAfterDummyFallOut);
   }
 
   Future<void> _createMiniMapBackgroundPattern() async {
@@ -243,20 +274,5 @@ class PixelQuest extends FlameGame
     // convert pattern to image
     final picture = recorder.endRecording();
     miniMapBackgroundPattern = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
-  }
-
-  void _setUpLoadingOverlay() {
-    loadingOverlay = LoadingOverlay(screenToWorldScale: worldToScreenScale, safePadding: safePadding, size: size);
-
-    // important that it is explicitly added to the router
-    router.add(loadingOverlay);
-  }
-
-  Future<void> showLoadingOverlay(LevelMetadata levelMetadata) async {
-    await loadingOverlay.showOverlay(levelMetadata);
-  }
-
-  Future<void> hideLoadingOverlay({VoidCallback? onAfterDummyFallOut}) async {
-    await loadingOverlay.hideOverlay(onAfterDummyFallOut: onAfterDummyFallOut);
   }
 }

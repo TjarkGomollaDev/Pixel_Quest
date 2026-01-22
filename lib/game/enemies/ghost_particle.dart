@@ -8,7 +8,7 @@ import 'package:pixel_adventure/game/game.dart';
 
 class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
-  final Ghost _owner; // has to be public
+  final Ghost _owner;
   final bool _spawnOnLeftSide;
 
   GhostParticle({required Ghost owner, required bool spawnOnLeftSide, required super.position})
@@ -36,7 +36,7 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
     }

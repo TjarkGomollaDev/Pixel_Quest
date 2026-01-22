@@ -470,7 +470,7 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
       position: size / 2,
       anchor: Anchor(0.5, 0.42),
       textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText),
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white),
       ),
     );
     add(_textComponent!);
@@ -554,7 +554,7 @@ class SpriteToggleBtn extends SpriteBtn {
       position: size / 2,
       anchor: Anchor(0.5, 0.42),
       textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText),
+        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white),
       ),
     );
     add(_textComponent!);
@@ -564,9 +564,13 @@ class SpriteToggleBtn extends SpriteBtn {
   @override
   FutureOr<void> _callOnPressed() => triggerToggle();
 
-  void _setSpriteToState() => sprite = _toggleState ? _sprite : _sprite_2;
+  void _setSpriteToState() {
+    sprite = _toggleState ? _sprite : _sprite_2;
+  }
 
-  void _setTextToState() => _textComponent?.text = _toggleState ? (_textOnBtn ?? '') : (_textOnBtn_2 ?? '');
+  void _setTextToState() {
+    _textComponent?.text = _toggleState ? (_textOnBtn ?? '') : (_textOnBtn_2 ?? '');
+  }
 
   /// Switches the sprite and triggers the corresponding action.
   FutureOr<void> triggerToggle() {
@@ -670,7 +674,7 @@ class RadioComponent extends PositionComponent {
     super.anchor = Anchor.topLeft,
     double outlineCornerLength = 5,
     double outlineStrokeWidth = 1,
-    Color outlineColor = AppTheme.ingameText,
+    Color outlineColor = AppTheme.white,
   }) : _outlineColor = outlineColor,
        _outlineStrokeWidth = outlineStrokeWidth,
        _outlineCornerLength = outlineCornerLength,

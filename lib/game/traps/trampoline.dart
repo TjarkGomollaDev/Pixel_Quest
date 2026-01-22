@@ -51,8 +51,8 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
   static const String _pathEnd = '.png';
 
   // bounce
-  final double _bounceHeight = 500;
-  bool _bounced = false;
+  final double _bounceHeight = 500; // [Adjustable]
+  bool _isBouncing = false;
 
   @override
   FutureOr<void> onLoad() {
@@ -63,19 +63,23 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
 
   @override
   Future<void> onEntityCollision(CollisionSide collisionSide) async {
-    if (!_bounced) {
-      _bounced = true;
+    if (!_isBouncing) {
+      _isBouncing = true;
 
       // is needed, because otherwise the ground collision may reset the y velocity directly back to 0 before the player can even jump off
       _player.adjustPostion(y: -1);
 
+      // bounce player
       _player.bounceUp(jumpForce: _bounceHeight);
       game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
 
+      // play animation
       animationGroupComponent.current = TrampolineState.jump;
       await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
       animationGroupComponent.current = TrampolineState.idle;
-      _bounced = false;
+
+      // unblocking the trampoline
+      _isBouncing = false;
     }
   }
 
@@ -87,7 +91,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;

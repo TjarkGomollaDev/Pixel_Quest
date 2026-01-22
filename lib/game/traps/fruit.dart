@@ -69,6 +69,8 @@ class Fruit extends SpriteAnimationGroupComponent
     if (!_isCollected) {
       _isCollected = true;
       world.increaseFruitsCount();
+
+      // play collected animation and then remove from level
       game.audioCenter.playSound(Sfx.collected, SfxType.game);
       current = FruitState.collected;
       animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
@@ -83,7 +85,7 @@ class Fruit extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;

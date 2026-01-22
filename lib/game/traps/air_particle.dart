@@ -28,10 +28,10 @@ class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, Deb
        _baseWidth = baseWidth;
 
   // size
-  static final List<Vector2> _sizeList = [Vector2.all(14), Vector2.all(12), Vector2.all(8), Vector2.all(6)];
+  static final List<Vector2> _sizeList = [Vector2.all(14), Vector2.all(12), Vector2.all(8), Vector2.all(6)]; // [Adjustable]
 
   // opacity
-  static final List<double> _opacityList = [0.2, 0.25, 0.3, 0.4];
+  static final List<double> _opacityList = [0.2, 0.25, 0.3, 0.4]; // [Adjustable]
 
   // animation settings
   static const String _path = 'Other/Dust Particle (16x16).png';
@@ -63,7 +63,7 @@ class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, Deb
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
     }

@@ -52,7 +52,7 @@ class Joystick extends PositionComponent with VisibleComponent {
           // white circle with a shader to create a 3D effect
           ..shader =
               const RadialGradient(
-                colors: [AppTheme.ingameText, AppTheme.ingameText, Color.fromARGB(255, 176, 176, 178)],
+                colors: [AppTheme.white, AppTheme.white, Color.fromARGB(255, 176, 176, 178)],
                 stops: [0.0, 0.8, 1.0],
               ).createShader(
                 Rect.fromCircle(center: Offset(GameSettings.knobRadius, GameSettings.knobRadius), radius: GameSettings.knobRadius),

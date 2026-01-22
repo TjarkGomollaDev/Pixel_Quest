@@ -88,7 +88,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
@@ -136,7 +136,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
     for (var i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
         ..anchor = Anchor.center
-        ..debugMode = GameSettings.customDebug
+        ..debugMode = GameSettings.customDebugMode
         ..debugColor = AppTheme.debugColorTrapHitbox;
 
       final chainItem = ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);
@@ -148,7 +148,9 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
     _transformChain();
   }
 
-  void _setUpSpeed() => _scaledSpeed = _swingSpeed / _radiusToCenterOfSpikedBall / _halfArcRad;
+  void _setUpSpeed() {
+    _scaledSpeed = _swingSpeed / _radiusToCenterOfSpikedBall / _halfArcRad;
+  }
 
   void _movement(double dt) {
     // check whether we have reached the ends of our arc

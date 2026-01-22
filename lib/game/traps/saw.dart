@@ -92,7 +92,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -152,7 +152,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
               position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
               priority: GameSettings.trapParticlesLayerLevel,
             )
-            ..debugMode = GameSettings.customDebug
+            ..debugMode = GameSettings.customDebugMode
             ..debugColor = AppTheme.debugColorTrapHitbox;
       game.world.add(chain);
       offset += chainSize;

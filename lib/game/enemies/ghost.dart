@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -32,7 +33,7 @@ enum GhostState implements AnimationState {
 }
 
 class Ghost extends PositionComponent
-    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
+    with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -138,7 +139,7 @@ class Ghost extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -148,6 +149,7 @@ class Ghost extends PositionComponent
     priority = GameSettings.enemieLayerLevel;
     _hitbox.collisionType = CollisionType.passive;
     add(_hitbox);
+    configureAmbientLoop(loop: LoopSfx.ghost, hitbox: _hitbox);
   }
 
   void _loadAllSpriteAnimations() {
@@ -172,9 +174,13 @@ class Ghost extends PositionComponent
     _rightBorder = (_moveDirection == 1) ? _rangePos + _hitbox.position.x : _rangePos - _hitbox.position.x - _hitbox.width;
   }
 
-  void _startParticleTimer() => _particleTimer = Timer(_particleDelayBetweenBurst, repeat: true, onTick: _spawnGhostParticles);
+  void _startParticleTimer() {
+    _particleTimer = Timer(_particleDelayBetweenBurst, repeat: true, onTick: _spawnGhostParticles);
+  }
 
-  void _startGhostTimer() => _ghostTimer = Timer(_durationVisible, onTick: _triggerDisappear);
+  void _startGhostTimer() {
+    _ghostTimer = Timer(_durationVisible, onTick: _triggerDisappear);
+  }
 
   Future<void> _triggerDisappear() async {
     _ghostTimer.stop();

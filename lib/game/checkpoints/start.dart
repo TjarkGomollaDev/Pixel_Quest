@@ -37,11 +37,11 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
   static const String _path = 'Items/Checkpoints/Start/';
   static const String _pathEnd = ' (64x64).png';
 
-  // reached
-  bool reached = false;
-
   // player start point
-  late final Vector2 playerPosition;
+  late final Vector2 _playerPosition;
+
+  // getter
+  Vector2 get playerPosition => _playerPosition;
 
   @override
   FutureOr<void> onLoad() {
@@ -51,9 +51,12 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
     return super.onLoad();
   }
 
+  @override
+  ShapeHitbox get worldHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorWorldBlock;
@@ -72,12 +75,9 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
   }
 
   void _setUpPlayerPosition() {
-    playerPosition = Vector2(
+    _playerPosition = Vector2(
       position.x + _hitbox.x + (_hitbox.width - Player.gridSize.x) / 2,
       position.y + height - _hitbox.height - Player.gridSize.y,
     );
   }
-
-  @override
-  ShapeHitbox get worldHitbox => _hitbox;
 }

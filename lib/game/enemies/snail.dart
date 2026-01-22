@@ -151,7 +151,7 @@ class Snail extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -167,7 +167,7 @@ class Snail extends PositionComponent
   }
 
   void _addSubscription() {
-    _sub = GameEventBus.instance.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
+    _sub = game.eventBus.listen<PlayerRespawned>((_) => onEntityCollisionEnd());
   }
 
   void _removeSubscription() {
@@ -337,9 +337,9 @@ class Snail extends PositionComponent
     if (collisionSide == CollisionSide.Top) {
       _shellGotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       animationGroupComponent.animationTickers![SnailState.snailHit]?.onComplete?.call();
       animationGroupComponent.current = SnailState.shellTopHit;
       animationGroupComponent.animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());

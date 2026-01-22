@@ -91,9 +91,9 @@ class Turtle extends PositionComponent
     if (!_spikesAreOut && collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       animationGroupComponent.animationTickers![TurtleState.spikesOut]?.onComplete?.call();
       animationGroupComponent.animationTickers![TurtleState.spikesIn]?.onComplete?.call();
       animationGroupComponent.current = TurtleState.hit;
@@ -108,7 +108,7 @@ class Turtle extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -127,7 +127,9 @@ class Turtle extends PositionComponent
     if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
-  void _startTimer() => _spikeTimer = Timer(_toggleDuration, onTick: _toggleSpikes, repeat: true);
+  void _startTimer() {
+    _spikeTimer = Timer(_toggleDuration, onTick: _toggleSpikes, repeat: true);
+  }
 
   void _toggleSpikes() => _spikesAreOut ? unawaited(_spikesIn()) : unawaited(_spikesOut());
 

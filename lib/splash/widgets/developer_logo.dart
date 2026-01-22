@@ -25,26 +25,26 @@ class DeveloperLogoState extends State<DeveloperLogo> {
           Container(
             padding: EdgeInsets.all(4),
             decoration: BoxDecoration(
-              border: BoxBorder.all(color: AppTheme.ingameText),
+              border: BoxBorder.all(color: AppTheme.white),
               borderRadius: BorderRadius.circular(50).copyWith(bottomLeft: Radius.zero),
             ),
             child: Center(
               child: Text(
                 'by',
-                style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText),
+                style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white),
               ),
             ),
           ),
           6.widthSizedBox,
           Shimmer.fromColors(
-            baseColor: AppTheme.ingameText,
-            highlightColor: AppTheme.ingameTextShimmer,
+            baseColor: AppTheme.white,
+            highlightColor: AppTheme.whiteShimmer,
             period: Duration(milliseconds: 1000),
             loop: 1,
             enabled: _shimmerEnabled,
             child: Text(
               'tj.studios',
-              style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText),
+              style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white),
             ),
           ),
         ],

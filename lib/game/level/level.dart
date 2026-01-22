@@ -6,6 +6,7 @@ import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
@@ -18,6 +19,7 @@ import 'package:pixel_adventure/game/enemies/slime.dart';
 import 'package:pixel_adventure/game/enemies/snail.dart';
 import 'package:pixel_adventure/game/enemies/trunk.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
@@ -100,7 +102,10 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   late final DateTime _startTime;
 
   // flag we need if we want to load a level directly for testing purposes without going through the menu
-  static bool _debugStartInLevel = false;
+  static bool _testModeStartInLevel = false;
+
+  // subscription for game events
+  GameSubscription? _sub;
 
   // getter
   PlayerInput get playerInput => _playerInput;
@@ -120,15 +125,15 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
   @override
   Future<void> onMount() async {
-    _addGameHud();
-    _addMobileControls();
-    _addFpsDisplay();
+    _addSubscription();
+    _addAllOverlays();
     await _completeLoading();
     super.onMount();
   }
 
   @override
   Future<void> onRemove() async {
+    _removeSubscription();
     _removeGameHud();
     _removeMobileControls();
     _removeFpsDisplay();
@@ -142,13 +147,30 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     super.renderFromCamera(canvas);
   }
 
+  void _addSubscription() {
+    _sub = game.eventBus.listenMany((on) {
+      on<GameLifecycleChanged>((event) {
+        if (event.lifecycle == Lifecycle.paused && !_levelPaused) return _gameHud.triggerPause();
+      });
+      on<LevelLifecycleChanged>((event) {
+        if (event.lifecycle == Lifecycle.paused) return _pause();
+        if (event.lifecycle == Lifecycle.resumed) return _resume();
+      });
+    });
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
+  }
+
   void _startLoading() {
     _startTime = DateTime.now();
     timeScale = 0;
   }
 
   Future<void> _completeLoading() async {
-    if (game.router.initialRoute == RouteNames.menu || _debugStartInLevel) {
+    if (game.router.initialRoute == RouteNames.menu || _testModeStartInLevel) {
       // the overlay should be displayed for a minimum amount of time
       final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
       final delayMs = 1400;
@@ -156,7 +178,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
       await game.hideLoadingOverlay(onAfterDummyFallOut: () => timeScale = 1);
     } else {
       // when we start testing directly in a level, we don't want any delays and we don't need to hide any overlays
-      _debugStartInLevel = true;
+      _testModeStartInLevel = true;
       timeScale = 1;
     }
 
@@ -164,7 +186,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     await Future.delayed(Duration(milliseconds: 100));
 
     // this method spawns the player and initiates the level start
-    _player.spawnInLevel();
+    _player.appearInLevel();
   }
 
   Future<void> _loadLevelMap() async {
@@ -672,7 +694,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void _addFpsDisplay() {
-    if (!GameSettings.customDebug) return _fpsDisplay = null;
+    if (!GameSettings.customDebugMode) return _fpsDisplay = null;
     _fpsDisplay = VisibleFpsTextComponent(position: _gameHud.position + Vector2(0, _gameHud.size.y), show: false);
     game.camera.viewport.add(_fpsDisplay!);
   }
@@ -681,38 +703,56 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     if (_fpsDisplay != null && _fpsDisplay.isMounted) game.camera.viewport.remove(_fpsDisplay);
   }
 
-  void showOverlayOnStart() {
-    _gameHud.show();
-    resumeLevel();
-    _fpsDisplay?.show();
+  void _addAllOverlays() {
+    _addGameHud();
+    _addMobileControls();
+    _addFpsDisplay();
   }
 
-  void removeOverlaysOnFinish() {
+  void _removeAllOverlays() {
     _removeGameHud();
     _removeMobileControls();
     _removeFpsDisplay();
   }
 
-  void pauseLevel() {
-    timeScale = 0;
-    _levelPaused = true;
-    _mobileControls?.hide();
-    _fpsDisplay?.hide();
-  }
-
-  void resumeLevel() {
-    timeScale = 1;
-    _levelPaused = false;
+  void _showAllOverlays() {
+    _gameHud.show();
     _mobileControls?.show();
     _fpsDisplay?.show();
   }
 
-  void increaseFruitsCount() {
-    _gameHud.updateFruitCount(++_playerFruitsCount);
+  void beginGameplay() {
+    _showAllOverlays();
+    game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
+    game.audioCenter.unmuteGameSfx();
   }
 
-  void _increaseDeathCount() {
-    _gameHud.updateDeathCount(++_deathCount);
+  void endGameplay() {
+    _removeAllOverlays();
+    game.audioCenter.stopBackgroundMusic();
+    unawaited(game.audioCenter.muteGameSfx());
+  }
+
+  void _pause() {
+    if (_levelPaused) return;
+    _levelPaused = true;
+    timeScale = 0;
+    _mobileControls?.hide();
+    _fpsDisplay?.hide();
+    unawaited(game.audioCenter.pauseAllLoops());
+  }
+
+  void _resume() {
+    if (!_levelPaused) return;
+    _levelPaused = false;
+    timeScale = 1;
+    _mobileControls?.show();
+    _fpsDisplay?.show();
+    unawaited(game.audioCenter.resumeAllLoops());
+  }
+
+  void increaseFruitsCount() {
+    _gameHud.updateFruitCount(++_playerFruitsCount);
   }
 
   void queueForRespawn(Respawnable item) {
@@ -731,7 +771,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
   void playerRespawn() {
     _processRespawns();
-    _increaseDeathCount();
+    _gameHud.updateDeathCount(++_deathCount);
   }
 
   Future<void> saveData() async {

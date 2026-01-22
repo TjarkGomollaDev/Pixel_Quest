@@ -81,6 +81,8 @@ class ArrowUp extends PositionComponent
     if (!_isCollected) {
       _isCollected = true;
       _player.bounceUp(jumpForce: _bounceHeight);
+
+      // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
       animationGroupComponent.current = ArrowUpState.hit;
       animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() {
@@ -98,7 +100,7 @@ class ArrowUp extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorCollectibles;
       _hitbox.debugColor = AppTheme.debugColorCollectiblesHitbox;

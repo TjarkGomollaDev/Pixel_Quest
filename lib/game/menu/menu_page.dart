@@ -68,7 +68,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   @override
   void onMount() {
     _menuActive = true;
-    resumeMenu();
+    _resume();
     game.setUpCameraForMenu();
     unawaited(_checkForNewStarsEvent());
     game.audioCenter.playBackgroundMusic(BackgroundMusic.menu);
@@ -80,7 +80,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _menuActive = false;
     _animationGuard++;
     _abortNewStarsAnimationAndSync();
-    pauseMenu();
+    _pause();
     game.audioCenter.stopBackgroundMusic();
     super.onRemove();
   }
@@ -91,7 +91,13 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _addSubscription() {
-    _sub = GameEventBus.instance.listen<NewStarsEarned>((event) => _pendingNewStarsEarnedEvent = event);
+    _sub = game.eventBus.listenMany((on) {
+      on<GameLifecycleChanged>((event) {
+        if (_menuActive && event.lifecycle == Lifecycle.paused) return _pause();
+        if (_menuActive && event.lifecycle == Lifecycle.resumed) return _resume();
+      });
+      on<NewStarsEarned>((event) => _pendingNewStarsEarnedEvent = event);
+    });
   }
 
   void _removeSubscription() {
@@ -235,12 +241,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _isChangingWorld = false;
   }
 
-  void pauseMenu() {
+  void _pause() {
     timeScale = 0;
     _characterPicker.pause();
   }
 
-  void resumeMenu() {
+  void _resume() {
     timeScale = 1;
     _characterPicker.resume();
   }

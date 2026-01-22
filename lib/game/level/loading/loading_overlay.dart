@@ -33,6 +33,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   late final InputBlocker _inputBlocker;
   late final BackgroundParallax _background;
   late final LoadingDummyCharacter _dummy;
+  final Paint _overlayPaint = Paint();
 
   // particle for dummy character
   late Timer _particleTimer;
@@ -71,9 +72,9 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     if (!isVisible || opacity <= 0) return;
 
     // render entire overlay, including children, into an alpha layer
-    final paint = Paint()..color = Color.fromRGBO(255, 255, 255, opacity);
+    _overlayPaint.color = Color.fromRGBO(255, 255, 255, opacity);
 
-    canvas.saveLayer(null, paint);
+    canvas.saveLayer(null, _overlayPaint);
     super.renderTree(canvas);
     canvas.restore();
   }
@@ -89,6 +90,8 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   Future<void> _animatedHide({double duration = 0.8, double targetScale = 5}) {
     final completer = Completer<void>();
+
+    // add visual effects
     final scaleEffect = ScaleEffect.to(Vector2.all(targetScale), EffectController(duration: duration, curve: Curves.easeInQuad));
     final opacityEffect = OpacityEffect.to(
       0,
@@ -134,30 +137,33 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _stageInfoText = VisibleTextComponent(
       text: game.l10n.loadingLevel(0, 0),
       anchor: Anchor.center,
-      textRenderer: AppTheme.characterPickerHeading.asTextPaint,
+      textRenderer: AppTheme.hudText.asTextPaint,
     );
 
     // stage info background
-    final stageInfoBgSize = Vector2(_stageInfoText.size.x + 15, 15);
+    final stageInfoBgSize = Vector2(_stageInfoText.size.x + 15, GameSettings.hudBgTileSize);
     _stageInfoBg = RRectComponent(
       color: AppTheme.tileBlur,
       borderRadius: 2,
       size: stageInfoBgSize,
       position: Vector2(
         _safePadding.minLeft(GameSettings.hudHorizontalMargin) + stageInfoBgSize.x / 2,
-        -20 + size.y - stageInfoBgSize.y / 2,
+        size.y - stageInfoBgSize.y / 2 - GameSettings.hudVerticalMargin,
       ),
       anchor: Anchor.center,
     );
-    _stageInfoText.position = _stageInfoBg.position;
+    _stageInfoText.position = _stageInfoBg.position + Vector2(1, 0);
 
     _root.addAll([_stageInfoBg, _stageInfoText]);
   }
 
-  void _updateStageInfo(LevelMetadata levelMetadata) =>
-      _stageInfoText.text = game.l10n.loadingLevel(game.staticCenter.getWorld(levelMetadata.worldUuid).index + 1, levelMetadata.number);
+  void _updateStageInfo(LevelMetadata levelMetadata) {
+    _stageInfoText.text = game.l10n.loadingLevel(game.staticCenter.getWorld(levelMetadata.worldUuid).index + 1, levelMetadata.number);
+  }
 
-  void _setUpParticleTimer() => _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true, autoStart: false);
+  void _setUpParticleTimer() {
+    _particleTimer = Timer(_delayParticleSpawn, onTick: _spawnParticle, repeat: true, autoStart: false);
+  }
 
   void _spawnParticle() {
     final dummyPosition = _dummy.position.clone();
@@ -198,15 +204,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   Future<void> warmUp(LevelMetadata levelMetadata) async {
     _updateStageInfo(levelMetadata);
     _inputBlocker.disable();
-
     final prevVisible = isVisible;
     final prevOpacity = _opacity;
-
     isVisible = true;
     _opacity = 0.001;
-
     await yieldFrame();
-
     _opacity = prevOpacity;
     isVisible = prevVisible;
   }

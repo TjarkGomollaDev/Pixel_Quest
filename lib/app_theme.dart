@@ -53,7 +53,7 @@ abstract class AppTheme {
   static const pinkDark = Color.fromRGBO(255, 55, 95, 1);
   static const brownDark = Color.fromRGBO(172, 142, 104, 1);
 
-  // debug colors
+  // Debug Colors
   static const debugColorEnemie = pinkLight;
   static const debugColorEnemieHitbox = indigoLight;
   static const debugColorTrap = black;
@@ -66,47 +66,45 @@ abstract class AppTheme {
   static const debugColorParticleHitbox = redLight;
   static const debugColorWorldBlock = mintDark;
 
-  // ingame
-  static const ingameText = white;
-  static final ingameTextShimmer = Color.fromRGBO(114, 114, 114, 1);
+  // Game Colors
+  static final whiteShimmer = Color.fromRGBO(114, 114, 114, 1);
   static final starColor = Color.fromRGBO(255, 255, 85, 1);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
   static final overlayBlur = black.withAlpha(140);
 
-  // colors for mini map
+  // Mini Map Block Colors
   static const brickBlock = Color.fromRGBO(207, 76, 94, 1);
-
   static const grasDarkBlock = Color.fromRGBO(218, 145, 80, 1);
   static const grasLightBlock = Color.fromRGBO(124, 160, 56, 1);
-
   static const dirtDarkBlock = Color.fromRGBO(150, 76, 71, 1);
   static const dirtLightBlock = Color.fromRGBO(175, 114, 89, 1);
-
   static const woodBlock = Color.fromRGBO(84, 45, 42, 1);
   static const platformBlock = woodBlock;
   static const goldBlock = yellowDark;
   static const orangeBlock = orangeDark;
 
-  static const skyBlock1 = Color.fromARGB(255, 2, 121, 247);
-  static const skyBlock2 = Color.fromARGB(255, 8, 117, 251);
-  static const skyBlock3 = Color.fromARGB(255, 0, 127, 243);
+  // Mini Map Background Colors
+  static const skyBlockWorld_1 = Color.fromARGB(255, 2, 121, 247);
+  static const skyBlockWorld_2 = Color.fromARGB(255, 8, 117, 251);
+  static const skyBlockWorld_3 = Color.fromARGB(255, 0, 127, 243);
 
+  // Mini Map Marker Colors
   static const playerMarker = redDark;
   static const entityMarkerStandard = white;
   static const entityMarkerSpecial = grayLight4;
 
-  // #### ALL COLORS ###########################################
-  static const TextStyle dialogTextStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText, height: 1.4);
-  static const TextStyle dialogHeadingStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 9, color: AppTheme.ingameText, height: 1.8);
-  static const TextStyle textBtnStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 10, color: AppTheme.ingameText, height: 1.4);
-  static const TextStyle characterPickerHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.ingameText, height: 1.4);
-  static const TextStyle characterPickerText = TextStyle(fontFamily: 'Pixel Font', fontSize: 5, color: AppTheme.ingameText, height: 1.4);
+  // #### ALL TEXT STYLES ######################################
 
-  static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.ingameText, height: 2.4);
-  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 20, color: AppTheme.ingameText, height: 3.2);
+  static const TextStyle dialogTextStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white, height: 1.4);
+  static const TextStyle dialogHeadingStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 9, color: AppTheme.white, height: 1.8);
 
-  static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.ingameText, height: 1.4);
+  static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 2.4);
+  static const TextStyle textBtnStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 10, color: AppTheme.white, height: 1.4);
+
+  static const TextStyle characterPickerText = TextStyle(fontFamily: 'Pixel Font', fontSize: 5, color: AppTheme.white, height: 1.4);
+  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 20, color: AppTheme.white, height: 3.2);
+  static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.4);
 
   static const double dialogTextStandardHeight = 8;
   static const double textBtnStandardHeight = 17;

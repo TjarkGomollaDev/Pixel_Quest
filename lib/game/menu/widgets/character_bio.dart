@@ -61,7 +61,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   }
 
   TextComponent _createTextComponent(String text, Vector2 position) =>
-      TextComponent(text: text, position: position, anchor: Anchor.centerLeft, textRenderer: AppTheme.characterPickerText.asTextPaint);
+      TextComponent(text: text, position: position, anchor: Anchor.centerLeft, textRenderer: AppTheme.dialogTextStandard.asTextPaint);
 
   Future<void> setCharacterBio(PlayerCharacter character, {bool animation = true}) async {
     final data = game.l10n.bioForCharacter(character);

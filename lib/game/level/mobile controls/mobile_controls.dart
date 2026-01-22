@@ -53,7 +53,7 @@ class MobileControls extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   void _addSubscription() {
-    _sub = GameEventBus.instance.listen<ControlSettingsChanged>((event) => _applyLayout(event.setup));
+    _sub = game.eventBus.listen<ControlSettingsChanged>((event) => _applyLayout(event.setup));
   }
 
   void _removeSubscription() {

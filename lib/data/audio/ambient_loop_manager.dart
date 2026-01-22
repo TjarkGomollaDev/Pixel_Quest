@@ -39,7 +39,7 @@ class AmbientLoopManager {
     if (wasEmpty) await _audioCenter.startLoop(loop, fadeIn: true);
   }
 
-  Future<void> unregisterSource(LoopSfx loop, Object source) async {
+  Future<void> unregisterSource(LoopSfx loop, Object source, {bool fadeOut = true}) async {
     if (_audioCenter.effectiveSfxVolume == 0 || _audioCenter.gameSfxMuted) return;
 
     // check whether a set exists for this loop sound
@@ -54,7 +54,7 @@ class AmbientLoopManager {
     _pendingStop[loop]?.cancel();
     _pendingStop[loop] = Timer(_defaultStopDelay, () async {
       final stillEmpty = (_activeSources[loop]?.isEmpty ?? true);
-      if (stillEmpty) await _audioCenter.stopLoop(loop, fadeOut: true);
+      if (stillEmpty) await _audioCenter.stopLoop(loop, fadeOut: fadeOut);
     });
   }
 

@@ -43,7 +43,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
   // layer colors
   static const Color _layerContentBoxColor = AppTheme.black; // [Adjustable]
   static const Color _layerFrameColor = AppTheme.grayDark4; // [Adjustable]
-  static const Color _layerOutlineHightlightColor = AppTheme.ingameText; // [Adjustable]
+  static const Color _layerOutlineHightlightColor = AppTheme.white; // [Adjustable]
   static const Color _layerOutlineColor = AppTheme.grayDark6; // [Adjustable]
   static final Color _layerTitleBarShadowColor = AppTheme.grayDark3.withAlpha(160); // [Adjustable]
 

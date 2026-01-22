@@ -53,7 +53,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
   static const String _pathEnd = ').png';
 
   // reached
-  bool reached = false;
+  bool _reached = false;
 
   // player respawn point
   late final Vector2 _playerRespawn;
@@ -69,9 +69,28 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     return super.onLoad();
   }
 
+  @override
+  Future<void> onEntityCollision(CollisionSide collisionSide) async {
+    if (_reached || _playerRespawn.x < _player.respawnPosition.x) return;
+    _reached = true;
+    _player.reachedCheckpoint(_playerRespawn);
+    game.audioCenter.playSound(Sfx.checkpoint, SfxType.level);
+
+    // play reached checkpoint animation
+    current = CheckpointState.flagOut;
+    await animationTickers![CheckpointState.flagOut]!.completed;
+    current = CheckpointState.flagIdle;
+  }
+
+  @override
+  EntityCollisionType get collisionType => EntityCollisionType.any;
+
+  @override
+  ShapeHitbox get entityHitbox => _hitbox;
+
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -93,22 +112,4 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     position.x + _hitbox.position.x + _hitbox.width - _player.hitboxLocalPosition.x + _offset,
     position.y + height - _player.height,
   );
-
-  @override
-  Future<void> onEntityCollision(CollisionSide collisionSide) async {
-    if (reached || _playerRespawn.x < _player.respawnPosition.x) return;
-    reached = true;
-    current = CheckpointState.flagOut;
-    _player.reachedCheckpoint(_playerRespawn);
-    game.audioCenter.playSound(Sfx.checkpoint, SfxType.level);
-
-    await animationTickers![CheckpointState.flagOut]!.completed;
-    current = CheckpointState.flagIdle;
-  }
-
-  @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
-
-  @override
-  ShapeHitbox get entityHitbox => _hitbox;
 }

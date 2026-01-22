@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/ambient_loop_emitter.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -27,7 +28,8 @@ enum BlueBirdState implements AnimationState {
   const BlueBirdState(this.fileName, this.amount, {this.loop = true});
 }
 
-class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
+class BlueBird extends SpriteAnimationGroupComponent
+    with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
   final double _offsetNeg;
   final double _offsetPos;
@@ -103,9 +105,10 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
     if (collisionSide == CollisionSide.Top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
+      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      stopAmbientLoop();
       current = BlueBirdState.hit;
       animationTickers![BlueBirdState.hit]!.completed.then((_) => removeFromParent());
     } else {
@@ -118,7 +121,7 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;
@@ -129,6 +132,7 @@ class BlueBird extends SpriteAnimationGroupComponent with EntityCollision, Entit
     _hitbox.collisionType = CollisionType.passive;
     _startY = position.y;
     add(_hitbox);
+    configureAmbientLoop(loop: LoopSfx.bird, hitbox: _hitbox);
   }
 
   void _loadAllSpriteAnimations() {

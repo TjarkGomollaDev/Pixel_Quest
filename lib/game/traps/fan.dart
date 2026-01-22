@@ -68,7 +68,7 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebug) {
+    if (GameSettings.customDebugMode) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
@@ -97,7 +97,11 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
     add(_airStream);
   }
 
-  void activateFan() => animationGroupComponent.current = FanState.on;
+  void activateFan() {
+    animationGroupComponent.current = FanState.on;
+  }
 
-  void deactivateFan() => animationGroupComponent.current = FanState.off;
+  void deactivateFan() {
+    animationGroupComponent.current = FanState.off;
+  }
 }
