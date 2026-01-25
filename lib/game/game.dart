@@ -237,7 +237,7 @@ class PixelQuest extends FlameGame
 
   void _setUpRouter() {
     // router = createRouter(staticCenter: staticCenter);
-    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(4).uuid);
+    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(14).uuid);
     add(router);
   }
 
@@ -246,14 +246,6 @@ class PixelQuest extends FlameGame
 
     // important that it is explicitly added to the router
     router.add(loadingOverlay);
-  }
-
-  Future<void> showLoadingOverlay(LevelMetadata levelMetadata) async {
-    await loadingOverlay.showOverlay(levelMetadata);
-  }
-
-  Future<void> hideLoadingOverlay({VoidCallback? onAfterDummyFallOut}) async {
-    await loadingOverlay.hideOverlay(onAfterDummyFallOut: onAfterDummyFallOut);
   }
 
   Future<void> _createMiniMapBackgroundPattern() async {

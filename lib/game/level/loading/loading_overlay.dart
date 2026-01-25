@@ -7,6 +7,7 @@ import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/utils/background_parallax.dart';
 import 'package:pixel_adventure/game/level/loading/loading_dummy_character.dart';
 import 'package:pixel_adventure/game/traps/air_particle.dart';
+import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
@@ -15,7 +16,9 @@ import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>, HasVisibility implements OpacityProvider {
+enum OverlayState { notVisible, transition, visible }
+
+class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>, CancelableAnimations implements OpacityProvider {
   // constructor parameters
   final double _worldToScreenScale;
   final GameSafePadding _safePadding;
@@ -25,8 +28,13 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
       _safePadding = safePadding {
     position = size / 2;
     anchor = Anchor.center;
-    _hide();
   }
+
+  // current state
+  OverlayState _state = OverlayState.notVisible;
+
+  // internal opacity
+  double _opacity = 1;
 
   // components
   late final PositionComponent _root;
@@ -44,11 +52,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   late final RRectComponent _stageInfoBg;
   late final VisibleTextComponent _stageInfoText;
 
-  // internal opacity
-  double _opacity = 1;
+  // getter
+  bool get isShown => _state != OverlayState.notVisible;
 
-  // flag indicating whether the overlay is currently being shown
-  bool _isShown = false;
+  // animation keys
+  static const String _keyZoomAndFadeOut = 'zoom-and-fade-out';
 
   @override
   FutureOr<void> onLoad() {
@@ -63,16 +71,17 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   @override
   void update(double dt) {
-    if (_isShown) _particleTimer.update(dt);
+    if (_state == OverlayState.notVisible) return;
+    _particleTimer.update(dt);
     super.update(dt);
   }
 
   @override
   void renderTree(Canvas canvas) {
-    if (!isVisible || opacity <= 0) return;
+    if (_state == OverlayState.notVisible || _opacity <= 0) return;
 
     // render entire overlay, including children, into an alpha layer
-    _overlayPaint.color = Color.fromRGBO(255, 255, 255, opacity);
+    _overlayPaint.color = Color.fromRGBO(255, 255, 255, _opacity);
 
     canvas.saveLayer(null, _overlayPaint);
     super.renderTree(canvas);
@@ -84,29 +93,6 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   @override
   set opacity(double value) => _opacity = value.clamp(0, 1);
-
-  void _show() => isVisible = true;
-  void _hide() => isVisible = false;
-
-  Future<void> _animatedHide({double duration = 0.8, double targetScale = 5}) {
-    final completer = Completer<void>();
-
-    // add visual effects
-    final scaleEffect = ScaleEffect.to(Vector2.all(targetScale), EffectController(duration: duration, curve: Curves.easeInQuad));
-    final opacityEffect = OpacityEffect.to(
-      0,
-      EffectController(duration: 0.2, startDelay: duration - 0.2),
-      onComplete: () {
-        completer.complete();
-        scale = Vector2.all(1);
-        _opacity = 1;
-        _hide();
-      },
-    );
-    addAll([scaleEffect, opacityEffect]);
-
-    return completer.future;
-  }
 
   void _setUpRoot() {
     _root = PositionComponent()..scale = Vector2.all(_worldToScreenScale);
@@ -177,39 +163,101 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _root.add(particle);
   }
 
-  Future<void> showOverlay(LevelMetadata levelMetadata) async {
-    if (_isShown) return;
-    _isShown = true;
-    _inputBlocker.enable();
+  void _removeAllParticles() {
+    final particles = _root.children.whereType<AirParticle>().toList();
+    for (final p in particles) {
+      p.removeFromParent();
+    }
+  }
+
+  @override
+  void cancelAnimations() {
+    super.cancelAnimations();
+
+    // remove all particles
+    _particleTimer.pause();
+    _removeAllParticles();
+
+    // all animations must also be canceled for the dummy
+    _dummy.cancelAnimations();
+
+    // additionally hide and disable all components
+    _stageInfoBg.hide();
+    _stageInfoText.hide();
+    _inputBlocker.disable();
+
+    // initial state
+    _state = OverlayState.notVisible;
+  }
+
+  Future<void> show(LevelMetadata levelMetadata) async {
+    if (_state != OverlayState.notVisible) return;
+    _state = OverlayState.transition;
+    final token = bumpToken();
+
+    // reset visuals in every show
+    scale = Vector2.all(1);
+    _opacity = 1;
+
+    // show and enable all components
     _updateStageInfo(levelMetadata);
     _stageInfoBg.show();
     _stageInfoText.show();
+    _inputBlocker.enable();
+
+    // dummy character falls in and start particle spawner
     _particleTimer.start();
-    _show();
     await _dummy.fallIn();
+    if (token != animationToken) return;
+
+    // update state
+    _state = OverlayState.visible;
   }
 
-  Future<void> hideOverlay({VoidCallback? onAfterDummyFallOut}) async {
-    if (!_isShown) return;
-    _isShown = false;
+  Future<void> hide({VoidCallback? onAfterDummyFallOut}) async {
+    if (_state != OverlayState.visible) return;
+    _state = OverlayState.transition;
+    final token = bumpToken();
+
+    // dummy character falls out and then particle timer stops
     await _dummy.fallOut();
+    if (token != animationToken) return;
     onAfterDummyFallOut?.call();
     _particleTimer.pause();
+
+    // hide all components
     _stageInfoBg.hide();
     _stageInfoText.hide();
-    await _animatedHide();
+
+    // zoom and fade out
+    await _zoomAndFadeOut();
+    if (token != animationToken) return;
+
+    // update state
+    _state = OverlayState.notVisible;
+
+    // input blocker can now also be disabled
     _inputBlocker.disable();
+  }
+
+  Future<void> _zoomAndFadeOut({double zoomDuration = 0.8, double fadeOutDuration = 0.4, double targetScale = 5}) {
+    // create effect
+    final effect = CombinedEffect([
+      ScaleEffect.to(Vector2.all(targetScale), EffectController(duration: zoomDuration, curve: Curves.easeInQuad)),
+      OpacityEffect.to(0, EffectController(duration: fadeOutDuration, startDelay: zoomDuration - fadeOutDuration)),
+    ]);
+    return registerEffect(_keyZoomAndFadeOut, effect);
   }
 
   Future<void> warmUp(LevelMetadata levelMetadata) async {
     _updateStageInfo(levelMetadata);
     _inputBlocker.disable();
-    final prevVisible = isVisible;
+    final prevState = _state;
     final prevOpacity = _opacity;
-    isVisible = true;
+    _state = OverlayState.visible;
     _opacity = 0.001;
     await yieldFrame();
     _opacity = prevOpacity;
-    isVisible = prevVisible;
+    _state = prevState;
   }
 }

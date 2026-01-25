@@ -74,18 +74,22 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Vis
     for (var tile in _grid.values) {
       final endPosition = tile.position.clone();
       tile.position += moveOffset;
-      tile.addAll([
-        MoveEffect.to(endPosition, EffectController(duration: duration, curve: Curves.linear)),
-        OpacityEffect.to(
-          1,
-          EffectController(duration: duration, curve: Curves.easeIn),
-          onComplete: () {
-            if (x == tile) {
-              completer.complete();
-            }
-          },
-        ),
-      ]);
+
+      // add visual effect
+      tile.add(
+        CombinedEffect([
+          MoveEffect.to(endPosition, EffectController(duration: duration, curve: Curves.linear)),
+          OpacityEffect.to(
+            1,
+            EffectController(duration: duration, curve: Curves.easeIn),
+            onComplete: () {
+              if (x == tile) {
+                completer.complete();
+              }
+            },
+          ),
+        ]),
+      );
     }
 
     return completer.future;

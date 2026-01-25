@@ -24,7 +24,10 @@ enum StartState implements AnimationState {
 }
 
 class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
-  Start({required super.position}) : super(size: gridSize);
+  Start({required super.position}) : super(size: gridSize) {
+    // is already called her so that we have immediate access to the player position from outside
+    _setUpPlayerPosition();
+  }
 
   // size
   static final Vector2 gridSize = Vector2.all(64);
@@ -47,7 +50,6 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
   FutureOr<void> onLoad() {
     _initialSetup();
     _loadAllSpriteAnimations();
-    _setUpPlayerPosition();
     return super.onLoad();
   }
 

@@ -3,13 +3,14 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
 enum StarVariant { filled, outline }
 
-class Star extends SpriteComponent with HasGameReference<PixelQuest> implements OpacityProvider {
+class Star extends SpriteComponent with HasGameReference<PixelQuest>, CancelableAnimations implements OpacityProvider {
   // constructor parameters
   final StarVariant _variant;
   final bool _spawnSizeZero;
@@ -29,21 +30,33 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
   static const String _pathFilled = 'Other/Star.png';
   static const String _pathOutline = 'Other/Star Outline.png';
 
-  // active animations are saved so that they can be canceled
-  final Map<String, Effect> _activeEffects = {};
-  final Map<String, Completer<void>> _activeCompleters = {};
-  final Map<String, Vector2> _resetPositions = {};
-
   // animation keys
-  static const String _keyFlyTo = 'fly-to';
-  static const String _keyFallTo = 'fall-to';
+  static const String _keyFlyToAndScaleIn = 'fly-to-and-scale-in';
+  static const String _keyFallToPopIn = 'fall-to-pop-in';
   static const String _keyPopIn = 'pop-in';
   static const String _keyScaleIn = 'scale-in';
   static const String _keyFadeOut = 'fade-out';
 
+  // for some animations, positions are saved to which the star is reset when the animation is canceled
+  final Map<String, Vector2> _resetPositions = {};
+
   @override
   Future<void> onLoad() async {
     _loadSprite();
+  }
+
+  @override
+  void cancelAnimations() {
+    super.cancelAnimations();
+
+    // reset visuals
+    scale = Vector2.all(1);
+    opacity = 1;
+
+    // reset position in a predictable priority (fallTo > flyTo)
+    final reset = _resetPositions[_keyFallToPopIn] ?? _resetPositions[_keyFlyToAndScaleIn];
+    if (reset != null) position = reset;
+    _resetPositions.clear();
   }
 
   void _loadSprite() {
@@ -51,156 +64,73 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest> implements 
     if (_spawnSizeZero) scale = Vector2.zero();
   }
 
-  void _cancelKey(String key) {
-    final effect = _activeEffects.remove(key);
-    final completer = _activeCompleters.remove(key);
+  Future<void> flyToAndScaleIn(Vector2 target, {double flyDuration = 1, double scaleDuration = 0.3}) {
+    // create effect
+    final effect = CombinedEffect([
+      MoveEffect.to(target, EffectController(duration: flyDuration, curve: Curves.easeOutBack)),
+      ScaleEffect.to(Vector2.all(1.0), EffectController(duration: scaleDuration, curve: Curves.easeOut)),
+    ]);
 
-    // remove effect and complete completer
-    if (effect != null && effect.parent != null) remove(effect);
-    if (completer != null && !completer.isCompleted) completer.complete();
-  }
-
-  void cancelAnimations({bool resetVisuals = true}) {
-    // cancel all registered animations
-    for (final k in _activeEffects.keys.toList()) {
-      _cancelKey(k);
-    }
-
-    // reset visuals
-    if (resetVisuals) {
-      scale = Vector2.all(1);
-      opacity = 1;
-    }
-
-    // reset position in a predictable priority (fallTo > flyTo)
-    final reset = _resetPositions[_keyFallTo] ?? _resetPositions[_keyFlyTo];
-    if (reset != null) position = reset;
-    _resetPositions.clear();
-  }
-
-  Future<void> flyTo(Vector2 target, {double flyDuration = 1}) async {
-    _cancelKey(_keyFlyTo);
-    final completer = Completer<void>();
-    _activeCompleters[_keyFlyTo] = completer;
-    _resetPositions[_keyFlyTo] = position.clone();
-
-    // add visual effect
-    final effect = SequenceEffect(
-      [
-        ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.1, curve: Curves.easeOut)),
-        MoveEffect.to(target, EffectController(duration: flyDuration, curve: Curves.easeOutBack)),
-      ],
-      onComplete: () {
+    // register effect and return future
+    return registerEffect(
+      _keyFlyToAndScaleIn,
+      effect,
+      additionallyOnStart: () => _resetPositions[_keyFlyToAndScaleIn] = position.clone(),
+      additionallyInOnComplete: () {
         game.audioCenter.playSound(Sfx.star, SfxType.level);
-        _resetPositions.remove(_keyFlyTo);
-        _activeEffects.remove(_keyFlyTo);
-        _activeCompleters.remove(_keyFlyTo);
-        if (!completer.isCompleted) completer.complete();
+        _resetPositions.remove(_keyFlyToAndScaleIn);
       },
     );
-    _activeEffects[_keyFlyTo] = effect;
-    add(effect);
-
-    return completer.future;
   }
 
-  Future<void> fallTo(Vector2 target, {double fallDuration = 0.4}) async {
-    _cancelKey(_keyFallTo);
-    final completer = Completer<void>();
-    _activeCompleters[_keyFallTo] = completer;
+  Future<void> fallToPopIn(Vector2 target, {double fallDuration = 0.4, double popInDuration = 0.15}) {
+    // create effect
+    final effect = SequenceEffect([
+      MoveEffect.to(target, EffectController(duration: fallDuration, curve: Curves.easeOutBack)),
+      ScaleEffect.to(Vector2.all(1.4), EffectController(duration: popInDuration * 0.5, curve: Curves.easeOut)),
+      ScaleEffect.to(Vector2.all(1.0), EffectController(duration: popInDuration * 0.5, curve: Curves.easeIn)),
+    ]);
+
+    // register effect and return future
     final startPosition = position.clone();
-    _resetPositions[_keyFallTo] = startPosition;
-
-    // play sound effect
-    game.audioCenter.playSound(Sfx.collected, SfxType.level);
-
-    // add visual effect
-    final effect = SequenceEffect(
-      [
-        MoveEffect.to(target, EffectController(duration: fallDuration, curve: Curves.easeOutBack)),
-        ScaleEffect.to(Vector2.all(1.3), EffectController(duration: 0.1, curve: Curves.easeOut)),
-        ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.1, curve: Curves.easeIn)),
-      ],
-      onComplete: () {
+    return registerEffect(
+      _keyFallToPopIn,
+      effect,
+      additionallyOnStart: () {
+        _resetPositions[_keyFallToPopIn] = startPosition;
+        game.audioCenter.playSound(Sfx.collected, SfxType.level);
+      },
+      additionallyInOnComplete: () {
         position = startPosition;
-        _resetPositions.remove(_keyFallTo);
-        _activeCompleters.remove(_keyFallTo);
-        _activeEffects.remove(_keyFallTo);
-        completer.complete();
+        _resetPositions.remove(_keyFallToPopIn);
       },
     );
-    _activeEffects[_keyFallTo] = effect;
-    add(effect);
-
-    return completer.future;
   }
 
-  Future<void> popIn({double duration = 0.6}) async {
-    _cancelKey(_keyPopIn);
-    final completer = Completer<void>();
-    _activeCompleters[_keyPopIn] = completer;
+  Future<void> popIn({double duration = 0.6}) {
+    // create effect
+    final effect = SequenceEffect([
+      ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
+      ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.5, curve: Curves.easeIn)),
+    ]);
 
-    // play sound effect
-    game.audioCenter.playSound(Sfx.star, SfxType.level);
-
-    // add visual effect
-    final effect = SequenceEffect(
-      [
-        ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.6, curve: Curves.easeOutBack)),
-        ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.4, curve: Curves.easeIn)),
-      ],
-      onComplete: () {
-        _activeEffects.remove(_keyPopIn);
-        _activeCompleters.remove(_keyPopIn);
-        if (!completer.isCompleted) completer.complete();
-      },
-    );
-    _activeEffects[_keyPopIn] = effect;
-    add(effect);
-
-    return completer.future;
+    // register effect and return future
+    return registerEffect(_keyPopIn, effect, additionallyOnStart: () => game.audioCenter.playSound(Sfx.star, SfxType.level));
   }
 
   Future<void> scaleIn({double duration = 0.6}) {
-    _cancelKey(_keyScaleIn);
-    final completer = Completer<void>();
-    _activeCompleters[_keyScaleIn] = completer;
+    // create effect
+    final effect = ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration, curve: Curves.fastEaseInToSlowEaseOut));
 
-    // add visual effect
-    final effect = ScaleEffect.to(
-      Vector2.all(1.0),
-      EffectController(duration: duration, curve: Curves.fastEaseInToSlowEaseOut),
-      onComplete: () {
-        _activeEffects.remove(_keyScaleIn);
-        _activeCompleters.remove(_keyScaleIn);
-        if (!completer.isCompleted) completer.complete();
-      },
-    );
-    _activeEffects[_keyScaleIn] = effect;
-    add(effect);
-
-    return completer.future;
+    // register effect and return future
+    return registerEffect(_keyScaleIn, effect);
   }
 
   Future<void> fadeOut({double duration = 0.1, bool removeAfter = true}) {
-    _cancelKey(_keyFadeOut);
-    final completer = Completer<void>();
-    _activeCompleters[_keyFadeOut] = completer;
+    // create effect
+    final effect = OpacityEffect.to(0, EffectController(duration: duration, curve: Curves.easeIn));
 
-    // add visual effect
-    final effect = OpacityEffect.to(
-      0,
-      EffectController(duration: duration, curve: Curves.easeIn),
-      onComplete: () {
-        _activeEffects.remove(_keyFadeOut);
-        _activeCompleters.remove(_keyFadeOut);
-        if (!completer.isCompleted) completer.complete();
-        if (removeAfter) removeFromParent();
-      },
-    );
-    _activeEffects[_keyFadeOut] = effect;
-    add(effect);
-
-    return completer.future;
+    // register effect and return future
+    return registerEffect(_keyFadeOut, effect, additionallyInOnComplete: removeAfter ? removeFromParent : null);
   }
 }

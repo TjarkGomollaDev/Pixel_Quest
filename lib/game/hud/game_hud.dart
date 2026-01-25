@@ -221,7 +221,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // at this point, we deliberately overwrite the existing route in the router by resetting the name,
     // this is the only way we can force the router to completely reload the level,
     // otherwise, the existing level would simply be placed on top of the stack without being reloaded
-    game.showLoadingOverlay(_levelMetadata);
+    game.loadingOverlay.show(_levelMetadata);
     game.router.pushReplacement(WorldRoute(() => Level(levelMetadata: _levelMetadata), maintainState: false), name: _levelMetadata.uuid);
   }
 

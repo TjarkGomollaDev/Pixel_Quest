@@ -51,6 +51,16 @@ import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 
+/// Internal control-flow exception used to abort the level loading pipeline.
+///
+/// This is thrown by the loading guard methods (e.g. `_guard`, `_guardYield`,
+/// `_guardDelay`) when loading has been canceled or a newer loading token is
+/// active. It is intentionally caught in `onLoad` / `onMount` to exit early
+/// without treating the cancellation as an actual error.
+final class _LoadingCanceled implements Exception {
+  const _LoadingCanceled();
+}
+
 class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCallbacks {
   // constructor parameters
   final LevelMetadata _levelMetadata;
@@ -107,28 +117,42 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   // subscription for game events
   GameSubscription? _sub;
 
+  // if the loading process is to be canceled
+  int _loadingToken = 0;
+  bool _loadingCanceled = false;
+
   // getter
   PlayerInput get playerInput => _playerInput;
   int get earnedStars => _earnedStars;
 
   @override
   Future<void> onLoad() async {
-    _startLoading();
-    await _loadLevelMap();
-    await _startMiniMapRecording();
-    await _addBackgroundLayer();
-    await _addSpawningLayer();
-    await _endMiniMapRecording();
-    _setUpCamera();
-    return super.onLoad();
+    final token = _bumpLoadingToken();
+    try {
+      _startLoading();
+      await _loadLevelMap(token);
+      _startMiniMapRecording();
+      await _addBackgroundLayer(token);
+      await _addSpawningLayer(token);
+      await _endMiniMapRecording(token);
+      _setUpCamera();
+      return super.onLoad();
+    } on _LoadingCanceled {
+      return;
+    }
   }
 
   @override
   Future<void> onMount() async {
-    _addSubscription();
-    _addAllOverlays();
-    await _completeLoading();
-    super.onMount();
+    final token = _loadingToken;
+    try {
+      _addSubscription();
+      _addAllOverlays();
+      await _completeLoading(token);
+      super.onMount();
+    } on _LoadingCanceled {
+      return;
+    }
   }
 
   @override
@@ -147,9 +171,42 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     super.renderFromCamera(canvas);
   }
 
+  int _bumpLoadingToken() => ++_loadingToken;
+
+  void _guard(int token) {
+    if (_loadingCanceled || token != _loadingToken) throw const _LoadingCanceled();
+  }
+
+  Future<void> _guardYield(int token) async {
+    await yieldFrame();
+    _guard(token);
+  }
+
+  Future<void> _guardDelay(int token, Duration d) async {
+    await Future.delayed(d);
+    _guard(token);
+  }
+
+  void _cancelLoading() {
+    _loadingCanceled = true;
+    _bumpLoadingToken();
+  }
+
   void _addSubscription() {
     _sub = game.eventBus.listenMany((on) {
       on<GameLifecycleChanged>((event) {
+        // if the level is still loading, cancel and return to the menu
+        if (game.loadingOverlay.isShown) {
+          _cancelLoading();
+          game.router.pushReplacementNamed(RouteNames.menu);
+
+          // wait until the menu is mounted and then pass on the event that the menu is paused
+          game.router.currentRoute.mounted.whenComplete(() => game.eventBus.emit(event));
+
+          // cancel loading overlay
+          game.loadingOverlay.cancelAnimations();
+          return;
+        }
         if (event.lifecycle == Lifecycle.paused && !_levelPaused) return _gameHud.triggerPause();
       });
       on<LevelLifecycleChanged>((event) {
@@ -169,13 +226,14 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     timeScale = 0;
   }
 
-  Future<void> _completeLoading() async {
+  Future<void> _completeLoading(int token) async {
     if (game.router.initialRoute == RouteNames.menu || _testModeStartInLevel) {
       // the overlay should be displayed for a minimum amount of time
       final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
       final delayMs = 1400;
-      if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
-      await game.hideLoadingOverlay(onAfterDummyFallOut: () => timeScale = 1);
+      if (elapsedMs < delayMs) await _guardDelay(token, Duration(milliseconds: delayMs - elapsedMs));
+      await game.loadingOverlay.hide(onAfterDummyFallOut: () => timeScale = 1);
+      _guard(token);
     } else {
       // when we start testing directly in a level, we don't want any delays and we don't need to hide any overlays
       _testModeStartInLevel = true;
@@ -183,30 +241,31 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     }
 
     // delay for visual reasons only
-    await Future.delayed(Duration(milliseconds: 100));
+    await _guardDelay(token, Duration(milliseconds: 100));
 
     // this method spawns the player and initiates the level start
     _player.appearInLevel();
   }
 
-  Future<void> _loadLevelMap() async {
+  Future<void> _loadLevelMap(int token) async {
     _levelMap = await TiledComponent.load('${_levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
       ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
-    await yieldFrame();
+    await _guardYield(token);
   }
 
-  Future<void> _startMiniMapRecording() async {
+  void _startMiniMapRecording() {
     _miniMapRecorder = PictureRecorder();
     _miniMapCanvas = Canvas(_miniMapRecorder);
     _miniMapPaint = Paint();
     _miniMapSize = Vector2(_levelMap.tileMap.map.width.toDouble(), _levelMap.tileMap.map.height.toDouble());
   }
 
-  Future<void> _endMiniMapRecording() async {
+  Future<void> _endMiniMapRecording(int token) async {
     final picture = _miniMapRecorder.endRecording();
     final image = await picture.toImage(_miniMapSize.x.toInt(), _miniMapSize.y.toInt());
     _readyMadeMiniMapForground = Sprite(image);
+    _guard(token);
   }
 
   void _addTileToMiniMap(int x, int y, int tileId, bool isPlatform) {
@@ -244,11 +303,12 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _miniMapEntities.add(entity);
   }
 
-  Future<void> _addBackgroundLayer() async {
+  Future<void> _addBackgroundLayer(int token) async {
     final backgroundLayer = _levelMap.tileMap.getLayer<TileLayer>('Background');
     if (backgroundLayer != null) {
       _addBackground(backgroundLayer);
-      await _addWorldCollisions(backgroundLayer);
+      await _addWorldCollisions(backgroundLayer, token);
+      _guard(token);
     }
   }
 
@@ -338,7 +398,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   ///
   /// This reduces the number of collision checks
   /// and improves runtime performance significantly.
-  Future<void> _addWorldCollisions(TileLayer backgroundLayer) async {
+  Future<void> _addWorldCollisions(TileLayer backgroundLayer, int token) async {
     _addWorldBorders();
 
     // y axis range of map
@@ -410,11 +470,12 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
           ),
         );
 
-        if ((x % 50) == 0) await yieldFrame();
+        if ((x % 50) == 0) await _guardYield(token);
       }
-      await yieldFrame();
+      await _guardYield(token);
     }
     addAll(_collisionBlocks);
+    await _guardYield(token);
   }
 
   void _addWorldBorders() {
@@ -422,17 +483,16 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     final borderWidth = GameSettings.tileSize;
     final verticalSize = Vector2(borderWidth, hasBorder ? _levelMap.height : _levelMap.height + borderWidth * 2);
     final horizontalSize = Vector2(hasBorder ? _levelMap.width - borderWidth * 2 : _levelMap.width, borderWidth);
+
+    // top, bottom, left, right
     final borders = [
-      // top
       WorldBlock(position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? 0 : -borderWidth), size: horizontalSize),
-      // bottom
       WorldBlock(
         position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
         size: horizontalSize,
       ),
-      // left
       WorldBlock(position: Vector2(hasBorder ? 0 : -borderWidth, hasBorder ? 0 : -borderWidth), size: verticalSize),
-      // right
+
       WorldBlock(
         position: Vector2(hasBorder ? _levelMap.width - borderWidth : _levelMap.width, hasBorder ? 0 : -borderWidth),
         size: verticalSize,
@@ -442,22 +502,34 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _collisionBlocks.addAll(borders);
   }
 
-  Future<void> _addSpawningLayer() async {
+  Future<void> _addSpawningLayer(int token) async {
     final spawnPointsLayer = _levelMap.tileMap.getLayer<ObjectGroup>('Spawning');
     if (spawnPointsLayer == null) return;
 
     // the start with player is always created first in the level, as many other objects require a reference to the player
+    bool foundStart = false;
     for (var spawnPoint in spawnPointsLayer.objects) {
       if (spawnPoint.class_ == 'Start') {
+        // first create start
+        foundStart = true;
         final gridPosition = snapVectorToGrid(spawnPoint.position);
         final start = Start(position: gridPosition);
-        add(start);
+
+        // then player and player input
         _player = Player(character: game.storageCenter.settings.character, startPosition: start.playerPosition);
         _playerInput = PlayerInput();
-        addAll([_player, _playerInput]);
+        addAll([start, _player, _playerInput]);
         _addCheckpointToMiniMap(gridPosition);
         break;
       }
+    }
+
+    // cancel if no start was found
+    if (!foundStart) {
+      return debugPrint(
+        '❌ Failed to spawn player: No Start object found in Spawning layer '
+        '(level=${_levelMetadata.tmxFileName}.tmx, layer=Spawning).',
+      );
     }
 
     // all other objects are created
@@ -656,11 +728,12 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         add(spawnObject);
         if (spawnObject is EntityOnMiniMap) _addEntityToMiniMap(spawnObject);
 
-        if ((++i % 10) == 0) await yieldFrame();
+        if ((++i % 10) == 0) await _guardYield(token);
       } catch (e, stack) {
         debugPrint('❌ Failed to spawn object ${spawnPoint.class_} at position (${spawnPoint.x}, ${spawnPoint.y}): $e\n$stack');
       }
     }
+    await _guardYield(token);
   }
 
   void _setUpCamera() {

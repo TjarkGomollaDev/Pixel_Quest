@@ -40,8 +40,6 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     return super.onLoad();
   }
 
-  void dispose() {}
-
   void _setUpStarsCount() {
     // star background
     _starBg = RRectComponent(
@@ -119,7 +117,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     for (var i = 0; i < newStars; i++) {
       if (token != _starsCountToken) return;
       _updateStarsCount(index: index, stars: totalStars - newStars + i + 1);
-      await _animatedStar.fallTo(_starItem.position);
+      await _animatedStar.fallToPopIn(_starItem.position);
       if (token != _starsCountToken) return;
       await Future.delayed(Duration(milliseconds: 50));
     }

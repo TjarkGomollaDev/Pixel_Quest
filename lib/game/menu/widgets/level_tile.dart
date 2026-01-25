@@ -71,7 +71,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
       path: 'Menu/Levels/${_levelMetadata.btnFileName}.png',
       onPressed: () async {
         game.audioCenter.stopBackgroundMusic();
-        unawaited(game.showLoadingOverlay(_levelMetadata));
+        unawaited(game.loadingOverlay.show(_levelMetadata));
         await yieldFrame();
         game.router.pushReplacementNamed(_levelMetadata.uuid);
       },

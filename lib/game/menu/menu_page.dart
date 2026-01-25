@@ -87,7 +87,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void dispose() {
     _removeSubscription();
-    _menuTopBar.dispose();
   }
 
   void _addSubscription() {

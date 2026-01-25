@@ -225,6 +225,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     scale = Vector2.zero();
     final completer = Completer<void>();
 
+    // add visual effect
     add(
       ScaleEffect.to(
         _normalScale,
@@ -235,6 +236,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
         },
       ),
     );
+
     return completer.future;
   }
 
@@ -254,6 +256,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     scale = _normalScale;
     final completer = Completer<void>();
 
+    // add visual effect
     add(
       ScaleEffect.to(
         Vector2.zero(),
@@ -283,6 +286,8 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   /// - [duration] : duration of each scale step (in seconds)
   Future<void> animatePopIn({double delay = 0.0, double duration = 0.2}) {
     final completer = Completer<void>();
+
+    // add visual effect
     add(
       SequenceEffect([
         ScaleEffect.to(_maxScale, EffectController(duration: duration, startDelay: delay)),

@@ -106,6 +106,8 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
           return;
         }
         current = PlayerState.fall;
+
+        // add visual effect
         final downEffect = MoveEffect.to(
           _defaultPosition,
           EffectController(duration: _jumpDownDuration, curve: JumpFallCurve()),

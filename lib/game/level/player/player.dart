@@ -537,7 +537,7 @@ class Player extends SpriteAnimationGroupComponent
       stars.add(star);
 
       // flies to the outline star position
-      await star.flyTo(starPositions[i]);
+      await star.flyToAndScaleIn(starPositions[i]);
       await _delayAnimation(delays[delayIndex]);
     }
     delayIndex++;

@@ -101,11 +101,11 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   Future<void> animatedShow({double duration = 0.4}) async {
     if (isVisible) return;
     isVisible = true;
-
     final endPosition = position.clone();
     position += Vector2(30, 0);
     final completer = Completer<void>();
 
+    // add visual effect
     add(MoveEffect.to(endPosition, EffectController(duration: duration, curve: Curves.easeOutCubic)));
 
     return completer.future;

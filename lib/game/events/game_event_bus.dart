@@ -97,11 +97,6 @@ class GameEventBus {
   }
 }
 
-/// Base class for all in-game events.
-abstract class GameEvent {
-  const GameEvent();
-}
-
 /// A lightweight handle for one or many event listeners.
 ///
 /// Call [cancel] to remove all registered event listeners and avoid leaks.
@@ -137,4 +132,9 @@ class GameSubscription {
     }
     _cancellers.clear();
   }
+}
+
+/// Base class for all in-game events.
+abstract class GameEvent {
+  const GameEvent();
 }

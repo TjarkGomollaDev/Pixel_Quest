@@ -2,42 +2,48 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
+enum DummyState { hidden, fallingIn, hovering, fallingOut }
+
+class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter, CancelableAnimations {
   LoadingDummyCharacter({required Vector2 screenSize}) {
     size = DummyCharacter.gridSize;
 
     // position points
     _startPosition = Vector2(screenSize.x / 2, -size.y);
-    _midPosition = Vector2(_startPosition.x, screenSize.y / 2 - _swingOffset.y);
+    _hoverPosition = Vector2(_startPosition.x, screenSize.y / 2 - _swingOffset.y);
     _endPosition = Vector2(_startPosition.x, screenSize.y + size.y);
     position = _startPosition;
   }
 
-  // fixed positions outside the screen
+  // current state
+  DummyState _state = DummyState.hidden;
+
+  // fixed positions outside the screen and hover position
   late final Vector2 _startPosition;
-  late final Vector2 _midPosition;
+  late final Vector2 _hoverPosition;
   late final Vector2 _endPosition;
 
-  // duration for fall effect
+  // durations for fall effect
+  static const double _jumpDownMultiplier = 0.002; // [Adjustable]
   late final double _jumpDownDurationFallIn;
   late final double _jumpDownDurationFallOut;
-  static const double _jumpDownMultiplier = 0.002; // [Adjustable]
 
-  // hover state
-  bool _isHovering = false;
-  Completer<void>? _hoverCompleter;
-
-  // flag indicating whether the dummy is currently being shown
-  bool _isShown = false;
-
-  // swing setup
+  // swing setup for hovering
   static final Vector2 _swingOffset = Vector2(4, 18); // [Adjustable]
   late final List<Vector2> _swingCornerPoints;
   static const double _swingTimePointToPoint = 0.36; // [Adjustable]
+
+  // completer to terminate the hover state
+  Completer<void>? _hoverCompleter;
+
+  // animation keys
+  static const String _keyFall = 'fall';
+  static const String _keyMoveToCorner = 'move-to-corner';
 
   @override
   FutureOr<void> onLoad() {
@@ -48,80 +54,103 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
 
   void _setUpSingleSwing() {
     _swingCornerPoints = [
-      _midPosition + Vector2(-_swingOffset.x, _swingOffset.y), // left center
-      _midPosition + Vector2(0, 2 * _swingOffset.y), // bottom center
-      _midPosition + Vector2(_swingOffset.x, _swingOffset.y), // right center
-      _midPosition, // top center -> starting point
+      _hoverPosition + Vector2(-_swingOffset.x, _swingOffset.y), // left center
+      _hoverPosition + Vector2(0, 2 * _swingOffset.y), // bottom center
+      _hoverPosition + Vector2(_swingOffset.x, _swingOffset.y), // right center
+      _hoverPosition, // top center -> starting point
     ];
   }
 
   void _setUpFallDuration() {
-    _jumpDownDurationFallIn = _jumpDownMultiplier * (_midPosition.y - _startPosition.y);
-    _jumpDownDurationFallOut = _jumpDownMultiplier * (_endPosition.y - _midPosition.y);
+    _jumpDownDurationFallIn = _jumpDownMultiplier * (_hoverPosition.y - _startPosition.y);
+    _jumpDownDurationFallOut = _jumpDownMultiplier * (_endPosition.y - _hoverPosition.y);
+  }
+
+  @override
+  void cancelAnimations() {
+    super.cancelAnimations();
+
+    // finish hover completer
+    if (_hoverCompleter != null && !_hoverCompleter!.isCompleted) _hoverCompleter!.complete();
+    _hoverCompleter = null;
+
+    // initial state
+    _state = DummyState.hidden;
   }
 
   Future<void> fallIn() async {
-    if (_isShown) return;
-    _isShown = true;
+    if (_state != DummyState.hidden) return;
+    _state = DummyState.fallingIn;
+    final token = bumpToken();
 
-    // choose correct character
+    // reset position in every fall in
+    position = _startPosition;
+
+    // choose correct dummy character
     animations = allCharacterAnimations[game.storageCenter.settings.character];
     current = PlayerState.fall;
 
-    // start effects
-    await _fallEffect(_midPosition, _jumpDownDurationFallIn);
+    // fall in animation
+    await _fall(_hoverPosition, _jumpDownDurationFallIn);
+    if (token != animationToken) return;
+
+    // start hover loop
     await Future.delayed(Duration(milliseconds: 50));
-    _startHoverLoop();
+    if (token != animationToken) return;
+    _startHoverLoop(token);
   }
 
   Future<void> fallOut() async {
-    if (!_isShown) return;
-    _isShown = false;
-    await _stopHoverLoop();
-    await _fallEffect(_endPosition, _jumpDownDurationFallOut);
-    position = _startPosition;
-  }
+    if (_state != DummyState.hovering) return;
+    _state = DummyState.fallingOut;
+    final token = bumpToken();
 
-  Future<void> _fallEffect(Vector2 targetPosition, double duration) {
-    final completer = Completer<void>();
-    final fallEffect = MoveEffect.to(
-      targetPosition,
-      EffectController(duration: duration, curve: JumpFallCurve()),
-      onComplete: () => completer.complete(),
-    );
-    add(fallEffect);
-
-    return completer.future;
-  }
-
-  void _startHoverLoop() {
-    _isHovering = true;
-    _hoverCompleter = Completer<void>();
-    _runHoverLoop();
-  }
-
-  Future<void> _stopHoverLoop() async {
-    _isHovering = false;
+    // since we are no longer in the over state, the hover loop ends itself
     await _hoverCompleter?.future;
+    if (token != animationToken) return;
+
+    // fall out animation
+    await _fall(_endPosition, _jumpDownDurationFallOut);
+    if (token != animationToken) return;
+
+    // update state
+    _state = DummyState.hidden;
   }
 
-  Future<void> _runHoverLoop() async {
-    while (_isHovering) {
-      await _singleSwing();
+  void _startHoverLoop(int token) {
+    _state = DummyState.hovering;
+    _hoverCompleter = Completer<void>();
+    _runHoverLoop(token);
+  }
+
+  Future<void> _runHoverLoop(int token) async {
+    while (_state == DummyState.hovering && token == animationToken) {
+      await _singleSwing(token);
     }
-    _hoverCompleter?.complete();
+    if (_hoverCompleter != null && !_hoverCompleter!.isCompleted) _hoverCompleter!.complete();
+    _hoverCompleter = null;
   }
 
-  Future<void> _singleSwing() async {
+  Future<void> _singleSwing(int token) async {
     for (var i = 0; i < 4; i++) {
-      await _moveTo(_swingCornerPoints[i]);
+      if (token != animationToken) return;
+      await _moveToCorner(_swingCornerPoints[i]);
     }
   }
 
-  Future<void> _moveTo(Vector2 target) {
-    final completer = Completer<void>();
-    final effect = MoveEffect.to(target, EffectController(duration: _swingTimePointToPoint), onComplete: () => completer.complete());
-    add(effect);
-    return completer.future;
+  Future<void> _moveToCorner(Vector2 target) {
+    // create effect
+    final effect = MoveEffect.to(target, EffectController(duration: _swingTimePointToPoint));
+
+    // register effect and return future
+    return registerEffect(_keyMoveToCorner, effect);
+  }
+
+  Future<void> _fall(Vector2 targetPosition, double duration) {
+    // create effect
+    final effect = MoveEffect.to(targetPosition, EffectController(duration: duration, curve: JumpFallCurve()));
+
+    // register effect and return future
+    return registerEffect(_keyFall, effect);
   }
 }
