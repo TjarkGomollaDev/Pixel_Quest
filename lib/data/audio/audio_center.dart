@@ -101,7 +101,8 @@ class AudioCenter {
     _pools[Sfx.popOut] = await FlameAudio.createPool(Sfx.popOut.path, maxPlayers: 4);
     _pools[Sfx.enemieHit] = await FlameAudio.createPool(Sfx.enemieHit.path, maxPlayers: 6);
     _pools[Sfx.enemieWallHit] = await FlameAudio.createPool(Sfx.enemieWallHit.path, maxPlayers: 8);
-    _pools[Sfx.enemieShot] = await FlameAudio.createPool(Sfx.enemieShot.path, maxPlayers: 8);
+    _pools[Sfx.trunkShot] = await FlameAudio.createPool(Sfx.trunkShot.path, maxPlayers: 8);
+    _pools[Sfx.plantShot] = await FlameAudio.createPool(Sfx.plantShot.path, maxPlayers: 8);
     _pools[Sfx.collected] = await FlameAudio.createPool(Sfx.collected.path, maxPlayers: 8);
     _pools[Sfx.jumpBoost] = await FlameAudio.createPool(Sfx.jumpBoost.path, maxPlayers: 6);
     _pools[Sfx.pressurePlate] = await FlameAudio.createPool(Sfx.pressurePlate.path, maxPlayers: 8);

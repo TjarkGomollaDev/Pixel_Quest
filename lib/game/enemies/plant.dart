@@ -86,7 +86,10 @@ class Plant extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
+
+    // since only top collision is taken into account, we can also run through the plant, which can also trigger the top collision,
+    // that's why there is an extra check to ensure that the player is really above the plant
+    if (collisionSide == CollisionSide.Top && _player.hitboxAbsoluteBottom <= position.y + _hitbox.position.y + 2) {
       _gotStomped = true;
       _player.bounceUp();
 
@@ -144,14 +147,17 @@ class Plant extends PositionComponent
 
   Future<bool> _attack() async {
     animationGroupComponent.current = PlantState.attack;
+
+    // the sound should start during the attack animation, not before or after
     final ticker = animationGroupComponent.animationTickers![PlantState.attack]!;
     ticker.onFrame = (frame) {
       if (frame == _startShotSoundFrame) {
-        game.audioCenter.playSoundIf(Sfx.enemieShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+        game.audioCenter.playSoundIf(Sfx.plantShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
         ticker.onFrame = null;
       }
     };
     await ticker.completed;
+
     if (_gotStomped) return false;
     _spawnBullet();
     animationGroupComponent.current = PlantState.idle;

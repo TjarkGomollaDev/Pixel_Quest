@@ -337,8 +337,8 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     current = TrunkState.attack;
     await animationTickers![TrunkState.attack]!.completed;
     if (!_isShooting || _gotStomped) return;
-    game.audioCenter.playSoundIf(Sfx.enemieShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     _spawnBullet();
+    game.audioCenter.playSoundIf(Sfx.trunkShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     current = TrunkState.idle;
   }
 

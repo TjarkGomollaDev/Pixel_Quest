@@ -72,6 +72,11 @@ class Chicken extends PositionComponent
   late int _moveDirection;
   final double _runSpeed = 80; // [Adjustable]
 
+  // attack sound
+  bool _attackSoundPlayedThisRange = false;
+  static const double _attackSoundCooldown = 0.4; // [Adjustable]
+  double _timeSinceLastAttackSound = double.infinity;
+
   // got stomped
   bool _gotStomped = false;
 
@@ -88,6 +93,7 @@ class Chicken extends PositionComponent
   @override
   void update(double dt) {
     if (!_gotStomped) {
+      _timeSinceLastAttackSound += dt;
       _movement(dt);
       _updateState();
     }
@@ -158,10 +164,22 @@ class Chicken extends PositionComponent
     _velocity.x = 0;
 
     // camera culling
-    if (!game.isEntityInVisibleWorldRectX(_hitbox)) return;
+    if (!game.isEntityInVisibleWorldRectX(_hitbox)) {
+      _attackSoundPlayedThisRange = false;
+      return;
+    }
 
     // first, we check whether the player is within the range in which the chicken can move
-    if (!_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom)) return;
+    if (_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom)) {
+      if (!_attackSoundPlayedThisRange && _timeSinceLastAttackSound >= _attackSoundCooldown) {
+        game.audioCenter.playSound(Sfx.chicken, SfxType.game);
+        _timeSinceLastAttackSound = 0;
+      }
+      _attackSoundPlayedThisRange = true;
+    } else {
+      _attackSoundPlayedThisRange = false;
+      return;
+    }
 
     // secondly, now that we know the player is in range, we check whether he is to the left or right of the chicken
     if (_player.hitboxAbsoluteRight < _hitboxLeft) {
@@ -180,8 +198,8 @@ class Chicken extends PositionComponent
   bool _playerInRange(double playerHitboxLeft, double playerHitboxRight, double playerHitboxBottom) {
     return playerHitboxRight >= _rangeNeg &&
         playerHitboxLeft <= _rangePos &&
-        playerHitboxBottom <= position.y + height &&
-        playerHitboxBottom >= position.y + _hitbox.position.y;
+        playerHitboxBottom >= position.y + _hitbox.position.y &&
+        playerHitboxBottom <= position.y + height;
   }
 
   void _updateState() {

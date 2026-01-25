@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
@@ -164,6 +165,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _particleTimer.start();
     _isFanOn = true;
     _fan.activateFan();
+    game.audioCenter.playSoundIf(Sfx.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     _fanTimer!
       ..limit = _durationFanOff
       ..onTick = _switchOff
@@ -174,6 +176,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _particleTimer.pause();
     _isFanOn = false;
     _fan.deactivateFan();
+    game.audioCenter.playSoundIf(Sfx.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     _fanTimer!
       ..limit = _durationFanOn
       ..onTick = _switchOn
