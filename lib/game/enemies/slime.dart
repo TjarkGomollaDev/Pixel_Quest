@@ -16,7 +16,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum SlimeState implements AnimationState {
+enum _SlimeState implements AnimationState {
   idle('Idle', 10),
   hit('Hit', 5, loop: false);
 
@@ -27,9 +27,13 @@ enum SlimeState implements AnimationState {
   @override
   final bool loop;
 
-  const SlimeState(this.fileName, this.amount, {this.loop = true});
+  const _SlimeState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A small patrolling enemy that slides back and forth within a configurable range.
+///
+/// The Slime moves horizontally between two borders, can be stomped by the player,
+/// and periodically spawns small slime particles while active.
 class Slime extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
@@ -102,15 +106,15 @@ class Slime extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       stopAmbientLoop();
-      animationGroupComponent.current = SlimeState.hit;
-      animationGroupComponent.animationTickers![SlimeState.hit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.current = _SlimeState.hit;
+      animationGroupComponent.animationTickers![_SlimeState.hit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -135,9 +139,9 @@ class Slime extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SlimeState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in SlimeState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SlimeState.idle);
+    final loadAnimation = spriteAnimationWrapper<_SlimeState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _SlimeState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SlimeState.idle);
   }
 
   void _setUpRange() {

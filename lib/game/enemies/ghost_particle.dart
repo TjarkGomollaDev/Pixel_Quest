@@ -6,6 +6,10 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A short-lived visual effect spawned by a [Ghost].
+///
+/// Plays a small particle animation once (optionally flipped) and removes itself
+/// when the animation finishes.
 class GhostParticle extends SpriteAnimationComponent with HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final Ghost _owner;

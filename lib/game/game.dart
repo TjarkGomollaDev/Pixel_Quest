@@ -7,7 +7,6 @@ import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_adventure/data/audio/ambient_loop_manager.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
@@ -23,6 +22,10 @@ import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/game/menu/menu_page.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 
+/// Main Flame game root that bootstraps the whole app.
+///
+/// Provides the shared game services (static/storage/audio + event bus), sets up and manages the camera,
+/// and creates the central router that hosts all routes/pages used throughout the game.
 class PixelQuest extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection, HasPerformanceTracker, SingleGameInstance, WidgetsBindingObserver {
   // constructor parameters
@@ -65,11 +68,13 @@ class PixelQuest extends FlameGame
   // timestamp used to measure loading time and used in conjunction with the splash screen
   late final DateTime _startTime;
 
+  // max update delta time
   static const double _maxDt = 1 / 60;
 
   // bridge to convert events from storage layer into game events
   StreamSubscription? _storageBridgeSub;
 
+  // internal oberserver attached flag
   bool _isObserverAttached = false;
 
   @override
@@ -203,12 +208,16 @@ class PixelQuest extends FlameGame
     worldToScreenScale = camera.viewport.size.y / size.y;
   }
 
+  /// Configures the camera for the menu: no world-follow, full-screen bounds, anchored top-left.
   void setUpCameraForMenu() {
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.setBounds(Rectangle.fromLTRB(0, 0, size.x, size.y));
     camera.follow(PositionComponent());
   }
 
+  /// Configures the camera for a level: clamps movement to map bounds and follows the player horizontally.
+  ///
+  /// The viewfinder anchor is shifted so the player sits around 1/4 of the screen width.
   void setUpCameraForLevel(double mapWidth, Player player) {
     // the player should not be visible on the far left of the screen, but rather at 1/4 of the screen width
     camera.viewfinder.anchor = Anchor(0.25, 0);
@@ -222,6 +231,7 @@ class PixelQuest extends FlameGame
     setRefollowForLevelCamera(player);
   }
 
+  /// Re-attaches the level camera follow target to the given player (used after respawn/camera resets).
   void setRefollowForLevelCamera(Player player) {
     camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
@@ -236,8 +246,8 @@ class PixelQuest extends FlameGame
   }
 
   void _setUpRouter() {
-    // router = createRouter(staticCenter: staticCenter);
-    router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(14).uuid);
+    router = createRouter(staticCenter: staticCenter);
+    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInOneWorldByIndex(0).getLevelByNumber(14).uuid);
     add(router);
   }
 

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 
+/// A lightweight page indicator made of dots.
 class DotsIndicator extends PositionComponent {
   // constructor parameters
   final int _dotCount;

@@ -10,7 +10,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum FanState implements AnimationState {
+enum _FanState implements AnimationState {
   off('Off', 1),
   on('On', 4);
 
@@ -21,7 +21,7 @@ enum FanState implements AnimationState {
   @override
   final bool loop = true;
 
-  const FanState(this.fileName, this.amount);
+  const _FanState(this.fileName, this.amount);
 }
 
 /// A fan trap that continuously blows air upwards.
@@ -80,9 +80,9 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
   }
 
   void _loadAllAnimation() {
-    final loadAnimation = spriteAnimationWrapper<FanState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in FanState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: FanState.on);
+    final loadAnimation = spriteAnimationWrapper<_FanState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _FanState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _FanState.on);
   }
 
   void _loadFanAirStream() {
@@ -98,10 +98,10 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
   }
 
   void activateFan() {
-    animationGroupComponent.current = FanState.on;
+    animationGroupComponent.current = _FanState.on;
   }
 
   void deactivateFan() {
-    animationGroupComponent.current = FanState.off;
+    animationGroupComponent.current = _FanState.off;
   }
 }

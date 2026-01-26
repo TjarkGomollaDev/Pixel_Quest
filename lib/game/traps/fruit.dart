@@ -13,7 +13,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum FruitState implements AnimationState {
+enum _FruitState implements AnimationState {
   idle('Idle', 17),
   collected('Collected', 6, loop: false);
 
@@ -24,7 +24,7 @@ enum FruitState implements AnimationState {
   @override
   final bool loop;
 
-  const FruitState(this.fileName, this.amount, {this.loop = true});
+  const _FruitState(this.fileName, this.amount, {this.loop = true});
 }
 
 // ignore: constant_identifier_names
@@ -72,8 +72,8 @@ class Fruit extends SpriteAnimationGroupComponent
 
       // play collected animation and then remove from level
       game.audioCenter.playSound(Sfx.collected, SfxType.game);
-      current = FruitState.collected;
-      animationTickers![FruitState.collected]!.completed.whenComplete(() => removeFromParent());
+      current = _FruitState.collected;
+      animationTickers![_FruitState.collected]!.completed.whenComplete(() => removeFromParent());
     }
   }
 
@@ -99,14 +99,14 @@ class Fruit extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FruitState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final loadAnimation = spriteAnimationWrapper<_FruitState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {
-      for (var state in FruitState.values)
+      for (var state in _FruitState.values)
         // small adjustment here, as we are not using the enum name for the fruit but the name from the class
-        state: state == FruitState.idle
+        state: state == _FruitState.idle
             ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, GameSettings.stepTime, _textureSize)
             : loadAnimation(state),
     };
-    current = FruitState.idle;
+    current = _FruitState.idle;
   }
 }

@@ -104,6 +104,9 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   // tap down is required before tap up
   bool _hadTapDown = false;
 
+  // if the button should be hidden initially
+  late final bool _initialShow;
+
   @override
   void onTapDown(TapDownEvent event) {
     if (!_canReceiveTap) return;
@@ -152,6 +155,12 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     super.update(dt);
   }
 
+  @override
+  FutureOr<void> onLoad() {
+    if (!_initialShow) hide();
+    return super.onLoad();
+  }
+
   /// Initializes the button.
   /// MUST be called inside the constructor of any class mixing in `_BaseBtn`.
   ///
@@ -160,7 +169,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   /// - [holdMode]  : if hold mode is to be used instead of a single tap
   void _setUpBaseBtn({required FutureOr<void> Function() onPressed, required bool show, required bool holdMode}) {
     _onPressed = onPressed;
-    if (!show) hide();
+    _initialShow = show;
     _holdMode = holdMode;
     anchor = Anchor.center;
   }
@@ -174,6 +183,14 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
 
   /// Sets scale to max.
   void setMaxScale() => scale = _maxScale;
+
+  /// Locks the button.
+  /// This actually happens automatically, but in some cases it may make sense to set the value manually.
+  void lockExecuting() => _executing = true;
+
+  /// Unlocks the button.
+  /// This actually happens automatically, but in some cases it may make sense to set the value manually.
+  void unlockExecuting() => _executing = false;
 
   /// Determines whether this button may receive and react to taps.
   ///
@@ -284,7 +301,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   /// Parameters:
   /// - [delay]    : optional delay before the animation starts (in seconds)
   /// - [duration] : duration of each scale step (in seconds)
-  Future<void> animatePopIn({double delay = 0.0, double duration = 0.2}) {
+  Future<void> animatedPopIn({double delay = 0.0, double duration = 0.2}) {
     final completer = Completer<void>();
 
     // add visual effect
@@ -457,7 +474,7 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
     String? textOnBtn,
   }) : this(path: type.path, onPressed: onPressed, position: position, show: show, holdMode: holdMode, textOnBtn: textOnBtn);
 
-  // text
+  // optional text
   TextComponent? _textComponent;
 
   @override
@@ -582,8 +599,7 @@ class SpriteToggleBtn extends SpriteBtn {
     _toggleState = !_toggleState;
     _setSpriteToState();
     _setTextToState();
-    if (_toggleState) return _onPressed_2();
-    return _onPressed();
+    return _toggleState ? _onPressed_2() : _onPressed();
   }
 
   /// Sets a new toggle state and updates the displayed sprite accordingly.
@@ -610,63 +626,157 @@ FutureOr<void> Function() nonBlocking(Future<void> Function() asyncFn) {
   };
 }
 
-class RadioOption {
+/// A single selectable option that can be used inside a [RadioComponent].
+abstract class RadioOption {
   // constructor parameters
-  final String text;
   final FutureOr<void> Function() onSelected;
 
-  const RadioOption({required this.text, required this.onSelected});
+  const RadioOption({required this.onSelected});
+
+  /// Creates the inner component that will be placed inside a radio button.
+  PositionComponent buildContent({
+    required PixelQuest game,
+    required Vector2 btnSize,
+    TextStyle? textStyle,
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
+  });
 }
 
+/// A text-based radio option.
+///
+/// The option renders a centered [TextComponent] with the given [text].
+/// Use this when the radio choice is best represented as a label.
+class RadioOptionText extends RadioOption {
+  // constructor parameters
+  final String text;
+
+  const RadioOptionText({required this.text, required super.onSelected});
+
+  @override
+  PositionComponent buildContent({
+    required PixelQuest game,
+    required Vector2 btnSize,
+    TextStyle? textStyle,
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
+  }) {
+    return TextComponent(
+      text: text,
+      position: btnSize / 2,
+      anchor: Anchor.center,
+      textRenderer: TextPaint(style: textStyle ?? AppTheme.dialogTextStandard),
+    );
+  }
+}
+
+/// A sprite-based radio option.
+///
+/// The option renders a centered [SpriteComponent] loaded from [path].
+/// Use this when the radio choice is best represented as an icon/graphic.
+class RadioOptionSprite extends RadioOption {
+  // constructor parameters
+  final String path;
+
+  const RadioOptionSprite({required this.path, required super.onSelected});
+
+  @override
+  PositionComponent buildContent({
+    required PixelQuest game,
+    required Vector2 btnSize,
+    TextStyle? textStyle,
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
+  }) {
+    return SpriteComponent(
+      sprite: loadSprite(game, path),
+      position: btnSize / 2 + (spriteOffset ?? Vector2.zero()),
+      anchor: Anchor.center,
+      size: spriteSize,
+    );
+  }
+}
+
+/// Internal button container used by [RadioComponent].
+///
+/// This wraps a [RadioOption] inside a tappable area powered by [_BaseBtn].
+///
+/// Notes:
+/// - The button uses the parent's calculated size and center position.
+/// - The actual visible content is stored in [_content] and can be scaled
+///   independently (so hiding does not affect layout/centering).
+/// - The `_BaseBtn` mixin handles tap locking, async safety, and logical visibility.
+///
+/// You normally shouldn't use this directly—use [RadioComponent] instead.
 class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, _BaseBtn {
   // constructor parameters
-  final String _text;
+  final RadioOption _option;
   final TextStyle? _textStyle;
+  final Vector2? _spriteSize;
+  final Vector2? _spriteOffset;
 
   _RadioBtn({
-    required String text,
-    required super.size,
+    required RadioOption option,
     required FutureOr<void> Function() onPressed,
+    required super.size,
     required super.position,
+    required bool show,
     TextStyle? textStyle,
-    bool show = true,
-  }) : _text = text,
-       _textStyle = textStyle {
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
+  }) : _option = option,
+       _textStyle = textStyle,
+       _spriteSize = spriteSize,
+       _spriteOffset = spriteOffset {
     _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: false);
   }
 
-  // text
-  late final TextComponent _textComponent;
+  // content
+  late PositionComponent _content;
 
   @override
   FutureOr<void> onLoad() {
-    _setUpText();
-    _setUpOriginalSize(size);
+    _setUpContent();
+    _setUpOriginalSize(size.clone());
     return super.onLoad();
   }
 
-  void _setUpText() {
-    _textComponent = TextComponent(
-      text: _text,
-      position: size / 2,
-      anchor: Anchor.center,
-      textRenderer: TextPaint(style: _textStyle ?? AppTheme.dialogTextStandard),
-    );
-    add(_textComponent);
+  void _setUpContent() {
+    _content = _option.buildContent(game: game, btnSize: size, textStyle: _textStyle, spriteSize: _spriteSize, spriteOffset: _spriteOffset);
+    add(_content);
+  }
+
+  @override
+  void show() {
+    _content.scale = Vector2.all(1);
+    super.show();
+  }
+
+  @override
+  void hide() {
+    _content.scale = Vector2.zero();
+    super.hide();
   }
 }
 
+/// A horizontal radio selection component with multiple tappable options.
+///
+/// [RadioComponent] builds a row of internal buttons ([ _RadioBtn ]) and
+/// draws an animated outline ([CornerOutline]) around the currently selected option.
 class RadioComponent extends PositionComponent {
   // constructor parameters
   final List<RadioOption> _options;
   final Vector2 _optionSize;
   final double _spacingBetweenOptions;
   final TextStyle? _textStyle;
+  final Vector2? _spriteSize;
+  final Vector2? _spriteOffset;
   final int _initialIndex;
   final bool _triggerInitialOnSelected;
   final double _outlineCornerLength;
   final double _outlineStrokeWidth;
   final Color _outlineColor;
+  final bool _show;
 
   RadioComponent({
     required List<RadioOption> options,
@@ -674,28 +784,34 @@ class RadioComponent extends PositionComponent {
     double spacingBetweenOptions = 6,
     super.position,
     TextStyle? textStyle,
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
     int initialIndex = 0,
     bool triggerInitialOnSelected = false,
     super.anchor = Anchor.topLeft,
     double outlineCornerLength = 5,
     double outlineStrokeWidth = 1,
     Color outlineColor = AppTheme.white,
+    bool show = true,
   }) : _outlineColor = outlineColor,
        _outlineStrokeWidth = outlineStrokeWidth,
        _outlineCornerLength = outlineCornerLength,
        _triggerInitialOnSelected = triggerInitialOnSelected,
        _initialIndex = initialIndex,
        _textStyle = textStyle,
+       _spriteSize = spriteSize,
+       _spriteOffset = spriteOffset,
        _spacingBetweenOptions = spacingBetweenOptions,
-       _optionSize = optionSize ?? defaultSize,
+       _optionSize = optionSize ?? defaultOptionSize,
        _options = options,
+       _show = show,
        assert(options.isNotEmpty, 'RadioComponent needs at least 1 option') {
     // calculate size of the component
     size = Vector2(_optionSize.x * _options.length + _spacingBetweenOptions * (_options.length - 1), _optionSize.y);
   }
 
   // default size
-  static final Vector2 defaultSize = Vector2(52, 20);
+  static final Vector2 defaultOptionSize = Vector2(52, 20);
 
   // internal
   final List<_RadioBtn> _btns = [];
@@ -726,11 +842,14 @@ class RadioComponent extends PositionComponent {
 
       // create radio btns
       final btn = _RadioBtn(
-        text: _options[i].text,
+        option: _options[i],
+        onPressed: () => _select(i),
         size: _optionSize,
         position: _centerOfIndex[i],
         textStyle: _textStyle,
-        onPressed: () => _select(i),
+        spriteSize: _spriteSize,
+        spriteOffset: _spriteOffset,
+        show: _show,
       );
       _btns.add(btn);
       add(btn);
@@ -745,6 +864,7 @@ class RadioComponent extends PositionComponent {
       color: _outlineColor,
       anchor: Anchor.center,
       position: _centerOfIndex[_selectedIndex],
+      show: _show,
     );
     add(_outline);
   }
@@ -752,18 +872,28 @@ class RadioComponent extends PositionComponent {
   FutureOr<void> _select(int index) async {
     if (index == _selectedIndex) return;
 
-    // lock all buttons while the function is running
+    // lock all buttons while switching + running callback.
     for (var btn in _btns) {
-      btn._executing = true;
+      btn.lockExecuting();
     }
+
+    // update
     _selectedIndex = index;
     _animateOutlineTo(index);
+
+    // await the option callback if it is async
     await _options[index].onSelected();
+
+    // unlock all buttons
     for (final btn in _btns) {
-      btn._executing = false;
+      btn.unlockExecuting();
     }
   }
 
+  /// Updates the selected index.
+  ///
+  /// - If [triggerCallback] is true, behaves like a user selection (runs `onSelected`).
+  /// - Otherwise, only updates selection + outline animation.
   FutureOr<void> setSelectedIndex(int index, {bool triggerCallback = false}) {
     if (triggerCallback) return _select(index);
     if (index == _selectedIndex) return null;
@@ -780,5 +910,22 @@ class RadioComponent extends PositionComponent {
     // animate outline to target center
     final targetCenter = _centerOfIndex[index];
     _outline.add(MoveEffect.to(targetCenter, EffectController(duration: _switchOutlineDuration, curve: Curves.easeOutCubic)));
+  }
+
+  /// Shows the entire radio component.
+  void show() {
+    _outline.show();
+    for (var btn in _btns) {
+      btn.show();
+    }
+  }
+
+  /// Hides the entire radio component..
+  /// Buttons become non-interactive because their hitbox size is set to zero.
+  void hide() {
+    _outline.hide();
+    for (var btn in _btns) {
+      btn.hide();
+    }
   }
 }

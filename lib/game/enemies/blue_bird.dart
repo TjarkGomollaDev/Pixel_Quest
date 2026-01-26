@@ -14,7 +14,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum BlueBirdState implements AnimationState {
+enum _BlueBirdState implements AnimationState {
   fly('Flying', 9),
   hit('Hit', 5, loop: false);
 
@@ -25,9 +25,13 @@ enum BlueBirdState implements AnimationState {
   @override
   final bool loop;
 
-  const BlueBirdState(this.fileName, this.amount, {this.loop = true});
+  const _BlueBirdState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A small patrolling enemy that flies back and forth within a configurable range.
+///
+/// The BlueBird moves horizontally between two borders with a short pause
+/// and acceleration when turning, and adds a subtle vertical sine-wave motion.
 class BlueBird extends SpriteAnimationGroupComponent
     with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
@@ -102,15 +106,15 @@ class BlueBird extends SpriteAnimationGroupComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
       stopAmbientLoop();
-      current = BlueBirdState.hit;
-      animationTickers![BlueBirdState.hit]!.completed.then((_) => removeFromParent());
+      current = _BlueBirdState.hit;
+      animationTickers![_BlueBirdState.hit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -136,9 +140,9 @@ class BlueBird extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<BlueBirdState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in BlueBirdState.values) state: loadAnimation(state)};
-    current = BlueBirdState.fly;
+    final loadAnimation = spriteAnimationWrapper<_BlueBirdState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _BlueBirdState.values) state: loadAnimation(state)};
+    current = _BlueBirdState.fly;
   }
 
   void _setUpRange() {

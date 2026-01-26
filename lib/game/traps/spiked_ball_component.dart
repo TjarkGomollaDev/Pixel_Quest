@@ -9,13 +9,17 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-class ChainItem {
+/// Small helper model for the spiked-ball chain: keeps a chain sprite component
+/// plus its distance from the swing center so it can be positioned each frame.
+class _ChainItem {
   final DebugSpriteComponent chainComponent;
   final double radiusToCenterOfChain;
 
-  ChainItem({required this.chainComponent, required this.radiusToCenterOfChain});
+  _ChainItem({required this.chainComponent, required this.radiusToCenterOfChain});
 }
 
+/// Handles a swinging spiked-ball trap by positioning the ball and its chain pieces
+/// along a circular arc around a fixed center point, creating a pendulum-like motion.
 class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final double _radius;
@@ -54,7 +58,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   late final double _radiusToCenterOfSpikedBall;
 
   // list of all chain elements
-  final List<ChainItem> _chainList = [];
+  final List<_ChainItem> _chainList = [];
 
   // half arc
   late final double _halfArcRad;
@@ -139,7 +143,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
         ..debugMode = GameSettings.customDebugMode
         ..debugColor = AppTheme.debugColorTrapHitbox;
 
-      final chainItem = ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);
+      final chainItem = _ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);
       _chainList.add(chainItem);
       add(chainComponent);
     }

@@ -11,7 +11,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum MovingPlatformState implements AnimationState {
+enum _MovingPlatformState implements AnimationState {
   off('Off', 1),
   on('On', 8);
 
@@ -22,7 +22,7 @@ enum MovingPlatformState implements AnimationState {
   @override
   final bool loop = true;
 
-  const MovingPlatformState(this.fileName, this.amount);
+  const _MovingPlatformState(this.fileName, this.amount);
 }
 
 /// A moving platform that can travel horizontally or vertically
@@ -146,9 +146,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<MovingPlatformState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in MovingPlatformState.values) state: loadAnimation(state)};
-    current = MovingPlatformState.on;
+    final loadAnimation = spriteAnimationWrapper<_MovingPlatformState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _MovingPlatformState.values) state: loadAnimation(state)};
+    current = _MovingPlatformState.on;
   }
 
   void _setUpRange() {
@@ -178,8 +178,8 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     _rightBorder = (_moveDirection == 1) ? _rangePos : _rangePos + width;
   }
 
-  // moves the saw vertically and changes direction if the end of the range is reached
   void _moveVertical(double dt) {
+    // change direction if the end of the range is reached
     if (position.y >= _rangePos && _moveDirection != -1) {
       _changeDirection(-1);
       return;
@@ -194,8 +194,8 @@ class MovingPlatform extends SpriteAnimationGroupComponent
     if (_playerOnTop) _player.adjustPostion(y: moveY);
   }
 
-  // moves the saw horizontally and changes direction if the end of the range is reached
   void _moveHorizontal(double dt) {
+    // change direction if the end of the range is reached
     if (position.x >= _rightBorder && _moveDirection != -1) {
       _changeDirection(-1);
       return;

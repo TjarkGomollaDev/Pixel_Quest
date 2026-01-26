@@ -1,6 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
+/// A simple overlay component that can block tap input when enabled.
+///
+/// Useful to prevent interaction with components behind it.
 class InputBlocker extends PositionComponent with TapCallbacks {
   // constructor parameters
   bool _enabled;

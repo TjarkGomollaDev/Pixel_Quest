@@ -7,6 +7,10 @@ import 'package:pixel_adventure/game/utils/arrow_indicator.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 
+/// Wrapper around Flame’s [JoystickComponent] that can be shown/hidden and (de)attached to [PlayerInput].
+///
+/// Keeps input wiring in one place: when the component is visible it attaches the joystick to the player input,
+/// and when it’s hidden or removed it detaches again to avoid stale input references.
 class Joystick extends PositionComponent with VisibleComponent {
   // constructor parameters
   final PlayerInput _playerInput;
@@ -77,6 +81,9 @@ class Joystick extends PositionComponent with VisibleComponent {
   }
 }
 
+/// Visual background for the joystick.
+///
+/// Purely decorative: it doesn’t handle input itself, it just renders the base UI for the joystick.
 class _JoystickBackground extends PositionComponent {
   _JoystickBackground() : super(size: Vector2.all(GameSettings.joystickRadius * 2));
 

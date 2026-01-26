@@ -7,6 +7,10 @@ import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Confirmation dialog route that returns a boolean result.
+///
+/// Shows a short message with Cancel/Confirm actions and completes the route
+/// with `true` when confirmed or `false` when cancelled.
 class ConfirmPage extends ValueRoute<bool> {
   // constructor parameters
   final String titleText;
@@ -29,6 +33,7 @@ class ConfirmPage extends ValueRoute<bool> {
   }
 }
 
+/// Dialog body that renders the message text and the two action buttons.
 class _ConfirmContent extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final String titleText;

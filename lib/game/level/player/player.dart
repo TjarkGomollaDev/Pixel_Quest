@@ -57,6 +57,28 @@ enum PlayerCharacter {
   static PlayerCharacter fromName(String name) => PlayerCharacter.values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
 }
 
+/// The controllable player character within a level.
+///
+/// This component represents the player avatar and acts as the central “glue” between
+/// input, physics-ish movement, collisions, animations, audio cues, and level flow.
+///
+/// Responsibilities:
+/// - Reads movement/jump intent from [PlayerInput] (via the [Level]) and turns it into velocity changes.
+/// - Integrates horizontal movement and vertical motion (jump impulses + gravity + terminal velocity).
+/// - Maintains a dedicated collision hitbox and computes its absolute world-space rect each frame
+///   (including compensation for horizontal sprite flips).
+/// - Resolves collisions against:
+///   - World geometry via [WorldCollision],
+///   - Other gameplay entities via [EntityCollision].
+/// - Drives the [PlayerState] animation state machine (idle/run/jump/fall/hit/double-jump) and sprite flipping.
+/// - Coordinates key gameplay sequences:
+///   - Spawning into the level (appear + fall onto start),
+///   - Checkpoints (updating respawn position),
+///   - Respawn after damage (temporary protection + effects + state reset),
+///   - Finishing a level (scripted movement + spotlight/stars + transition back to menu).
+/// - Delegates all “special” visuals to a separate [PlayerEffects] component, keeping this class focused on core player logic.
+///
+/// In short: this is the authoritative runtime model for the player’s behavior during gameplay.
 class Player extends SpriteAnimationGroupComponent
     with HasGameReference<PixelQuest>, HasWorldReference<Level>, CollisionCallbacks, VisibleComponent {
   // constructor parameters
@@ -156,7 +178,7 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void update(double dt) {
-    _updateHitboxEdges(); // must be done before updatePlayerMovement, important for world collision
+    _updateHitboxEdges();
     _applyInput();
     _updateMovement(dt);
     _updateGravity(dt);
@@ -168,9 +190,9 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (_isWorldCollisionActive) {
-      if (other is WorldCollision) onWorldCollision(other);
+      if (other is WorldCollision) _onWorldCollision(other);
       if (_isSpawnProtectionActive) return super.onCollision(intersectionPoints, other);
-      if (other is EntityCollision) onEntityCollision(other);
+      if (other is EntityCollision) _onEntityCollision(other);
     } else if (_isLevelStarting && other is Start) {
       _landedOnStartPlatform(other);
     }
@@ -185,7 +207,7 @@ class Player extends SpriteAnimationGroupComponent
     super.onCollisionEnd(other);
   }
 
-  void onEntityCollision(EntityCollision other) {
+  void _onEntityCollision(EntityCollision other) {
     // two rects
     final otherRect = other.entityHitbox.toAbsoluteRect();
     final playerRect = hitboxAbsoluteRect;
@@ -198,7 +220,7 @@ class Player extends SpriteAnimationGroupComponent
     if (!(hasVerticalIntersection && hasHorizontalIntersection)) return;
 
     // if the exact side is not required, we can simply pass "Any" as the collision side and save ourselves computing costs
-    if (other.collisionType == EntityCollisionType.any) return other.onEntityCollision(CollisionSide.Any);
+    if (other.collisionType == EntityCollisionType.any) return other.onEntityCollision(CollisionSide.any);
 
     // overlap calculation
     final overlapX = calculateOverlapX(playerRect, otherRect);
@@ -214,11 +236,11 @@ class Player extends SpriteAnimationGroupComponent
       hasHorizontalIntersection,
       false,
     );
-    if (result == CollisionSide.None) return;
+    if (result == CollisionSide.none) return;
     other.onEntityCollision(result);
   }
 
-  void onWorldCollision(WorldCollision other) {
+  void _onWorldCollision(WorldCollision other) {
     // two rects
     final worldBlockRect = other.worldHitbox.toAbsoluteRect();
     final playerRect = hitboxAbsoluteRect;
@@ -251,16 +273,16 @@ class Player extends SpriteAnimationGroupComponent
       hasHorizontalIntersection,
       forceVertical,
     )) {
-      case CollisionSide.Top:
+      case CollisionSide.top:
         _resolveTopWorldCollision(worldBlockRect.top, other);
         break;
-      case CollisionSide.Bottom:
+      case CollisionSide.bottom:
         _resolveBottomWorldCollision(worldBlockRect.bottom, other);
         break;
-      case CollisionSide.Left:
+      case CollisionSide.left:
         _resolveLeftWorldCollision(worldBlockRect.left);
         break;
-      case CollisionSide.Right:
+      case CollisionSide.right:
         _resolveRightWorldCollision(worldBlockRect.right);
         break;
       default:
@@ -273,6 +295,8 @@ class Player extends SpriteAnimationGroupComponent
     _velocity.y = 0;
     _isOnGround = true;
     _canDoubleJump = true;
+
+    // special cases
     if (other is MovingPlatform) other.playerOnTop();
     if (other is Finish) other.reachedFinish();
     if (other is FireTrap) other.hitTrap();
@@ -280,13 +304,16 @@ class Player extends SpriteAnimationGroupComponent
 
   void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
     if (_isOnGround) {
-      _respawn(CollisionSide.Bottom);
+      // if we are standing on the ground and still have a collision with our head above, we were crushed, for example, by a trap
+      _respawn(CollisionSide.bottom);
     } else {
       position.y = blockBottom - _hitbox.position.y;
       _velocity.y = 0;
 
       // reset can double jump if the player hits their head
       _canDoubleJump = false;
+
+      // special cases
       if (other is MovingPlatform && other.isVertical && other.moveDirection == 1) position.y += 1;
     }
   }
@@ -310,7 +337,7 @@ class Player extends SpriteAnimationGroupComponent
     _isWorldCollisionActive = true;
     _isSpawnProtectionActive = false;
     world.beginGameplay();
-    onWorldCollision(other);
+    _onWorldCollision(other);
   }
 
   void _initialSetup() {
@@ -603,7 +630,7 @@ class Player extends SpriteAnimationGroupComponent
     // respawn
     position = _respawnPosition;
     scale.x = 1;
-    world.playerRespawn();
+    world.playerRespawned();
 
     // a frame must be maintained before visible again, otherwise flickering will occur
     SchedulerBinding.instance.addPostFrameCallback((_) {

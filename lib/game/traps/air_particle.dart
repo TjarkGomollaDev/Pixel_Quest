@@ -7,6 +7,10 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A lightweight “dust/air” particle used for air streams.
+///
+/// Spawns with a random size/opacity inside a given stream area, moves upward with a bit of horizontal drift,
+/// bounces off the left/right bounds, and despawns once it reaches the top.
 class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final double _streamTop;

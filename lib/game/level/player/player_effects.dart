@@ -13,7 +13,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum PlayerEffectState implements AnimationState {
+enum _PlayerEffectState implements AnimationState {
   appearing('Appearing', 7, loop: false, special: true),
   disappearing('Disappearing', 7, loop: false, special: true);
 
@@ -25,9 +25,13 @@ enum PlayerEffectState implements AnimationState {
   final bool loop;
   final bool special;
 
-  const PlayerEffectState(this.fileName, this.amount, {this.loop = true, this.special = false});
+  const _PlayerEffectState(this.fileName, this.amount, {this.loop = true, this.special = false});
 }
 
+/// Dedicated helper component for the player's special visual effects.
+///
+/// Keeps non-core, “extra” effect logic (e.g. visuals/camera feedback) separated from
+/// the main player implementation so the player class stays clean and focused.
 class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, HasVisibility {
   // constructor parameters
   final Player player;
@@ -59,27 +63,40 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlayerEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in PlayerEffectState.values) state: loadAnimation(state)};
+    final loadAnimation = spriteAnimationWrapper<_PlayerEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _PlayerEffectState.values) state: loadAnimation(state)};
     isVisible = false;
   }
+
+  /// Plays the “appearing” effect at the given world-space [effectPosition].
+  ///
+  /// The effect is centered on the player by applying a fixed offset and hides itself
+  /// again once the one-shot animation has finished.
 
   Future<void> playAppearing(Vector2 effectPosition) async {
     position = effectPosition - _offset;
     isVisible = true;
-    current = PlayerEffectState.appearing;
-    await animationTickers![PlayerEffectState.appearing]!.completed;
+    current = _PlayerEffectState.appearing;
+    await animationTickers![_PlayerEffectState.appearing]!.completed;
     isVisible = false;
   }
 
+  /// Plays the “disappearing” effect at the given world-space [effectPosition].
+  ///
+  /// The effect is centered on the player by applying a fixed offset and hides itself
+  /// again once the one-shot animation has finished.
   Future<void> playDisappearing(Vector2 effectPosition) async {
     position = effectPosition - _offset;
     isVisible = true;
-    current = PlayerEffectState.disappearing;
-    await animationTickers![PlayerEffectState.disappearing]!.completed;
+    current = _PlayerEffectState.disappearing;
+    await animationTickers![_PlayerEffectState.disappearing]!.completed;
     isVisible = false;
   }
 
+  /// Briefly flashes a translucent white rectangle over the visible camera area.
+  ///
+  /// Useful as a quick “impact” cue; the flash fades out automatically and removes
+  /// itself from the world when the opacity animation completes.
   void playFlashScreen() {
     final flash = RectangleComponent(
       position: game.camera.visibleWorldRect.topLeft.toVector2(),
@@ -92,6 +109,11 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     flash.add(OpacityEffect.to(0, EffectController(duration: 0.2, curve: Curves.easeOut), onComplete: () => game.world.remove(flash)));
   }
 
+  /// Shakes the camera horizontally by alternating offsets around its original position.
+  ///
+  /// [shakes] controls how many left/right steps are performed, [intensity] the offset
+  /// in pixels/world-units (depending on your camera setup), and [duration] the delay
+  /// per step before resetting back to the original position.
   Future<void> shakeCamera({int shakes = 3, double intensity = 10, double duration = 0.04}) async {
     final originalPos = game.camera.viewfinder.position;
 
@@ -105,8 +127,12 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     game.camera.moveTo(originalPos);
   }
 
+  /// Plays the player’s death movement based on the [collisionSide].
+  ///
+  /// Horizontal collisions launch the player along a curved bezier arc with rotation,
+  /// while vertical collisions drop the player down (optionally with a small hop first).
   Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
-    if (collisionSide == CollisionSide.Left || collisionSide == CollisionSide.Right) {
+    if (collisionSide == CollisionSide.left || collisionSide == CollisionSide.right) {
       await _deathOnHorizontalCollision(collisionSide);
     } else {
       await _deathOnVerticalCollision(collisionSide);
@@ -118,13 +144,13 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final completer = Completer<void>();
 
     // control point
-    final controlPointX = collisionSide == CollisionSide.Left ? player.x - _offsetControlPoint.x : player.x + _offsetControlPoint.x;
+    final controlPointX = collisionSide == CollisionSide.left ? player.x - _offsetControlPoint.x : player.x + _offsetControlPoint.x;
     final controlPointY = player.y - _offsetControlPoint.y;
 
     // end point
     final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
     final verticalDistance = endPointY - controlPointY;
-    final endPointX = collisionSide == CollisionSide.Left
+    final endPointX = collisionSide == CollisionSide.left
         ? controlPointX - (verticalDistance * 0.02)
         : controlPointX + (verticalDistance * 0.02);
 
@@ -140,7 +166,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final moveEffect = MoveAlongPathEffect(path, _deathController(durationMs), absolute: true, onComplete: () => completer.complete());
 
     // rotate player while moving
-    final rotateEffect = RotateEffect.by((collisionSide == CollisionSide.Right) ? -tau / 4 : tau / 4, _deathController(durationMs));
+    final rotateEffect = RotateEffect.by((collisionSide == CollisionSide.right) ? -tau / 4 : tau / 4, _deathController(durationMs));
 
     // add effects
     player.add(moveEffect);
@@ -154,7 +180,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
 
     // end point
     final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
-    final verticalDistance = collisionSide == CollisionSide.Top ? endPointY - player.y + _hopHeight : endPointY - player.y;
+    final verticalDistance = collisionSide == CollisionSide.top ? endPointY - player.y + _hopHeight : endPointY - player.y;
 
     // duration depends on distance
     final durationMs = _calculateDuration(verticalDistance, _msPerPixelVertical);
@@ -163,7 +189,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final moveEffect = MoveEffect.to(Vector2(player.x, endPointY), _deathController(durationMs), onComplete: () => completer.complete());
 
     // possibly add a small hop effect before the move effect
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       final hopEffect = MoveEffect.to(
         Vector2(player.x, player.y - _hopHeight),
         EffectController(duration: _hopDuration, curve: Curves.easeOut),

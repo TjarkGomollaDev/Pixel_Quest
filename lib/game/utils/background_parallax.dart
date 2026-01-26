@@ -37,6 +37,11 @@ enum BackgroundColor {
   static BackgroundColor fromName(String name) => BackgroundColor.values.firstWhere((e) => e.name == name, orElse: () => defaultColor);
 }
 
+/// Parallax background component.
+///
+/// Can be created as:
+/// - a multi-layer "scene" parallax (folder with numbered layers)
+/// - a single-image colored background
 class BackgroundParallax extends ParallaxComponent with VisibleComponent {
   // constructor parameters
   final List<ParallaxImageData> _layers;
@@ -90,7 +95,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     bool show = true,
   }) {
     return BackgroundParallax._(
-      layers: [ParallaxImageData('$_path${color.fileName}$_pathEnd')],
+      layers: [ParallaxImageData('$_path$_pathAddColored${color.fileName}$_pathEnd')],
       baseVelocity: baseVelocity ?? GameSettings.coloredBaseVelocity,
       repeat: ImageRepeat.repeat,
       fill: LayerFill.none,
@@ -102,6 +107,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
 
   // animation settings
   static const String _path = 'Background/';
+  static const String _pathAddColored = 'Colored TilesZ';
   static const String _pathEnd = '.png';
 
   @override

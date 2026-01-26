@@ -6,6 +6,15 @@ import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A reusable dialog shell that renders a pixel-styled window.
+///
+/// The dialog sizes itself dynamically based on the provided [_contentSize],
+/// adding consistent padding/margins so all dialogs share the same layout rules.
+///
+/// Typical usage:
+/// - Build your dialog body as a component (e.g. a column of text/buttons)
+/// - Pass it into [DialogContainer] via `content` + `contentSize`
+/// - Place the container centered in a page/overlay (e.g. [DialogPage])
 class DialogContainer extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final String _titleText;
@@ -155,7 +164,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
         _layerFrame.position.y - _layerFrame.size.y / 2 + SpriteBtnType.btnSizeSmallCorrected.y / 2 + _closeBtnVerticalMargin,
       ),
     );
-    // debugMode = true;
+
     // title
     _title = TextComponent(
       text: _titleText,

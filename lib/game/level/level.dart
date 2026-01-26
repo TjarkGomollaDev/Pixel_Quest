@@ -61,6 +61,10 @@ final class _LoadingCanceled implements Exception {
   const _LoadingCanceled();
 }
 
+/// A complete, self-contained world instance for one playable level.
+///
+/// The level loads its Tiled map, builds optimized world collisions, spawns all entities (player, enemies, traps, checkpoints),
+/// records a mini map, wires up pause/resume via the event bus, and manages HUD/mobile overlays plus basic count stats.
 class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCallbacks {
   // constructor parameters
   final LevelMetadata _levelMetadata;
@@ -842,7 +846,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _pendingRespawnables.clear();
   }
 
-  void playerRespawn() {
+  void playerRespawned() {
     _processRespawns();
     _gameHud.updateDeathCount(++_deathCount);
   }

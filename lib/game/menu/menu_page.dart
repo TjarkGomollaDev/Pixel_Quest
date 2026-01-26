@@ -17,6 +17,11 @@ import 'package:pixel_adventure/game/menu/widgets/level_grid.dart';
 import 'package:pixel_adventure/game/menu/widgets/menu_top_bar.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Menu that renders the selectable worlds + level grids.
+///
+/// Builds and switches all menu visuals (background/foreground/title/grid),
+/// handles world navigation UI, and reacts to game events to keep the menu
+/// state and animations in sync.
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   // static content
   late final MenuTopBar _menuTopBar;
@@ -242,12 +247,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _pause() {
     timeScale = 0;
-    _characterPicker.pause();
+    _characterPicker.stopCharacterAnimationLoop();
   }
 
   void _resume() {
     timeScale = 1;
-    _characterPicker.resume();
+    _characterPicker.startCharacterAnimationLoop();
   }
 
   int _getWorldIndex(String worldUuid) {

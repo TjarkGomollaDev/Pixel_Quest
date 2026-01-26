@@ -12,6 +12,8 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// The actual damaging spiked-ball entity used by [SpikedBallComponent]:
+/// a circular hitbox with a sprite that can be positioned by its parent component.
 class SpikedBall extends PositionComponent
     with FixedGridOriginalSizeSprite, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters

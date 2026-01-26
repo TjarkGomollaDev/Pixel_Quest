@@ -13,7 +13,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum RockHeadState implements AnimationState {
+enum _RockHeadState implements AnimationState {
   idle('Idle', 1),
   blink('Blink', 4, loop: false),
   topHit('Top Hit', 4, loop: false),
@@ -26,7 +26,7 @@ enum RockHeadState implements AnimationState {
   @override
   final bool loop;
 
-  const RockHeadState(this.fileName, this.amount, {this.loop = true});
+  const _RockHeadState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A heavy stone trap that repeatedly slams down and retracts vertically
@@ -123,9 +123,9 @@ class RockHead extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<RockHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in RockHeadState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: RockHeadState.idle, isBottomCenter: false);
+    final loadAnimation = spriteAnimationWrapper<_RockHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _RockHeadState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _RockHeadState.idle, isBottomCenter: false);
   }
 
   void _setUpRange() {
@@ -166,12 +166,12 @@ class RockHead extends PositionComponent
     _moveDirection = newDirection;
 
     // depending on whether we hit the top or bottom, we choose the animation and the new speed
-    final RockHeadState hitAnimation;
+    final _RockHeadState hitAnimation;
     if (newDirection == 1) {
-      hitAnimation = RockHeadState.topHit;
+      hitAnimation = _RockHeadState.topHit;
       _moveSpeed = _moveSpeedDown;
     } else {
-      hitAnimation = RockHeadState.bottomHit;
+      hitAnimation = _RockHeadState.bottomHit;
       _moveSpeed = _moveSpeedUp;
       game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
     }
@@ -179,11 +179,11 @@ class RockHead extends PositionComponent
     // animation sequence
     animationGroupComponent.current = hitAnimation;
     await animationGroupComponent.animationTickers![hitAnimation]!.completed;
-    animationGroupComponent.current = RockHeadState.idle;
+    animationGroupComponent.current = _RockHeadState.idle;
     await Future.delayed((newDirection == 1 ? _delayAtTop : _delayAtBottom) - _delayBlinkBeforeMove);
-    animationGroupComponent.current = RockHeadState.blink;
-    await animationGroupComponent.animationTickers![RockHeadState.blink]!.completed;
-    animationGroupComponent.current = RockHeadState.idle;
+    animationGroupComponent.current = _RockHeadState.blink;
+    await animationGroupComponent.animationTickers![_RockHeadState.blink]!.completed;
+    animationGroupComponent.current = _RockHeadState.idle;
     await Future.delayed(_delayBlinkBeforeMove);
 
     // change of direction completed

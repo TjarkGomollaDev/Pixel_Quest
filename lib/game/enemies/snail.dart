@@ -16,7 +16,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum SnailState implements AnimationState {
+enum _SnailState implements AnimationState {
   // snail
   snailIdle('Idle', 15),
   snailWalk('Walk', 10),
@@ -35,9 +35,14 @@ enum SnailState implements AnimationState {
   @override
   final bool loop;
 
-  const SnailState(this.fileName, this.amount, {this.loop = true});
+  const _SnailState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A patrol enemy that turns into a kickable shell after being stomped.
+///
+/// The Snail starts by walking within a configured range. When the player stomps it,
+/// it retreats into its shell, which can then be kicked to slide across the level and
+/// bounce off walls.
 class Snail extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityCollisionEnd, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -176,9 +181,9 @@ class Snail extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SnailState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in SnailState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SnailState.snailWalk);
+    final loadAnimation = spriteAnimationWrapper<_SnailState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _SnailState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SnailState.snailWalk);
   }
 
   void _setUpRange() {
@@ -217,7 +222,7 @@ class Snail extends PositionComponent
       return;
     }
 
-    if (_accelProgress == 0) animationGroupComponent.current = SnailState.snailWalk;
+    if (_accelProgress == 0) animationGroupComponent.current = _SnailState.snailWalk;
 
     // movement
     final currentSpeed = _calculateCurrentSnailSpeed(dt);
@@ -226,7 +231,7 @@ class Snail extends PositionComponent
   }
 
   void _changeSnailDirection(int newDirection) {
-    animationGroupComponent.current = SnailState.snailIdle;
+    animationGroupComponent.current = _SnailState.snailIdle;
     _moveDirection = newDirection;
     flipHorizontallyAroundCenter();
 
@@ -279,22 +284,22 @@ class Snail extends PositionComponent
 
   Future<void> _shellWallHitAnimation() async {
     game.audioCenter.playSoundIf(Sfx.enemieWallHit, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
-    animationGroupComponent.current = SnailState.shellWallHit;
-    await animationGroupComponent.animationTickers![SnailState.shellWallHit]!.completed;
-    animationGroupComponent.current = SnailState.shellSpin;
+    animationGroupComponent.current = _SnailState.shellWallHit;
+    await animationGroupComponent.animationTickers![_SnailState.shellWallHit]!.completed;
+    animationGroupComponent.current = _SnailState.shellSpin;
   }
 
   Future<void> _handleSnailStomp(CollisionSide collisionSide) async {
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _snailGotStomped = true;
       _player.bounceUp();
 
       // play hit animation
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationGroupComponent.current = SnailState.snailHit;
-      await animationGroupComponent.animationTickers![SnailState.snailHit]!.completed;
+      animationGroupComponent.current = _SnailState.snailHit;
+      await animationGroupComponent.animationTickers![_SnailState.snailHit]!.completed;
       if (_shellGotStomped) return;
-      animationGroupComponent.current = SnailState.shellIdle;
+      animationGroupComponent.current = _SnailState.shellIdle;
 
       // change snail to shell and update hitbox
       _hitbox.position = _shellHitbox.position;
@@ -305,18 +310,18 @@ class Snail extends PositionComponent
   }
 
   void _handleShellKick(CollisionSide collisionSide) {
-    animationGroupComponent.current = SnailState.shellSpin;
+    animationGroupComponent.current = _SnailState.shellSpin;
     _shellGotKicked = true;
 
     // depending on the collisionSide, the shell is kicked in the corresponding direction
     switch (collisionSide) {
-      case CollisionSide.Left:
+      case CollisionSide.left:
         _shellMoveDirection = 1;
         break;
-      case CollisionSide.Right:
+      case CollisionSide.right:
         _shellMoveDirection = -1;
         break;
-      case CollisionSide.Top:
+      case CollisionSide.top:
         final shellLeft = scale.x > 0 ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
         final shellCenter = shellLeft + _hitbox.width / 2;
         final playerCenter = (_player.hitboxAbsoluteLeft + _player.hitboxAbsoluteRight) / 2;
@@ -334,15 +339,15 @@ class Snail extends PositionComponent
   }
 
   void _handleShellStomp(CollisionSide collisionSide) {
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _shellGotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationGroupComponent.animationTickers![SnailState.snailHit]?.onComplete?.call();
-      animationGroupComponent.current = SnailState.shellTopHit;
-      animationGroupComponent.animationTickers![SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.animationTickers![_SnailState.snailHit]?.onComplete?.call();
+      animationGroupComponent.current = _SnailState.shellTopHit;
+      animationGroupComponent.animationTickers![_SnailState.shellTopHit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }

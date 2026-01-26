@@ -10,6 +10,9 @@ import 'package:pixel_adventure/game/game.dart';
 
 enum StarVariant { filled, outline }
 
+/// Star UI component used for level rewards and spotlight animations.
+///
+/// Supports filled/outline variants and a small set of reusable effects
 class Star extends SpriteComponent with HasGameReference<PixelQuest>, CancelableAnimations implements OpacityProvider {
   // constructor parameters
   final StarVariant _variant;
@@ -64,7 +67,8 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
     if (_spawnSizeZero) scale = Vector2.zero();
   }
 
-  Future<void> flyToAndScaleIn(Vector2 target, {double flyDuration = 1, double scaleDuration = 0.3}) {
+  /// Animates the star flying to a target position while scaling up to full size.
+  Future<void> flyToAndScaleIn(Vector2 target, {double flyDuration = 1, double scaleDuration = 0.3, bool playSound = true}) {
     // create effect
     final effect = CombinedEffect([
       MoveEffect.to(target, EffectController(duration: flyDuration, curve: Curves.easeOutBack)),
@@ -77,13 +81,14 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
       effect,
       additionallyOnStart: () => _resetPositions[_keyFlyToAndScaleIn] = position.clone(),
       additionallyInOnComplete: () {
-        game.audioCenter.playSound(Sfx.star, SfxType.level);
         _resetPositions.remove(_keyFlyToAndScaleIn);
+        if (playSound) game.audioCenter.playSound(Sfx.star, SfxType.level);
       },
     );
   }
 
-  Future<void> fallToPopIn(Vector2 target, {double fallDuration = 0.4, double popInDuration = 0.15}) {
+  /// Drops the star to a target and does a quick pop-in squash/stretch.
+  Future<void> fallToPopIn(Vector2 target, {double fallDuration = 0.4, double popInDuration = 0.15, bool playSound = true}) {
     // create effect
     final effect = SequenceEffect([
       MoveEffect.to(target, EffectController(duration: fallDuration, curve: Curves.easeOutBack)),
@@ -98,7 +103,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
       effect,
       additionallyOnStart: () {
         _resetPositions[_keyFallToPopIn] = startPosition;
-        game.audioCenter.playSound(Sfx.collected, SfxType.level);
+        if (playSound) game.audioCenter.playSound(Sfx.collected, SfxType.level);
       },
       additionallyInOnComplete: () {
         position = startPosition;
@@ -107,7 +112,8 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
     );
   }
 
-  Future<void> popIn({double duration = 0.6}) {
+  /// Quick pop-in animation (overshoot then settle).
+  Future<void> popIn({double duration = 0.6, bool playSound = true}) {
     // create effect
     final effect = SequenceEffect([
       ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
@@ -115,9 +121,14 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
     ]);
 
     // register effect and return future
-    return registerEffect(_keyPopIn, effect, additionallyOnStart: () => game.audioCenter.playSound(Sfx.star, SfxType.level));
+    return registerEffect(
+      _keyPopIn,
+      effect,
+      additionallyOnStart: playSound ? () => game.audioCenter.playSound(Sfx.star, SfxType.level) : null,
+    );
   }
 
+  /// Smooth scale-in to full size, useful when the star spawns at zero scale.
   Future<void> scaleIn({double duration = 0.6}) {
     // create effect
     final effect = ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration, curve: Curves.fastEaseInToSlowEaseOut));
@@ -126,6 +137,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
     return registerEffect(_keyScaleIn, effect);
   }
 
+  /// Fades the star out and optionally removes it from the component tree afterwards.
   Future<void> fadeOut({double duration = 0.1, bool removeAfter = true}) {
     // create effect
     final effect = OpacityEffect.to(0, EffectController(duration: duration, curve: Curves.easeIn));

@@ -26,7 +26,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   late final TextComponent _abilityTextValue;
 
   // spacing
-  static const double _verticalSpacing = 11; // [Adjustable]
+  static const double _verticalSpacing = 12; // [Adjustable]
   static const double _horizontalSpacing = 3.5; // [Adjustable]
 
   // typing speed in ms

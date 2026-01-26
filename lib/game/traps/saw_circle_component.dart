@@ -33,8 +33,9 @@ class SawCircleComponent extends PositionComponent with HasGameReference<PixelQu
        _doubleSaw = doubleSaw,
        _player = player,
        super(size: _adjustedSize(size), position: position - Vector2.all(sawRadius)) {
-    // in this case, we create the single saws in the constructor and not in onLoad(), so that we have access to the single saws
-    // immediately after creation via getSingleSaws(), this is important for the mini map
+    // in this case, we create the single saws in the constructor and not in onLoad(),
+    // so that we have access to the single saws immediately after creation via getSingleSaws(),
+    // this is important for the mini map
     _setUpPath();
     _createSingleSaws();
   }

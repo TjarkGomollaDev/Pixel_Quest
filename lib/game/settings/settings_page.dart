@@ -13,6 +13,7 @@ import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/game/utils/slider.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Settings overlay route that opens the in-game settings dialog.
 class SettingsPage extends Route {
   SettingsPage() : super(() => _SettingsDialog(), transparent: true);
 }
@@ -25,6 +26,7 @@ class _SettingsDialog extends Component with HasGameReference<PixelQuest> {
   }
 }
 
+/// Dialog body component that builds the settings UI sections.
 class _SettingsContent extends PositionComponent with HasGameReference<PixelQuest> {
   _SettingsContent() : super(size: contentSize);
 
@@ -33,7 +35,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     DialogContainer.contentWidth,
     8 * 2 +
         Slider.defaultHeight * 2 +
-        RadioComponent.defaultSize.y * 4 +
+        RadioComponent.defaultOptionSize.y * 4 +
         DialogContainer.spacingBetweenSections * 5 +
         DialogContainer.headlineMarginBottom * 2,
   );
@@ -115,7 +117,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
       options: [
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionOn,
           onSelected: () {
             _sfxSlider.enable();
@@ -123,7 +125,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
             game.audioCenter.toggleSound(SoundState.on);
           },
         ),
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionOff,
           onSelected: () {
             _sfxSlider.disable();
@@ -156,11 +158,11 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: _languageIndex,
       options: [
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionEnglish,
           onSelected: () => _confirmLanguageChange(const Locale('en'), game.l10n.settingsOptionEnglish),
         ),
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionGerman,
           onSelected: () => _confirmLanguageChange(const Locale('de'), game.l10n.settingsOptionGerman),
         ),
@@ -187,8 +189,8 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: game.storageCenter.settings.joystickSetup.isLeft ? 0 : 1,
       options: [
-        RadioOption(text: game.l10n.settingsOptionLeft, onSelected: () => _controlSettingChanged(JoystickSetup.left)),
-        RadioOption(text: game.l10n.settingsOptionRight, onSelected: () => _controlSettingChanged(JoystickSetup.right)),
+        RadioOptionText(text: game.l10n.settingsOptionLeft, onSelected: () => _controlSettingChanged(JoystickSetup.left)),
+        RadioOptionText(text: game.l10n.settingsOptionRight, onSelected: () => _controlSettingChanged(JoystickSetup.right)),
       ],
     );
 
@@ -212,11 +214,11 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       ),
       initialIndex: game.storageCenter.settings.showMiniMapAtStart ? 0 : 1,
       options: [
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionShow,
           onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: true)),
         ),
-        RadioOption(
+        RadioOptionText(
           text: game.l10n.settingsOptionHide,
           onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: false)),
         ),

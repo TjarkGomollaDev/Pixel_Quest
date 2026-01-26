@@ -14,7 +14,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum ChickenState implements AnimationState {
+enum _ChickenState implements AnimationState {
   idle('Idle', 13),
   run('Run', 14),
   hit('Hit', 5, loop: false);
@@ -26,9 +26,13 @@ enum ChickenState implements AnimationState {
   @override
   final bool loop;
 
-  const ChickenState(this.fileName, this.amount, {this.loop = true});
+  const _ChickenState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A ground-based enemy that reacts to the player within a defined patrol range.
+///
+/// The Chicken stays idle until the player enters its range, then runs toward them
+/// (with a small attack sound trigger) while respecting its movement boundaries.
 class Chicken extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -103,14 +107,14 @@ class Chicken extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationGroupComponent.current = ChickenState.hit;
-      animationGroupComponent.animationTickers![ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.current = _ChickenState.hit;
+      animationGroupComponent.animationTickers![_ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -134,9 +138,9 @@ class Chicken extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<ChickenState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in ChickenState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ChickenState.idle);
+    final loadAnimation = spriteAnimationWrapper<_ChickenState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _ChickenState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _ChickenState.idle);
   }
 
   void _setUpRange() {
@@ -203,7 +207,7 @@ class Chicken extends PositionComponent
   }
 
   void _updateState() {
-    animationGroupComponent.current = (_velocity.x != 0) ? ChickenState.run : ChickenState.idle;
+    animationGroupComponent.current = (_velocity.x != 0) ? _ChickenState.run : _ChickenState.idle;
 
     // detection of a change in direction
     if ((_moveDirection > 0 && scale.x > 0) || (_moveDirection < 0 && scale.x < 0)) {

@@ -14,7 +14,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum SpikeHeadState implements AnimationState {
+enum _SpikeHeadState implements AnimationState {
   idle('Idle', 1),
   blink('Blink', 4, loop: false),
   topHit('Top Hit', 4, loop: false),
@@ -27,9 +27,11 @@ enum SpikeHeadState implements AnimationState {
   @override
   final bool loop;
 
-  const SpikeHeadState(this.fileName, this.amount, {this.loop = true});
+  const _SpikeHeadState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A spiked variant of the RockHead-style crusher: moves up/down in a fixed range,
+/// pauses/animates at the ends, and hurts the player on contact via its hitbox.
 class SpikeHead extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -132,9 +134,9 @@ class SpikeHead extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<SpikeHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in SpikeHeadState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: SpikeHeadState.idle, isBottomCenter: false);
+    final loadAnimation = spriteAnimationWrapper<_SpikeHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _SpikeHeadState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SpikeHeadState.idle, isBottomCenter: false);
   }
 
   void _setUpRange() {
@@ -173,12 +175,12 @@ class SpikeHead extends PositionComponent
     _moveDirection = newDirection;
 
     // depending on whether we hit the top or bottom, we choose the animation and the new speed
-    final SpikeHeadState hitAnimation;
+    final _SpikeHeadState hitAnimation;
     if (newDirection == 1) {
-      hitAnimation = SpikeHeadState.topHit;
+      hitAnimation = _SpikeHeadState.topHit;
       _moveSpeed = _moveSpeedDown;
     } else {
-      hitAnimation = SpikeHeadState.bottomHit;
+      hitAnimation = _SpikeHeadState.bottomHit;
       _moveSpeed = _moveSpeedUp;
       game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(entityHitbox), SfxType.game);
     }
@@ -186,11 +188,11 @@ class SpikeHead extends PositionComponent
     // animation sequence
     animationGroupComponent.current = hitAnimation;
     await animationGroupComponent.animationTickers![hitAnimation]!.completed;
-    animationGroupComponent.current = SpikeHeadState.idle;
+    animationGroupComponent.current = _SpikeHeadState.idle;
     await Future.delayed((newDirection == 1 ? _delayAtTop : _delayAtBottom) - _delayBlinkBeforeMove);
-    animationGroupComponent.current = SpikeHeadState.blink;
-    await animationGroupComponent.animationTickers![SpikeHeadState.blink]!.completed;
-    animationGroupComponent.current = SpikeHeadState.idle;
+    animationGroupComponent.current = _SpikeHeadState.blink;
+    await animationGroupComponent.animationTickers![_SpikeHeadState.blink]!.completed;
+    animationGroupComponent.current = _SpikeHeadState.idle;
     await Future.delayed(_delayBlinkBeforeMove);
     _directionChangePending = false;
   }

@@ -11,7 +11,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum CheckpointState implements AnimationState {
+enum _CheckpointState implements AnimationState {
   flagIdle('Flag Idle', 10),
   flagOut('Flag Out', 26, loop: false),
   noFlag('No Flag', 1);
@@ -23,15 +23,15 @@ enum CheckpointState implements AnimationState {
   @override
   final bool loop;
 
-  const CheckpointState(this.fileName, this.amount, {this.loop = true});
+  const _CheckpointState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// Represents a checkpoint in the level where the player can respawn.
 ///
 /// The checkpoint has three animation states:
-/// - [CheckpointState.noFlag]: Default inactive state.
-/// - [CheckpointState.flagOut]: Flag is raised when the player reaches the checkpoint.
-/// - [CheckpointState.flagIdle]: Flag stays up after activation.
+/// - [_CheckpointState.noFlag]: Default inactive state.
+/// - [_CheckpointState.flagOut]: Flag is raised when the player reaches the checkpoint.
+/// - [_CheckpointState.flagIdle]: Flag stays up after activation.
 ///
 /// When the player collides with the checkpoint, the flag animation
 /// plays, and the player is registered as having reached the checkpoint.
@@ -77,9 +77,9 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     game.audioCenter.playSound(Sfx.checkpoint, SfxType.level);
 
     // play reached checkpoint animation
-    current = CheckpointState.flagOut;
-    await animationTickers![CheckpointState.flagOut]!.completed;
-    current = CheckpointState.flagIdle;
+    current = _CheckpointState.flagOut;
+    await animationTickers![_CheckpointState.flagOut]!.completed;
+    current = _CheckpointState.flagIdle;
   }
 
   @override
@@ -103,9 +103,9 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<CheckpointState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in CheckpointState.values) state: loadAnimation(state)};
-    current = CheckpointState.noFlag;
+    final loadAnimation = spriteAnimationWrapper<_CheckpointState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _CheckpointState.values) state: loadAnimation(state)};
+    current = _CheckpointState.noFlag;
   }
 
   void _setUpRespawn() => _playerRespawn = Vector2(

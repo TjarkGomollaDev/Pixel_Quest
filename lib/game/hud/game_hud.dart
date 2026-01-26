@@ -16,6 +16,7 @@ import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 
+/// HUD overlay for a running level (buttons, counters, and the mini map).
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final int _totalFruitsCount;

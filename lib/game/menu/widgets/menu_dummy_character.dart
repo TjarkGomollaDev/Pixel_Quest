@@ -158,42 +158,39 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
     position = _defaultPosition;
   }
 
-  /// Switches to the next or previous character, saves the selection in storage,
-  /// and updates the character bio and animation loop accordingly.
-  void switchCharacter({bool next = true}) {
-    currentCharacterIndex = (currentCharacterIndex + (next ? 1 : -1)) % allCharacters.length;
-    final character = allCharacters[currentCharacterIndex];
-    game.storageCenter.updateSettings(character: character);
-    _changeAnimation(character);
-    _characterBio.setCharacterBio(character);
-  }
-
   /// Changes the active character animation set to [character],
   /// resets the state to idle, and restarts the animation loop
   /// only if animation is currently enabled.
-  void _changeAnimation(PlayerCharacter character) {
+  void setCharacter(PlayerCharacter character) {
+    if (isCurrentCharacter(character)) return;
+
+    // if the animation loop is currently running, stop it
     if (_animationEnabled) _clearAnimationLoop();
 
-    // change animations for new character
-    game.audioCenter.playSound(Sfx.changeCharacter, SfxType.ui);
-    animations = allCharacterAnimations[character];
-    current = PlayerState.idle;
+    // update storage and bio to new chracter
+    unawaited(game.storageCenter.updateSettings(character: character));
+    unawaited(_characterBio.setCharacterBio(character));
 
-    // start new loop
+    // set the new character
+    changeChracter(character);
+    current = PlayerState.idle;
+    game.audioCenter.playSound(Sfx.changeCharacter, SfxType.ui);
+
+    // start new animation loop if needed
     if (_animationEnabled) _startAnimationLoop();
   }
 
-  /// Resumes the dummy character animation: enables the animation loop
+  /// Starts the dummy character animation: enables the animation loop
   /// and starts the demo sequence if it is currently disabled.
-  void resumeAnimation() {
+  void start() {
     if (_animationEnabled) return;
     _animationEnabled = true;
     _startAnimationLoop();
   }
 
-  /// Pauses the dummy character animation: disables the animation loop,
+  /// Stops the dummy character animation: disables the animation loop,
   /// clears all active effects, and sets the current state to idle.
-  void pauseAnimation() {
+  void stop() {
     if (!_animationEnabled) return;
     _animationEnabled = false;
     _clearAnimationLoop();

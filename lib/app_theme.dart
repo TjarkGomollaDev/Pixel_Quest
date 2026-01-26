@@ -96,18 +96,19 @@ abstract class AppTheme {
 
   // #### ALL TEXT STYLES ######################################
 
+  // Dialog Text Styles
   static const TextStyle dialogTextStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white, height: 1.4);
   static const TextStyle dialogHeadingStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 9, color: AppTheme.white, height: 1.8);
-
-  static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 2.4);
   static const TextStyle textBtnStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 10, color: AppTheme.white, height: 1.4);
-
-  static const TextStyle characterPickerText = TextStyle(fontFamily: 'Pixel Font', fontSize: 5, color: AppTheme.white, height: 1.4);
-  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 20, color: AppTheme.white, height: 3.2);
-  static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.4);
-
   static const double dialogTextStandardHeight = 8;
   static const double textBtnStandardHeight = 17;
+
+  // HUD Text Styles
+  static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 2.4);
+  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 20, color: AppTheme.white, height: 3.2);
+
+  // Splash Text Styles
+  static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.4);
 }
 
 extension TextStyleExtension on TextStyle {

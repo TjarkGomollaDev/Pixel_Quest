@@ -1,6 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 
+/// Central input aggregator for the player.
+///
+/// Combines keyboard and on-screen joystick input into a simple movement axis (`moveX`)
+/// and a one-shot jump trigger (`jumped`). Also exposes small helper methods to
+/// trigger, clear, and (de)attach mobile controls.
 class PlayerInput extends Component with KeyboardHandler {
   // movement output
   double _moveX = 0; // -1, 0, or 1
@@ -61,19 +66,23 @@ class PlayerInput extends Component with KeyboardHandler {
     _moveX = (_keyboardMoveX != 0) ? _keyboardMoveX : _joystickMoveX;
   }
 
+  /// Called to trigger a jump for the current frame.
   void jumpPressed() {
     _jumped = true;
   }
 
+  /// Resets one-shot input flags after the player consumed them.
   void clearInput() {
     _jumped = false;
   }
 
+  /// Attaches a joystick as an input source and resets the cached direction state.
   void attachJoystick(JoystickComponent joystick) {
     _joystick = joystick;
     _lastJoystickDirection = JoystickDirection.idle;
   }
 
+  /// Detaches the current joystick input source and clears related cached state.
   void detachJoystick() {
     _joystick = null;
     _lastJoystickDirection = JoystickDirection.idle;

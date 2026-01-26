@@ -15,6 +15,10 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A simple projectile fired by the Trunk.
+///
+/// The bullet moves straight left/right, damages the player on hit,
+/// and disappears when colliding with solid world/trap/enemy objects.
 class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, DebugOutlineOnly {
   // constructor parameters
   final bool _isLeft;

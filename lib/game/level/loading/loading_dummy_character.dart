@@ -7,8 +7,9 @@ import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum DummyState { hidden, fallingIn, hovering, fallingOut }
+enum _DummyState { hidden, fallingIn, hovering, fallingOut }
 
+/// Animated “loading” character that falls into view, hovers in a small loop, and falls out again.
 class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter, CancelableAnimations {
   LoadingDummyCharacter({required Vector2 screenSize}) {
     size = DummyCharacter.gridSize;
@@ -21,7 +22,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   // current state
-  DummyState _state = DummyState.hidden;
+  _DummyState _state = _DummyState.hidden;
 
   // fixed positions outside the screen and hover position
   late final Vector2 _startPosition;
@@ -75,19 +76,19 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     _hoverCompleter = null;
 
     // initial state
-    _state = DummyState.hidden;
+    _state = _DummyState.hidden;
   }
 
   Future<void> fallIn() async {
-    if (_state != DummyState.hidden) return;
-    _state = DummyState.fallingIn;
+    if (_state != _DummyState.hidden) return;
+    _state = _DummyState.fallingIn;
     final token = bumpToken();
 
     // reset position in every fall in
     position = _startPosition;
 
     // choose correct dummy character
-    animations = allCharacterAnimations[game.storageCenter.settings.character];
+    changeChracter(game.storageCenter.settings.character);
     current = PlayerState.fall;
 
     // fall in animation
@@ -101,8 +102,8 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   Future<void> fallOut() async {
-    if (_state != DummyState.hovering) return;
-    _state = DummyState.fallingOut;
+    if (_state != _DummyState.hovering) return;
+    _state = _DummyState.fallingOut;
     final token = bumpToken();
 
     // since we are no longer in the over state, the hover loop ends itself
@@ -114,17 +115,17 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     if (token != animationToken) return;
 
     // update state
-    _state = DummyState.hidden;
+    _state = _DummyState.hidden;
   }
 
   void _startHoverLoop(int token) {
-    _state = DummyState.hovering;
+    _state = _DummyState.hovering;
     _hoverCompleter = Completer<void>();
     _runHoverLoop(token);
   }
 
   Future<void> _runHoverLoop(int token) async {
-    while (_state == DummyState.hovering && token == animationToken) {
+    while (_state == _DummyState.hovering && token == animationToken) {
       await _singleSwing(token);
     }
     if (_hoverCompleter != null && !_hoverCompleter!.isCompleted) _hoverCompleter!.complete();

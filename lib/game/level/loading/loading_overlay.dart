@@ -16,8 +16,12 @@ import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum OverlayState { notVisible, transition, visible }
+enum _OverlayState { notVisible, transition, visible }
 
+/// Fullscreen loading overlay that blocks input and shows a parallax background plus a small “dummy” character animation.
+///
+/// Handles a simple state machine (hidden / transition / visible), spawns a few air particles while loading,
+/// and supports smooth show/hide transitions (including a zoom + fade-out).
 class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>, CancelableAnimations implements OpacityProvider {
   // constructor parameters
   final double _worldToScreenScale;
@@ -31,7 +35,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   // current state
-  OverlayState _state = OverlayState.notVisible;
+  _OverlayState _state = _OverlayState.notVisible;
 
   // internal opacity
   double _opacity = 1;
@@ -53,7 +57,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   late final VisibleTextComponent _stageInfoText;
 
   // getter
-  bool get isShown => _state != OverlayState.notVisible;
+  bool get isShown => _state != _OverlayState.notVisible;
 
   // animation keys
   static const String _keyZoomAndFadeOut = 'zoom-and-fade-out';
@@ -71,14 +75,14 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   @override
   void update(double dt) {
-    if (_state == OverlayState.notVisible) return;
+    if (_state == _OverlayState.notVisible) return;
     _particleTimer.update(dt);
     super.update(dt);
   }
 
   @override
   void renderTree(Canvas canvas) {
-    if (_state == OverlayState.notVisible || _opacity <= 0) return;
+    if (_state == _OverlayState.notVisible || _opacity <= 0) return;
 
     // render entire overlay, including children, into an alpha layer
     _overlayPaint.color = Color.fromRGBO(255, 255, 255, _opacity);
@@ -187,12 +191,12 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _inputBlocker.disable();
 
     // initial state
-    _state = OverlayState.notVisible;
+    _state = _OverlayState.notVisible;
   }
 
   Future<void> show(LevelMetadata levelMetadata) async {
-    if (_state != OverlayState.notVisible) return;
-    _state = OverlayState.transition;
+    if (_state != _OverlayState.notVisible) return;
+    _state = _OverlayState.transition;
     final token = bumpToken();
 
     // reset visuals in every show
@@ -211,12 +215,12 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     if (token != animationToken) return;
 
     // update state
-    _state = OverlayState.visible;
+    _state = _OverlayState.visible;
   }
 
   Future<void> hide({VoidCallback? onAfterDummyFallOut}) async {
-    if (_state != OverlayState.visible) return;
-    _state = OverlayState.transition;
+    if (_state != _OverlayState.visible) return;
+    _state = _OverlayState.transition;
     final token = bumpToken();
 
     // dummy character falls out and then particle timer stops
@@ -234,7 +238,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     if (token != animationToken) return;
 
     // update state
-    _state = OverlayState.notVisible;
+    _state = _OverlayState.notVisible;
 
     // input blocker can now also be disabled
     _inputBlocker.disable();
@@ -254,7 +258,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _inputBlocker.disable();
     final prevState = _state;
     final prevOpacity = _opacity;
-    _state = OverlayState.visible;
+    _state = _OverlayState.visible;
     _opacity = 0.001;
     await yieldFrame();
     _opacity = prevOpacity;

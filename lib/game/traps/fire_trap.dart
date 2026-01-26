@@ -12,7 +12,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum FireTrapState implements AnimationState {
+enum _FireTrapState implements AnimationState {
   off('Off', 1),
   on('On', 3),
   hit('Hit', 4, loop: false);
@@ -24,14 +24,14 @@ enum FireTrapState implements AnimationState {
   @override
   final bool loop;
 
-  const FireTrapState(this.fileName, this.amount, {this.loop = true});
+  const _FireTrapState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A flame trap that activates when the player steps on its trigger area.
 ///
-/// Initially idle in the [FireTrapState.off] state, it switches to [FireTrapState.hit]
+/// Initially idle in the [_FireTrapState.off] state, it switches to [_FireTrapState.hit]
 /// when triggered from above. After a short delay, the fire ignites into the
-/// [FireTrapState.on] state, dealing continuous damage while active. Once the
+/// [_FireTrapState.on] state, dealing continuous damage while active. Once the
 /// burn duration ends, the trap returns to its idle state and can be triggered again.
 ///
 /// Damage is only applied while the fire is burning. Triggering and timing
@@ -96,9 +96,9 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FireTrapState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in FireTrapState.values) state: loadAnimation(state)};
-    current = FireTrapState.off;
+    final loadAnimation = spriteAnimationWrapper<_FireTrapState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _FireTrapState.values) state: loadAnimation(state)};
+    current = _FireTrapState.off;
   }
 
   Future<void> hitTrap() async {
@@ -107,23 +107,27 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
     // hit pressure plate
     game.audioCenter.playSound(Sfx.pressurePlate, SfxType.game);
-    current = FireTrapState.hit;
-    await animationTickers![FireTrapState.hit]!.completed;
+    current = _FireTrapState.hit;
+    await animationTickers![_FireTrapState.hit]!.completed;
 
     // fire on
     await Future.delayed(_fireDelayAfterHit);
     _isDamageOn = true;
     game.audioCenter.playSound(Sfx.jetFlame, SfxType.game);
-    current = FireTrapState.on;
+    current = _FireTrapState.on;
 
     // fire off
     await Future.delayed(_fireDuration);
-    current = FireTrapState.off;
+    current = _FireTrapState.off;
     _isDamageOn = false;
     _isFireActivated = false;
   }
 }
 
+/// Small helper component that provides a dedicated entity-collision hitbox for [FireTrap].
+///
+/// This keeps the trap's world-collision/trigger logic separate from the damage collider,
+/// and simply forwards collision sides to the provided callback.
 class _FireTrapEntityCollider extends PositionComponent with EntityCollision, CollisionCallbacks {
   // constructor parameters
   final void Function(CollisionSide collisonSide) _onCollide;

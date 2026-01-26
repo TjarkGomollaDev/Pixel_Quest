@@ -11,6 +11,7 @@ import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 
+/// Route that pauses/resumes the level by emitting lifecycle events when shown/closed.
 class PausePage extends Route with HasGameReference<PixelQuest> {
   PausePage() : super(_PauseContent.new, transparent: true);
 
@@ -25,6 +26,7 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
   }
 }
 
+/// Pause menu UI content: builds the overlay layout and optionally plays a simple show animation.
 class _PauseContent extends Component with HasGameReference<PixelQuest> {
   // container
   late final PositionComponent _root;
@@ -35,7 +37,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
   late final TextComponent _pauseText;
   late final CornerOutline _pauseOutline;
 
-  // text btns
+  // btns
   late final TextBtn _settingsBtn;
   late final TextBtn _menuBtn;
 
@@ -150,7 +152,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
 
     // add pop-in effect for all buttons
     for (var i = 0; i < _btns.length; i++) {
-      _btns[i].animatePopIn(delay: (i + 2) * 0.45);
+      _btns[i].animatedPopIn(delay: (i + 2) * 0.45);
     }
   }
 }

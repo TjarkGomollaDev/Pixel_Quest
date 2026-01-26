@@ -1,8 +1,0 @@
-"filename", "language", "XML", "Dart", "comment", "blank", "total"
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_02.tmx", "XML", -15, 0, 0, 0, -15
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/tiles/Level_03.tmx", "XML", 6, 0, 0, 0, 6
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/app_theme.dart", "Dart", 0, 0, 0, 1, 1
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/enemies/chicken.dart", "Dart", 0, -2, -1, 0, -3
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/hud/game_hud.dart", "Dart", 0, 34, 5, 7, 46
-"/Users/tjarkgomolla/Development/Flutter/pixel_adventure/lib/game/level/level.dart", "Dart", 0, 3, 1, 3, 7
-"Total", "-", -9, 35, 5, 11, 42

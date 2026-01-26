@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/spotlight.dart';
+import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
+import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/menu/widgets/character_bio.dart';
 import 'package:pixel_adventure/game/menu/widgets/menu_dummy_character.dart';
 import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/visible_components.dart';
 
 class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
@@ -20,35 +25,217 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     priority = GameSettings.chracterPicker;
   }
 
-  // character picker
+  // dummy character and open btn
   late final MenuDummyCharacter _dummy;
-  late final SpriteBtn _editBtn;
+  late final SpriteBtn _openBtn;
 
   // spotlight
+  bool _isSpotlightActive = false;
   late final Spotlight _spotlight;
   late final SpriteBtn _closeBtn;
   late final CharacterBio _characterBio;
-  late final SpriteBtn _previousCharacterBtn;
-  late final SpriteBtn _nextCharacterBtn;
-  bool _isSpotlightActive = false;
 
-  // spotlight spacing
-  static const double _characterChangeBtnSpacing = 14; // [Adjustable]
+  // title
 
   @override
   FutureOr<void> onLoad() {
     _setUpCharacterBio();
     _setUpDummyCharacter();
-    _setUpEditBtn();
+    _setUpOpenBtn();
     _setUpCloseBtn();
-    _setUpCharacterChangeBtns();
     _setUpSpotlight();
+
+    _setUpTitle();
+    _setUpCharacterPicker();
+    _setUpLevelBgPicker();
+    _setUpLoadingBgPicker();
     return super.onLoad();
   }
 
+  @override
+  Future<void> onMount() async {
+    _isSpotlightActive = true;
+    _inputBlocker.enable();
+    await _spotlight.focusOnTarget();
+    _showSpotlightContent();
+
+    game.router.pushNamed(RouteNames.settings);
+    super.onMount();
+  }
+
+  void _setUpTitle() {
+    _title = VisibleTextComponent(
+      text: 'Your Inventory',
+      anchor: Anchor.topCenter,
+      position: Vector2((size.x - _spotlightCenter.x + Spotlight.playerTargetRadius / 2) / 2 + _spotlightCenter.x, 30),
+      textRenderer: AppTheme.dialogHeadingStandard.asTextPaint,
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    addAll([_title]);
+  }
+
+  late final VisibleTextComponent _title;
+  late final VisibleTextComponent _characterPickerText;
+  late final RadioComponent _characterPickerSelector;
+  late final VisibleTextComponent _levelBgPickerText;
+  late final RadioComponent _levelBgPickerSelector;
+  late final VisibleTextComponent _loadingBgPickerText;
+  late final RadioComponent _loadingBgPickerSelector;
+
+  void _setUpCharacterPicker() {
+    // character picker text
+    _characterPickerText = VisibleTextComponent(
+      text: 'Chracter',
+      anchor: Anchor.topCenter,
+      position: _title.position + Vector2(0, _title.height + 20),
+      textRenderer: AppTheme.dialogTextStandard.asTextPaint,
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    // character picker selector
+    _characterPickerSelector = RadioComponent(
+      anchor: Anchor.topCenter,
+      position: _characterPickerText.position + Vector2(0, _characterPickerText.height + DialogContainer.headlineMarginBottom),
+      initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
+      optionSize: Vector2(38, 44),
+      spacingBetweenOptions: 12,
+      spriteOffset: Vector2(0, -4),
+      show: false,
+      options: [
+        RadioOptionSprite(
+          path: 'Menu/Inventory/Mask_Dude_Preview.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+            _dummy.setCharacter(PlayerCharacter.maskDude);
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Menu/Inventory/Ninja_Frog_Preview.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+            _dummy.setCharacter(PlayerCharacter.ninjaFrog);
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Menu/Inventory/Pink_Man_Preview.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+            _dummy.setCharacter(PlayerCharacter.pinkMan);
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Menu/Inventory/Virtual_Guy_Preview.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+            _dummy.setCharacter(PlayerCharacter.virtualGuy);
+          },
+        ),
+      ],
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    addAll([_characterPickerText, _characterPickerSelector]);
+  }
+
+  void _setUpLevelBgPicker() {
+    // level background picker text
+    _levelBgPickerText = VisibleTextComponent(
+      text: 'Level',
+      anchor: Anchor.topCenter,
+      position: _characterPickerSelector.position + Vector2(0, _characterPickerSelector.height + DialogContainer.spacingBetweenSections),
+      textRenderer: AppTheme.dialogTextStandard.asTextPaint,
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    // level background picker selector
+    _levelBgPickerSelector = RadioComponent(
+      anchor: Anchor.topCenter,
+      position: _levelBgPickerText.position + Vector2(0, _levelBgPickerText.height + DialogContainer.headlineMarginBottom),
+      initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
+      optionSize: Vector2(62, 37.5),
+      spacingBetweenOptions: 12,
+      spriteSize: Vector2(56, 31.5),
+      show: false,
+      options: [
+        // RadioOptionText(
+        //   text: 'Default',
+        //   onSelected: () {
+        //     if (!_isSpotlightActive) return;
+        //   },
+        // ),
+        RadioOptionSprite(
+          path: 'Background/Szene 1/4.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Background/Szene 2/4.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Background/Szene 4/4.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+          },
+        ),
+      ],
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    addAll([_levelBgPickerText, _levelBgPickerSelector]);
+  }
+
+  void _setUpLoadingBgPicker() {
+    // loading background picker text
+    _loadingBgPickerText = VisibleTextComponent(
+      text: 'Loading',
+      anchor: Anchor.topCenter,
+      position: _levelBgPickerSelector.position + Vector2(0, _levelBgPickerSelector.height + DialogContainer.spacingBetweenSections),
+      textRenderer: AppTheme.dialogTextStandard.asTextPaint,
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    // loading background picker selector
+    _loadingBgPickerSelector = RadioComponent(
+      anchor: Anchor.topCenter,
+      position: _loadingBgPickerText.position + Vector2(0, _loadingBgPickerText.height + DialogContainer.headlineMarginBottom),
+      initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
+      optionSize: Vector2(62, 37.5),
+      spacingBetweenOptions: 12,
+      spriteSize: Vector2(56, 31.5),
+      show: false,
+      options: [
+        // RadioOptionText(
+        //   text: 'Default',
+        //   onSelected: () {
+        //     if (!_isSpotlightActive) return;
+        //   },
+        // ),
+        RadioOptionSprite(
+          path: 'Background/Szene 3/4.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+          },
+        ),
+        RadioOptionSprite(
+          path: 'Background/Szene 6/4.png',
+          onSelected: () {
+            if (!_isSpotlightActive) return;
+          },
+        ),
+      ],
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+
+    addAll([_loadingBgPickerText, _loadingBgPickerSelector]);
+  }
+
   void _setUpCharacterBio() {
-    _characterBio = CharacterBio(position: _spotlightCenter + Vector2(Spotlight.playerTargetRadius * 1.2, 0), show: false)
-      ..priority = GameSettings.spotlightAnimationContentLayer;
+    _characterBio = CharacterBio(
+      position: _spotlightCenter + Vector2(-Spotlight.playerTargetRadius + 22, Spotlight.playerTargetRadius + 32),
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
     add(_characterBio);
   }
 
@@ -57,8 +244,8 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
     add(_dummy);
   }
 
-  void _setUpEditBtn() {
-    _editBtn = SpriteBtn.fromType(
+  void _setUpOpenBtn() {
+    _openBtn = SpriteBtn.fromType(
       type: SpriteBtnType.editSmall,
       onPressed: () async {
         if (_isSpotlightActive) return;
@@ -69,7 +256,7 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
       },
       position: _dummy.position + Vector2(0, 39),
     );
-    add(_editBtn);
+    add(_openBtn);
   }
 
   void _setUpCloseBtn() {
@@ -82,34 +269,10 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
         _hideSpotlightContent();
         await _spotlight.expandToFull();
       },
-      position: _dummy.position + Vector2(Spotlight.playerTargetRadius * 0.9, -Spotlight.playerTargetRadius * 0.9),
+      position: _spotlightCenter + Vector2(Spotlight.playerTargetRadius, -Spotlight.playerTargetRadius),
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     add(_closeBtn);
-  }
-
-  void _setUpCharacterChangeBtns() {
-    final basePosition = Vector2(_characterBio.x + 28, _characterBio.position.y + _characterBio.size.y / 2);
-    final btnHorizontalCenter = SpriteBtnType.btnSizeSmall.x / 2;
-    _previousCharacterBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.previousSmall,
-      onPressed: () {
-        if (!_isSpotlightActive) return;
-        _dummy.switchCharacter(next: false);
-      },
-      position: basePosition + Vector2(-_characterChangeBtnSpacing / 2 - btnHorizontalCenter, 0),
-      show: false,
-    )..priority = GameSettings.spotlightAnimationContentLayer;
-    _nextCharacterBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.nextSmall,
-      onPressed: () {
-        if (!_isSpotlightActive) return;
-        _dummy.switchCharacter();
-      },
-      position: basePosition + Vector2(_characterChangeBtnSpacing / 2 + btnHorizontalCenter, 0),
-      show: false,
-    )..priority = GameSettings.spotlightAnimationContentLayer;
-    addAll([_previousCharacterBtn, _nextCharacterBtn]);
   }
 
   void _setUpSpotlight() {
@@ -120,22 +283,32 @@ class CharacterPicker extends PositionComponent with HasGameReference<PixelQuest
   void _showSpotlightContent() {
     _closeBtn.animatedShow();
     _characterBio.animatedShow();
-    _nextCharacterBtn.animatedShow();
-    _previousCharacterBtn.animatedShow();
+    _title.show();
+    _characterPickerText.show();
+    _characterPickerSelector.show();
+    _levelBgPickerText.show();
+    _levelBgPickerSelector.show();
+    _loadingBgPickerText.show();
+    _loadingBgPickerSelector.show();
   }
 
   void _hideSpotlightContent() {
     _closeBtn.hide();
     _characterBio.hide();
-    _nextCharacterBtn.hide();
-    _previousCharacterBtn.hide();
+    _title.hide();
+    _characterPickerText.hide();
+    _characterPickerSelector.hide();
+    _levelBgPickerText.hide();
+    _levelBgPickerSelector.hide();
+    _loadingBgPickerText.hide();
+    _loadingBgPickerSelector.hide();
   }
 
-  void pause() {
-    _dummy.pauseAnimation();
+  void stopCharacterAnimationLoop() {
+    _dummy.stop();
   }
 
-  void resume() {
-    _dummy.resumeAnimation();
+  void startCharacterAnimationLoop() {
+    _dummy.start();
   }
 }

@@ -1,9 +1,10 @@
 import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
+
+const List<double> _angles = [0.0, 1.5708, 3.1416, 4.7124]; // in radians
 
 /// Renders a row of sprites or sprite animations along the given side of a [PositionComponent].
 ///
@@ -24,17 +25,16 @@ void addSpriteRow({
     final component = animation != null
         ? SpriteAnimationComponent(animation: animation, size: Vector2(GameSettings.tileSize, GameSettings.tileSize))
         : SpriteComponent(sprite: sprite, size: Vector2(GameSettings.tileSize, GameSettings.tileSize));
-
     component.debugColor = AppTheme.transparent;
 
-    final angle = [0.0, 1.5708, 3.1416, 4.7124][side - 1];
+    // compute angle and position
+    final angle = _angles[side - 1];
     final position = switch (side) {
       2 => Vector2(parent.size.x, i * GameSettings.tileSize),
       3 => Vector2(parent.size.x - i * GameSettings.tileSize, parent.size.y),
       4 => Vector2(0, i * GameSettings.tileSize + parent.size.x),
       _ => Vector2(i * GameSettings.tileSize, 0),
     };
-
     component
       ..angle = angle
       ..position = position;

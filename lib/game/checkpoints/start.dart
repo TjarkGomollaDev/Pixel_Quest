@@ -9,7 +9,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum StartState implements AnimationState {
+enum _StartState implements AnimationState {
   idle('Idle', 1),
   moving('Moving', 8, loop: false);
 
@@ -20,9 +20,13 @@ enum StartState implements AnimationState {
   @override
   final bool loop;
 
-  const StartState(this.fileName, this.amount, {this.loop = true});
+  const _StartState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// Level start checkpoint that defines the player spawn point.
+///
+/// Exposes a computed `playerPosition` so the level can spawn the player in a
+/// consistent spot relative to the start marker’s hitbox.
 class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   Start({required super.position}) : super(size: gridSize) {
     // is already called her so that we have immediate access to the player position from outside
@@ -71,9 +75,9 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<StartState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in StartState.values) state: loadAnimation(state)};
-    current = StartState.idle;
+    final loadAnimation = spriteAnimationWrapper<_StartState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _StartState.values) state: loadAnimation(state)};
+    current = _StartState.idle;
   }
 
   void _setUpPlayerPosition() {

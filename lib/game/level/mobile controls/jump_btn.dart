@@ -7,6 +7,9 @@ import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 
+/// Simple on-screen jump button that triggers the provided callback on tap.
+///
+/// Uses [VisibleComponent] so it can be shown/hidden without removing it, and ignores taps while hidden.
 class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCallbacks, VisibleComponent {
   // constructor parameters
   final VoidCallback _onJump;

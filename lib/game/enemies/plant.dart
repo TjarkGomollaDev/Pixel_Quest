@@ -15,7 +15,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum PlantState implements AnimationState {
+enum _PlantState implements AnimationState {
   idle('Idle', 11),
   attack('Attack', 8, loop: false),
   hit('Hit', 5, loop: false);
@@ -27,9 +27,13 @@ enum PlantState implements AnimationState {
   @override
   final bool loop;
 
-  const PlantState(this.fileName, this.amount, {this.loop = true});
+  const _PlantState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A stationary enemy that periodically shoots projectiles.
+///
+/// The Plant plays an attack animation, spawns a bullet at the right moment,
+/// and can optionally fire a second shot shortly after the first.
 class Plant extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -55,7 +59,7 @@ class Plant extends PositionComponent
   static const String _pathEnd = ' (44x42).png';
 
   // start sound frame
-  static const int _startShotSoundFrame = 4;
+  static const int _startShotSoundFrame = 6;
 
   // attack
   double _timeSinceLastAttack = 0;
@@ -89,15 +93,15 @@ class Plant extends PositionComponent
 
     // since only top collision is taken into account, we can also run through the plant, which can also trigger the top collision,
     // that's why there is an extra check to ensure that the player is really above the plant
-    if (collisionSide == CollisionSide.Top && _player.hitboxAbsoluteBottom <= position.y + _hitbox.position.y + 2) {
+    if (collisionSide == CollisionSide.top && _player.hitboxAbsoluteBottom <= position.y + _hitbox.position.y + 5) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationGroupComponent.animationTickers![PlantState.attack]?.onComplete?.call();
-      animationGroupComponent.current = PlantState.hit;
-      animationGroupComponent.animationTickers![PlantState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.animationTickers![_PlantState.attack]?.onComplete?.call();
+      animationGroupComponent.current = _PlantState.hit;
+      animationGroupComponent.animationTickers![_PlantState.hit]!.completed.whenComplete(() => removeFromParent());
     }
 
     // the plant itself can not kill the player, only its bullet
@@ -121,9 +125,9 @@ class Plant extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<PlantState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in PlantState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: PlantState.idle);
+    final loadAnimation = spriteAnimationWrapper<_PlantState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _PlantState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _PlantState.idle);
     if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
@@ -146,10 +150,10 @@ class Plant extends PositionComponent
   }
 
   Future<bool> _attack() async {
-    animationGroupComponent.current = PlantState.attack;
+    animationGroupComponent.current = _PlantState.attack;
 
     // the sound should start during the attack animation, not before or after
-    final ticker = animationGroupComponent.animationTickers![PlantState.attack]!;
+    final ticker = animationGroupComponent.animationTickers![_PlantState.attack]!;
     ticker.onFrame = (frame) {
       if (frame == _startShotSoundFrame) {
         game.audioCenter.playSoundIf(Sfx.plantShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
@@ -160,7 +164,7 @@ class Plant extends PositionComponent
 
     if (_gotStomped) return false;
     _spawnBullet();
-    animationGroupComponent.current = PlantState.idle;
+    animationGroupComponent.current = _PlantState.idle;
     return true;
   }
 

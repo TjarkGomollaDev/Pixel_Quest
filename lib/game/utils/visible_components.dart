@@ -1,6 +1,11 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
 
+/// Small visibility helper for Flame components.
+///
+/// If [isVisible] is `false`, the component (and its children) won’t render.
+/// This is meant for simple UI/show-hide cases where you just want to stop drawing,
+/// without changing layout/size or removing the component from the tree.
 mixin VisibleComponent on Component {
   bool isVisible = true;
 
@@ -11,14 +16,19 @@ mixin VisibleComponent on Component {
     }
   }
 
+  /// Convenience init so constructors can easily start hidden/visible.
   void initVisibility(bool show) {
     show ? this.show() : hide();
   }
 
+  /// Shows the component (renders again).
   void show() => isVisible = true;
+
+  /// Hides the component (skips rendering).
   void hide() => isVisible = false;
 }
 
+/// SpriteComponent variant that supports the [VisibleComponent] show/hide pattern.
 class VisibleSpriteComponent extends SpriteComponent with VisibleComponent {
   VisibleSpriteComponent({
     super.sprite,
@@ -40,6 +50,7 @@ class VisibleSpriteComponent extends SpriteComponent with VisibleComponent {
   }
 }
 
+/// TextComponent variant that supports the [VisibleComponent] show/hide pattern.
 class VisibleTextComponent extends TextComponent with VisibleComponent {
   VisibleTextComponent({
     super.text,
@@ -58,6 +69,7 @@ class VisibleTextComponent extends TextComponent with VisibleComponent {
   }
 }
 
+/// FpsTextComponent variant that supports the [VisibleComponent] show/hide pattern.
 class VisibleFpsTextComponent extends FpsTextComponent with VisibleComponent {
   VisibleFpsTextComponent({
     super.windowSize,

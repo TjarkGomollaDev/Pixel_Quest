@@ -10,7 +10,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum FinishState implements AnimationState {
+enum _FinishState implements AnimationState {
   idle('Idle', 1),
   pressed('Pressed', 8, loop: false);
 
@@ -21,9 +21,13 @@ enum FinishState implements AnimationState {
   @override
   final bool loop;
 
-  const FinishState(this.fileName, this.amount, {this.loop = true});
+  const _FinishState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// Level end checkpoint that triggers when the player reaches it.
+///
+/// Provides a passive world hitbox for collision detection and plays a short
+/// activation animation + finish sound exactly once per level run.
 class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   // constructor parameters
   final Player _player;
@@ -69,9 +73,9 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<FinishState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in FinishState.values) state: loadAnimation(state)};
-    current = FinishState.idle;
+    final loadAnimation = spriteAnimationWrapper<_FinishState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _FinishState.values) state: loadAnimation(state)};
+    current = _FinishState.idle;
   }
 
   Future<void> reachedFinish() async {
@@ -84,8 +88,8 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
     game.audioCenter.playSound(Sfx.finish, SfxType.level);
 
     // play reached finish animation
-    current = FinishState.pressed;
-    await animationTickers![FinishState.pressed]!.completed;
-    current = FinishState.idle;
+    current = _FinishState.pressed;
+    await animationTickers![_FinishState.pressed]!.completed;
+    current = _FinishState.idle;
   }
 }

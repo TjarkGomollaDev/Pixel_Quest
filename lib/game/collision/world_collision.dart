@@ -6,14 +6,23 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Contract for components that participate in "world" collision.
+///
+/// The player resolves collisions against [worldHitbox] and applies movement correction (blocking, landing, etc.).
 mixin WorldCollision on PositionComponent {
+  /// The hitbox used for world collision checks (absolute rect is derived from this).
   ShapeHitbox get worldHitbox;
 }
 
+/// Optional hook for world objects that need to react when the player leaves contact.
 mixin WorldCollisionEnd on PositionComponent {
+  /// Called by the player when the collision with this world object ends.
   void onWorldCollisionEnd();
 }
 
+/// Solid world geometry block that the player collides with.
+///
+/// Can optionally be a one-way platform (handled by the player via [isPlatform]).
 class WorldBlock extends PositionComponent with HasGameReference<PixelQuest>, CollisionCallbacks, WorldCollision {
   // constructor parameters
   final bool isPlatform;

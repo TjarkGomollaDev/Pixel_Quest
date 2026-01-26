@@ -5,6 +5,11 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A simple horizontal slider component (value range `0..1`).
+///
+/// Supports dragging and tapping on the track to change the value.
+/// You can react to the final value via [onChanged] and optionally receive
+/// continuous updates while dragging via [onChangedContinuous].
 class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCallbacks, TapCallbacks {
   // constructor parameters
   final void Function(double value) onChanged;
@@ -132,6 +137,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
     _thumb.position.x = x;
   }
 
+  /// Disables interaction and shows the slider in its disabled visual state.
   void disable() {
     _enabled = false;
     if (!isLoaded) return;
@@ -140,6 +146,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
     _track.color = AppTheme.grayDark1;
   }
 
+  /// Enables interaction and restores the current value visuals.
   void enable() {
     _enabled = true;
     if (!isLoaded) return;
@@ -148,6 +155,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
   }
 }
 
+/// Visual thumb used by [Slider]. Purely a UI component (no input handling).
 class _SliderThumb extends PositionComponent {
   _SliderThumb({super.position}) : super(size: _thumbSize, anchor: Anchor.center);
 

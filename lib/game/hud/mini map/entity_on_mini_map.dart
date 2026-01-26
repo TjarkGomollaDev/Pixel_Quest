@@ -60,16 +60,22 @@ mixin EntityOnMiniMap on PositionComponent {
 
   // y move range
   Vector2? _yMoveRange;
+
+  /// Optional hint range for entities that can move vertically (used for quick mini map filtering).
   Vector2 get yMoveRange => _yMoveRange ?? Vector2.all(occlusionPosition.y);
   set yMoveRange(Vector2 range) => _yMoveRange = range;
 
   // marker
   EntityMiniMapMarker _marker = EntityMiniMapMarker();
   EntityMiniMapMarker get marker => _marker;
+
+  /// Updates how this entity should be drawn on the mini map.
   set marker(EntityMiniMapMarker value) => _marker = value;
 
-  // callback that will be called when the entity is removed from the game
+  // callback
   void Function(EntityOnMiniMap entity)? _onRemovedFromLevel;
+
+  /// Hook used by the mini map to keep its internal lists in sync when entities despawn.
   set onRemovedFromLevel(void Function(EntityOnMiniMap entity) function) => _onRemovedFromLevel = function;
 }
 

@@ -10,6 +10,10 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A short-lived particle spawned by a Slime.
+///
+/// It plays a small one-shot animation (with an optional delayed start),
+/// can hurt the player on contact, and removes itself when finished.
 class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGameReference<PixelQuest>, DebugOutlineOnly {
   // constructor parameters
   final Slime _owner;

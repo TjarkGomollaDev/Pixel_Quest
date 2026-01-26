@@ -16,7 +16,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum GhostState implements AnimationState {
+enum _GhostState implements AnimationState {
   idle('Idle', 10),
   appear('Appear', 4, loop: false),
   disappear('Disappear', 4, loop: false),
@@ -29,9 +29,13 @@ enum GhostState implements AnimationState {
   @override
   final bool loop;
 
-  const GhostState(this.fileName, this.amount, {this.loop = true});
+  const _GhostState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A patrolling enemy that fades in and out on a timer.
+///
+/// The Ghost moves back and forth within a set range, periodically becoming
+/// intangible/hidden and then reappearing with a small particle burst.
 class Ghost extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest>, AmbientLoopEmitter {
   // constructor parameters
@@ -121,14 +125,14 @@ class Ghost extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped || !_isVisible) return;
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
 
       // play hit animation and then remove from level
-      animationGroupComponent.current = GhostState.hit;
-      animationGroupComponent.animationTickers![GhostState.hit]!.completed.then((_) => removeFromParent());
+      animationGroupComponent.current = _GhostState.hit;
+      animationGroupComponent.animationTickers![_GhostState.hit]!.completed.then((_) => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -153,9 +157,9 @@ class Ghost extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<GhostState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in GhostState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: GhostState.idle);
+    final loadAnimation = spriteAnimationWrapper<_GhostState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _GhostState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _GhostState.idle);
   }
 
   void _setUpRange() {
@@ -189,8 +193,8 @@ class Ghost extends PositionComponent
       _start = false;
     }
     _particleTimer.stop();
-    animationGroupComponent.current = GhostState.disappear;
-    await animationGroupComponent.animationTickers![GhostState.disappear]!.completed;
+    animationGroupComponent.current = _GhostState.disappear;
+    await animationGroupComponent.animationTickers![_GhostState.disappear]!.completed;
     animationGroupComponent.opacity = 0;
     _isVisible = false;
     _ghostTimer
@@ -200,11 +204,11 @@ class Ghost extends PositionComponent
   }
 
   Future<void> _triggerAppear() async {
-    animationGroupComponent.current = GhostState.appear;
+    animationGroupComponent.current = _GhostState.appear;
     _ghostTimer.stop();
     animationGroupComponent.opacity = 1;
-    await animationGroupComponent.animationTickers![GhostState.appear]!.completed;
-    animationGroupComponent.current = GhostState.idle;
+    await animationGroupComponent.animationTickers![_GhostState.appear]!.completed;
+    animationGroupComponent.current = _GhostState.idle;
     _isVisible = true;
     _spawnGhostParticles();
     _ghostTimer

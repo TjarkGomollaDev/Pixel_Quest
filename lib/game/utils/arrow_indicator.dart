@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 
 enum ArrowDir { left, right }
 
+/// Small UI component that draws a simple triangular arrow.
 class ArrowIndicator extends PositionComponent {
   // constructor parameters
   final ArrowDir dir;

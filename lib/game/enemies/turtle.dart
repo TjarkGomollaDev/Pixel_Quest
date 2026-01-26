@@ -14,7 +14,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum TurtleState implements AnimationState {
+enum _TurtleState implements AnimationState {
   idleSpikesIn('Idle Spikes in', 14),
   idleSpikesOut('Idle Spikes out', 14),
   spikesIn('Spikes in', 8, loop: false),
@@ -28,9 +28,13 @@ enum TurtleState implements AnimationState {
   @override
   final bool loop;
 
-  const TurtleState(this.fileName, this.amount, {this.loop = true});
+  const _TurtleState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A stationary turtle enemy that periodically toggles its spikes in and out.
+///
+/// While spikes are out, the turtle hurts the player on contact; when spikes are in,
+/// it can be stomped from above.
 class Turtle extends PositionComponent
     with FixedGridOriginalSizeGroupAnimation, EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
@@ -88,16 +92,16 @@ class Turtle extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (!_spikesAreOut && collisionSide == CollisionSide.Top) {
+    if (!_spikesAreOut && collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationGroupComponent.animationTickers![TurtleState.spikesOut]?.onComplete?.call();
-      animationGroupComponent.animationTickers![TurtleState.spikesIn]?.onComplete?.call();
-      animationGroupComponent.current = TurtleState.hit;
-      animationGroupComponent.animationTickers![TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationGroupComponent.animationTickers![_TurtleState.spikesOut]?.onComplete?.call();
+      animationGroupComponent.animationTickers![_TurtleState.spikesIn]?.onComplete?.call();
+      animationGroupComponent.current = _TurtleState.hit;
+      animationGroupComponent.animationTickers![_TurtleState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -121,9 +125,9 @@ class Turtle extends PositionComponent
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TurtleState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in TurtleState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TurtleState.idleSpikesOut);
+    final loadAnimation = spriteAnimationWrapper<_TurtleState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _TurtleState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _TurtleState.idleSpikesOut);
     if (!_isLeft) flipHorizontallyAroundCenter();
   }
 
@@ -134,8 +138,8 @@ class Turtle extends PositionComponent
   void _toggleSpikes() => _spikesAreOut ? unawaited(_spikesIn()) : unawaited(_spikesOut());
 
   Future<void> _spikesOut() async {
-    animationGroupComponent.current = TurtleState.spikesOut;
-    final ticker = animationGroupComponent.animationTickers![TurtleState.spikesOut]!;
+    animationGroupComponent.current = _TurtleState.spikesOut;
+    final ticker = animationGroupComponent.animationTickers![_TurtleState.spikesOut]!;
     ticker.onFrame = (frame) {
       if (frame >= _spikesOutActivationFrame) {
         _spikesAreOut = true;
@@ -146,12 +150,12 @@ class Turtle extends PositionComponent
     };
     await ticker.completed;
     if (_gotStomped) return;
-    animationGroupComponent.current = TurtleState.idleSpikesOut;
+    animationGroupComponent.current = _TurtleState.idleSpikesOut;
   }
 
   Future<void> _spikesIn() async {
-    animationGroupComponent.current = TurtleState.spikesIn;
-    final ticker = animationGroupComponent.animationTickers![TurtleState.spikesIn]!;
+    animationGroupComponent.current = _TurtleState.spikesIn;
+    final ticker = animationGroupComponent.animationTickers![_TurtleState.spikesIn]!;
     ticker.onFrame = (frame) {
       if (frame >= _spikesInActivationFrame) {
         _spikesAreOut = false;
@@ -163,6 +167,6 @@ class Turtle extends PositionComponent
     if (_gotStomped) return;
     await ticker.completed;
     if (_gotStomped) return;
-    animationGroupComponent.current = TurtleState.idleSpikesIn;
+    animationGroupComponent.current = _TurtleState.idleSpikesIn;
   }
 }

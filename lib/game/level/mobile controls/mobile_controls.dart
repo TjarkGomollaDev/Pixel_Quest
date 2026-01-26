@@ -16,6 +16,9 @@ enum JoystickSetup {
   static JoystickSetup fromName(String name) => JoystickSetup.values.firstWhere((s) => s.name == name, orElse: () => defaultSetup);
 }
 
+/// Container that owns and lays out the mobile on-screen controls (joystick + jump button).
+///
+/// It also listens to [ControlSettingsChanged] to apply the current left/right control layout at runtime.
 class MobileControls extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final PlayerInput _playerInput;

@@ -12,7 +12,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum TrampolineState implements AnimationState {
+enum _TrampolineState implements AnimationState {
   idle('Idle', 1),
   jump('Jump', 8, loop: false);
 
@@ -23,13 +23,13 @@ enum TrampolineState implements AnimationState {
   @override
   final bool loop;
 
-  const TrampolineState(this.fileName, this.amount, {this.loop = true});
+  const _TrampolineState(this.fileName, this.amount, {this.loop = true});
 }
 
 /// A spring-loaded trampoline trap that launches the [Player] upwards on contact.
 ///
-/// The trampoline is animated with two states: [TrampolineState.idle] and
-/// [TrampolineState.jump]. When the player collides with its hitbox, it triggers
+/// The trampoline is animated with two states: [_TrampolineState.idle] and
+/// [_TrampolineState.jump]. When the player collides with its hitbox, it triggers
 /// the jump animation, applies an upward bounce force to the player, and then
 /// automatically resets back to idle once the animation is complete.
 /// The trampoline acts as a passive collision object and does not move by itself.
@@ -74,9 +74,9 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
       game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
 
       // play animation
-      animationGroupComponent.current = TrampolineState.jump;
-      await animationGroupComponent.animationTickers![TrampolineState.jump]!.completed;
-      animationGroupComponent.current = TrampolineState.idle;
+      animationGroupComponent.current = _TrampolineState.jump;
+      await animationGroupComponent.animationTickers![_TrampolineState.jump]!.completed;
+      animationGroupComponent.current = _TrampolineState.idle;
 
       // unblocking the trampoline
       _isBouncing = false;
@@ -104,8 +104,8 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TrampolineState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in TrampolineState.values) state: loadAnimation(state)};
-    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: TrampolineState.idle);
+    final loadAnimation = spriteAnimationWrapper<_TrampolineState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    final animations = {for (var state in _TrampolineState.values) state: loadAnimation(state)};
+    addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _TrampolineState.idle);
   }
 }

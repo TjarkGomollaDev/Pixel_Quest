@@ -5,20 +5,33 @@ import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// A full-screen overlay page that displays a centered [DialogContainer].
+///
+/// Features:
+/// - Optional blur overlay behind the dialog
+/// - Closes the dialog when the user taps outside the dialog bounds
+/// - Scales a root component by `game.worldToScreenScale` so UI matches world scaling
+///
+/// Typical usage:
+/// Push this component via your router to show modal dialogs consistently:
+/// - The page captures taps everywhere (`containsLocalPoint` always true)
+/// - Outside-tap detection uses the dialog's absolute rect
 class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbacks {
   // constructor parameters
   final String _titleText;
   final PositionComponent _content;
   final Vector2 _contentSize;
+  final bool _blurBackground;
 
-  DialogPage({required String titleText, required PositionComponent content, required Vector2 contentSize})
+  DialogPage({required String titleText, required PositionComponent content, required Vector2 contentSize, bool blurBackground = true})
     : _titleText = titleText,
       _content = content,
-      _contentSize = contentSize;
+      _contentSize = contentSize,
+      _blurBackground = blurBackground;
 
   // components
   late final PositionComponent _root;
-  late final RectangleComponent _blurLayer;
+  RectangleComponent? _blurLayer;
   late final DialogContainer _dialogContainer;
 
   @override
@@ -47,8 +60,9 @@ class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _setUpBlurLayer() {
+    if (!_blurBackground) return;
     _blurLayer = RectangleComponent(size: game.canvasSize / game.worldToScreenScale, paint: Paint()..color = AppTheme.overlayBlur);
-    _root.add(_blurLayer);
+    _root.add(_blurLayer!);
   }
 
   void _setUpDialog() {

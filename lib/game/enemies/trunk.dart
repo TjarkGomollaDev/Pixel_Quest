@@ -15,7 +15,7 @@ import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-enum TrunkState implements AnimationState {
+enum _TrunkState implements AnimationState {
   idle('Idle', 18),
   run('Run', 14),
   attack('Attack', 11, loop: false),
@@ -28,9 +28,15 @@ enum TrunkState implements AnimationState {
   @override
   final bool loop;
 
-  const TrunkState(this.fileName, this.amount, {this.loop = true});
+  const _TrunkState(this.fileName, this.amount, {this.loop = true});
 }
 
+/// A patrolling enemy that can stop, aim at the player, and shoot projectiles.
+///
+/// The Trunk moves back and forth within a configured range. If the player enters
+/// its attack range and stands in front of it, the Trunk switches to a shooting
+/// behavior. After an attack it can stay “combat ready” for a bit, before returning
+/// to normal patrol movement.
 class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOnMiniMap, HasGameReference<PixelQuest> {
   // constructor parameters
   final double _offsetNeg;
@@ -163,15 +169,15 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.Top) {
+    if (collisionSide == CollisionSide.top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
       game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
-      animationTickers![TrunkState.attack]?.onComplete?.call();
-      current = TrunkState.hit;
-      animationTickers![TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
+      animationTickers![_TrunkState.attack]?.onComplete?.call();
+      current = _TrunkState.hit;
+      animationTickers![_TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
       _player.collidedWithEnemy(collisionSide);
     }
@@ -195,9 +201,9 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
   }
 
   void _loadAllSpriteAnimations() {
-    final loadAnimation = spriteAnimationWrapper<TrunkState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in TrunkState.values) state: loadAnimation(state)};
-    current = TrunkState.run;
+    final loadAnimation = spriteAnimationWrapper<_TrunkState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
+    animations = {for (var state in _TrunkState.values) state: loadAnimation(state)};
+    current = _TrunkState.run;
   }
 
   void _setUpRange() {
@@ -232,7 +238,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     _wasShooting = false;
     if (_pendingDirection == null) {
       // since the trunk is already standing during his break, the run animation must not be triggered
-      current = TrunkState.run;
+      current = _TrunkState.run;
     } else {
       // if the trunk attacks during the break at the borders, the timer should be reset after the attack
       _pauseTimer = _pauseDuration;
@@ -257,7 +263,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
       return;
     }
 
-    if (_accelProgress == 0) current = TrunkState.run;
+    if (_accelProgress == 0) current = _TrunkState.run;
 
     // movement
     final currentSpeed = _calculateCurrentSpeed(dt);
@@ -268,7 +274,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
 
   void _startDirectionChange(int newDirection) {
     // change of direction recognized, but still pending
-    current = TrunkState.idle;
+    current = _TrunkState.idle;
     _pendingDirection = newDirection;
 
     // reset acceleration and timer
@@ -321,7 +327,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
   void _startShooting() {
     _isShooting = true;
     _wasShooting = true;
-    current = TrunkState.idle;
+    current = _TrunkState.idle;
     _shoot();
     _shootTimer.start();
   }
@@ -329,17 +335,17 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
   void _stopShooting() {
     _isShooting = false;
     _shootTimer.stop();
-    animationTickers![TrunkState.attack]?.onComplete?.call();
-    current = TrunkState.idle;
+    animationTickers![_TrunkState.attack]?.onComplete?.call();
+    current = _TrunkState.idle;
   }
 
   void _shoot() async {
-    current = TrunkState.attack;
-    await animationTickers![TrunkState.attack]!.completed;
+    current = _TrunkState.attack;
+    await animationTickers![_TrunkState.attack]!.completed;
     if (!_isShooting || _gotStomped) return;
     _spawnBullet();
     game.audioCenter.playSoundIf(Sfx.trunkShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
-    current = TrunkState.idle;
+    current = _TrunkState.idle;
   }
 
   void _spawnBullet() {
