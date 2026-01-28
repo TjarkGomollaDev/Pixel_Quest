@@ -144,7 +144,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
     double offset = chainSize * 2;
 
     // exactly two chain elements fit into a tile and a tile is left free at both ends
-    for (var i = 0; i < length * 2 - 4; i++) {
+    for (int i = 0; i < length * 2 - 4; i++) {
       final chain =
           DebugSpriteComponent(
               sprite: chainSprite,

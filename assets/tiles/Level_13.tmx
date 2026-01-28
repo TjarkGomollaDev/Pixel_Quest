@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="80" height="20">
   <properties>
-   <property name="BackgroundType" value="Green"/>
+   <property name="BackgroundType" value="green"/>
   </properties>
   <data encoding="csv">
 4,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,
@@ -35,7 +35,7 @@
     <property name="offsetPos" type="float" value="10"/>
    </properties>
   </object>
-  <object id="86" name="Finish" type="Finish" x="368" y="208" width="64" height="64"/>
+  <object id="86" name="Finish" type="Finish" x="112" y="160" width="64" height="64"/>
   <object id="88" name="ArrowUp" type="ArrowUp" x="80" y="16" width="32" height="32"/>
   <object id="89" name="Start" type="Start" x="48" y="208" width="64" height="64"/>
   <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="32" width="16" height="16">

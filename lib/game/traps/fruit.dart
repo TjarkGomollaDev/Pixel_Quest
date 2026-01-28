@@ -101,7 +101,7 @@ class Fruit extends SpriteAnimationGroupComponent
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_FruitState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
     animations = {
-      for (var state in _FruitState.values)
+      for (final state in _FruitState.values)
         // small adjustment here, as we are not using the enum name for the fruit but the name from the class
         state: state == _FruitState.idle
             ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, GameSettings.stepTime, _textureSize)

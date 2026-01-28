@@ -1,16 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:pixel_adventure/game/utils/background_parallax.dart';
-
-enum LevelBaseBlock {
-  gras,
-  mud,
-  sand;
-
-  static const LevelBaseBlock defaultBaseBlock = mud;
-
-  static LevelBaseBlock fromName(String name) => LevelBaseBlock.values.firstWhere((e) => e.name == name, orElse: () => defaultBaseBlock);
-}
+import 'package:pixel_adventure/game/background/background.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map_helper.dart';
 
 class WorldMetadata {
   final String uuid;
@@ -19,7 +10,7 @@ class WorldMetadata {
   final String titleFileName;
   final String foregroundFileName;
   final String miniMapFrameFileName;
-  final BackgroundSzene backgroundSzene;
+  final BackgroundScene backgroundScene;
   final LevelBaseBlock baseBlock;
 
   const WorldMetadata._({
@@ -29,7 +20,7 @@ class WorldMetadata {
     required this.titleFileName,
     required this.foregroundFileName,
     required this.miniMapFrameFileName,
-    required this.backgroundSzene,
+    required this.backgroundScene,
     required this.baseBlock,
   });
 
@@ -41,7 +32,7 @@ class WorldMetadata {
       titleFileName: map['titleFileName'] as String,
       foregroundFileName: map['foregroundFileName'] as String,
       miniMapFrameFileName: map['miniMapFrameFileName'] as String,
-      backgroundSzene: BackgroundSzene.fromName(map['backgroundSzene'] as String),
+      backgroundScene: BackgroundScene.fromName(map['backgroundScene'] as String)!,
       baseBlock: LevelBaseBlock.fromName(map['baseBlock'] as String),
     );
   }

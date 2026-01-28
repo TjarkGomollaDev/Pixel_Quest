@@ -141,7 +141,7 @@ class BlueBird extends SpriteAnimationGroupComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_BlueBirdState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _BlueBirdState.values) state: loadAnimation(state)};
+    animations = {for (final state in _BlueBirdState.values) state: loadAnimation(state)};
     current = _BlueBirdState.fly;
   }
 

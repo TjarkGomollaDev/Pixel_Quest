@@ -139,7 +139,7 @@ class Chicken extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_ChickenState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _ChickenState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _ChickenState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _ChickenState.idle);
   }
 

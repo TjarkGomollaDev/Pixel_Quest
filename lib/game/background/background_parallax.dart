@@ -1,41 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:pixel_adventure/game/background/background_scene.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
-
-enum BackgroundSzene {
-  szene1('Szene 1', 4),
-  szene2('Szene 2', 5),
-  szene3('Szene 3', 4),
-  szene4('Szene 4', 5),
-  szene5('Szene 5', 3),
-  szene6('Szene 6', 4);
-
-  final String fileName;
-  final int amount;
-  const BackgroundSzene(this.fileName, this.amount);
-
-  static const BackgroundSzene defaultSzene = BackgroundSzene.szene1;
-  static BackgroundSzene fromName(String name) => BackgroundSzene.values.firstWhere((e) => e.name == name, orElse: () => defaultSzene);
-}
-
-enum BackgroundColor {
-  blue('Blue'),
-  brown('Brown'),
-  gray('Gray'),
-  green('Green'),
-  pink('Pink'),
-  purple('Purple'),
-  yellow('Yellow');
-
-  final String fileName;
-  const BackgroundColor(this.fileName);
-
-  static const BackgroundColor defaultColor = BackgroundColor.blue;
-  static BackgroundColor fromName(String name) => BackgroundColor.values.firstWhere((e) => e.name == name, orElse: () => defaultColor);
-}
 
 /// Parallax background component.
 ///
@@ -67,8 +37,9 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     initVisibility(show);
   }
 
-  factory BackgroundParallax.szene({
-    required BackgroundSzene szene,
+  /// Creates a multi-layer parallax background from a [BackgroundScene] folder.
+  factory BackgroundParallax.scene({
+    required BackgroundScene scene,
     Vector2? baseVelocity,
     Vector2? velocityMultiplierDelta,
     Vector2? position,
@@ -76,7 +47,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     bool show = true,
   }) {
     return BackgroundParallax._(
-      layers: [for (var i = 1; i <= szene.amount; i++) ParallaxImageData('$_path${szene.fileName}/$i$_pathEnd')],
+      layers: [for (int i = 1; i <= scene.amount; i++) ParallaxImageData('$_path${scene.fileName}/$i$_pathEnd')],
       baseVelocity: baseVelocity ?? GameSettings.parallaxBaseVelocityLevel,
       velocityMultiplierDelta: velocityMultiplierDelta ?? GameSettings.velocityMultiplierDelta,
       repeat: ImageRepeat.repeatX,
@@ -87,6 +58,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     );
   }
 
+  /// Creates a single-image colored tile background from a [BackgroundColor] asset.
   factory BackgroundParallax.colored({
     required BackgroundColor color,
     Vector2? baseVelocity,
@@ -107,7 +79,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
 
   // animation settings
   static const String _path = 'Background/';
-  static const String _pathAddColored = 'Colored TilesZ';
+  static const String _pathAddColored = 'Colored Tiles/';
   static const String _pathEnd = '.png';
 
   @override
@@ -124,5 +96,38 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
       repeat: _repeat,
       fill: _fill,
     );
+  }
+
+  /// Builds a background from a string identifier.
+  ///
+  /// Expects an enum `name` of [BackgroundScene] or [BackgroundColor].
+  /// Returns `null` if [type] is `null`, blank, or not recognized.
+  static BackgroundParallax? fromType({
+    String? type,
+    Vector2? baseVelocity,
+    Vector2? velocityMultiplierDelta,
+    Vector2? position,
+    Vector2? size,
+    bool show = true,
+  }) {
+    final trimmed = type?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+
+    final scene = BackgroundScene.fromName(trimmed, orNull: true);
+    if (scene != null) {
+      return BackgroundParallax.scene(
+        scene: scene,
+        baseVelocity: baseVelocity,
+        velocityMultiplierDelta: velocityMultiplierDelta,
+        position: position,
+        size: size,
+        show: show,
+      );
+    }
+
+    final color = BackgroundColor.fromName(trimmed, orNull: true);
+    return color == null
+        ? null
+        : BackgroundParallax.colored(color: color, baseVelocity: baseVelocity, position: position, size: size, show: show);
   }
 }

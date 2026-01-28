@@ -115,7 +115,7 @@ class ArrowUp extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<ArrowUpState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in ArrowUpState.values) state: loadAnimation(state)};
+    final animations = {for (final state in ArrowUpState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: ArrowUpState.idle, isBottomCenter: false);
   }
 }

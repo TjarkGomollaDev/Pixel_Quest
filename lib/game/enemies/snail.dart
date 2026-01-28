@@ -95,7 +95,7 @@ class Snail extends PositionComponent
 
   // shell movement
   late double _shellMoveDirection;
-  final double _shellMoveSpeed = 220; // [Adjustable]
+  final double _shellMoveSpeed = 180; // [Adjustable]
 
   // status
   bool _snailGotStomped = false;
@@ -182,7 +182,7 @@ class Snail extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_SnailState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _SnailState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _SnailState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SnailState.snailWalk);
   }
 

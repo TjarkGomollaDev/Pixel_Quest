@@ -84,15 +84,42 @@ abstract class AppTheme {
   static const goldBlock = yellowDark;
   static const orangeBlock = orangeDark;
 
-  // Mini Map Background Colors
-  static const skyBlockWorld_1 = Color.fromARGB(255, 2, 121, 247);
-  static const skyBlockWorld_2 = Color.fromARGB(255, 8, 117, 251);
-  static const skyBlockWorld_3 = Color.fromARGB(255, 0, 127, 243);
-
   // Mini Map Marker Colors
   static const playerMarker = redDark;
   static const entityMarkerStandard = white;
   static const entityMarkerSpecial = grayLight4;
+
+  // Mini Map Background Colors
+  static const ({Color a, Color b, Color c}) miniMapBgScene1 = (
+    a: Color.fromARGB(255, 2, 121, 247),
+    b: Color.fromARGB(255, 8, 117, 251),
+    c: Color.fromARGB(255, 0, 127, 243),
+  );
+  static const ({Color a, Color b, Color c}) miniMapBgScene2 = (
+    a: Color.fromARGB(255, 79, 107, 161),
+    b: Color.fromARGB(255, 86, 112, 161),
+    c: Color.fromARGB(255, 94, 117, 161),
+  );
+  static const ({Color a, Color b, Color c}) miniMapBgScene3 = (
+    a: Color.fromARGB(255, 168, 216, 224),
+    b: Color.fromARGB(255, 176, 224, 232),
+    c: Color.fromARGB(255, 184, 232, 240),
+  );
+  static const ({Color a, Color b, Color c}) miniMapBgScene4 = (
+    a: Color.fromARGB(255, 96, 68, 160),
+    b: Color.fromARGB(255, 105, 75, 164),
+    c: Color.fromARGB(255, 112, 82, 168),
+  );
+  static const ({Color a, Color b, Color c}) miniMapBgScene5 = (
+    a: Color.fromARGB(255, 184, 184, 176),
+    b: Color.fromARGB(255, 192, 192, 184),
+    c: Color.fromARGB(255, 200, 200, 192),
+  );
+  static const ({Color a, Color b, Color c}) miniMapBgScene6 = (
+    a: Color.fromARGB(255, 70, 70, 101),
+    b: Color.fromARGB(255, 72, 72, 106),
+    c: Color.fromARGB(255, 73, 73, 108),
+  );
 
   // #### ALL TEXT STYLES ######################################
 

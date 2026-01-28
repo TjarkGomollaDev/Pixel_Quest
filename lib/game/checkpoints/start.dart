@@ -76,7 +76,7 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_StartState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _StartState.values) state: loadAnimation(state)};
+    animations = {for (final state in _StartState.values) state: loadAnimation(state)};
     current = _StartState.idle;
   }
 

@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/utils/corner_outline.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_adventure/game/utils/rounded_sprite_component.dart';
 
 /// `_BaseBtn` is a mixin providing consistent and safe button behavior for Flame.
 ///
@@ -323,7 +324,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     // copy list before removing
     final effects = List<Effect>.from(children.whereType<Effect>());
 
-    for (var effect in effects) {
+    for (final effect in effects) {
       effect.controller.setToEnd();
       effect.removeFromParent();
     }
@@ -392,6 +393,7 @@ enum SpriteBtnType {
   achievements('Achievements'),
   leaderboard('Leaderboard'),
   levels('Levels'),
+  edit('Edit'),
   next('Next'),
   play('Play'),
   pause('Pause'),
@@ -640,6 +642,7 @@ abstract class RadioOption {
     TextStyle? textStyle,
     Vector2? spriteSize,
     Vector2? spriteOffset,
+    double? spriteCornerRadius,
   });
 }
 
@@ -660,6 +663,7 @@ class RadioOptionText extends RadioOption {
     TextStyle? textStyle,
     Vector2? spriteSize,
     Vector2? spriteOffset,
+    double? spriteCornerRadius,
   }) {
     return TextComponent(
       text: text,
@@ -687,12 +691,14 @@ class RadioOptionSprite extends RadioOption {
     TextStyle? textStyle,
     Vector2? spriteSize,
     Vector2? spriteOffset,
+    double? spriteCornerRadius,
   }) {
-    return SpriteComponent(
+    return RoundedSpriteComponent(
       sprite: loadSprite(game, path),
       position: btnSize / 2 + (spriteOffset ?? Vector2.zero()),
       anchor: Anchor.center,
       size: spriteSize,
+      cornerRadius: spriteCornerRadius ?? 0,
     );
   }
 }
@@ -714,6 +720,7 @@ class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, Tap
   final TextStyle? _textStyle;
   final Vector2? _spriteSize;
   final Vector2? _spriteOffset;
+  final double? _spriteCornerRadius;
 
   _RadioBtn({
     required RadioOption option,
@@ -724,10 +731,12 @@ class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, Tap
     TextStyle? textStyle,
     Vector2? spriteSize,
     Vector2? spriteOffset,
+    double? spriteCornerRadius,
   }) : _option = option,
        _textStyle = textStyle,
        _spriteSize = spriteSize,
-       _spriteOffset = spriteOffset {
+       _spriteOffset = spriteOffset,
+       _spriteCornerRadius = spriteCornerRadius {
     _setUpBaseBtn(onPressed: onPressed, show: show, holdMode: false);
   }
 
@@ -742,7 +751,14 @@ class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, Tap
   }
 
   void _setUpContent() {
-    _content = _option.buildContent(game: game, btnSize: size, textStyle: _textStyle, spriteSize: _spriteSize, spriteOffset: _spriteOffset);
+    _content = _option.buildContent(
+      game: game,
+      btnSize: size,
+      textStyle: _textStyle,
+      spriteSize: _spriteSize,
+      spriteOffset: _spriteOffset,
+      spriteCornerRadius: _spriteCornerRadius,
+    );
     add(_content);
   }
 
@@ -771,6 +787,7 @@ class RadioComponent extends PositionComponent {
   final TextStyle? _textStyle;
   final Vector2? _spriteSize;
   final Vector2? _spriteOffset;
+  final double? _spriteCornerRadius;
   final int _initialIndex;
   final bool _triggerInitialOnSelected;
   final double _outlineCornerLength;
@@ -786,6 +803,7 @@ class RadioComponent extends PositionComponent {
     TextStyle? textStyle,
     Vector2? spriteSize,
     Vector2? spriteOffset,
+    double? spriteCornerRadius,
     int initialIndex = 0,
     bool triggerInitialOnSelected = false,
     super.anchor = Anchor.topLeft,
@@ -801,6 +819,7 @@ class RadioComponent extends PositionComponent {
        _textStyle = textStyle,
        _spriteSize = spriteSize,
        _spriteOffset = spriteOffset,
+       _spriteCornerRadius = spriteCornerRadius,
        _spacingBetweenOptions = spacingBetweenOptions,
        _optionSize = optionSize ?? defaultOptionSize,
        _options = options,
@@ -835,7 +854,7 @@ class RadioComponent extends PositionComponent {
 
   void _setUpRadioBtns() {
     _selectedIndex = _initialIndex.clamp(0, _options.length - 1);
-    for (var i = 0; i < _options.length; i++) {
+    for (int i = 0; i < _options.length; i++) {
       // calculate center
       final center = Vector2(_optionSize.x / 2 + i * (_optionSize.x + _spacingBetweenOptions), _optionSize.y / 2);
       _centerOfIndex.add(center);
@@ -849,6 +868,7 @@ class RadioComponent extends PositionComponent {
         textStyle: _textStyle,
         spriteSize: _spriteSize,
         spriteOffset: _spriteOffset,
+        spriteCornerRadius: _spriteCornerRadius,
         show: _show,
       );
       _btns.add(btn);
@@ -873,7 +893,7 @@ class RadioComponent extends PositionComponent {
     if (index == _selectedIndex) return;
 
     // lock all buttons while switching + running callback.
-    for (var btn in _btns) {
+    for (final btn in _btns) {
       btn.lockExecuting();
     }
 
@@ -915,7 +935,7 @@ class RadioComponent extends PositionComponent {
   /// Shows the entire radio component.
   void show() {
     _outline.show();
-    for (var btn in _btns) {
+    for (final btn in _btns) {
       btn.show();
     }
   }
@@ -924,7 +944,7 @@ class RadioComponent extends PositionComponent {
   /// Buttons become non-interactive because their hitbox size is set to zero.
   void hide() {
     _outline.hide();
-    for (var btn in _btns) {
+    for (final btn in _btns) {
       btn.hide();
     }
   }

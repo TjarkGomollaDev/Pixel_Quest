@@ -135,7 +135,7 @@ class SpikeHead extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_SpikeHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _SpikeHeadState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _SpikeHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SpikeHeadState.idle, isBottomCenter: false);
   }
 

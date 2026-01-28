@@ -158,7 +158,7 @@ class Ghost extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_GhostState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _GhostState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _GhostState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _GhostState.idle);
   }
 
@@ -260,7 +260,7 @@ class Ghost extends PositionComponent
     final particleBasePosition = position + particleBaseOffset;
 
     // spawn particles from a list with a small delay between
-    for (var i = 0; i < _particleOffsets.length; i++) {
+    for (int i = 0; i < _particleOffsets.length; i++) {
       if (_particleDelays[i] > 0) {
         await Future.delayed(Duration(milliseconds: _particleDelays[i]));
       }

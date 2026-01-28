@@ -26,6 +26,13 @@
     }
   },
 
+  "inventoryTitle": "Inventar",
+  "inventoryLabelCharacter": "Dein Charakter",
+  "inventoryLabelLevelBackground": "Level-Optik",
+  "inventoryLabelLoadingBackground": "Loading Screen",
+  "inventoryOptionDefault": "Standard",
+  "inventoryOptionRandom": "Zufällig",
+
   "loadingGame": "Spiel wird geladen",
   "loadingLevel": "Erstelle Level {world}.{level}",
   "@loadingLevel" : {

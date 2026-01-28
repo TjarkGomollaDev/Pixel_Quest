@@ -88,7 +88,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     position = _startPosition;
 
     // choose correct dummy character
-    changeChracter(game.storageCenter.settings.character);
+    changeChracter(game.storageCenter.inventory.character);
     current = PlayerState.fall;
 
     // fall in animation
@@ -133,7 +133,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   Future<void> _singleSwing(int token) async {
-    for (var i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       if (token != animationToken) return;
       await _moveToCorner(_swingCornerPoints[i]);
     }

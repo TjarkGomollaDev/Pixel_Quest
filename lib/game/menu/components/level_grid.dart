@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/menu/widgets/level_tile.dart';
+import 'package:pixel_adventure/game/menu/components/level_tile.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 
@@ -41,13 +41,13 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Vis
   void hide() {
     isVisible = false;
     priority = -1;
-    for (var tile in _grid.values) {
+    for (final tile in _grid.values) {
       tile.opacity = 0;
     }
   }
 
   void _setUpGrid() {
-    final levels = game.staticCenter.allLevelsInOneWorld(_worldUuid);
+    final levels = game.staticCenter.allLevelsInWorldById(_worldUuid);
     int index = 0;
     for (int i = 0; i < 4 && index < levels.length; i++) {
       for (int j = 0; j < 4 && index < levels.length; j++) {
@@ -71,7 +71,7 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Vis
     show();
     final x = _grid.values.last;
     final moveOffset = Vector2(toLeft ? _moveTileDistanceAnimation : -_moveTileDistanceAnimation, 0);
-    for (var tile in _grid.values) {
+    for (final tile in _grid.values) {
       final endPosition = tile.position.clone();
       tile.position += moveOffset;
 

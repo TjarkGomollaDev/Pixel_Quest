@@ -93,7 +93,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
 
   // btn margin and spacing
   static const double _btnLeftMargin = 4; // [Adjustable]
-  static const double _btnSpacing = 3; // [Adjustable]
+  static const double _scrollBtnsSpacing = 3; // [Adjustable]
 
   // arrow layer
   static const double _arrowLayerSpacing = 1; // [Adjustable]
@@ -159,7 +159,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// ends of the frame so that it visually aligns with the mini map view.
   void _setUpFrame() {
     _frame = VisibleSpriteComponent(
-      sprite: loadSprite(game, 'Mini Map/${game.staticCenter.getWorld(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
+      sprite: loadSprite(game, 'Mini Map/${game.staticCenter.worldById(_levelMetadata.worldUuid).miniMapFrameFileName}.png'),
       show: _showAtStart ? _inistialState : false,
     );
     add(_frame);
@@ -200,6 +200,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       targetSize: targetSize,
       levelWidth: _levelWidth,
       player: _player,
+      levelMetadata: _levelMetadata,
       entitiesAboveForeground: _entitiesAboveForeground,
       entitiesBehindForeground: _entitiesBehindForeground,
       position: viewPosition,
@@ -214,6 +215,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// Manual scroll temporarily disables the auto-follow mode of [`MiniMapView`]
   /// until the player moves again.
   void _setUpBtns() {
+    // hide btn
     _hideBtn = SpriteToggleBtn.fromType(
       type: SpriteBtnType.downSmall,
       type_2: SpriteBtnType.upSmall,
@@ -227,6 +229,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       show: _showAtStart,
     );
 
+    // scroll right btn
     _scrollRightBtn = SpriteBtn.fromType(
       type: SpriteBtnType.nextSmall,
       onPressed: () => _miniMapView.scrollManual(1),
@@ -235,11 +238,15 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       show: _showAtStart ? _inistialState : false,
     );
 
+    // scroll left btn
     _scrollLeftBtn = SpriteBtn.fromType(
       type: SpriteBtnType.previousSmall,
       onPressed: () => _miniMapView.scrollManual(-1),
       holdMode: true,
-      position: Vector2(_scrollRightBtn.position.x, _scrollRightBtn.position.y - SpriteBtnType.btnSizeSmallCorrected.y - _btnSpacing),
+      position: Vector2(
+        _scrollRightBtn.position.x,
+        _scrollRightBtn.position.y - SpriteBtnType.btnSizeSmallCorrected.y - _scrollBtnsSpacing,
+      ),
       show: _showAtStart ? _inistialState : false,
     );
 

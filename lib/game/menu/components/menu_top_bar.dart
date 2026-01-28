@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/animations/star.dart';
+import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/rrect.dart';
@@ -9,6 +10,7 @@ import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game.dart';
 import 'package:pixel_adventure/game/game_router.dart';
 
+/// Top bar for the menu page. Shows the world's total star count and provides quick navigation buttons.
 class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   // constructor parameters
   final int _startWorldIndex;
@@ -20,6 +22,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   }
   // btns
   late final SpriteBtn _shopBtn;
+  late final SpriteBtn _inventoryBtn;
   late final SpriteBtn _settingsBtn;
 
   // stars count
@@ -55,9 +58,9 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     addAll([_starBg, _starItem]);
 
     // world star counts text
-    for (var world in game.staticCenter.allWorlds) {
+    for (final world in game.staticCenter.allWorlds()) {
       final text = VisibleTextComponent(
-        text: '${game.storageCenter.getWorld(world.uuid).stars}/48',
+        text: '${game.storageCenter.worldById(world.uuid).stars}/48',
         anchor: Anchor.centerLeft,
         position: _starBg.position + Vector2(_starBg.size.x + GameSettings.hudBtnTextSpacing, 0),
         textRenderer: AppTheme.hudText.asTextPaint,
@@ -76,7 +79,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpBtns() {
     // positioning
-    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSizeCorrected.x * 1.5 - GameSettings.hudBtnSpacing, _starBg.position.y);
+    final btnBasePosition = Vector2(size.x - SpriteBtnType.btnSizeCorrected.x * 2.5 - GameSettings.hudBtnSpacing * 2, _starBg.position.y);
     final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + GameSettings.hudBtnSpacing, 0);
 
     // shop btn
@@ -86,14 +89,21 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
       position: btnBasePosition,
     );
 
+    // inventory btn
+    _inventoryBtn = SpriteBtn.fromType(
+      type: SpriteBtnType.edit,
+      onPressed: () => game.eventBus.emit(InventoryStateChanged(PageAction.opend)),
+      position: _shopBtn.position + btnOffset,
+    );
+
     // settings btn
     _settingsBtn = SpriteBtn.fromType(
       type: SpriteBtnType.settings,
       onPressed: () => game.router.pushNamed(RouteNames.settings),
-      position: _shopBtn.position + btnOffset,
+      position: _inventoryBtn.position + btnOffset,
     );
 
-    addAll([_shopBtn, _settingsBtn]);
+    addAll([_shopBtn, _inventoryBtn, _settingsBtn]);
   }
 
   void _updateStarsCount({required int index, required int stars}) {
@@ -114,7 +124,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   Future<void> starsCountAnimation({required int index, required int newStars, required int totalStars}) async {
     final token = ++_starsCountToken;
-    for (var i = 0; i < newStars; i++) {
+    for (int i = 0; i < newStars; i++) {
       if (token != _starsCountToken) return;
       _updateStarsCount(index: index, stars: totalStars - newStars + i + 1);
       await _animatedStar.fallToPopIn(_starItem.position);

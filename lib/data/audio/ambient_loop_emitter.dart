@@ -5,6 +5,11 @@ import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/utils/camera_culling.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Mixin for entities that should automatically start/stop an ambient loop sound.
+///
+/// The emitter periodically checks whether its [hitbox] is visible to the camera
+/// and optionally applies an additional [guard]. Based on that, it registers or
+/// unregisters itself with [AmbientLoopManager].
 mixin AmbientLoopEmitter on Component, HasGameReference<PixelQuest> {
   // configs
   late final LoopSfx _loop;
@@ -36,6 +41,7 @@ mixin AmbientLoopEmitter on Component, HasGameReference<PixelQuest> {
     super.onRemove();
   }
 
+  /// Configures which loop to emit and which hitbox to use for visibility checks.
   void configureAmbientLoop({required LoopSfx loop, required ShapeHitbox hitbox, bool Function()? guard, bool guardFadeOut = true}) {
     _loop = loop;
     _ambientHitbox = hitbox;

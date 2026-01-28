@@ -53,7 +53,7 @@ mixin DummyCharacter on SpriteAnimationGroupComponent, HasGameReference<PixelQue
   }
 
   void _loadAllSpriteAnimations() {
-    for (var character in PlayerCharacter.values) {
+    for (final character in PlayerCharacter.values) {
       final loadAnimation = spriteAnimationWrapper<PlayerState>(
         game,
         '$_path${character.fileName}/',
@@ -64,7 +64,7 @@ mixin DummyCharacter on SpriteAnimationGroupComponent, HasGameReference<PixelQue
       _allCharacterAnimations[character] = {for (final s in PlayerState.values) s: loadAnimation(s)};
     }
 
-    changeChracter(game.storageCenter.settings.character);
+    changeChracter(game.storageCenter.inventory.character);
     current = PlayerState.idle;
   }
 

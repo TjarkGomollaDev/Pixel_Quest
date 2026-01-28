@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
@@ -16,30 +17,40 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
 
   Spotlight({required Vector2 targetCenter, double targetRadius = playerTargetRadius})
     : _targetRadius = targetRadius,
-      _targetCenter = targetCenter;
+      _targetCenter = targetCenter {
+    size = game.size;
+  }
 
   // default target radius for player
   static const double playerTargetRadius = 60;
 
-  // spotlight radius
+  // current spotlight radius
   late double _radius;
+
+  // max spotlight radius
+  late final double _fullRadius;
+
+  // getter
+  Vector2 get targetCenter => _targetCenter;
 
   @override
   FutureOr<void> onLoad() {
-    _radius = game.size.length;
+    _computeFullRadius();
+    debugPrint(targetCenter.toString());
+    _radius = _fullRadius;
     priority = GameSettings.spotlightAnimationLayer;
     return super.onLoad();
   }
 
   @override
   void render(Canvas canvas) {
+    final rect = game.camera.visibleWorldRect;
+
     // create a new layer to safely apply the blend mode
-    final layerPaint = Paint();
-    canvas.saveLayer(Rect.fromLTWH(game.camera.viewfinder.position.x, 0, game.size.x, game.size.y), layerPaint);
+    canvas.saveLayer(rect, Paint());
 
     // draw a full black rectangle covering the entire screen
-    final paint = Paint()..color = AppTheme.black;
-    canvas.drawRect(game.camera.visibleWorldRect, paint);
+    canvas.drawRect(rect, Paint()..color = AppTheme.black);
 
     // draw a transparent circle to "cut out" the spotlight
     final clearPaint = Paint()
@@ -49,6 +60,26 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
 
     canvas.restore();
     super.render(canvas);
+  }
+
+  void _computeFullRadius({double buffer = 2.0}) {
+    final rect = Rect.fromLTWH(0, 0, size.x, size.y);
+
+    final corners = [
+      Vector2(rect.left, rect.top),
+      Vector2(rect.right, rect.top),
+      Vector2(rect.left, rect.bottom),
+      Vector2(rect.right, rect.bottom),
+    ];
+
+    // determine maximum distance
+    double maxDist = 0;
+    for (final corner in corners) {
+      final d = (corner - _targetCenter).length;
+      if (d > maxDist) maxDist = d;
+    }
+    debugPrint(maxDist.toString());
+    _fullRadius = maxDist + buffer;
   }
 
   /// Animates the spotlight from full screen to the target radius
@@ -61,7 +92,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
       FunctionEffect<Spotlight>(
         (spotlight, progress) {
           // interpolate from full screen to target radius
-          _radius = game.size.length - (game.size.length - _targetRadius) * progress;
+          _radius = _fullRadius - (_fullRadius - _targetRadius) * progress;
         },
         CurvedEffectController(duration, Curves.easeInOutCubicEmphasized),
         onComplete: () {
@@ -78,7 +109,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest> {
   Future<void> expandToFull({double duration = 2}) {
     final completer = Completer<void>();
     final startRadius = _radius;
-    final endRadius = game.size.length;
+    final endRadius = _fullRadius;
 
     // add visual effect
     add(

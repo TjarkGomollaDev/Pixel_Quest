@@ -137,7 +137,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
     final count = (_radius - GameSettings.tileSize / 2 - SpikedBall.gridSize.x) / GameSettings.tileSize * 2 + 1;
     final baseRadius = GameSettings.tileSize / 2;
     final chainSprite = loadSprite(game, _pathChain);
-    for (var i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
         ..anchor = Anchor.center
         ..debugMode = GameSettings.customDebugMode
@@ -181,7 +181,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   void _transformSpikedBall() => _applyTransform(_spikedBall, _radiusToCenterOfSpikedBall);
 
   void _transformChain() {
-    for (var chainItem in _chainList) {
+    for (final chainItem in _chainList) {
       _applyTransform(chainItem.chainComponent, chainItem.radiusToCenterOfChain);
     }
   }

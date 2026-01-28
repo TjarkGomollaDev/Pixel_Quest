@@ -26,6 +26,13 @@
     }
   },
 
+  "inventoryTitle": "Inventory",
+  "inventoryLabelCharacter": "Your Character",
+  "inventoryLabelLevelBackground": "Level Stage",
+  "inventoryLabelLoadingBackground": "Loading Screen",
+  "inventoryOptionDefault": "Default",
+  "inventoryOptionRandom": "Random",
+
   "loadingGame": "Loading Game",
   "loadingLevel": "Building stage {world}.{level}",
   "@loadingLevel" : {

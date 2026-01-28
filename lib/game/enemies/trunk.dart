@@ -202,7 +202,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_TrunkState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _TrunkState.values) state: loadAnimation(state)};
+    animations = {for (final state in _TrunkState.values) state: loadAnimation(state)};
     current = _TrunkState.run;
   }
 

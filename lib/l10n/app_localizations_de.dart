@@ -68,6 +68,24 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get inventoryTitle => 'Inventar';
+
+  @override
+  String get inventoryLabelCharacter => 'Dein Charakter';
+
+  @override
+  String get inventoryLabelLevelBackground => 'Level-Optik';
+
+  @override
+  String get inventoryLabelLoadingBackground => 'Loading Screen';
+
+  @override
+  String get inventoryOptionDefault => 'Standard';
+
+  @override
+  String get inventoryOptionRandom => 'Zufällig';
+
+  @override
   String get loadingGame => 'Spiel wird geladen';
 
   @override

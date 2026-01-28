@@ -1,5 +1,4 @@
 import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
 
 double _clamp01(double value) => value.toDouble().clamp(0, 1);
@@ -11,7 +10,6 @@ class SettingsEntity {
   final double musicVolume;
   final JoystickSetup joystickSetup;
   final bool showMiniMapAtStart;
-  final PlayerCharacter character;
 
   const SettingsEntity({
     required this.soundState,
@@ -19,7 +17,6 @@ class SettingsEntity {
     required this.musicVolume,
     required this.joystickSetup,
     required this.showMiniMapAtStart,
-    required this.character,
   });
 
   SettingsEntity.defaultSettings()
@@ -29,7 +26,6 @@ class SettingsEntity {
         musicVolume: 0.2,
         joystickSetup: JoystickSetup.defaultSetup,
         showMiniMapAtStart: true,
-        character: PlayerCharacter.defaultCharacter,
       );
 
   Map<String, dynamic> toMap() => {
@@ -38,7 +34,6 @@ class SettingsEntity {
     'musicVolume': musicVolume,
     'joystickSetup': joystickSetup.name,
     'showMiniMapAtStart': showMiniMapAtStart,
-    'character': character.name,
   };
 
   factory SettingsEntity.fromMap(Map<String, dynamic> map) {
@@ -48,7 +43,6 @@ class SettingsEntity {
       musicVolume: map['musicVolume'] as double,
       joystickSetup: JoystickSetup.fromName(map['joystickSetup'] as String),
       showMiniMapAtStart: map['showMiniMapAtStart'] as bool,
-      character: PlayerCharacter.fromName(map['character'] as String),
     );
   }
 
@@ -58,7 +52,6 @@ class SettingsEntity {
     double? musicVolume,
     JoystickSetup? joystickSetup,
     bool? showMiniMapAtStart,
-    PlayerCharacter? character,
   }) {
     return SettingsEntity(
       soundState: soundState ?? this.soundState,
@@ -66,7 +59,6 @@ class SettingsEntity {
       musicVolume: musicVolume != null ? _clamp01(musicVolume) : this.musicVolume,
       joystickSetup: joystickSetup ?? this.joystickSetup,
       showMiniMapAtStart: showMiniMapAtStart ?? this.showMiniMapAtStart,
-      character: character ?? this.character,
     );
   }
 }

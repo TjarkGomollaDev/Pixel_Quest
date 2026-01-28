@@ -81,7 +81,7 @@ class Fan extends PositionComponent with FixedGridOriginalSizeGroupAnimation, Ha
 
   void _loadAllAnimation() {
     final loadAnimation = spriteAnimationWrapper<_FanState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _FanState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _FanState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _FanState.on);
   }
 

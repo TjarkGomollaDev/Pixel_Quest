@@ -212,6 +212,42 @@ abstract class AppLocalizations {
   /// **'Are you sure that you want to change the language to {language}?'**
   String settingsConfirmLanguage(String language);
 
+  /// No description provided for @inventoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get inventoryTitle;
+
+  /// No description provided for @inventoryLabelCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Character'**
+  String get inventoryLabelCharacter;
+
+  /// No description provided for @inventoryLabelLevelBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Level Stage'**
+  String get inventoryLabelLevelBackground;
+
+  /// No description provided for @inventoryLabelLoadingBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Screen'**
+  String get inventoryLabelLoadingBackground;
+
+  /// No description provided for @inventoryOptionDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get inventoryOptionDefault;
+
+  /// No description provided for @inventoryOptionRandom.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get inventoryOptionRandom;
+
   /// No description provided for @loadingGame.
   ///
   /// In en, this message translates to:

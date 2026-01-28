@@ -57,7 +57,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
     addAll([_nameTextLabel, _originTextLabel, _abilityTextLabel, _nameTextValue, _originTextValue, _abilityTextValue]);
 
     // initial display
-    setCharacterBio(game.storageCenter.settings.character, animation: false);
+    setCharacterBio(game.storageCenter.inventory.character, animation: false);
   }
 
   TextComponent _createTextComponent(String text, Vector2 position) =>

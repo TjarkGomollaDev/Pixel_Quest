@@ -84,7 +84,7 @@ class DotsIndicator extends PositionComponent {
     final centerY = offsetY + (diameter / 2);
 
     // render dots
-    for (var i = 0; i < _dotCount; i++) {
+    for (int i = 0; i < _dotCount; i++) {
       final cx = offsetX + _dotRadius + i * (diameter + _dotSpacing);
       final paint = (i == _activeIndex) ? _activePaint : _inactivePaint;
       canvas.drawCircle(Offset(cx, centerY), _dotRadius, paint);

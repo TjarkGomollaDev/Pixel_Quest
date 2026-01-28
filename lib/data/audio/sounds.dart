@@ -1,5 +1,6 @@
 part of 'package:pixel_adventure/data/audio/audio_center.dart';
 
+/// One-shot sound effects.
 enum Sfx {
   appearing('appearing'),
   disappearing('disappearing'),
@@ -35,6 +36,7 @@ enum Sfx {
   const Sfx(this.fileName);
 }
 
+/// Loopable sound effects.
 enum LoopSfx {
   saw('saw'),
   bird('bird'),
@@ -52,6 +54,7 @@ enum LoopSfx {
   const LoopSfx(this.fileName);
 }
 
+/// Background music tracks.
 enum BackgroundMusic {
   menu('menu'),
   win('win'),
@@ -66,13 +69,15 @@ enum BackgroundMusic {
   const BackgroundMusic(this.fileName);
 }
 
+/// Logical channel a sound effect belongs to.
+enum SfxType { ui, game, level, player }
+
+/// Global sound toggle state used across the game.
 enum SoundState {
   on,
   off;
 
   bool get enabled => this == SoundState.on;
-  static const SoundState defaultState = SoundState.off;
+  static const SoundState defaultState = SoundState.on;
   static SoundState fromName(String name) => SoundState.values.firstWhere((s) => s.name == name, orElse: () => defaultState);
 }
-
-enum SfxType { ui, game, level, player }

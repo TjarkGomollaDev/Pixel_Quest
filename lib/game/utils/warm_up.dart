@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:pixel_adventure/game/background/background.dart';
 import 'package:pixel_adventure/game/utils/misc_utils.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/game.dart';
@@ -33,7 +34,12 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
     final shaderMatrix = math64.Matrix4.identity(); // scale ist egal fürs warmup
     final paint = Paint()
       ..color = const Color(0x00000000)
-      ..shader = ImageShader(game.miniMapBackgroundPattern, TileMode.repeated, TileMode.repeated, shaderMatrix.storage);
+      ..shader = ImageShader(
+        game.miniMapPatternFor(BackgroundScene.defaultScene),
+        TileMode.repeated,
+        TileMode.repeated,
+        shaderMatrix.storage,
+      );
     final shaderWarm = _WarmUpDraw(paint);
     await game.camera.viewport.add(shaderWarm);
     await yieldFrame();
@@ -44,7 +50,7 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
     // warms up flame_tiled parsing and atlas/material setup by loading one TMX once
     final map =
         await TiledComponent.load(
-            '${game.staticCenter.allLevelsInOneWorldByIndex(0).first.tmxFileName}.tmx',
+            '${game.staticCenter.allLevelsInWorldByIndex(0).first.tmxFileName}.tmx',
             Vector2.all(GameSettings.tileSize),
           )
           ..priority = -99999;
@@ -56,7 +62,7 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
     map.removeFromParent();
 
     // warms up the loading overlay render path without showing animations or blocking input
-    await game.loadingOverlay.warmUp(game.staticCenter.allLevelsInOneWorldByIndex(0).first);
+    await game.loadingOverlay.warmUp(game.staticCenter.allLevelsInWorldByIndex(0).first);
 
     removeFromParent();
   }

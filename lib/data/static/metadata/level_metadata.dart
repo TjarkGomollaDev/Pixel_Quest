@@ -54,7 +54,7 @@ extension LevelMetadataListLookup on List<LevelMetadata> {
 
 extension LevelMetadataMapLookup on Map<String, List<LevelMetadata>> {
   Iterable<LevelMetadata> flat() sync* {
-    for (var levels in values) {
+    for (final levels in values) {
       yield* levels;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
+import 'package:pixel_adventure/game/level/player/player.dart';
 part 'package:pixel_adventure/game/events/game_events.dart';
 
 typedef EventListener<T extends GameEvent> = void Function(T event);

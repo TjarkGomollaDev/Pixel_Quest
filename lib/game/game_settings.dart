@@ -23,7 +23,7 @@ abstract class GameSettings {
   // hud
   static const double hudVerticalMargin = 10;
   static const double hudHorizontalMargin = 40;
-  static const double hudBtnSpacing = 7;
+  static const double hudBtnSpacing = 6;
   static const double hudBtnTextSpacing = 4;
   static const double hudSectionSpacing = 18;
   static const double hudBgTileSize = 19;

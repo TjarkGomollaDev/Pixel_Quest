@@ -105,7 +105,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_TrampolineState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _TrampolineState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _TrampolineState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _TrampolineState.idle);
   }
 }

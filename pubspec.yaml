@@ -76,17 +76,16 @@ flutter:
     - assets/data/
     - assets/images/Terrain/
     - assets/images/Background/
-    - assets/images/Background/Szene 1/
-    - assets/images/Background/Szene 2/
-    - assets/images/Background/Szene 3/
-    - assets/images/Background/Szene 4/
-    - assets/images/Background/Szene 5/
-    - assets/images/Background/Szene 6/
+    - assets/images/Background/Scene 1/
+    - assets/images/Background/Scene 2/
+    - assets/images/Background/Scene 3/
+    - assets/images/Background/Scene 4/
+    - assets/images/Background/Scene 5/
+    - assets/images/Background/Scene 6/
     - assets/images/Background/Colored Tiles/
     - assets/images/Mini Map/
     - assets/images/Menu/
     - assets/images/Menu/Buttons/
-    - assets/images/Menu/Inventory/
     - assets/images/Menu/Levels/
     - assets/images/Menu/Worlds/
     - assets/images/Other/

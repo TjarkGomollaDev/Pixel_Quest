@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 
+/// Keeps track of "ambient loop" demand across multiple entities.
+///
+/// Entities register/unregister themselves as sources for a specific [LoopSfx].
+/// A loop is started when the first source appears, and stopped when the last source disappears.
 class AmbientLoopManager {
   // constructor parameters
   final AudioCenter _audioCenter;
@@ -23,6 +27,7 @@ class AmbientLoopManager {
     _clearUp();
   }
 
+  /// Registers [source] as an active producer for the given ambient [loop].
   Future<void> registerSource(LoopSfx loop, Object source) async {
     if (_audioCenter.effectiveSfxVolume == 0 || _audioCenter.gameSfxMuted) return;
 
@@ -39,6 +44,7 @@ class AmbientLoopManager {
     if (wasEmpty) await _audioCenter.startLoop(loop, fadeIn: true);
   }
 
+  /// Unregisters [source] for the given ambient [loop] and stops the loop when no sources remain.
   Future<void> unregisterSource(LoopSfx loop, Object source, {bool fadeOut = true}) async {
     if (_audioCenter.effectiveSfxVolume == 0 || _audioCenter.gameSfxMuted) return;
 

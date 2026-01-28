@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
 import 'package:pixel_adventure/game/hud/pause_page.dart';
+import 'package:pixel_adventure/game/inventory/inventory_page.dart';
 import 'package:pixel_adventure/game/settings/settings_page.dart';
 import 'package:pixel_adventure/game/level/level.dart';
 import 'package:pixel_adventure/game/menu/menu_page.dart';
@@ -12,6 +13,7 @@ abstract class RouteNames {
   static const String pause = 'pause';
   static const String settings = 'settings';
   static const String shop = 'shop';
+  static const String inventory = 'inventory';
 }
 
 RouterComponent createRouter({required StaticCenter staticCenter, String? initialRoute}) {
@@ -20,7 +22,8 @@ RouterComponent createRouter({required StaticCenter staticCenter, String? initia
     RouteNames.pause: PausePage(),
     RouteNames.settings: SettingsPage(),
     RouteNames.shop: ShopPage(),
-    for (final levelMetadata in staticCenter.allLevelsInAllWorlds.flat())
+    RouteNames.inventory: InventoryPage(),
+    for (final levelMetadata in staticCenter.allLevelsInAllWorlds().flat())
       levelMetadata.uuid: WorldRoute(() => Level(levelMetadata: levelMetadata), maintainState: false),
   };
 

@@ -4,12 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 part 'package:pixel_adventure/data/audio/sounds.dart';
 
+/// Central audio facade for the game.
+///
+/// Provides a single API for:
+/// - one-shot sound effects (`Sfx`) via pools for low-latency spam-safe playback,
+/// - loopable ambient effects (`LoopSfx`) with safe start/stop + optional fades,
+/// - background music (`BackgroundMusic`) with volume/state handling.
+///
+/// It also bridges persisted user settings (sound on/off, SFX/music volume) from
+/// [StorageCenter] and exposes a lightweight sync mechanism for ambient emitters.
 class AudioCenter {
   // constructor parameters
   final StorageCenter _storageCenter;
 
   AudioCenter._(this._storageCenter);
 
+  /// Creates and initializes the audio system and returns a fully initialized AudioCenter instance.
   static Future<AudioCenter> init({required StorageCenter storageCenter}) async {
     final audioCenter = AudioCenter._(storageCenter);
     await audioCenter._loadData();
@@ -77,13 +87,40 @@ class AudioCenter {
 
   // all listeners are informed that all ambient loops have been removed
   final List<VoidCallback> _ambientResetListeners = [];
+
+  /// Registers a callback that is invoked when ambient sources are reset.
   void addAmbientResetListener(VoidCallback listener) => _ambientResetListeners.add(listener);
+
+  /// Unregisters a previously added ambient reset callback.
   void removeAmbientResetListener(VoidCallback listener) => _ambientResetListeners.remove(listener);
 
   void _notifyAmbientReset() {
     for (final listener in List.of(_ambientResetListeners)) {
       listener();
     }
+  }
+
+  Future<void> dispose() async {
+    // kill everything loop-related
+    await _stopAllLoops(resetSources: false);
+
+    // dispose pools
+    for (final pool in _pools.values) {
+      await pool.dispose();
+    }
+    _pools.clear();
+
+    // dispose BGM and clear cache
+    await FlameAudio.bgm.dispose();
+    await FlameAudio.audioCache.clearAll();
+
+    // clear internal bookkeeping
+    _loadedLoopSfx.clear();
+    _loopLoadInFlight.clear();
+    _loopVolumes.clear();
+    _loopFadeToken.clear();
+    _loopOpChain.clear();
+    _loopDesired.clear();
   }
 
   Future<void> _loadData() async {
@@ -132,29 +169,7 @@ class AudioCenter {
     }
   }
 
-  Future<void> dispose() async {
-    // kill everything loop-related
-    await stopAllLoops(resetSources: false);
-
-    // dispose pools
-    for (final pool in _pools.values) {
-      await pool.dispose();
-    }
-    _pools.clear();
-
-    // dispose BGM and clear cache
-    await FlameAudio.bgm.dispose();
-    await FlameAudio.audioCache.clearAll();
-
-    // clear internal bookkeeping
-    _loadedLoopSfx.clear();
-    _loopLoadInFlight.clear();
-    _loopVolumes.clear();
-    _loopFadeToken.clear();
-    _loopOpChain.clear();
-    _loopDesired.clear();
-  }
-
+  /// Plays a one-shot sound effect, respecting global sound state and channel-specific muting.
   void playSound(Sfx sound, SfxType type) {
     if (effectiveSfxVolume == 0) return;
     if (type == SfxType.game && _gameSfxMuted) return;
@@ -167,24 +182,24 @@ class AudioCenter {
     }
   }
 
+  /// Convenience wrapper around [playSound] that only plays when [guard] is true.
   void playSoundIf(Sfx sound, bool guard, SfxType type) {
     if (!guard) return;
     playSound(sound, type);
   }
 
+  /// Returns whether a loop player is currently active for the given ambient loop sound.
   bool isLoopPlaying(LoopSfx loop) => _loopPlayers.containsKey(loop);
 
   Future<void> _enqueueLoopOp(LoopSfx loop, Future<void> Function(int token) op) {
     final prev = _loopOpChain[loop] ?? Future<void>.value();
     final tokenAtEnqueue = _loopGlobalToken;
-
     final next = prev
         .then((_) async {
           if (tokenAtEnqueue != _loopGlobalToken) return;
           await op(tokenAtEnqueue);
         })
         .catchError((_) {});
-
     _loopOpChain[loop] = next;
     return next;
   }
@@ -202,6 +217,7 @@ class AudioCenter {
     }
   }
 
+  /// Starts (or re-activates) a loopable ambient sound, optionally fading in.
   Future<void> startLoop(LoopSfx loop, {bool fadeIn = false}) async {
     _loopDesired[loop] = true;
 
@@ -210,14 +226,14 @@ class AudioCenter {
 
     return _enqueueLoopOp(loop, (token) async {
       if (token != _loopGlobalToken || !_wantLoop(loop) || effectiveSfxVolume == 0 || _gameSfxMuted) return;
-      if (isLoopPlaying(loop)) return await _raiseExistingNow(loop, fadeIn);
+      if (isLoopPlaying(loop)) return _raiseExistingNow(loop, fadeIn);
 
       // lazy loading
       await _ensureLoopLoaded(loop);
 
       // re-check if something happened during previous await
       if (token != _loopGlobalToken || !_wantLoop(loop) || effectiveSfxVolume == 0 || _gameSfxMuted) return;
-      if (isLoopPlaying(loop)) return await _raiseExistingNow(loop, fadeIn);
+      if (isLoopPlaying(loop)) return _raiseExistingNow(loop, fadeIn);
 
       // start the loop, with a fade-in if desired
       final initialVolume = fadeIn ? 0.0 : _sfxVolume;
@@ -243,10 +259,12 @@ class AudioCenter {
       _loopPlayers[loop] = player;
       _loopVolumes[loop] = initialVolume;
 
+      // optional fade in
       if (fadeIn) await _fadeLoopTo(loop, _sfxVolume, _loopFadeInDuration);
     });
   }
 
+  /// Stops a loopable ambient sound, optionally fading out before disposal.
   Future<void> stopLoop(LoopSfx loop, {bool fadeOut = false}) async {
     _loopDesired[loop] = false;
 
@@ -261,7 +279,7 @@ class AudioCenter {
     }
 
     // in case we have a fade out
-    unawaited(_fadeOutThenMaybeDispose(loop, player));
+    _fadeOutThenMaybeDispose(loop, player);
   }
 
   Future<void> _fadeOutThenMaybeDispose(LoopSfx loop, AudioPlayer expectedPlayer) async {
@@ -326,7 +344,7 @@ class AudioCenter {
     }
   }
 
-  Future<void> stopAllLoops({bool resetSources = true}) async {
+  Future<void> _stopAllLoops({bool resetSources = true}) async {
     if (resetSources) _notifyAmbientReset();
 
     // bump tokens
@@ -352,7 +370,7 @@ class AudioCenter {
   }
 
   Future<void> _applyLoopVolumes() async {
-    if (effectiveSfxVolume == 0) return await stopAllLoops();
+    if (effectiveSfxVolume == 0) return await _stopAllLoops();
     for (final loop in _loopPlayers.keys) {
       _nextFadeToken(loop);
       _loopVolumes[loop] = _sfxVolume;
@@ -360,12 +378,16 @@ class AudioCenter {
     await Future.wait([for (final player in _loopPlayers.values) player.setVolume(_sfxVolume)]);
   }
 
+  /// Pauses all currently playing ambient loop players.
   Future<void> pauseAllLoops() async => await Future.wait([for (final player in _loopPlayers.values) player.pause()]);
 
+  /// Resumes all currently paused ambient loop players.
   Future<void> resumeAllLoops() async => await Future.wait([for (final player in _loopPlayers.values) player.resume()]);
 
+  /// Starts playing background music (replaces any currently playing track).
   void playBackgroundMusic(BackgroundMusic music) => FlameAudio.bgm.play(music.path, volume: effectiveMusicVolume);
 
+  /// Stops the currently playing background music track, if any.
   void stopBackgroundMusic() => FlameAudio.bgm.stop();
 
   Future<void> _applyBgmVolume() async {
@@ -373,6 +395,7 @@ class AudioCenter {
     await FlameAudio.bgm.audioPlayer.setVolume(effectiveMusicVolume);
   }
 
+  /// Sets the global sound state and applies it to currently playing audio, then persists the change.
   Future<void> toggleSound(SoundState soundState) async {
     _soundState = soundState;
 
@@ -380,35 +403,39 @@ class AudioCenter {
     await _applyBgmVolume();
 
     // depending on the situation, a new sync event is triggered or all loops are removed
-    soundState == SoundState.on ? _bumpAmbientSyncToken() : await stopAllLoops();
+    soundState == SoundState.on ? _bumpAmbientSyncToken() : await _stopAllLoops();
 
-    await _storageCenter.updateSettings(soundState: soundState);
+    await _storageCenter.saveSettings(soundState: soundState);
   }
 
+  /// Sets the SFX volume, applies it to active loops, and persists the change.
   Future<void> setSfxVolume(double volume) async {
     _sfxVolume = volume;
 
     // update current loop volumes without restarting
     await _applyLoopVolumes();
 
-    await _storageCenter.updateSettings(sfxVolume: _sfxVolume);
+    await _storageCenter.saveSettings(sfxVolume: _sfxVolume);
   }
 
+  /// Sets the music volume, applies it to the current BGM player, and optionally persists the change.
   Future<void> setMusicVolume(double volume, {bool automaticSave = true}) async {
     _musicVolume = volume;
 
     // update current BGM volume without restarting
     await _applyBgmVolume();
 
-    if (automaticSave) await _storageCenter.updateSettings(musicVolume: _musicVolume);
+    if (automaticSave) await _storageCenter.saveSettings(musicVolume: _musicVolume);
   }
 
+  /// Mutes gameplay SFX and stops any active ambient loops.
   Future<void> muteGameSfx() async {
     if (_gameSfxMuted) return;
     _gameSfxMuted = true;
-    await stopAllLoops();
+    await _stopAllLoops();
   }
 
+  /// Unmutes gameplay SFX and triggers a resync so ambient emitters can re-register if needed.
   void unmuteGameSfx() {
     if (!_gameSfxMuted) return;
     _gameSfxMuted = false;

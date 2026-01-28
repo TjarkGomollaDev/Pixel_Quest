@@ -64,7 +64,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_PlayerEffectState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _PlayerEffectState.values) state: loadAnimation(state)};
+    animations = {for (final state in _PlayerEffectState.values) state: loadAnimation(state)};
     isVisible = false;
   }
 

@@ -126,7 +126,7 @@ class Plant extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_PlantState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _PlantState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _PlantState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _PlantState.idle);
     if (!_isLeft) flipHorizontallyAroundCenter();
   }

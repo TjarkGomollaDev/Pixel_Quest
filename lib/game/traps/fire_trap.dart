@@ -97,7 +97,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_FireTrapState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _FireTrapState.values) state: loadAnimation(state)};
+    animations = {for (final state in _FireTrapState.values) state: loadAnimation(state)};
     current = _FireTrapState.off;
   }
 

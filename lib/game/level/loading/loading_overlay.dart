@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/utils/background_parallax.dart';
+import 'package:pixel_adventure/game/background/background.dart';
 import 'package:pixel_adventure/game/level/loading/loading_dummy_character.dart';
 import 'package:pixel_adventure/game/traps/air_particle.dart';
 import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
@@ -43,9 +44,13 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   // components
   late final PositionComponent _root;
   late final InputBlocker _inputBlocker;
-  late final BackgroundParallax _background;
+  late final Map<BackgroundScene, BackgroundParallax> _backgrounds;
   late final LoadingDummyCharacter _dummy;
+
+  // helper
   final Paint _overlayPaint = Paint();
+  BackgroundParallax? _activeBackground;
+  static final _random = Random();
 
   // particle for dummy character
   late Timer _particleTimer;
@@ -98,6 +103,26 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   @override
   set opacity(double value) => _opacity = value.clamp(0, 1);
 
+  @override
+  void cancelAnimations() {
+    super.cancelAnimations();
+
+    // remove all particles
+    _particleTimer.pause();
+    _removeAllParticles();
+
+    // all animations must also be canceled for the dummy
+    _dummy.cancelAnimations();
+
+    // additionally hide and disable all components
+    _stageInfoBg.hide();
+    _stageInfoText.hide();
+    _inputBlocker.disable();
+
+    // initial state
+    _state = _OverlayState.notVisible;
+  }
+
   void _setUpRoot() {
     _root = PositionComponent()..scale = Vector2.all(_worldToScreenScale);
     add(_root);
@@ -109,12 +134,17 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   void _setUpBackground() {
-    _background = BackgroundParallax.szene(
-      szene: BackgroundSzene.szene3,
-      baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay,
-      size: size,
-    );
-    _root.add(_background);
+    final scenes = BackgroundScene.loadingChoices.isNotEmpty ? BackgroundScene.loadingChoices : const [BackgroundScene.defaultScene];
+    _backgrounds = {
+      for (final scene in scenes)
+        scene: BackgroundParallax.scene(
+          scene: scene,
+          baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay,
+          size: size,
+          show: false,
+        ),
+    };
+    _root.addAll(_backgrounds.values);
   }
 
   void _setUpDummyCharacter() {
@@ -148,7 +178,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   void _updateStageInfo(LevelMetadata levelMetadata) {
-    _stageInfoText.text = game.l10n.loadingLevel(game.staticCenter.getWorld(levelMetadata.worldUuid).index + 1, levelMetadata.number);
+    _stageInfoText.text = game.l10n.loadingLevel(game.staticCenter.worldById(levelMetadata.worldUuid).index + 1, levelMetadata.number);
   }
 
   void _setUpParticleTimer() {
@@ -174,24 +204,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     }
   }
 
-  @override
-  void cancelAnimations() {
-    super.cancelAnimations();
-
-    // remove all particles
-    _particleTimer.pause();
-    _removeAllParticles();
-
-    // all animations must also be canceled for the dummy
-    _dummy.cancelAnimations();
-
-    // additionally hide and disable all components
-    _stageInfoBg.hide();
-    _stageInfoText.hide();
-    _inputBlocker.disable();
-
-    // initial state
-    _state = _OverlayState.notVisible;
+  void _activateBackground() {
+    _activeBackground?.hide();
+    final scene = game.storageCenter.inventory.loadingBackground.resolveChoice();
+    _activeBackground = scene != null ? _backgrounds[scene] : _backgrounds.values.elementAt(_random.nextInt(_backgrounds.length));
+    _activeBackground?.show();
   }
 
   Future<void> show(LevelMetadata levelMetadata) async {
@@ -204,6 +221,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _opacity = 1;
 
     // show and enable all components
+    _activateBackground();
     _updateStageInfo(levelMetadata);
     _stageInfoBg.show();
     _stageInfoText.show();
@@ -254,6 +272,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   Future<void> warmUp(LevelMetadata levelMetadata) async {
+    _activateBackground();
     _updateStageInfo(levelMetadata);
     _inputBlocker.disable();
     final prevState = _state;

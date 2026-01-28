@@ -104,7 +104,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_CheckpointState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _CheckpointState.values) state: loadAnimation(state)};
+    animations = {for (final state in _CheckpointState.values) state: loadAnimation(state)};
     current = _CheckpointState.noFlag;
   }
 

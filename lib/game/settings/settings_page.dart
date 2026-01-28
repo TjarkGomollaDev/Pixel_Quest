@@ -13,11 +13,12 @@ import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/game/utils/slider.dart';
 import 'package:pixel_adventure/game/game.dart';
 
-/// Settings overlay route that opens the in-game settings dialog.
+/// Settings overlay route that opens the in-game Settings dialog.
 class SettingsPage extends Route {
   SettingsPage() : super(() => _SettingsDialog(), transparent: true);
 }
 
+/// Internal Settings dialog wrapper that mounts the shared [DialogPage] container.
 class _SettingsDialog extends Component with HasGameReference<PixelQuest> {
   @override
   FutureOr<void> onLoad() {
@@ -26,14 +27,14 @@ class _SettingsDialog extends Component with HasGameReference<PixelQuest> {
   }
 }
 
-/// Dialog body component that builds the settings UI sections.
+/// Settings dialog body that builds the UI content.
 class _SettingsContent extends PositionComponent with HasGameReference<PixelQuest> {
   _SettingsContent() : super(size: contentSize);
 
   // content size
   static final Vector2 contentSize = Vector2(
     DialogContainer.contentWidth,
-    8 * 2 +
+    AppTheme.dialogTextStandardHeight * 2 +
         Slider.defaultHeight * 2 +
         RadioComponent.defaultOptionSize.y * 4 +
         DialogContainer.spacingBetweenSections * 5 +
@@ -216,11 +217,11 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       options: [
         RadioOptionText(
           text: game.l10n.settingsOptionShow,
-          onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: true)),
+          onSelected: nonBlocking(() => game.storageCenter.saveSettings(showMiniMapAtStart: true)),
         ),
         RadioOptionText(
           text: game.l10n.settingsOptionHide,
-          onSelected: nonBlocking(() => game.storageCenter.updateSettings(showMiniMapAtStart: false)),
+          onSelected: nonBlocking(() => game.storageCenter.saveSettings(showMiniMapAtStart: false)),
         ),
       ],
     );
@@ -253,7 +254,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
   }
 
   void _controlSettingChanged(JoystickSetup setup) {
-    unawaited(game.storageCenter.updateSettings(joystickSetup: setup));
+    unawaited(game.storageCenter.saveSettings(joystickSetup: setup));
     game.eventBus.emit(ControlSettingsChanged(setup));
   }
 }

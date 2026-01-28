@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/storage/entities/level_entity.dart';
+import 'package:pixel_adventure/game/background/background.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/checkpoints/start.dart';
 import 'package:pixel_adventure/game/enemies/blue_bird.dart';
@@ -25,8 +26,7 @@ import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/hud/game_hud.dart';
 import 'package:pixel_adventure/game/level/player/player_input.dart';
 import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
-import 'package:pixel_adventure/game/utils/tile_id_helper.dart';
-import 'package:pixel_adventure/game/utils/background_parallax.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map_helper.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/traps/arrow_up.dart';
 import 'package:pixel_adventure/game/checkpoints/finish.dart';
@@ -276,7 +276,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _miniMapPaint.color = getMiniMapColor(
       tileId: tileId,
       isPlatform: isPlatform,
-      baseBlock: game.staticCenter.getWorld(_levelMetadata.worldUuid).baseBlock,
+      baseBlock: game.staticCenter.worldById(_levelMetadata.worldUuid).baseBlock,
     );
     _miniMapCanvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
   }
@@ -317,44 +317,33 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void _addBackground(TileLayer backgroundLayer) {
-    final type = backgroundLayer.properties.getValue<String?>('BackgroundType');
     final position = Vector2.all(GameSettings.hasBorder ? GameSettings.tileSize : 0);
     final size = Vector2(
       _levelMap.width - (GameSettings.hasBorder ? GameSettings.tileSize * 2 : 0),
       _levelMap.height - (GameSettings.hasBorder ? GameSettings.tileSize * 2 : 0),
     );
-    bool isInitialized = false;
 
-    // if desired, you can assign an individual background to each level, which is particularly useful for testing purposes
-    if (type != null && type.isNotEmpty) {
-      for (final szene in BackgroundSzene.values) {
-        if (szene.fileName == type) {
-          _levelBackground = BackgroundParallax.szene(szene: szene, position: position, size: size);
-          isInitialized = true;
-          break;
-        }
-      }
-      if (!isInitialized) {
-        for (final tileColor in BackgroundColor.values) {
-          if (tileColor.fileName == type) {
-            _levelBackground = BackgroundParallax.colored(color: tileColor, position: position, size: size);
-            isInitialized = true;
-            break;
-          }
-        }
-      }
-    }
+    // if the user has set a specific scene in the inventory, take the
+    final overrideScene = game.storageCenter.inventory.levelBackground.resolveChoice();
+    if (overrideScene != null) return _addBackgroundHelper(BackgroundParallax.scene(scene: overrideScene, position: position, size: size));
 
-    // the background from the world is the default
-    if (!isInitialized) {
-      _levelBackground = BackgroundParallax.szene(
-        szene: game.staticCenter.getWorld(_levelMetadata.worldUuid).backgroundSzene,
+    // otherwise, check whether a special background is set in the map file.
+    final type = backgroundLayer.properties.getValue<String?>('BackgroundType');
+    final fromLayer = BackgroundParallax.fromType(type: type, position: position, size: size);
+    if (fromLayer != null) return _addBackgroundHelper(fromLayer);
+
+    // if none of these apply, use the scene set in the world of the leve
+    _addBackgroundHelper(
+      BackgroundParallax.scene(
+        scene: game.staticCenter.worldById(_levelMetadata.worldUuid).backgroundScene,
         position: position,
         size: size,
-      );
-    }
+      ),
+    );
+  }
 
-    _levelBackground.priority = GameSettings.backgroundLayerLevel;
+  void _addBackgroundHelper(BackgroundParallax background) {
+    _levelBackground = background..priority = GameSettings.backgroundLayerLevel;
     add(_levelBackground);
   }
 
@@ -445,7 +434,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         if (!isPlatform) {
           bool done = false;
           while (y + h < yEnd && !done) {
-            for (var dx = 0; dx < w; dx++) {
+            for (int dx = 0; dx < w; dx++) {
               final tileBelowId = backgroundLayer.tileData![y + h][x + dx].tile;
               final isBelowPlatform = platformBlockIds.contains(tileBelowId);
               if (tileBelowId == 0 || isBelowPlatform || visited[y + h][x + dx]) {
@@ -459,8 +448,8 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         }
 
         // mark all merged tiles as visited
-        for (var dy = 0; dy < h; dy++) {
-          for (var dx = 0; dx < w; dx++) {
+        for (int dy = 0; dy < h; dy++) {
+          for (int dx = 0; dx < w; dx++) {
             visited[y + dy][x + dx] = true;
           }
         }
@@ -512,7 +501,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
     // the start with player is always created first in the level, as many other objects require a reference to the player
     bool foundStart = false;
-    for (var spawnPoint in spawnPointsLayer.objects) {
+    for (final spawnPoint in spawnPointsLayer.objects) {
       if (spawnPoint.class_ == 'Start') {
         // first create start
         foundStart = true;
@@ -520,7 +509,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         final start = Start(position: gridPosition);
 
         // then player and player input
-        _player = Player(character: game.storageCenter.settings.character, startPosition: start.playerPosition);
+        _player = Player(character: game.storageCenter.inventory.character, startPosition: start.playerPosition);
         _playerInput = PlayerInput();
         addAll([start, _player, _playerInput]);
         _addCheckpointToMiniMap(gridPosition);
@@ -538,7 +527,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
     // all other objects are created
     int i = 0;
-    for (var spawnPoint in spawnPointsLayer.objects) {
+    for (final spawnPoint in spawnPointsLayer.objects) {
       try {
         final gridPosition = snapVectorToGrid(spawnPoint.position);
         PositionComponent? spawnObject;
@@ -580,7 +569,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
             );
 
             // add the single saws from the saw circle component to the mini map entities
-            for (var singleSaw in (spawnObject as SawCircleComponent).singleSaws) {
+            for (final singleSaw in (spawnObject as SawCircleComponent).singleSaws) {
               if (singleSaw != null) _addEntityToMiniMap(singleSaw);
             }
             break;
@@ -837,7 +826,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void _processRespawns() {
-    for (var item in _pendingRespawnables) {
+    for (final item in _pendingRespawnables) {
       if (!item.isMounted) {
         item.onRespawn();
         add(item);
@@ -854,14 +843,14 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   Future<void> saveData() async {
     _calculateEarnedStars();
     await game.storageCenter.saveLevel(
-      data: LevelEntity(
+      LevelEntity(
         uuid: _levelMetadata.uuid,
         stars: _earnedStars,
         totalFruits: _totalFruitsCount,
         earnedFruits: _playerFruitsCount,
         deaths: _deathCount,
       ),
-      worldUuid: _levelMetadata.worldUuid,
+      _levelMetadata.worldUuid,
     );
   }
 

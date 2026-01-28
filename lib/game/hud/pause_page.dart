@@ -137,7 +137,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
   /// Stops all running button animations and resets scale.
   void _stopShowAnimation() {
     if (_btnAnimationsStopped) return;
-    for (var button in _btns) {
+    for (final button in _btns) {
       button.resetAllAnimations();
     }
     _btnAnimationsStopped = true;
@@ -151,7 +151,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
     _pauseContainer.add(ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.18, curve: Curves.easeOutQuad)));
 
     // add pop-in effect for all buttons
-    for (var i = 0; i < _btns.length; i++) {
+    for (int i = 0; i < _btns.length; i++) {
       _btns[i].animatedPopIn(delay: (i + 2) * 0.45);
     }
   }

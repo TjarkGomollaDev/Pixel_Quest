@@ -147,7 +147,7 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_MovingPlatformState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _MovingPlatformState.values) state: loadAnimation(state)};
+    animations = {for (final state in _MovingPlatformState.values) state: loadAnimation(state)};
     current = _MovingPlatformState.on;
   }
 

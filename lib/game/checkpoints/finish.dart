@@ -74,7 +74,7 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_FinishState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    animations = {for (var state in _FinishState.values) state: loadAnimation(state)};
+    animations = {for (final state in _FinishState.values) state: loadAnimation(state)};
     current = _FinishState.idle;
   }
 

@@ -124,7 +124,7 @@ class RockHead extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_RockHeadState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _RockHeadState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _RockHeadState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _RockHeadState.idle, isBottomCenter: false);
   }
 

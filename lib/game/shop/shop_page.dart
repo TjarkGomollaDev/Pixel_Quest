@@ -6,10 +6,12 @@ import 'package:pixel_adventure/game/utils/dialog_container.dart';
 import 'package:pixel_adventure/game/utils/dialog_page.dart';
 import 'package:pixel_adventure/game/game.dart';
 
+/// Shop overlay route that opens the in-game Shop dialog.
 class ShopPage extends Route {
   ShopPage() : super(() => _ShopDialog(), transparent: true);
 }
 
+/// Internal Shop dialog wrapper that mounts the shared [DialogPage] container.
 class _ShopDialog extends Component with HasGameReference<PixelQuest> {
   @override
   FutureOr<void> onLoad() {
@@ -18,6 +20,7 @@ class _ShopDialog extends Component with HasGameReference<PixelQuest> {
   }
 }
 
+/// Shop dialog body that builds the UI content.
 class _ShopContent extends PositionComponent with HasGameReference<PixelQuest> {
   _ShopContent() : super(size: contentSize);
 

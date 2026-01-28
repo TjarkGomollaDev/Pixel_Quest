@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -8,11 +7,12 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_adventure/data/audio/ambient_loop_manager.dart';
 import 'package:pixel_adventure/data/static/static_center.dart';
+import 'package:pixel_adventure/data/storage/storage_events.dart';
 import 'package:pixel_adventure/data/storage/storage_center.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/mini_map_helper.dart';
 import 'package:pixel_adventure/game/level/loading/loading_overlay.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/tile_id_helper.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/level/player/player_hitbox_position_provider.dart.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
@@ -21,6 +21,8 @@ import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/l10n/app_localizations.dart';
 import 'package:pixel_adventure/game/menu/menu_page.dart';
 import 'package:pixel_adventure/game/game_router.dart';
+
+import 'background/background.dart';
 
 /// Main Flame game root that bootstraps the whole app.
 ///
@@ -56,8 +58,8 @@ class PixelQuest extends FlameGame
   // padding that depends on the device and is converted to the pixel size of the game
   late final GameSafePadding safePadding;
 
-  // mini map background image
-  late final Image miniMapBackgroundPattern;
+  // mini map background images
+  late final Map<BackgroundScene, Image> _miniMapBackgroundPatterns;
 
   // router
   late final RouterComponent router;
@@ -88,7 +90,7 @@ class PixelQuest extends FlameGame
     _setUpSafePadding();
     _setUpRouter();
     _setUpLoadingOverlay();
-    await _createMiniMapBackgroundPattern();
+    await _setUpMiniMapBackgroundPatterns();
     await _completeLoading();
     return super.onLoad();
   }
@@ -258,23 +260,10 @@ class PixelQuest extends FlameGame
     router.add(loadingOverlay);
   }
 
-  Future<void> _createMiniMapBackgroundPattern() async {
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-    final patternSize = Vector2.all(16);
-    final random = Random();
-    final paint = Paint();
-
-    // create a small pattern
-    for (int y = 0; y < patternSize.y; y++) {
-      for (int x = 0; x < patternSize.x; x++) {
-        paint.color = miniMapBackgroundColors[random.nextInt(miniMapBackgroundColors.length)];
-        canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
-      }
-    }
-
-    // convert pattern to image
-    final picture = recorder.endRecording();
-    miniMapBackgroundPattern = await picture.toImage(patternSize.x.toInt(), patternSize.y.toInt());
+  Future<void> _setUpMiniMapBackgroundPatterns() async {
+    _miniMapBackgroundPatterns = await createMiniMapBackgroundPatterns(BackgroundScene.levelChoices);
   }
+
+  Image miniMapPatternFor(BackgroundScene scene) =>
+      _miniMapBackgroundPatterns[scene] ?? _miniMapBackgroundPatterns[BackgroundScene.defaultScene]!;
 }

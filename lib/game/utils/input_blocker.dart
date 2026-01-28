@@ -31,6 +31,9 @@ class InputBlocker extends PositionComponent with TapCallbacks {
     event.handled = true;
   }
 
+  /// Activates the input blocker.
   void enable() => _enabled = true;
+
+  /// Deactivates the input blocker.
   void disable() => _enabled = false;
 }

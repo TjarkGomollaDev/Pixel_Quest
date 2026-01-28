@@ -140,7 +140,7 @@ class Slime extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_SlimeState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _SlimeState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _SlimeState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _SlimeState.idle);
   }
 

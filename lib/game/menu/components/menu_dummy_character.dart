@@ -6,7 +6,7 @@ import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
-import 'package:pixel_adventure/game/menu/widgets/character_bio.dart';
+import 'package:pixel_adventure/game/menu/components/character_bio.dart';
 import 'package:pixel_adventure/game/game.dart';
 
 class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
@@ -148,7 +148,7 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
     _loopId++;
 
     // remove active effects
-    for (var e in _activeEffects) {
+    for (final e in _activeEffects) {
       if (e.onComplete != null) e.onComplete!();
       e.removeFromParent();
     }
@@ -168,7 +168,7 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
     if (_animationEnabled) _clearAnimationLoop();
 
     // update storage and bio to new chracter
-    unawaited(game.storageCenter.updateSettings(character: character));
+    unawaited(game.storageCenter.saveInventory(character: character));
     unawaited(_characterBio.setCharacterBio(character));
 
     // set the new character

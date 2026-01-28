@@ -2,6 +2,8 @@ part of 'package:pixel_adventure/game/events/game_event_bus.dart';
 
 enum Lifecycle { paused, resumed }
 
+enum PageAction { opend, closed }
+
 class GameLifecycleChanged extends GameEvent {
   final Lifecycle lifecycle;
   const GameLifecycleChanged(this.lifecycle);
@@ -19,6 +21,16 @@ class ControlSettingsChanged extends GameEvent {
 
 class PlayerRespawned extends GameEvent {
   const PlayerRespawned();
+}
+
+class InventoryStateChanged extends GameEvent {
+  final PageAction action;
+  const InventoryStateChanged(this.action);
+}
+
+class InventoryChangedCharacter extends GameEvent {
+  final PlayerCharacter character;
+  InventoryChangedCharacter(this.character);
 }
 
 class NewStarsEarned extends GameEvent {

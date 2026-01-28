@@ -3,8 +3,12 @@ import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
+import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/utils/background_parallax.dart';
+import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_adventure/game/menu/components/character_bio.dart';
+import 'package:pixel_adventure/game/menu/components/menu_dummy_character.dart';
+import 'package:pixel_adventure/game/background/background_parallax.dart';
 import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dots_indicator.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
@@ -12,9 +16,8 @@ import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/menu/widgets/character_picker.dart';
-import 'package:pixel_adventure/game/menu/widgets/level_grid.dart';
-import 'package:pixel_adventure/game/menu/widgets/menu_top_bar.dart';
+import 'package:pixel_adventure/game/menu/components/level_grid.dart';
+import 'package:pixel_adventure/game/menu/components/menu_top_bar.dart';
 import 'package:pixel_adventure/game/game.dart';
 
 /// Menu that renders the selectable worlds + level grids.
@@ -25,8 +28,6 @@ import 'package:pixel_adventure/game/game.dart';
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   // static content
   late final MenuTopBar _menuTopBar;
-  late final CharacterPicker _characterPicker;
-  late final InputBlocker _blockerWhenSpotlight;
   late final SpriteBtn _previousWorldBtn;
   late final SpriteBtn _nextWorldBtn;
 
@@ -39,6 +40,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   // world index
   late int _currentWorldIndex;
   late final DotsIndicator _dotsIndicator;
+
+  // spotlight and dummy character
+  late final Spotlight _spotlight;
+  late final InputBlocker _inputBlockerSpotlight;
+  late final CharacterBio _characterBio;
+  late final MenuDummyCharacter _dummy;
 
   // spacing
   static const double _levelGridChangeWorldBtnsSpacing = 22; // [Adjustable]
@@ -65,8 +72,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpWorldLevelGrids();
     _setUpMenuTopBar();
     _setUpChangeWorldBtns();
-    _setUpCharacterPicker();
     _setUpDotsIndicator();
+    _setUpSpotlight();
+    _setUpInputBlocker();
+    _setUpCharacterBio();
+    _setUpDummyCharacter();
     return super.onLoad();
   }
 
@@ -100,7 +110,16 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
         if (_menuActive && event.lifecycle == Lifecycle.paused) return _pause();
         if (_menuActive && event.lifecycle == Lifecycle.resumed) return _resume();
       });
-      on<NewStarsEarned>((event) => _pendingNewStarsEarnedEvent = event);
+      on<NewStarsEarned>((event) {
+        _pendingNewStarsEarnedEvent = event;
+      });
+      on<InventoryStateChanged>((event) {
+        if (event.action == PageAction.opend) return unawaited(_openInventory());
+        if (event.action == PageAction.closed) return unawaited(_closeInventory());
+      });
+      on<InventoryChangedCharacter>((event) {
+        _dummy.setCharacter(event.character);
+      });
     });
   }
 
@@ -110,12 +129,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpCurrentWorldIndex() =>
-      _currentWorldIndex = game.staticCenter.allWorlds.getIndexByUUID(game.storageCenter.highestUnlockedWorld.uuid);
+      _currentWorldIndex = game.staticCenter.allWorlds().getIndexByUUID(game.storageCenter.highestUnlockedWorld.uuid);
 
   void _setUpWorldBackgrounds() {
-    for (var world in game.staticCenter.allWorlds) {
-      final background = BackgroundParallax.szene(
-        szene: world.backgroundSzene,
+    for (final world in game.staticCenter.allWorlds()) {
+      final background = BackgroundParallax.scene(
+        scene: world.backgroundScene,
         position: Vector2.zero(),
         size: game.size,
         show: world.index == _currentWorldIndex,
@@ -126,7 +145,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpWorldForegrounds() async {
-    for (var world in game.staticCenter.allWorlds) {
+    for (final world in game.staticCenter.allWorlds()) {
       final sprite = loadSprite(game, 'Menu/Worlds/${world.foregroundFileName}.png');
       final size = calculateSizeForBoxFit(sprite.srcSize, game.size);
       final foreground = VisibleSpriteComponent(
@@ -142,7 +161,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpWorldTitles() {
-    for (var world in game.staticCenter.allWorlds) {
+    for (final world in game.staticCenter.allWorlds()) {
       final sprite = loadSprite(game, 'Menu/Worlds/${world.titleFileName}.png');
       final size = calculateSizeForHeight(sprite.srcSize, 28);
       final title = VisibleSpriteComponent(
@@ -158,7 +177,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpWorldLevelGrids() {
-    for (var world in game.staticCenter.allWorlds) {
+    for (final world in game.staticCenter.allWorlds()) {
       final levelGrid = LevelGrid(worldUuid: world.uuid, show: world.index == _currentWorldIndex);
       add(levelGrid);
       _worldLevelGrids.add(levelGrid);
@@ -189,18 +208,6 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     addAll([_previousWorldBtn, _nextWorldBtn]);
   }
 
-  void _setUpCharacterPicker() {
-    _blockerWhenSpotlight = InputBlocker(size: game.size, priority: GameSettings.chracterPicker - 1);
-    _characterPicker = CharacterPicker(
-      inputBlocker: _blockerWhenSpotlight,
-      spotlightCenter: Vector2(
-        game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
-        7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
-      ),
-    );
-    addAll([_blockerWhenSpotlight, _characterPicker]);
-  }
-
   void _setUpDotsIndicator() {
     _dotsIndicator = DotsIndicator(
       dotCount: 2,
@@ -212,19 +219,47 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     add(_dotsIndicator);
   }
 
+  void _setUpSpotlight() {
+    _spotlight = Spotlight(
+      targetCenter: Vector2(
+        game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+        7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
+      ),
+    );
+    add(_spotlight);
+  }
+
+  void _setUpInputBlocker() {
+    _inputBlockerSpotlight = InputBlocker(size: game.size, priority: 99);
+    add(_inputBlockerSpotlight);
+  }
+
+  void _setUpCharacterBio() {
+    _characterBio = CharacterBio(
+      position: _spotlight.targetCenter + Vector2(-Spotlight.playerTargetRadius + 22, Spotlight.playerTargetRadius + 32),
+      show: false,
+    )..priority = GameSettings.spotlightAnimationContentLayer;
+    add(_characterBio);
+  }
+
+  void _setUpDummyCharacter() {
+    _dummy = MenuDummyCharacter(defaultPosition: _spotlight.targetCenter, characterBio: _characterBio);
+    add(_dummy);
+  }
+
   void _changeWorld(int direction) async {
     if (_isChangingWorld) return;
     final oldIndex = _currentWorldIndex;
     final newIndex = _currentWorldIndex + direction;
 
     // index out of range
-    if (newIndex < 0 || newIndex >= game.staticCenter.allWorlds.length) return;
+    if (newIndex < 0 || newIndex >= game.staticCenter.allWorlds().length) return;
 
     _currentWorldIndex = newIndex;
-    _updateContent(oldIndex, newIndex);
+    _updateVisibleWorld(oldIndex, newIndex);
   }
 
-  Future<void> _updateContent(int oldIndex, int newIndex) async {
+  Future<void> _updateVisibleWorld(int oldIndex, int newIndex) async {
     // abort possible new stars animations
     _animationGuard++;
     _abortNewStarsAnimationAndSync();
@@ -245,21 +280,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _isChangingWorld = false;
   }
 
-  void _pause() {
-    timeScale = 0;
-    _characterPicker.stopCharacterAnimationLoop();
-  }
-
-  void _resume() {
-    timeScale = 1;
-    _characterPicker.startCharacterAnimationLoop();
-  }
-
   int _getWorldIndex(String worldUuid) {
-    if (worldUuid == game.staticCenter.allWorlds[_currentWorldIndex].uuid) return _currentWorldIndex;
+    if (worldUuid == game.staticCenter.allWorlds()[_currentWorldIndex].uuid) return _currentWorldIndex;
 
     // fallback
-    return game.staticCenter.allWorlds.getIndexByUUID(worldUuid);
+    return game.staticCenter.allWorlds().getIndexByUUID(worldUuid);
   }
 
   bool _shouldContinue(int guardSnapshot, NewStarsEarned eventSnapshot) {
@@ -314,5 +339,28 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
     // clear pending event
     _pendingNewStarsEarnedEvent = null;
+  }
+
+  void _pause() {
+    timeScale = 0;
+    _dummy.stop();
+  }
+
+  void _resume() {
+    timeScale = 1;
+    _dummy.start();
+  }
+
+  Future<void> _openInventory() async {
+    _inputBlockerSpotlight.enable();
+    await _spotlight.focusOnTarget();
+    game.router.pushNamed(RouteNames.inventory);
+    _characterBio.animatedShow();
+  }
+
+  Future<void> _closeInventory() async {
+    _characterBio.hide();
+    await _spotlight.expandToFull();
+    _inputBlockerSpotlight.disable();
   }
 }

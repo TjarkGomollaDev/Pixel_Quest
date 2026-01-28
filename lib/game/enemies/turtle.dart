@@ -126,7 +126,7 @@ class Turtle extends PositionComponent
 
   void _loadAllSpriteAnimations() {
     final loadAnimation = spriteAnimationWrapper<_TurtleState>(game, _path, _pathEnd, GameSettings.stepTime, _textureSize);
-    final animations = {for (var state in _TurtleState.values) state: loadAnimation(state)};
+    final animations = {for (final state in _TurtleState.values) state: loadAnimation(state)};
     addAnimationGroupComponent(textureSize: _textureSize, animations: animations, current: _TurtleState.idleSpikesOut);
     if (!_isLeft) flipHorizontallyAroundCenter();
   }

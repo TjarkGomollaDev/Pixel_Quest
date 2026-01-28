@@ -50,6 +50,12 @@ enum PlayerCharacter {
   pinkMan('Pink Man'),
   virtualGuy('Virtual Guy');
 
+  // path
+  static const String _basePath = 'Main Characters/';
+  static const String _pathEnd = '(32x32).png';
+  static const String _pathPreview = 'Preview ';
+  String get pathPreview => '$_basePath$fileName/$_pathPreview$_pathEnd';
+
   final String fileName;
   const PlayerCharacter(this.fileName);
 
@@ -360,7 +366,7 @@ class Player extends SpriteAnimationGroupComponent
       GameSettings.stepTime,
       _textureSize,
     );
-    animations = {for (var state in PlayerState.values) state: loadAnimation(state)};
+    animations = {for (final state in PlayerState.values) state: loadAnimation(state)};
     current = PlayerState.idle;
   }
 
@@ -549,7 +555,7 @@ class Player extends SpriteAnimationGroupComponent
     final stars = [];
 
     // outline stars
-    for (var position in starPositions) {
+    for (final position in starPositions) {
       final outlineStar = Star(variant: StarVariant.outline, position: position, spawnSizeZero: true);
       world.add(outlineStar);
       outlineStars.add(outlineStar);
@@ -558,7 +564,7 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // earned stars
-    for (var i = 0; i < world.earnedStars; i++) {
+    for (int i = 0; i < world.earnedStars; i++) {
       final star = Star(variant: StarVariant.filled, position: playerCenter, spawnSizeZero: true);
       world.add(star);
       stars.add(star);
@@ -570,7 +576,7 @@ class Player extends SpriteAnimationGroupComponent
     delayIndex++;
 
     // delete all outline stars that are behind the earned stars
-    for (var i = 0; i < stars.length; i++) {
+    for (int i = 0; i < stars.length; i++) {
       world.remove(outlineStars[0]);
       outlineStars.removeAt(0);
     }
@@ -592,10 +598,10 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // fade stars out and shrink light circle to zero
-    for (var e in outlineStars) {
+    for (final e in outlineStars) {
       unawaited(e.fadeOut());
     }
-    for (var e in stars) {
+    for (final e in stars) {
       unawaited(e.fadeOut());
     }
     game.audioCenter.stopBackgroundMusic();

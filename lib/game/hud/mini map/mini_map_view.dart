@@ -3,6 +3,8 @@ import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
+import 'package:pixel_adventure/game/background/background.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/game.dart';
@@ -28,6 +30,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, V
   final Vector2 _targetSize;
   final double _levelWidth;
   final Player _player;
+  final LevelMetadata _levelMetadata;
   final List<EntityOnMiniMap> _entitiesAboveForeground;
   final List<EntityOnMiniMap> _entitiesBehindForeground;
 
@@ -36,6 +39,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, V
     required Vector2 targetSize,
     required double levelWidth,
     required Player player,
+    required LevelMetadata levelMetadata,
     required List<EntityOnMiniMap> entitiesAboveForeground,
     required List<EntityOnMiniMap> entitiesBehindForeground,
     required super.position,
@@ -44,6 +48,7 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, V
        _levelWidth = levelWidth,
        _targetSize = targetSize,
        _player = player,
+       _levelMetadata = levelMetadata,
        _entitiesAboveForeground = entitiesAboveForeground,
        _entitiesBehindForeground = entitiesBehindForeground,
        super(size: targetSize) {
@@ -146,8 +151,11 @@ class MiniMapView extends PositionComponent with HasGameReference<PixelQuest>, V
     final shaderMatrix = math64.Matrix4.identity()..scaleByVector3(math64.Vector3(_spriteToMiniMapScale, _spriteToMiniMapScale, 1));
 
     // create a repeatable shader paint using the pre-rendered background texture from the game class
-    _backgroundPaint = Paint()
-      ..shader = ImageShader(game.miniMapBackgroundPattern, TileMode.repeated, TileMode.repeated, shaderMatrix.storage);
+    final scene =
+        game.storageCenter.inventory.levelBackground.resolveChoice() ??
+        game.staticCenter.worldById(_levelMetadata.worldUuid).backgroundScene;
+    final pattern = game.miniMapPatternFor(scene);
+    _backgroundPaint = Paint()..shader = ImageShader(pattern, TileMode.repeated, TileMode.repeated, shaderMatrix.storage);
   }
 
   /// Initializes marker sizes and paints for the player and all entity markers.
