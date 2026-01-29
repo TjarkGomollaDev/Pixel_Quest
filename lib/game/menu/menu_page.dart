@@ -42,6 +42,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   late final DotsIndicator _dotsIndicator;
 
   // spotlight and dummy character
+  late final Vector2 _spotlightCenter;
   late final Spotlight _spotlight;
   late final InputBlocker _inputBlockerSpotlight;
   late final CharacterBio _characterBio;
@@ -58,6 +59,9 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   // flag for animation when world is changing
   bool _isChangingWorld = false;
+
+  // indicates whether the audio has been reset and we now need to restart the audio
+  bool _audioWasReset = false;
 
   // subscription for game events
   GameSubscription? _sub;
@@ -83,10 +87,9 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   @override
   void onMount() {
     _menuActive = true;
-    _resume();
+    _start();
     game.setUpCameraForMenu();
     unawaited(_checkForNewStarsEvent());
-    game.audioCenter.playBackgroundMusic(BackgroundMusic.menu);
     super.onMount();
   }
 
@@ -95,8 +98,8 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _menuActive = false;
     _animationGuard++;
     _abortNewStarsAnimationAndSync();
-    _pause();
-    game.audioCenter.stopBackgroundMusic();
+    _stop();
+    _spotlight.cancelAnimations();
     super.onRemove();
   }
 
@@ -107,7 +110,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _addSubscription() {
     _sub = game.eventBus.listenMany((on) {
       on<GameLifecycleChanged>((event) {
-        if (_menuActive && event.lifecycle == Lifecycle.paused) return _pause();
+        if (_menuActive && event.lifecycle == Lifecycle.paused) return _pause(audioReset: event.reset);
         if (_menuActive && event.lifecycle == Lifecycle.resumed) return _resume();
       });
       on<NewStarsEarned>((event) {
@@ -129,7 +132,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpCurrentWorldIndex() =>
-      _currentWorldIndex = game.staticCenter.allWorlds().getIndexByUUID(game.storageCenter.highestUnlockedWorld.uuid);
+      _currentWorldIndex = game.staticCenter.allWorlds().indexById(game.storageCenter.highestUnlockedWorld.uuid);
 
   void _setUpWorldBackgrounds() {
     for (final world in game.staticCenter.allWorlds()) {
@@ -220,12 +223,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpSpotlight() {
-    _spotlight = Spotlight(
-      targetCenter: Vector2(
-        game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
-        7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
-      ),
+    _spotlightCenter = Vector2(
+      game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+      7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
     );
+    _spotlight = Spotlight(localTargetCenter: _spotlightCenter);
     add(_spotlight);
   }
 
@@ -236,14 +238,14 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _setUpCharacterBio() {
     _characterBio = CharacterBio(
-      position: _spotlight.targetCenter + Vector2(-Spotlight.playerTargetRadius + 22, Spotlight.playerTargetRadius + 32),
+      position: _spotlightCenter + Vector2(-Spotlight.playerTargetRadius + 22, Spotlight.playerTargetRadius + 32),
       show: false,
     )..priority = GameSettings.spotlightAnimationContentLayer;
     add(_characterBio);
   }
 
   void _setUpDummyCharacter() {
-    _dummy = MenuDummyCharacter(defaultPosition: _spotlight.targetCenter, characterBio: _characterBio);
+    _dummy = MenuDummyCharacter(defaultPosition: _spotlightCenter, characterBio: _characterBio);
     add(_dummy);
   }
 
@@ -284,7 +286,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     if (worldUuid == game.staticCenter.allWorlds()[_currentWorldIndex].uuid) return _currentWorldIndex;
 
     // fallback
-    return game.staticCenter.allWorlds().getIndexByUUID(worldUuid);
+    return game.staticCenter.allWorlds().indexById(worldUuid);
   }
 
   bool _shouldContinue(int guardSnapshot, NewStarsEarned eventSnapshot) {
@@ -341,14 +343,28 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _pendingNewStarsEarnedEvent = null;
   }
 
-  void _pause() {
+  void _pause({bool audioReset = false}) async {
     timeScale = 0;
     _dummy.stop();
+    if (_characterBio.isVisible) _characterBio.setCharacterBio(game.storageCenter.inventory.character, animation: false);
+    audioReset ? game.audioCenter.stopBackgroundMusic() : game.audioCenter.pauseBackgroundMusic();
+    if (audioReset) _audioWasReset;
   }
 
   void _resume() {
     timeScale = 1;
     _dummy.start();
+    _audioWasReset ? game.audioCenter.startBackgroundMusic(BackgroundMusic.menu) : game.audioCenter.resumeBackgroundMusic();
+    if (_audioWasReset) _audioWasReset = false;
+  }
+
+  void _start() {
+    game.audioCenter.startBackgroundMusic(BackgroundMusic.menu);
+  }
+
+  void _stop() {
+    _dummy.stop();
+    game.audioCenter.stopBackgroundMusic();
   }
 
   Future<void> _openInventory() async {
@@ -360,7 +376,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   Future<void> _closeInventory() async {
     _characterBio.hide();
-    await _spotlight.expandToFull();
     _inputBlockerSpotlight.disable();
+    await _spotlight.expandToFull();
   }
 }

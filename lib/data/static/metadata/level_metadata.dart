@@ -45,11 +45,11 @@ class LevelMetadata {
 }
 
 extension LevelMetadataListLookup on List<LevelMetadata> {
-  LevelMetadata getLevelByNumber(int number) =>
+  LevelMetadata levelByNumber(int number) =>
       firstWhere((level) => level.number == number, orElse: () => firstWhere((level) => level.number == 1));
 
-  LevelMetadata getLevelByUUID(String uuid) =>
-      firstWhere((level) => level.uuid == uuid, orElse: () => firstWhere((level) => level.number == 1));
+  LevelMetadata levelById(String levelUuid) =>
+      firstWhere((level) => level.uuid == levelUuid, orElse: () => firstWhere((level) => level.number == 1));
 }
 
 extension LevelMetadataMapLookup on Map<String, List<LevelMetadata>> {

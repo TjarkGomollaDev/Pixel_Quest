@@ -162,7 +162,6 @@ class Player extends SpriteAnimationGroupComponent
   double? _targetX;
 
   // getter hitbox related
-  Vector2 get respawnPosition => _respawnPosition;
   Vector2 get hitboxLocalPosition => _hitbox.position;
   Vector2 get hitboxLocalSize => _hitbox.size;
   Vector2 get hitboxAbsolutePosition => Vector2(_hitboxLeft, _hitboxTop);
@@ -171,6 +170,10 @@ class Player extends SpriteAnimationGroupComponent
   double get hitboxAbsoluteRight => _hitboxRight;
   double get hitboxAbsoluteTop => _hitboxTop;
   double get hitboxAbsoluteBottom => _hitboxBottom;
+
+  // getter
+  Vector2 get respawnPosition => _respawnPosition;
+  bool get spawnProtection => _isSpawnProtectionActive;
 
   @override
   FutureOr<void> onLoad() {
@@ -540,12 +543,15 @@ class Player extends SpriteAnimationGroupComponent
     // player moves to the horizontal center of the finish
     await _waitUntilPlayerIsAtX(finish.toAbsoluteRect().center.dx);
 
-    // spotlight animation
+    // place spotlight in visible world rect and transform player center in local space
     final playerCenter = hitboxAbsoluteRect.center.toVector2();
-    final spotlight = Spotlight(targetCenter: playerCenter);
+    final topLeft = game.camera.visibleWorldRect.topLeft.toVector2();
+    final spotlight = Spotlight(localTargetCenter: playerCenter - topLeft, position: topLeft);
     world.add(spotlight);
+
+    // spotlight animation
     await spotlight.focusOnTarget();
-    game.audioCenter.playBackgroundMusic(BackgroundMusic.win);
+    game.audioCenter.startBackgroundMusic(BackgroundMusic.win);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // star positions

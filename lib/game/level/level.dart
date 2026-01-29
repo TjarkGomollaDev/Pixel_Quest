@@ -112,6 +112,9 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   bool _levelPaused = false;
   PaintDecorator decorator = PaintDecorator.tint(AppTheme.screenBlur)..addBlur(6.0);
 
+  // indicates whether we are in active gameplay or in the start and end animation sequence
+  bool _isGameplayActive = false;
+
   // timestamp used to measure loading time and used in conjunction with the loading overlay
   late final DateTime _startTime;
 
@@ -171,7 +174,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
   @override
   void renderFromCamera(Canvas canvas) {
-    if (_levelPaused) return decorator.applyChain(super.renderFromCamera, canvas);
+    if (_levelPaused && _isGameplayActive) return decorator.applyChain(super.renderFromCamera, canvas);
     super.renderFromCamera(canvas);
   }
 
@@ -198,25 +201,8 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
   void _addSubscription() {
     _sub = game.eventBus.listenMany((on) {
-      on<GameLifecycleChanged>((event) {
-        // if the level is still loading, cancel and return to the menu
-        if (game.loadingOverlay.isShown) {
-          _cancelLoading();
-          game.router.pushReplacementNamed(RouteNames.menu);
-
-          // wait until the menu is mounted and then pass on the event that the menu is paused
-          game.router.currentRoute.mounted.whenComplete(() => game.eventBus.emit(event));
-
-          // cancel loading overlay
-          game.loadingOverlay.cancelAnimations();
-          return;
-        }
-        if (event.lifecycle == Lifecycle.paused && !_levelPaused) return _gameHud.triggerPause();
-      });
-      on<LevelLifecycleChanged>((event) {
-        if (event.lifecycle == Lifecycle.paused) return _pause();
-        if (event.lifecycle == Lifecycle.resumed) return _resume();
-      });
+      on<GameLifecycleChanged>((event) => _handleGameLifecycleChanged(event));
+      on<LevelLifecycleChanged>((event) => _handleLevelLifecycleChanged(event));
     });
   }
 
@@ -788,15 +774,51 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void beginGameplay() {
+    _isGameplayActive = true;
     _showAllOverlays();
-    game.audioCenter.playBackgroundMusic(BackgroundMusic.game);
+    game.audioCenter.startBackgroundMusic(BackgroundMusic.game);
     game.audioCenter.unmuteGameSfx();
   }
 
   void endGameplay() {
+    _isGameplayActive = false;
     _removeAllOverlays();
     game.audioCenter.stopBackgroundMusic();
     unawaited(game.audioCenter.muteGameSfx());
+  }
+
+  void _handleLevelLifecycleChanged(LevelLifecycleChanged event) {
+    if (event.lifecycle == Lifecycle.paused) return _pause();
+    if (event.lifecycle == Lifecycle.resumed) return _resume();
+  }
+
+  void _handleGameLifecycleChanged(GameLifecycleChanged event) {
+    // if the level is still loading, cancel and return to the menu
+    if (game.loadingOverlay.isShown) {
+      _cancelLoading();
+      game.router.pushReplacementNamed(RouteNames.menu);
+
+      // wait until the menu is mounted and then pass on the event that the menu is paused
+      game.router.currentRoute.mounted.whenComplete(() => game.eventBus.emit(GameLifecycleChanged(event.lifecycle, reset: true)));
+
+      // cancel loading overlay
+      game.loadingOverlay.cancelAnimations();
+      return;
+    }
+
+    // pause level
+    if (event.lifecycle == Lifecycle.paused && !_levelPaused) {
+      if (_isGameplayActive) {
+        // if we are in gameplay, pause with pause page
+        return _gameHud.triggerPause();
+      } else {
+        // if we are not in gameplay (level start and end), pause without pause page
+        return _pause();
+      }
+    }
+
+    // resume level only when we are not in gameplay, otherwise the user should do this manually
+    if (event.lifecycle == Lifecycle.resumed && !_isGameplayActive) return _resume();
   }
 
   void _pause() {

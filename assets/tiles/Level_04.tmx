@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="450" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="465">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="450" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="466">
  <tileset firstgid="1" source="Pixel Adventure.tsx"/>
  <layer id="1" name="Background" width="450" height="20">
   <properties>
@@ -571,7 +571,6 @@
     <property name="side" type="int" value="3"/>
    </properties>
   </object>
-  <object id="438" name="Start" type="Start" x="32" y="96" width="64" height="64"/>
   <object id="444" name="Spikes" type="Spikes" x="1744" y="208" width="16" height="16">
    <properties>
     <property name="side" type="int" value="3"/>
@@ -615,5 +614,6 @@
     <property name="offsetPos" type="float" value="4"/>
    </properties>
   </object>
+  <object id="465" name="Start" type="Start" x="5136" y="112" width="64" height="64"/>
  </objectgroup>
 </map>

@@ -3,13 +3,13 @@ import 'package:flame/extensions.dart';
 abstract class GameSettings {
   // custom debug mode
   static const bool testMode = true;
-  static const bool customDebugMode = true;
+  static const bool customDebugMode = false;
 
   // mobile cotrols
   static const bool showMobileControls = true;
-  static const double joystickRadius = 32;
-  static const double knobRadius = 14;
-  static const double jumpBtnRadius = 18;
+  static const double joystickRadius = 42;
+  static const double knobRadius = 20;
+  static const double jumpBtnRadius = 28;
 
   // tiled map dimensions
   static const double tileSize = 16;

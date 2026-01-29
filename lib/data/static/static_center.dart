@@ -42,5 +42,5 @@ class StaticCenter {
   List<WorldMetadata> allWorlds() => _allWorlds;
 
   /// Returns the world metadata for the given world id.
-  WorldMetadata worldById(String worldUuid) => _allWorlds.getWorldByUUID(worldUuid);
+  WorldMetadata worldById(String worldUuid) => _allWorlds.worldById(worldUuid);
 }

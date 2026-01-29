@@ -6,7 +6,8 @@ enum PageAction { opend, closed }
 
 class GameLifecycleChanged extends GameEvent {
   final Lifecycle lifecycle;
-  const GameLifecycleChanged(this.lifecycle);
+  final bool reset;
+  const GameLifecycleChanged(this.lifecycle, {this.reset = false});
 }
 
 class LevelLifecycleChanged extends GameEvent {

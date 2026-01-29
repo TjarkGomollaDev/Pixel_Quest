@@ -385,10 +385,16 @@ class AudioCenter {
   Future<void> resumeAllLoops() async => await Future.wait([for (final player in _loopPlayers.values) player.resume()]);
 
   /// Starts playing background music (replaces any currently playing track).
-  void playBackgroundMusic(BackgroundMusic music) => FlameAudio.bgm.play(music.path, volume: effectiveMusicVolume);
+  void startBackgroundMusic(BackgroundMusic music) => unawaited(FlameAudio.bgm.play(music.path, volume: effectiveMusicVolume));
 
   /// Stops the currently playing background music track, if any.
-  void stopBackgroundMusic() => FlameAudio.bgm.stop();
+  void stopBackgroundMusic() => unawaited(FlameAudio.bgm.stop());
+
+  /// Pauses the currently playing background music track, if any.
+  void pauseBackgroundMusic() => unawaited(FlameAudio.bgm.pause());
+
+  /// Resumes the currently paused background music track, if any.
+  void resumeBackgroundMusic() => unawaited(FlameAudio.bgm.resume());
 
   Future<void> _applyBgmVolume() async {
     if (!FlameAudio.bgm.isPlaying) return;

@@ -90,7 +90,7 @@ class StorageCenter {
   void _loadAllWorlds() {
     if (_staticCenter.allWorlds().isEmpty) return;
     for (final worldMetadata in _staticCenter.allWorlds()) {
-      _loadWorld(worldMetadata.uuid, _staticCenter.allWorlds().getIndexByUUID(worldMetadata.uuid));
+      _loadWorld(worldMetadata.uuid, _staticCenter.allWorlds().indexById(worldMetadata.uuid));
     }
   }
 
@@ -175,16 +175,17 @@ class StorageCenter {
     // check if any relevant field has changed
     if (!data.shouldReplace(storedData)) return;
 
-    // update level data
-    final json = jsonEncode(data.toMap());
-    await _prefs.setString(data.uuid, json);
+    // optimistic cache update
     _cacheLevelData[data.uuid] = data;
 
-    // update world data
+    // update stored level data
+    final json = jsonEncode(data.toMap());
+    await _prefs.setString(data.uuid, json);
+
+    // update stored world data
     final starDiff = data.starDifference(storedData);
     if (starDiff > 0) {
       final updatedWorld = _cacheWorldData[worldUuid]!.copyWithIncreasedStars(starDiff);
-      await saveWorld(updatedWorld);
 
       // add event to stream
       _onDataChanged.add(
@@ -196,14 +197,18 @@ class StorageCenter {
           levelStars: data.stars,
         ),
       );
+
+      await saveWorld(updatedWorld);
     }
   }
 
   /// Persists the given world data.
   Future<void> saveWorld(WorldEntity data) async {
+    // optimistic cache update
+    _cacheWorldData[data.uuid] = data;
+
     final json = jsonEncode(data.toMap());
     await _prefs.setString(data.uuid, json);
-    _cacheWorldData[data.uuid] = data;
   }
 
   /// Persists the given settings data.
@@ -221,16 +226,22 @@ class StorageCenter {
       joystickSetup: joystickSetup,
       showMiniMapAtStart: showMiniMapAtStart,
     );
+
+    // optimistic cache update
+    _cacheSettings = data;
+
     final json = jsonEncode(data.toMap());
     await _prefs.setString(_storageKeySettings, json);
-    _cacheSettings = data;
   }
 
   /// Persists the given inventory data.
   Future<void> saveInventory({PlayerCharacter? character, BackgroundChoice? levelBackground, BackgroundChoice? loadingBackground}) async {
     final data = inventory.copyWith(character: character, levelBackground: levelBackground, loadingBackground: loadingBackground);
+
+    // optimistic cache update
+    _cacheInventory = data;
+
     final json = jsonEncode(data.toMap());
     await _prefs.setString(_storageKeyInventory, json);
-    _cacheInventory = data;
   }
 }

@@ -46,10 +46,10 @@ class WorldMetadata {
 }
 
 extension WorldMetadataLookup on List<WorldMetadata> {
-  WorldMetadata getWorldByUUID(String uuid) => (firstWhere((level) => level.uuid == uuid, orElse: () => this[0]));
+  WorldMetadata worldById(String worldUuid) => (firstWhere((level) => level.uuid == worldUuid, orElse: () => this[0]));
 
-  int getIndexByUUID(String uuid) {
-    final index = indexWhere((world) => world.uuid == uuid);
+  int indexById(String worldUuid) {
+    final index = indexWhere((world) => world.uuid == worldUuid);
     return index == -1 ? 0 : index;
   }
 }

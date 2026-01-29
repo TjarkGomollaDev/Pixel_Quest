@@ -174,7 +174,7 @@ class Chicken extends PositionComponent
     }
 
     // first, we check whether the player is within the range in which the chicken can move
-    if (_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom)) {
+    if (_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom) && !_player.spawnProtection) {
       if (!_attackSoundPlayedThisRange && _timeSinceLastAttackSound >= _attackSoundCooldown) {
         game.audioCenter.playSound(Sfx.chicken, SfxType.game);
         _timeSinceLastAttackSound = 0;

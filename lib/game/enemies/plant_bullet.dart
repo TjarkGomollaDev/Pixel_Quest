@@ -6,6 +6,7 @@ import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
 import 'package:pixel_adventure/game/collision/world_collision.dart';
 import 'package:pixel_adventure/game/enemies/turtle.dart';
+import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
@@ -19,7 +20,8 @@ import 'package:pixel_adventure/game/game.dart';
 ///
 /// The bullet moves straight left/right, damages the player on hit,
 /// and disappears when colliding with solid world/trap/enemy objects.
-class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, DebugOutlineOnly {
+class PlantBullet extends SpriteComponent
+    with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, EntityOnMiniMap, DebugOutlineOnly {
   // constructor parameters
   final bool _isLeft;
   final Player _player;
@@ -87,6 +89,7 @@ class PlantBullet extends SpriteComponent with EntityCollision, HasGameReference
     priority = GameSettings.enemieBulletLayerLevel;
     add(_hitbox);
     _moveDirection = _isLeft ? -1 : 1;
+    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
   }
 
   void _loadSprite() {
