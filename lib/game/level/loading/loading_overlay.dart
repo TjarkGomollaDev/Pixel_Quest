@@ -164,10 +164,10 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     final stageInfoBgSize = Vector2(_stageInfoText.size.x + 15, GameSettings.hudBgTileSize);
     _stageInfoBg = RRectComponent(
       color: AppTheme.tileBlur,
-      borderRadius: 2,
+      borderRadius: GameSettings.hugBgTileRadius,
       size: stageInfoBgSize,
       position: Vector2(
-        _safePadding.minLeft(GameSettings.hudHorizontalMargin) + stageInfoBgSize.x / 2,
+        _safePadding.minLeft(GameSettings.hudHorizontalMinMargin) + stageInfoBgSize.x / 2,
         size.y - stageInfoBgSize.y / 2 - GameSettings.hudVerticalMargin,
       ),
       anchor: Anchor.center,

@@ -9,6 +9,7 @@ import 'package:pixel_adventure/game/enemies/turtle.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/traps/fire.dart';
 import 'package:pixel_adventure/game/traps/saw.dart';
+import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
 import 'package:pixel_adventure/game/traps/spikes.dart';
 import 'package:pixel_adventure/game/utils/debug_components.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
@@ -46,7 +47,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
   int _spawnProtectionFrames = 2;
 
   // list of objects that will destroy the projectile upon collision
-  static const List<Type> _despawnTypes = [WorldBlock, Saw, Turtle, Spikes, Fire]; // [Adjustable]
+  static const List<Type> _despawnTypes = [WorldBlock, Saw, SawCircleSingleSaw, Turtle, Spikes, Fire]; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {

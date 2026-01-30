@@ -13,13 +13,13 @@ class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, Vis
   final bool _show;
 
   LevelGrid({required String worldUuid, bool show = true}) : _worldUuid = worldUuid, _show = show {
-    size = _tileSize * 4 + _tileSpacing * 3;
-    position = Vector2((game.size.x - size.x) / 2, GameSettings.tileSize * 4);
+    size = Vector2(_tileSize.x * 4 + _tileSpacing.x * 3, _tileSize.y * 3 + _tileSpacing.y * 2);
+    position = Vector2((game.size.x - size.x) / 2, GameSettings.tileSize * 3.6);
   }
 
   // grid
   static final _tileSize = Vector2(GameSettings.tileSize * 3, GameSettings.tileSize * 2);
-  static final Vector2 _tileSpacing = Vector2(GameSettings.tileSize * 2, GameSettings.tileSize);
+  static final Vector2 _tileSpacing = Vector2(GameSettings.tileSize * 1.2, GameSettings.tileSize * 1.2);
   final Map<String, LevelTile> _grid = {};
 
   // show animation settings

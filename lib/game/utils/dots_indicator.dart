@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/game_settings.dart';
 
 /// A lightweight page indicator made of dots.
 class DotsIndicator extends PositionComponent {
@@ -14,6 +15,7 @@ class DotsIndicator extends PositionComponent {
   final double _bgPaddingHorizontal;
   final double _bgPaddingVertical;
   final double _bgRadius;
+  final bool _round;
 
   DotsIndicator({
     required int dotCount,
@@ -21,11 +23,12 @@ class DotsIndicator extends PositionComponent {
     double dotRadius = 2.5,
     double spacing = 4,
     Color activeColor = AppTheme.white,
-    Color inactiveColor = AppTheme.grayDark3,
+    Color inactiveColor = AppTheme.backgroundColor,
     Color? backgroundColor = AppTheme.grayLight3,
     double paddingHorizontal = 4,
     double paddingVertical = 3,
-    double backgroundRadius = 3,
+    double backgroundRadius = GameSettings.hugBgTileRadius,
+    bool round = true,
     super.position,
     super.anchor = Anchor.topCenter,
     super.priority,
@@ -38,7 +41,8 @@ class DotsIndicator extends PositionComponent {
        _bgPaint = backgroundColor != null ? (Paint()..color = backgroundColor) : null,
        _bgPaddingHorizontal = paddingHorizontal,
        _bgPaddingVertical = paddingVertical,
-       _bgRadius = backgroundRadius {
+       _bgRadius = backgroundRadius,
+       _round = round {
     _computeSize();
     _activeIndex = startIndex.clamp(0, _dotCount - 1);
   }
@@ -70,6 +74,7 @@ class DotsIndicator extends PositionComponent {
   void render(Canvas canvas) {
     super.render(canvas);
     if (_dotCount <= 0) return;
+
     final diameter = _dotRadius * 2;
 
     // render optional background
@@ -79,15 +84,28 @@ class DotsIndicator extends PositionComponent {
     }
 
     // dots offsets depend on background
-    final offsetX = _bgPaint != null ? _bgPaddingHorizontal : 0;
-    final offsetY = _bgPaint != null ? _bgPaddingVertical : 0;
-    final centerY = offsetY + (diameter / 2);
+    final offsetX = _bgPaint != null ? _bgPaddingHorizontal : 0.0;
+    final offsetY = _bgPaint != null ? _bgPaddingVertical : 0.0;
 
-    // render dots
-    for (int i = 0; i < _dotCount; i++) {
-      final cx = offsetX + _dotRadius + i * (diameter + _dotSpacing);
+    final step = diameter + _dotSpacing;
+
+    // pixel-snap for square mode
+    final py = offsetY.roundToDouble();
+    final s = diameter.roundToDouble();
+
+    // y-center for circle mode
+    final centerY = offsetY + diameter / 2;
+
+    for (var i = 0, x = offsetX; i < _dotCount; i++, x += step) {
       final paint = (i == _activeIndex) ? _activePaint : _inactivePaint;
-      canvas.drawCircle(Offset(cx, centerY), _dotRadius, paint);
+
+      if (_round) {
+        final cx = x + _dotRadius;
+        canvas.drawCircle(Offset(cx, centerY), _dotRadius, paint);
+      } else {
+        final px = x.roundToDouble();
+        canvas.drawRect(Rect.fromLTWH(px, py, s, s), paint);
+      }
     }
   }
 }

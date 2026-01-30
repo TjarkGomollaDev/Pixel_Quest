@@ -116,7 +116,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
   Future<void> popIn({double duration = 0.6, bool playSound = true}) {
     // create effect
     final effect = SequenceEffect([
-      ScaleEffect.to(Vector2.all(1.4), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
+      ScaleEffect.to(Vector2.all(1.2), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
       ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.5, curve: Curves.easeIn)),
     ]);
 

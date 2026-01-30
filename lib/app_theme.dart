@@ -67,8 +67,9 @@ abstract class AppTheme {
   static const debugColorWorldBlock = mintDark;
 
   // Game Colors
-  static final whiteShimmer = Color.fromRGBO(114, 114, 114, 1);
-  static final starColor = Color.fromRGBO(255, 255, 85, 1);
+  static const whiteShimmer = Color.fromRGBO(114, 114, 114, 1);
+  static const starColor = Color.fromRGBO(255, 255, 85, 1);
+  static const backgroundColor = Color.fromRGBO(33, 31, 47, 1);
   static final screenBlur = black.withAlpha(40);
   static final tileBlur = black.withAlpha(56);
   static final overlayBlur = black.withAlpha(140);
@@ -132,7 +133,8 @@ abstract class AppTheme {
 
   // HUD Text Styles
   static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 2.4);
-  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 20, color: AppTheme.white, height: 3.2);
+  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 16, color: AppTheme.white, height: 3.4);
+  static const TextStyle jumpBtn = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.8);
 
   // Splash Text Styles
   static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.4);

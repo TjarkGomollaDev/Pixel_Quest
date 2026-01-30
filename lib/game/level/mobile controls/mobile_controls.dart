@@ -25,8 +25,8 @@ class MobileControls extends PositionComponent with HasGameReference<PixelQuest>
   final bool _showAtStart;
 
   MobileControls({required PlayerInput playerInput, bool show = false}) : _playerInput = playerInput, _showAtStart = show {
-    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMargin);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMargin), GameSettings.joystickRadius * 2);
+    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMinMargin);
+    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMinMargin), GameSettings.joystickRadius * 2);
     position = Vector2(minLeft, game.size.y - GameSettings.joystickRadius * 2 - GameSettings.mapBorderWidth - 10);
   }
 

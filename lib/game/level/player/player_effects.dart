@@ -97,16 +97,22 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
   ///
   /// Useful as a quick “impact” cue; the flash fades out automatically and removes
   /// itself from the world when the opacity animation completes.
-  void playFlashScreen() {
+  void playFlashScreen({double duration = 0.2}) {
     final flash = RectangleComponent(
-      position: game.camera.visibleWorldRect.topLeft.toVector2(),
-      size: game.camera.viewport.size,
-      paint: Paint()..color = AppTheme.white.withAlpha(70),
+      position: game.camera.visibleWorldRect.topLeft.toVector2() - Vector2(20, 0),
+      size: game.camera.viewport.size + Vector2(40, 0),
+      paint: Paint()..color = AppTheme.white.withAlpha(100),
       priority: GameSettings.flashEffectLayerLevel,
     );
 
     game.world.add(flash);
-    flash.add(OpacityEffect.to(0, EffectController(duration: 0.2, curve: Curves.easeOut), onComplete: () => game.world.remove(flash)));
+    flash.add(
+      OpacityEffect.to(
+        0,
+        EffectController(duration: duration, curve: Curves.bounceInOut),
+        onComplete: () => game.world.remove(flash),
+      ),
+    );
   }
 
   /// Shakes the camera horizontally by alternating offsets around its original position.

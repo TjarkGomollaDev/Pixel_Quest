@@ -36,7 +36,7 @@ class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
     final background = CircleComponent(radius: GameSettings.jumpBtnRadius, paint: Paint()..color = AppTheme.tileBlur);
     final text = TextComponent(
       text: 'UP',
-      textRenderer: AppTheme.textBtnStandard.asTextPaint,
+      textRenderer: AppTheme.jumpBtn.asTextPaint,
       anchor: Anchor.center,
       position: size / 2 + Vector2.all(1),
     );

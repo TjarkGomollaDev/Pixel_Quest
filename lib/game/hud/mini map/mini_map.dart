@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
+import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -82,6 +84,9 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   // image of the frame
   late final VisibleSpriteComponent _frame;
 
+  // extra padded background fill to prevent edge flicker/bleed due to rounding when the view matches the frame cutout
+  VisibleRectangleComponent? _bleedGuard;
+
   // border width of the frame image
   static const double _frameBorderWidth = 12; // [Adjustable]
   static const double _frameOverhangAdjust = 3; // [Adjustable]
@@ -93,7 +98,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
 
   // btn margin and spacing
   static const double _btnLeftMargin = 4; // [Adjustable]
-  static const double _scrollBtnsSpacing = 3; // [Adjustable]
+  static const double _scrollBtnsSpacing = 5; // [Adjustable]
 
   // arrow layer
   static const double _arrowLayerSpacing = 1; // [Adjustable]
@@ -193,8 +198,20 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     } else {
       targetSize = miniMapTargetViewSize;
       viewPosition = Vector2.all(_frameBorderWidth);
+
+      // add bleed guard to hide background seams from subpixel rounding at the frame cutout edges,
+      // only relevant if the view is the same size as the inside of the frame
+      final pad = 1.0;
+      _bleedGuard = VisibleRectangleComponent(
+        paint: Paint()..color = AppTheme.backgroundColor,
+        size: targetSize + Vector2.all(pad * 2),
+        position: viewPosition - Vector2.all(pad),
+        show: _showAtStart ? _inistialState : false,
+      );
+      add(_bleedGuard!);
     }
 
+    // create view with the calculated parameters
     _miniMapView = MiniMapView(
       sprite: _miniMapSprite,
       targetSize: targetSize,
@@ -206,7 +223,6 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
       position: viewPosition,
       show: _showAtStart ? _inistialState : false,
     );
-
     add(_miniMapView);
   }
 
@@ -271,6 +287,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     _hideBtn.show();
     if (!_inistialState) return;
     _miniMapView.show();
+    _bleedGuard?.show();
     _frame.show();
     _arrowLayer.show();
     _scrollLeftBtn.show();
@@ -288,6 +305,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// Folds the mini map in.
   Future<void> _foldInAnimated() async {
     _miniMapView.hide();
+    _bleedGuard?.hide();
     _frame.hide();
     _arrowLayer.hide();
     await Future.wait([_scrollLeftBtn.animatedHide(delay: 0.15), _scrollRightBtn.animatedHide()]);

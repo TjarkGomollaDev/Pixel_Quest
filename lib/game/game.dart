@@ -249,7 +249,7 @@ class PixelQuest extends FlameGame
 
   void _setUpRouter() {
     router = createRouter(staticCenter: staticCenter);
-    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInWorldByIndex(0).levelByNumber(14).uuid);
+    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInWorldByIndex(0).levelByNumber(1).uuid);
     add(router);
   }
 

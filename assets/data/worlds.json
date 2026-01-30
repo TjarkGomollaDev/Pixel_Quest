@@ -2,9 +2,9 @@
   {  
     "uuid": "014809d5-8ec5-4171-a82e-df72e7839d45",
     "titleFileName": "World_1_Title",
-    "foregroundFileName": "World_1_Foreground",
+    "foregroundFileName": "World_01_Foreground",
     "miniMapFrameFileName": "MiniMap_Frame_World_1",
-    "backgroundScene": "scene1",
+    "backgroundScene": "scene6",
     "baseBlock": "mud",
     "levelUuids": [
       "bd278912-62ee-4e96-8130-6deb764016bc",
@@ -18,18 +18,15 @@
       "1cad9a69-2d7d-4a3b-8d06-0c0e0aa2908a",
       "8209bf38-da80-4d41-95c4-9395e9f3129d",
       "9d39de83-59cf-4e4f-9cf1-bedbf344c69d",
-      "91e91a6d-58a8-4fa2-b9c8-92dff0dbf085",
-      "e51cbaf5-05f3-4ff9-95cb-d5b1e5b2483c",
-      "0c730d10-9f9d-4e43-96ee-6111a5ee06be",
-      "1b6b292d-28df-4894-ae87-6292adfe3eb7",
-      "d8f75fd3-2ec9-4bea-aba6-7f94b3103834"]
+      "91e91a6d-58a8-4fa2-b9c8-92dff0dbf085"
+    ]
   },
   {
     "uuid": "07ee6495-e92a-4845-95a6-500f402420d3",
     "titleFileName": "World_2_Title",
-    "foregroundFileName": "World_2_Foreground",
+    "foregroundFileName": "World_02_Foreground",
     "miniMapFrameFileName": "MiniMap_Frame_World_2",
-    "backgroundScene": "scene6",
+    "backgroundScene": "scene2",
     "baseBlock": "sand",
     "levelUuids": [
       "7eb6e210-54e5-447f-908d-3ee026a25532",
@@ -43,11 +40,7 @@
       "10c0b178-413f-4429-be49-9d0d6fc50657",
       "187419d2-23da-482c-aa79-f3cd34810a92",
       "a0febf79-2811-4544-bf1b-26633cf87edb",
-      "8c884767-1553-446f-b5fa-4ce2c2ab04b1",
-      "43455063-6d25-4abd-9127-e43e7afc349b",
-      "f3212349-51ac-4f79-b705-6285ed42fe4b",
-      "7bc56ed0-f2ce-4051-bf72-20a4c2712a0f",
-      "15e015e4-119f-4ccf-bd8e-e5a4d1d386a9"
+      "8c884767-1553-446f-b5fa-4ce2c2ab04b1"
     ]
   }
 ]

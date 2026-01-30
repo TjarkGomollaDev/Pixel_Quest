@@ -50,6 +50,25 @@ class VisibleSpriteComponent extends SpriteComponent with VisibleComponent {
   }
 }
 
+/// RectangleComponent variant that supports the [VisibleComponent] show/hide pattern.
+class VisibleRectangleComponent extends RectangleComponent with VisibleComponent {
+  VisibleRectangleComponent({
+    super.position,
+    super.size,
+    super.scale,
+    super.angle,
+    super.anchor,
+    super.children,
+    super.priority,
+    super.paint,
+    super.paintLayers,
+    super.key,
+    bool show = true,
+  }) {
+    initVisibility(show);
+  }
+}
+
 /// TextComponent variant that supports the [VisibleComponent] show/hide pattern.
 class VisibleTextComponent extends TextComponent with VisibleComponent {
   VisibleTextComponent({

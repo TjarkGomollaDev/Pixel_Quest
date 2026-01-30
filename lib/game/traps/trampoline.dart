@@ -51,7 +51,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
   static const String _pathEnd = '.png';
 
   // bounce
-  final double _bounceHeight = 500; // [Adjustable]
+  final double _bounceHeight = 460; // [Adjustable]
   bool _isBouncing = false;
 
   @override

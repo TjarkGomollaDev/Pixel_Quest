@@ -3,27 +3,27 @@
     "worldUuid": "014809d5-8ec5-4171-a82e-df72e7839d45",
     "levels": [
       {
-        "tmxFileName": "Level_01",
+        "tmxFileName": "Level_01_01",
         "btnFileName": "01",
         "uuid": "bd278912-62ee-4e96-8130-6deb764016bc"
       },
       {
-        "tmxFileName": "Level_02",
+        "tmxFileName": "Level_01_02",
         "btnFileName": "02",
         "uuid": "875a7aa7-5899-4dfe-96a5-d99d070c44d6"
       },
       {
-        "tmxFileName": "Level_03",
+        "tmxFileName": "Level_01_03",
         "btnFileName": "03",
         "uuid": "f4c710e8-847c-4334-a0d7-39915939eaaf"
       },
       {
-        "tmxFileName": "Level_04",
+        "tmxFileName": "Level_01_04",
         "btnFileName": "04",
         "uuid": "e6e1a833-2ce8-482f-b7b7-1a84cfe74cfd"
       },
       {
-        "tmxFileName": "Level_05",
+        "tmxFileName": "Level_01_05",
         "btnFileName": "05",
         "uuid": "85821992-ee5b-442b-9a6d-882e7931a956"
       },
@@ -61,26 +61,6 @@
         "tmxFileName": "Level_13",
         "btnFileName": "12",
         "uuid": "91e91a6d-58a8-4fa2-b9c8-92dff0dbf085"
-      },
-      {
-        "tmxFileName": "Level_13",
-        "btnFileName": "13",
-        "uuid": "e51cbaf5-05f3-4ff9-95cb-d5b1e5b2483c"
-      },
-      {
-        "tmxFileName": "Level_13",
-        "btnFileName": "14",
-        "uuid": "0c730d10-9f9d-4e43-96ee-6111a5ee06be"
-      },
-      {
-        "tmxFileName": "Level_13",
-        "btnFileName": "15",
-        "uuid": "1b6b292d-28df-4894-ae87-6292adfe3eb7"
-      },
-      {
-        "tmxFileName": "Level_13",
-        "btnFileName": "16",
-        "uuid": "d8f75fd3-2ec9-4bea-aba6-7f94b3103834"
       }
     ]
   },
@@ -146,26 +126,6 @@
         "tmxFileName": "Level_2-01",
         "btnFileName": "12",
         "uuid": "8c884767-1553-446f-b5fa-4ce2c2ab04b1"
-      },
-      {
-        "tmxFileName": "Level_2-01",
-        "btnFileName": "13",
-        "uuid": "43455063-6d25-4abd-9127-e43e7afc349b"
-      },
-      {
-        "tmxFileName": "Level_2-01",
-        "btnFileName": "14",
-        "uuid": "f3212349-51ac-4f79-b705-6285ed42fe4b"
-      },
-      {
-        "tmxFileName": "Level_2-01",
-        "btnFileName": "15",
-        "uuid": "7bc56ed0-f2ce-4051-bf72-20a4c2712a0f"
-      },
-      {
-        "tmxFileName": "Level_2-01",
-        "btnFileName": "16",
-        "uuid": "15e015e4-119f-4ccf-bd8e-e5a4d1d386a9"
       }
     ]
   }

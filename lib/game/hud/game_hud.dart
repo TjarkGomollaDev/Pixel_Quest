@@ -42,8 +42,11 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
        _levelMetadata = levelMetadata,
        _miniMapEntities = miniMapEntities,
        _showAtStart = show {
-    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMargin);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMargin), SpriteBtnType.btnSizeCorrected.y);
+    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMinMargin);
+    size = Vector2(
+      game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMinMargin),
+      SpriteBtnType.btnSizeCorrected.y,
+    );
     position = Vector2(minLeft, GameSettings.mapBorderWidth + GameSettings.hudVerticalMargin);
   }
 
@@ -115,7 +118,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // fruit background
     _fruitBg = RRectComponent(
       color: AppTheme.tileBlur,
-      borderRadius: 2,
+      borderRadius: GameSettings.hugBgTileRadius,
       position: _restartBtn.position + Vector2(SpriteBtnType.btnSizeCorrected.x / 2 + GameSettings.hudSectionSpacing, 0),
       size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,
@@ -126,7 +129,6 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Apple.png'),
       position: _fruitBg.position + Vector2(_fruitBg.size.x / 2, 2),
-      size: Vector2.all(32),
       anchor: Anchor.center,
       show: _showAtStart,
     );
@@ -147,7 +149,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     // death background
     _deathBg = RRectComponent(
       color: AppTheme.tileBlur,
-      borderRadius: 2,
+      borderRadius: GameSettings.hugBgTileRadius,
       position: _fruitsCount.position + Vector2(_fruitsCount.size.x + GameSettings.hudSectionSpacing, 0),
       size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,

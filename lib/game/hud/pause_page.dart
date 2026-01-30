@@ -83,7 +83,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
     // pause text
     _pauseText = TextComponent(
       text: game.l10n.pauseTitel.toUpperCase(),
-      position: Vector2(0, -30),
+      position: Vector2(0, -12),
       anchor: Anchor.center,
       textRenderer: AppTheme.pausedHeading.asTextPaint,
     );
@@ -93,15 +93,15 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
       color: AppTheme.tileBlur,
       borderRadius: 4,
       position: _pauseText.position,
-      size: Vector2(_pauseText.size.x + 40, 40),
+      size: Vector2(_pauseText.size.x + 30, 32),
       anchor: Anchor.center,
     );
 
     // outline
     _pauseOutline = CornerOutline(
-      size: _pauseBg.size + Vector2.all(16),
-      cornerLength: 12,
-      strokeWidth: 3.5,
+      size: _pauseBg.size + Vector2.all(12),
+      cornerLength: 10,
+      strokeWidth: 2.6,
       color: AppTheme.white,
       anchor: Anchor.center,
       position: _pauseText.position,
@@ -114,7 +114,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
         if (animationEnabled) _stopShowAnimation();
         game.router.pushNamed(RouteNames.settings);
       },
-      position: Vector2(0, 24),
+      position: _pauseText.position + Vector2(0, 46),
     );
 
     // menu btn

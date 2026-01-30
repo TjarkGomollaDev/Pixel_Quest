@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pixel_adventure/app_theme.dart';
 import 'package:pixel_adventure/game/collision/collision.dart';
 import 'package:pixel_adventure/game/collision/entity_collision.dart';
@@ -188,6 +189,7 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void update(double dt) {
     _updateHitboxEdges();
+    _checkFallOutOfMap();
     _applyInput();
     _updateMovement(dt);
     _updateGravity(dt);
@@ -389,6 +391,12 @@ class Player extends SpriteAnimationGroupComponent
     _hitboxRight = _hitboxLeft + _hitbox.width;
     _hitboxTop = position.y + _hitbox.position.y;
     _hitboxBottom = _hitboxTop + _hitbox.height;
+  }
+
+  void _checkFallOutOfMap() {
+    if (position.y > game.camera.visibleWorldRect.bottom && !_isSpawnProtectionActive) {
+      _respawn(CollisionSide.none);
+    }
   }
 
   void _applyInput() {
@@ -619,6 +627,8 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _respawn(CollisionSide collisionSide) async {
+    final gotHit = collisionSide != CollisionSide.any && collisionSide != CollisionSide.none;
+
     // hit
     _isSpawnProtectionActive = true;
     _isGravityActive = false;
@@ -630,13 +640,15 @@ class Player extends SpriteAnimationGroupComponent
     game.eventBus.emit(const PlayerRespawned());
 
     // play death effects
-    game.audioCenter.playSound(Sfx.playerHit, SfxType.player);
-    game.audioCenter.playSound(Sfx.playerDeath, SfxType.player);
-    _effect.playFlashScreen();
-    _effect.shakeCamera();
     current = PlayerState.hit;
-    await _effect.playDeathTrajectory(collisionSide);
-    game.setRefollowForLevelCamera(this);
+    if (gotHit) game.audioCenter.playSound(Sfx.playerHit, SfxType.player);
+    game.audioCenter.playSound(Sfx.playerDeath, SfxType.player);
+    if (gotHit) {
+      _effect.playFlashScreen();
+
+      await Future.wait([_effect.shakeCamera(), _effect.playDeathTrajectory(collisionSide)]);
+      game.setRefollowForLevelCamera(this);
+    }
     isVisible = false;
 
     // respawn

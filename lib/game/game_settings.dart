@@ -9,24 +9,26 @@ abstract class GameSettings {
   static const bool showMobileControls = true;
   static const double joystickRadius = 42;
   static const double knobRadius = 20;
-  static const double jumpBtnRadius = 28;
+  static const double jumpBtnRadius = 30;
 
   // tiled map dimensions
   static const double tileSize = 16;
-  static const double mapHeight = 320;
-  static const double mapBorderWidth = tileSize / 2;
+  static const double mapHeight = 256;
+  static const double mapBorderWidth = 0;
   static const bool hasBorder = mapBorderWidth != 0;
+  static const bool bottomWorldBorder = false;
 
   // animation settings
   static const double stepTime = 0.05;
 
   // hud
   static const double hudVerticalMargin = 10;
-  static const double hudHorizontalMargin = 40;
+  static const double hudHorizontalMinMargin = 20;
   static const double hudBtnSpacing = 6;
   static const double hudBtnTextSpacing = 4;
   static const double hudSectionSpacing = 18;
   static const double hudBgTileSize = 19;
+  static const double hugBgTileRadius = 2;
 
   // in which layers the various objects are rendered
   static const int mapLayerLevel = 0;

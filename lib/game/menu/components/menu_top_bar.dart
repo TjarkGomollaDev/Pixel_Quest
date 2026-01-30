@@ -16,8 +16,11 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   final int _startWorldIndex;
 
   MenuTopBar({required int startWorldIndex}) : _startWorldIndex = startWorldIndex {
-    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMargin);
-    size = Vector2(game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMargin), SpriteBtnType.btnSizeCorrected.y);
+    final minLeft = game.safePadding.minLeft(GameSettings.hudHorizontalMinMargin);
+    size = Vector2(
+      game.size.x - minLeft - game.safePadding.minRight(GameSettings.hudHorizontalMinMargin),
+      SpriteBtnType.btnSizeCorrected.y,
+    );
     position = Vector2(minLeft, GameSettings.hudVerticalMargin);
   }
   // btns
@@ -47,7 +50,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     // star background
     _starBg = RRectComponent(
       color: AppTheme.tileBlur,
-      borderRadius: 2,
+      borderRadius: GameSettings.hugBgTileRadius,
       position: Vector2(0, size.y / 2),
       size: Vector2.all(GameSettings.hudBgTileSize),
       anchor: Anchor.centerLeft,

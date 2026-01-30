@@ -76,9 +76,12 @@ class MiniMapArrowLayer extends PositionComponent with HasGameReference<PixelQue
 
     // based on all four values, it is now very easy to check which entities are obscured by the minimap
     for (final entity in _arrowCandidates) {
-      final entityCenter = entity.occlusionPosition;
-      if (entityCenter.x > frameLeft && entityCenter.y > _frameTop && entityCenter.x < frameRight && entityCenter.y < _frameBottom) {
-        _renderTriangleArrowMarker(canvas, entityCenter.x - frameLeft);
+      final occlusionPosition = entity.occlusionPosition;
+      if (occlusionPosition.x > frameLeft &&
+          occlusionPosition.y > _frameTop &&
+          occlusionPosition.x < frameRight &&
+          occlusionPosition.y < _frameBottom) {
+        _renderTriangleArrowMarker(canvas, occlusionPosition.x - frameLeft);
       }
     }
   }

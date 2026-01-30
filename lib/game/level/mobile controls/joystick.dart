@@ -90,8 +90,8 @@ class _JoystickBackground extends PositionComponent {
   // styling
   static final Color _bgColor = AppTheme.tileBlur; // [Adjustable]
   static const Color _arrowColor = AppTheme.grayLight6; // [Adjustable]
-  static final Vector2 _arrowSize = Vector2(5, 6); // [Adjustable]
-  static const double _arrowDistanceFromCenter = 0.7; // [Adjustable]
+  static final Vector2 _arrowSize = Vector2(6, 7); // [Adjustable]
+  static const double _arrowDistanceFromCenter = 0.72; // [Adjustable]
 
   @override
   Future<void> onLoad() async {

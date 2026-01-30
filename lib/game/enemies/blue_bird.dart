@@ -66,6 +66,9 @@ class BlueBird extends SpriteAnimationGroupComponent
   late double _leftBorder;
   late double _rightBorder;
 
+  // fixed hitbox center y position without vertical movement
+  late final double _fixedHitboxCenterY;
+
   // movement
   late int _moveDirection;
   final double _moveSpeed = 24; // [Adjustable]
@@ -123,6 +126,9 @@ class BlueBird extends SpriteAnimationGroupComponent
   @override
   ShapeHitbox get entityHitbox => _hitbox;
 
+  @override
+  Vector2 get occlusionPosition => Vector2(_hitbox.toAbsoluteRect().center.dx, _fixedHitboxCenterY);
+
   void _initialSetup() {
     // debug
     if (GameSettings.customDebugMode) {
@@ -150,8 +156,8 @@ class BlueBird extends SpriteAnimationGroupComponent
     _rangePos = position.x + _offsetPos * GameSettings.tileSize + width;
 
     // only relevant for mini map not for the actual functionality
-    final startHitboxCenterY = position.y + _hitbox.position.y + _hitbox.height / 2;
-    yMoveRange = Vector2(startHitboxCenterY - _waveAmplitude, startHitboxCenterY + _waveAmplitude);
+    _fixedHitboxCenterY = position.y + _hitbox.position.y + _hitbox.height / 2;
+    yMoveRange = Vector2(_fixedHitboxCenterY - _waveAmplitude, _fixedHitboxCenterY + _waveAmplitude);
   }
 
   void _setUpMoveDirection() {

@@ -50,7 +50,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   // spacing
   static const double _levelGridChangeWorldBtnsSpacing = 22; // [Adjustable]
-  static const double _levelGridDotsIndicatorSpacing = 14; // [Adjustable]
+  static const double _levelGridDotsIndicatorSpacing = 12; // [Adjustable]
 
   // animation event for new stars
   NewStarsEarned? _pendingNewStarsEarnedEvent;
@@ -166,10 +166,10 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _setUpWorldTitles() {
     for (final world in game.staticCenter.allWorlds()) {
       final sprite = loadSprite(game, 'Menu/Worlds/${world.titleFileName}.png');
-      final size = calculateSizeForHeight(sprite.srcSize, 28);
+      final size = calculateSizeForHeight(sprite.srcSize, 26);
       final title = VisibleSpriteComponent(
         sprite: sprite,
-        position: Vector2(game.size.x / 2, 16),
+        position: Vector2(game.size.x / 2, GameSettings.hudVerticalMargin),
         size: size,
         anchor: Anchor.topCenter,
         show: world.index == _currentWorldIndex,
@@ -224,8 +224,8 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
 
   void _setUpSpotlight() {
     _spotlightCenter = Vector2(
-      game.size.x / 2 - 16 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
-      7 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
+      game.size.x / 2 - 12 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+      5 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
     );
     _spotlight = Spotlight(localTargetCenter: _spotlightCenter);
     add(_spotlight);

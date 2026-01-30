@@ -405,17 +405,22 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
         _addTileToMiniMap(x, y, tileId, isPlatform);
 
-        // find width to the right
+        // find width to the right (merge horizontally)
         int w = 1;
-        int nextTileId = backgroundLayer.tileData![y][x + w].tile;
-        bool isNextPlatform = platformBlockIds.contains(nextTileId);
-        while (x + w < xEnd && !visited[y][x + w] && nextTileId != 0 && (isPlatform ? isNextPlatform : !isNextPlatform)) {
+        while (x + w < xEnd) {
+          if (visited[y][x + w]) break;
+
+          // read next tile id only after bounds checks
+          final nextTileId = backgroundLayer.tileData![y][x + w].tile;
+
+          if (nextTileId == 0) break;
+          final isNextPlatform = platformBlockIds.contains(nextTileId);
+          if (isPlatform ? !isNextPlatform : isNextPlatform) break;
           _addTileToMiniMap(x + w, y, nextTileId, isNextPlatform);
-          nextTileId = backgroundLayer.tileData![y][x + ++w].tile;
-          isNextPlatform = platformBlockIds.contains(nextTileId);
+          w++;
         }
 
-        // find height downwards
+        // find height downwards (merge vertically)
         int h = 1;
         if (!isPlatform) {
           bool done = false;
@@ -466,10 +471,11 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     // top, bottom, left, right
     final borders = [
       WorldBlock(position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? 0 : -borderWidth), size: horizontalSize),
-      WorldBlock(
-        position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
-        size: horizontalSize,
-      ),
+      if (GameSettings.bottomWorldBorder)
+        WorldBlock(
+          position: Vector2(hasBorder ? borderWidth : 0, hasBorder ? _levelMap.height - borderWidth : _levelMap.height),
+          size: horizontalSize,
+        ),
       WorldBlock(position: Vector2(hasBorder ? 0 : -borderWidth, hasBorder ? 0 : -borderWidth), size: verticalSize),
 
       WorldBlock(
