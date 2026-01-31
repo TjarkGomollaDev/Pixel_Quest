@@ -62,7 +62,7 @@ class _ConfirmContent extends PositionComponent with HasGameReference<PixelQuest
   void _setUpContent() {
     final centerX = size.x / 2;
 
-    // user message
+    // message
     final message = TextBoxComponent(
       text: this.message,
       anchor: Anchor.topCenter,

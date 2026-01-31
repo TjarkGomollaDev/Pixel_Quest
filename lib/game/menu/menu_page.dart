@@ -9,11 +9,10 @@ import 'package:pixel_adventure/game/game_router.dart';
 import 'package:pixel_adventure/game/menu/components/character_bio.dart';
 import 'package:pixel_adventure/game/menu/components/menu_dummy_character.dart';
 import 'package:pixel_adventure/game/background/background_parallax.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
 import 'package:pixel_adventure/game/utils/dots_indicator.dart';
-import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/utils/input_blocker.dart';
 import 'package:pixel_adventure/game/utils/load_sprites.dart';
+import 'package:pixel_adventure/game/utils/swipe_handler.dart';
 import 'package:pixel_adventure/game/utils/visible_components.dart';
 import 'package:pixel_adventure/game/game_settings.dart';
 import 'package:pixel_adventure/game/menu/components/level_grid.dart';
@@ -26,10 +25,8 @@ import 'package:pixel_adventure/game/game.dart';
 /// handles world navigation UI, and reacts to game events to keep the menu
 /// state and animations in sync.
 class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
-  // static content
+  // top bar
   late final MenuTopBar _menuTopBar;
-  late final SpriteBtn _previousWorldBtn;
-  late final SpriteBtn _nextWorldBtn;
 
   // worlds content
   final List<BackgroundParallax> _worldBackgrounds = [];
@@ -37,20 +34,21 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   final List<VisibleSpriteComponent> _worldTitles = [];
   final List<LevelGrid> _worldLevelGrids = [];
 
+  // change world via swipe
+  late final SwipeHandler _swipeHandler;
+
   // world index
   late int _currentWorldIndex;
   late final DotsIndicator _dotsIndicator;
 
   // spotlight and dummy character
-  late final Vector2 _spotlightCenter;
   late final Spotlight _spotlight;
   late final InputBlocker _inputBlockerSpotlight;
   late final CharacterBio _characterBio;
   late final MenuDummyCharacter _dummy;
 
   // spacing
-  static const double _levelGridChangeWorldBtnsSpacing = 22; // [Adjustable]
-  static const double _levelGridDotsIndicatorSpacing = 12; // [Adjustable]
+  static const double _dotsIndicatorSpacing = 24; // [Adjustable]
 
   // animation event for new stars
   NewStarsEarned? _pendingNewStarsEarnedEvent;
@@ -75,7 +73,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     _setUpWorldTitles();
     _setUpWorldLevelGrids();
     _setUpMenuTopBar();
-    _setUpChangeWorldBtns();
+    _setUpChangeWorldSwipe();
     _setUpDotsIndicator();
     _setUpSpotlight();
     _setUpInputBlocker();
@@ -134,6 +132,11 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _setUpCurrentWorldIndex() =>
       _currentWorldIndex = game.staticCenter.allWorlds().indexById(game.storageCenter.highestUnlockedWorld.uuid);
 
+  void _setUpMenuTopBar() {
+    _menuTopBar = MenuTopBar(startWorldIndex: _currentWorldIndex);
+    add(_menuTopBar);
+  }
+
   void _setUpWorldBackgrounds() {
     for (final world in game.staticCenter.allWorlds()) {
       final background = BackgroundParallax.scene(
@@ -187,47 +190,22 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     }
   }
 
-  void _setUpMenuTopBar() {
-    _menuTopBar = MenuTopBar(startWorldIndex: _currentWorldIndex);
-    add(_menuTopBar);
-  }
-
-  void _setUpChangeWorldBtns() {
-    final levelGridVerticalCenter = _worldLevelGrids[0].position.y + _worldLevelGrids[0].size.y / 2;
-    final btnHorizontalCenter = SpriteBtnType.btnSizeSmall.x / 2;
-    _previousWorldBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.previousSmall,
-      onPressed: () => _changeWorld(-1),
-      position: Vector2(_worldLevelGrids[0].position.x - _levelGridChangeWorldBtnsSpacing - btnHorizontalCenter, levelGridVerticalCenter),
-    );
-    _nextWorldBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.nextSmall,
-      onPressed: () => _changeWorld(1),
-      position: Vector2(
-        _worldLevelGrids[0].position.x + _worldLevelGrids[0].size.x + _levelGridChangeWorldBtnsSpacing + btnHorizontalCenter,
-        levelGridVerticalCenter,
-      ),
-    );
-    addAll([_previousWorldBtn, _nextWorldBtn]);
+  void _setUpChangeWorldSwipe() {
+    _swipeHandler = SwipeHandler(onSwipeLeft: () => _changeWorld(1), onSwipeRight: () => _changeWorld(-1), size: game.size);
+    add(_swipeHandler);
   }
 
   void _setUpDotsIndicator() {
     _dotsIndicator = DotsIndicator(
       dotCount: 2,
       backgroundColor: AppTheme.tileBlur,
-      position:
-          _worldLevelGrids[0].position +
-          Vector2(_worldLevelGrids[0].size.x / 2, _worldLevelGrids[0].size.y + _levelGridDotsIndicatorSpacing),
+      position: _worldLevelGrids[0].position + Vector2(_worldLevelGrids[0].size.x / 2, _worldLevelGrids[0].size.y + _dotsIndicatorSpacing),
     );
     add(_dotsIndicator);
   }
 
   void _setUpSpotlight() {
-    _spotlightCenter = Vector2(
-      game.size.x / 2 - 12 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
-      5 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
-    );
-    _spotlight = Spotlight(localTargetCenter: _spotlightCenter);
+    _spotlight = Spotlight(localTargetCenter: game.spotlightCenterMenu);
     add(_spotlight);
   }
 
@@ -237,19 +215,17 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   }
 
   void _setUpCharacterBio() {
-    _characterBio = CharacterBio(
-      position: _spotlightCenter + Vector2(-Spotlight.playerTargetRadius + 22, Spotlight.playerTargetRadius + 32),
-      show: false,
-    )..priority = GameSettings.spotlightAnimationContentLayer;
+    _characterBio = CharacterBio(position: game.spotlightCenterMenu + Vector2(-36, Spotlight.playerTargetRadius + 16), show: false)
+      ..priority = GameSettings.spotlightAnimationContentLayer;
     add(_characterBio);
   }
 
   void _setUpDummyCharacter() {
-    _dummy = MenuDummyCharacter(defaultPosition: _spotlightCenter, characterBio: _characterBio);
+    _dummy = MenuDummyCharacter(defaultPosition: game.spotlightCenterMenu, characterBio: _characterBio);
     add(_dummy);
   }
 
-  void _changeWorld(int direction) async {
+  Future<void> _changeWorld(int direction) async {
     if (_isChangingWorld) return;
     final oldIndex = _currentWorldIndex;
     final newIndex = _currentWorldIndex + direction;
@@ -258,7 +234,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     if (newIndex < 0 || newIndex >= game.staticCenter.allWorlds().length) return;
 
     _currentWorldIndex = newIndex;
-    _updateVisibleWorld(oldIndex, newIndex);
+    await _updateVisibleWorld(oldIndex, newIndex);
   }
 
   Future<void> _updateVisibleWorld(int oldIndex, int newIndex) async {

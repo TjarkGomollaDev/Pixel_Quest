@@ -13,6 +13,7 @@ import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/hud/mini%20map/mini_map_helper.dart';
 import 'package:pixel_adventure/game/level/loading/loading_overlay.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_adventure/game/utils/dummy_character.dart';
 import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
 import 'package:pixel_adventure/game/level/player/player_hitbox_position_provider.dart.dart';
 import 'package:pixel_adventure/data/audio/audio_center.dart';
@@ -92,8 +93,15 @@ class PixelQuest extends FlameGame
     _setUpLoadingOverlay();
     await _setUpMiniMapBackgroundPatterns();
     await _completeLoading();
+
+    spotlightCenterMenu = Vector2(
+      size.x / 2 - 12 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+      5 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
+    );
     return super.onLoad();
   }
+
+  late final Vector2 spotlightCenterMenu;
 
   @override
   Future<void> onMount() async {

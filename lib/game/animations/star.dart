@@ -27,11 +27,11 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
   }
 
   // size
-  static final Vector2 defaultSize = Vector2.all(24);
+  static final Vector2 defaultSize = Vector2.all(26);
 
   // animation settings
-  static const String _pathFilled = 'Other/Star.png';
-  static const String _pathOutline = 'Other/Star Outline.png';
+  static const String _pathFilled = 'Other/Star (32x32).png';
+  static const String _pathOutline = 'Other/Star Outline (32x32).png';
 
   // animation keys
   static const String _keyFlyToAndScaleIn = 'fly-to-and-scale-in';
@@ -116,7 +116,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
   Future<void> popIn({double duration = 0.6, bool playSound = true}) {
     // create effect
     final effect = SequenceEffect([
-      ScaleEffect.to(Vector2.all(1.2), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
+      ScaleEffect.to(Vector2.all(1.3), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
       ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.5, curve: Curves.easeIn)),
     ]);
 

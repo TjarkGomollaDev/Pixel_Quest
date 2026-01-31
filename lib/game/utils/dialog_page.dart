@@ -22,12 +22,19 @@ class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbac
   final PositionComponent _content;
   final Vector2 _contentSize;
   final bool _blurBackground;
+  final Vector2? _dialogPosition;
 
-  DialogPage({required String titleText, required PositionComponent content, required Vector2 contentSize, bool blurBackground = true})
-    : _titleText = titleText,
-      _content = content,
-      _contentSize = contentSize,
-      _blurBackground = blurBackground;
+  DialogPage({
+    required String titleText,
+    required PositionComponent content,
+    required Vector2 contentSize,
+    bool blurBackground = true,
+    Vector2? dialogPosition,
+  }) : _titleText = titleText,
+       _content = content,
+       _contentSize = contentSize,
+       _blurBackground = blurBackground,
+       _dialogPosition = dialogPosition;
 
   // components
   late final PositionComponent _root;
@@ -70,7 +77,7 @@ class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbac
       titleText: _titleText,
       content: _content,
       contentSize: _contentSize,
-      position: game.canvasSize / game.worldToScreenScale / 2,
+      position: _dialogPosition ?? game.canvasSize / game.worldToScreenScale / 2,
     );
     _root.add(_dialogContainer);
   }

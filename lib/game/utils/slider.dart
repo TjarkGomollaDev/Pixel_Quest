@@ -32,7 +32,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
   static final double defaultHeight = _SliderThumb._thumbSize.y;
 
   // styling
-  static const double _trackHeight = 6; // [Adjustable]
+  static const double _trackHeight = 5; // [Adjustable]
   static const Color _trackColorEnabled = AppTheme.grayLight3; // [Adjustable]
   static const Color _trackColorDisabled = AppTheme.grayDark1; // [Adjustable]
   static const Color _fillColor = AppTheme.greenDark; // [Adjustable]
@@ -160,7 +160,7 @@ class _SliderThumb extends PositionComponent {
   _SliderThumb({super.position}) : super(size: _thumbSize, anchor: Anchor.center);
 
   // styling
-  static final Vector2 _thumbSize = Vector2(8, 12); // [Adjustable]
+  static final Vector2 _thumbSize = Vector2(7, 11); // [Adjustable]
   static const Color _thumbColor = AppTheme.grayDark3; // [Adjustable]
   static const Color _lineColor = AppTheme.grayDark6; // [Adjustable]
 
@@ -172,7 +172,7 @@ class _SliderThumb extends PositionComponent {
 
   void _setUpThumb() {
     // background
-    final bg = RRectComponent(size: size, anchor: Anchor.topLeft, borderRadius: 3, color: _thumbColor);
+    final bg = RRectComponent(size: size, anchor: Anchor.topLeft, borderRadius: 2.5, color: _thumbColor);
 
     // lines
     final upperLine = RRectComponent(

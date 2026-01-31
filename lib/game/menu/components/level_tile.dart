@@ -30,7 +30,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   late final SpriteBtn _levelBtn;
 
   // stars
-  static final Vector2 _starSize = Vector2.all(16); // [Adjustable]
+  static final Vector2 _starSize = Vector2.all(20); // [Adjustable]
   late final List<Vector2> _starPositions;
   final List<double> _starAngles = [-0.1, 0, 0.1]; // [Adjustable]
   final List<Star> _outlineStars = [];
@@ -38,8 +38,8 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   int _newStarsToken = 0;
 
   // spacing
-  static const double _starSpacingHorizontal = 0; // [Adjustable]
-  static const double _starsMarginTop = 4; // [Adjustable]
+  static const double _starSpacingHorizontal = -6; // [Adjustable]
+  static const double _starsMarginTop = 2; // [Adjustable]
   static const double _btnMarginBottom = -1; // [Adjustable]
 
   @override

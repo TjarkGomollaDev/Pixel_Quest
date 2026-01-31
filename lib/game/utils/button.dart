@@ -105,6 +105,9 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   // tap down is required before tap up
   bool _hadTapDown = false;
 
+  // cooldwon
+  static const Duration _cooldown = Duration(milliseconds: 150);
+
   // if the button should be hidden initially
   late final bool _initialShow;
 
@@ -115,6 +118,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     scale = _maxScale;
     if (_holdMode) _isHeld = true;
     game.audioCenter.playSound(Sfx.tap, SfxType.ui);
+
     super.onTapDown(event);
   }
 
@@ -125,10 +129,14 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
 
     if (!_canReceiveTap) return;
     scale = _normalScale;
+
+    // single tap logic or held modus
     if (!_holdMode) {
-      // single tap logic below
+      // start cooldown to avoid double triggering
       _tapLocked = true;
-      Future.delayed(const Duration(milliseconds: 200), () => _tapLocked = false);
+      Future.delayed(_cooldown, () => _tapLocked = false);
+
+      // execute callback and block if it returns a Future
       final result = _callOnPressed();
       if (result is Future) {
         _executing = true;
@@ -137,6 +145,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     } else {
       _isHeld = false;
     }
+
     super.onTapUp(event);
   }
 
@@ -798,7 +807,7 @@ class RadioComponent extends PositionComponent {
   RadioComponent({
     required List<RadioOption> options,
     Vector2? optionSize,
-    double spacingBetweenOptions = 6,
+    double spacingBetweenOptions = defaultSpacingBetweenOptions,
     super.position,
     TextStyle? textStyle,
     Vector2? spriteSize,
@@ -830,7 +839,8 @@ class RadioComponent extends PositionComponent {
   }
 
   // default size
-  static final Vector2 defaultOptionSize = Vector2(52, 20);
+  static final Vector2 defaultOptionSize = Vector2(48, 18);
+  static const double defaultSpacingBetweenOptions = 5;
 
   // internal
   final List<_RadioBtn> _btns = [];

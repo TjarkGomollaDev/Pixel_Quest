@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_adventure/game/animations/spotlight.dart';
 import 'package:pixel_adventure/game/background/background.dart';
 import 'package:pixel_adventure/game/events/game_event_bus.dart';
 import 'package:pixel_adventure/game/game.dart';
@@ -25,12 +26,17 @@ class InventoryPage extends Route with HasGameReference<PixelQuest> {
 class _InventoryDialog extends Component with HasGameReference<PixelQuest> {
   @override
   FutureOr<void> onLoad() {
+    final spot = game.spotlightCenterMenu.x + Spotlight.playerTargetRadius;
     add(
       DialogPage(
         content: _InventoryContent(),
         titleText: game.l10n.inventoryTitle,
         contentSize: _InventoryContent.contentSize,
         blurBackground: false,
+        dialogPosition: Vector2(
+          spot + (game.canvasSize.x / game.worldToScreenScale - spot) / 2,
+          game.canvasSize.y / game.worldToScreenScale / 2,
+        ),
       ),
     );
     return super.onLoad();
@@ -47,7 +53,7 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     AppTheme.dialogTextStandardHeight * 3 +
         _optionSize.y * 3 +
         DialogContainer.spacingBetweenSections * 2 +
-        DialogContainer.headlineMarginBottom * 3,
+        DialogContainer.subHeadlineMarginBottom * 3,
   );
 
   // character picker
@@ -64,9 +70,9 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
 
   // styling
   static final Vector2 _optionSize = Vector2.all((DialogContainer.contentWidth - _spacingBetweenOptions * 3) / 4);
-  static final double _spacingBetweenOptions = 6; // [Adjustable]
-  static final Vector2 _spriteSize = Vector2.all(32); // [Adjustable]
-  static const double _spriteCornerRadius = 4; // [Adjustable]
+  static final double _spacingBetweenOptions = 4; // [Adjustable]
+  static final Vector2 _bgSpriteSize = Vector2.all(29); // [Adjustable]
+  static const double _bgSpriteCornerRadius = 3.5; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {
@@ -88,7 +94,7 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // character picker selector
     _characterPickerSelector = RadioComponent(
       anchor: Anchor.topCenter,
-      position: _characterPickerText.position + Vector2(0, _characterPickerText.height + DialogContainer.headlineMarginBottom),
+      position: _characterPickerText.position + Vector2(0, _characterPickerText.height + DialogContainer.subHeadlineMarginBottom),
       initialIndex: game.storageCenter.inventory.character.index,
       optionSize: _optionSize,
       spacingBetweenOptions: _spacingBetweenOptions,
@@ -114,15 +120,15 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // level background picker selector
     _levelBgPickerSelector = RadioComponent(
       anchor: Anchor.topCenter,
-      position: _levelBgPickerText.position + Vector2(0, _levelBgPickerText.height + DialogContainer.headlineMarginBottom),
+      position: _levelBgPickerText.position + Vector2(0, _levelBgPickerText.height + DialogContainer.subHeadlineMarginBottom),
       initialIndex: game.storageCenter.inventory.levelBackground.indexForScenes(
         BackgroundScene.levelChoices,
         tail: BackgroundChoiceTail.worldDefault,
       ),
       optionSize: _optionSize,
       spacingBetweenOptions: _spacingBetweenOptions,
-      spriteSize: _spriteSize,
-      spriteCornerRadius: _spriteCornerRadius,
+      spriteSize: _bgSpriteSize,
+      spriteCornerRadius: _bgSpriteCornerRadius,
       options: [
         for (final scene in BackgroundScene.levelChoices)
           RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLevelBg(BackgroundChoice.scene(scene))),
@@ -148,15 +154,15 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // loading background picker selector
     _loadingBgPickerSelector = RadioComponent(
       anchor: Anchor.topCenter,
-      position: _loadingBgPickerText.position + Vector2(0, _loadingBgPickerText.height + DialogContainer.headlineMarginBottom),
+      position: _loadingBgPickerText.position + Vector2(0, _loadingBgPickerText.height + DialogContainer.subHeadlineMarginBottom),
       initialIndex: game.storageCenter.inventory.loadingBackground.indexForScenes(
         BackgroundScene.loadingChoices,
         tail: BackgroundChoiceTail.random,
       ),
       optionSize: _optionSize,
       spacingBetweenOptions: _spacingBetweenOptions,
-      spriteSize: _spriteSize,
-      spriteCornerRadius: _spriteCornerRadius,
+      spriteSize: _bgSpriteSize,
+      spriteCornerRadius: _bgSpriteCornerRadius,
       options: [
         for (final scene in BackgroundScene.loadingChoices)
           RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLoadingBg(BackgroundChoice.scene(scene))),

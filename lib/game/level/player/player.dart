@@ -570,7 +570,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // outline stars
     for (final position in starPositions) {
-      final outlineStar = Star(variant: StarVariant.outline, position: position, spawnSizeZero: true);
+      final outlineStar = Star(variant: StarVariant.outline, size: Vector2.all(38), position: position, spawnSizeZero: true);
       world.add(outlineStar);
       outlineStars.add(outlineStar);
       unawaited(outlineStar.scaleIn());
@@ -579,7 +579,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // earned stars
     for (int i = 0; i < world.earnedStars; i++) {
-      final star = Star(variant: StarVariant.filled, position: playerCenter, spawnSizeZero: true);
+      final star = Star(variant: StarVariant.filled, size: Vector2.all(38), position: playerCenter, spawnSizeZero: true);
       world.add(star);
       stars.add(star);
 

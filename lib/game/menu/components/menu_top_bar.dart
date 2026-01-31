@@ -57,7 +57,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // star item
-    _starItem = Star(variant: StarVariant.filled, position: _starBg.position + Vector2(_starBg.size.x / 2, 0), size: Vector2.all(16));
+    _starItem = Star(variant: StarVariant.filled, position: _starBg.position + Vector2(_starBg.size.x / 2, 0));
     addAll([_starBg, _starItem]);
 
     // world star counts text

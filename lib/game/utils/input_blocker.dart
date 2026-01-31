@@ -4,7 +4,7 @@ import 'package:flame/events.dart';
 /// A simple overlay component that can block tap input when enabled.
 ///
 /// Useful to prevent interaction with components behind it.
-class InputBlocker extends PositionComponent with TapCallbacks {
+class InputBlocker extends PositionComponent with TapCallbacks, DragCallbacks {
   // constructor parameters
   bool _enabled;
 
@@ -29,6 +29,33 @@ class InputBlocker extends PositionComponent with TapCallbacks {
   void onTapCancel(TapCancelEvent event) {
     if (!_enabled) return;
     event.handled = true;
+  }
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    if (!_enabled) return;
+    event.handled = true;
+    super.onDragStart(event);
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    if (!_enabled) return;
+    event.handled = true;
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    if (!_enabled) return;
+    event.handled = true;
+    super.onDragEnd(event);
+  }
+
+  @override
+  void onDragCancel(DragCancelEvent event) {
+    if (!_enabled) return;
+    event.handled = true;
+    super.onDragCancel(event);
   }
 
   /// Activates the input blocker.

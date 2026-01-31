@@ -63,8 +63,8 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
   static const double _layerTitleBarShadowRadius = 3.5; // [Adjustable]
 
   // sizes and spacing
-  static const double _contentBoxMargin = 4; // [Adjustable]
-  static const double _contentBoxPaddingHorizontal = 22; // [Adjustable]
+  static const double _contentBoxMargin = 3.5; // [Adjustable]
+  static const double _contentBoxPaddingHorizontal = 20; // [Adjustable]
   static const double _contentBoxPaddingVertical = 14; // [Adjustable]
   static const double _outlineHighlighStrokeWidth = 0.5; // [Adjustable]
   static const double _outlineStrokeWidth = 1; // [Adjustable]
@@ -72,11 +72,10 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
   static const double _closeBtnVerticalMargin = 3; // [Adjustable]
 
   // use this in your custom dialog for a consistent layout
-  static const double headlineMarginBottom = 6; // [Adjustable]
-  static const double spacingBetweenSections = 15; // [Adjustable]
+  static const double subHeadlineMarginBottom = 5; // [Adjustable]
+  static const double spacingBetweenSections = 13; // [Adjustable]
   static const double spacingBetweenSectionsXL = 32; // [Adjustable]
-  static const double yPositionSecondColumn = 70; // [Adjustable]
-  static const double contentWidth = 180; // [Adjustable]
+  static const double contentWidth = 156; // [Adjustable]
 
   @override
   FutureOr<void> onLoad() {

@@ -127,8 +127,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
     // fruit item
     _fruitItem = VisibleSpriteComponent(
-      sprite: loadSprite(game, 'Other/Apple.png'),
-      position: _fruitBg.position + Vector2(_fruitBg.size.x / 2, 2),
+      sprite: loadSprite(game, 'Other/Apple (32x32).png'),
+      position: _fruitBg.position + Vector2(_fruitBg.size.x / 2, 0),
       anchor: Anchor.center,
       show: _showAtStart,
     );
@@ -158,9 +158,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
 
     // death item
     _deathItem = VisibleSpriteComponent(
-      sprite: loadSprite(game, 'Other/Bone.png'),
+      sprite: loadSprite(game, 'Other/Bone (32x32).png'),
       position: _deathBg.position + Vector2(_deathBg.size.x / 2, 0),
-      size: Vector2.all(32),
       anchor: Anchor.center,
       show: _showAtStart,
     );

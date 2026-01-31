@@ -38,7 +38,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
         Slider.defaultHeight * 2 +
         RadioComponent.defaultOptionSize.y * 4 +
         DialogContainer.spacingBetweenSections * 5 +
-        DialogContainer.headlineMarginBottom * 2,
+        DialogContainer.subHeadlineMarginBottom * 2,
   );
 
   // audio settings
@@ -84,7 +84,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     _musicSlider = Slider(
       initialValue: game.audioCenter.musicVolume,
       width: size.x,
-      position: _musicVolumeText.position + Vector2(0, _musicVolumeText.size.y + DialogContainer.headlineMarginBottom),
+      position: _musicVolumeText.position + Vector2(0, _musicVolumeText.size.y + DialogContainer.subHeadlineMarginBottom),
       onChanged: (value) => game.audioCenter.setMusicVolume(value),
       onChangedContinuous: (value) => game.audioCenter.setMusicVolume(value, automaticSave: false),
       enabled: game.audioCenter.soundState.enabled,
@@ -102,7 +102,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     _sfxSlider = Slider(
       initialValue: game.audioCenter.sfxVolume,
       width: size.x,
-      position: _sfxVolumeText.position + Vector2(0, _sfxVolumeText.size.y + DialogContainer.headlineMarginBottom),
+      position: _sfxVolumeText.position + Vector2(0, _sfxVolumeText.size.y + DialogContainer.subHeadlineMarginBottom),
       onChanged: (value) {
         game.audioCenter.setSfxVolume(value);
         game.audioCenter.playSound(Sfx.collected, SfxType.ui);
@@ -113,7 +113,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // sound state selector
     _soundStateSelector = RadioComponent(
       position: Vector2(
-        DialogContainer.yPositionSecondColumn,
+        size.x - RadioComponent.defaultOptionSize.x * 2 - RadioComponent.defaultSpacingBetweenOptions,
         _sfxSlider.position.y + _sfxSlider.size.y + DialogContainer.spacingBetweenSections,
       ),
       initialIndex: game.audioCenter.soundState.enabled ? 0 : 1,
@@ -154,7 +154,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // language selector
     _languageSelector = RadioComponent(
       position: Vector2(
-        DialogContainer.yPositionSecondColumn,
+        _soundStateSelector.position.x,
         _soundStateSelector.position.y + _soundStateSelector.size.y + DialogContainer.spacingBetweenSections,
       ),
       initialIndex: _languageIndex,
@@ -185,7 +185,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // control selector
     _controlSelector = RadioComponent(
       position: Vector2(
-        DialogContainer.yPositionSecondColumn,
+        _languageSelector.position.x,
         _languageSelector.position.y + _languageSelector.size.y + DialogContainer.spacingBetweenSections,
       ),
       initialIndex: game.storageCenter.settings.joystickSetup.isLeft ? 0 : 1,
@@ -210,7 +210,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // mini map selector
     _miniMapSelector = RadioComponent(
       position: Vector2(
-        DialogContainer.yPositionSecondColumn,
+        _controlSelector.position.x,
         _controlSelector.position.y + _controlSelector.size.y + DialogContainer.spacingBetweenSections,
       ),
       initialIndex: game.storageCenter.settings.showMiniMapAtStart ? 0 : 1,

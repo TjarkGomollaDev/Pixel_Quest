@@ -10,8 +10,7 @@ import 'package:pixel_adventure/game/game.dart';
 
 class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   CharacterBio({required super.position, bool show = true}) {
-    size = Vector2(100, 64);
-    anchor = Anchor.centerLeft;
+    size = Vector2(100, AppTheme.dialogTextStandardHeight * 3 + _verticalSpacing * 2);
     initVisibility(show);
   }
 
@@ -26,7 +25,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   late final TextComponent _abilityTextValue;
 
   // spacing
-  static const double _verticalSpacing = 12; // [Adjustable]
+  static const double _verticalSpacing = 5; // [Adjustable]
   static const double _horizontalSpacing = 3.5; // [Adjustable]
 
   // typing speed in ms
@@ -42,12 +41,13 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   }
 
   void _setUpBio() {
-    final startY = size.y / 2;
-
     // set up labeels
-    _nameTextLabel = _createTextComponent(game.l10n.characterPickerLabelName, Vector2(0, startY - _verticalSpacing));
-    _originTextLabel = _createTextComponent(game.l10n.characterPickerLabelOrigin, Vector2(0, startY));
-    _abilityTextLabel = _createTextComponent(game.l10n.characterPickerLabelAbility, Vector2(0, startY + _verticalSpacing));
+    _nameTextLabel = _createTextComponent(game.l10n.characterPickerLabelName, Vector2(0, 0));
+    _originTextLabel = _createTextComponent(game.l10n.characterPickerLabelOrigin, Vector2(0, _nameTextLabel.size.y + _verticalSpacing));
+    _abilityTextLabel = _createTextComponent(
+      game.l10n.characterPickerLabelAbility,
+      Vector2(0, _originTextLabel.position.y + _originTextLabel.size.y + _verticalSpacing),
+    );
 
     // set up values
     _nameTextValue = _createTextComponent('', _nameTextLabel.position + Vector2(_nameTextLabel.size.x + _horizontalSpacing, 0));
@@ -61,7 +61,7 @@ class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, 
   }
 
   TextComponent _createTextComponent(String text, Vector2 position) =>
-      TextComponent(text: text, position: position, anchor: Anchor.centerLeft, textRenderer: AppTheme.dialogTextStandard.asTextPaint);
+      TextComponent(text: text, position: position, anchor: Anchor.topLeft, textRenderer: AppTheme.dialogTextStandard.asTextPaint);
 
   Future<void> setCharacterBio(PlayerCharacter character, {bool animation = true}) async {
     final data = game.l10n.bioForCharacter(character);
