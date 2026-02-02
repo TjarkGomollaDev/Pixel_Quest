@@ -3,13 +3,13 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/utils/corner_outline.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/utils/corner_outline.dart';
+import 'package:pixel_quest/game/utils/rrect.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/game_router.dart';
 
 /// Route that pauses/resumes the level by emitting lifecycle events when shown/closed.
 class PausePage extends Route with HasGameReference<PixelQuest> {

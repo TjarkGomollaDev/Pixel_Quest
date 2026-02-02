@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/data/storage/storage_center.dart';
-part 'package:pixel_adventure/data/audio/sounds.dart';
+import 'package:pixel_quest/data/storage/storage_center.dart';
+part 'package:pixel_quest/data/audio/sounds.dart';
 
 /// Central audio facade for the game.
 ///

@@ -1,4 +1,4 @@
-# pixel_adventure
+# pixel_quest
 
 A new Flutter project.
 

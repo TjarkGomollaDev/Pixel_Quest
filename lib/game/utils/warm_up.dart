@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:pixel_adventure/game/background/background.dart';
-import 'package:pixel_adventure/game/utils/misc_utils.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 import 'package:vector_math/vector_math_64.dart' as math64;
 
 class WarmUpRunner extends Component with HasGameReference<PixelQuest> {

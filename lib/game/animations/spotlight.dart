@@ -3,10 +3,10 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/cancelable_effects.dart';
 
 /// A spotlight effect that covers the entire screen with black
 /// except for a circular area around a target center. Can animate

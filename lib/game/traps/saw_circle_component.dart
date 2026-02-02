@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
-import 'package:pixel_adventure/game/utils/grid.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/traps/saw_circle_single_saw.dart';
+import 'package:pixel_quest/game/utils/grid.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A circular saw trap that moves one or two saws along the edges of a rectangular path.
 ///

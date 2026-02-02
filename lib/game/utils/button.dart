@@ -3,13 +3,13 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/utils/corner_outline.dart';
-import 'package:pixel_adventure/game/utils/curves.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/utils/rounded_sprite_component.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/utils/corner_outline.dart';
+import 'package:pixel_quest/game/utils/curves.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/rounded_sprite_component.dart';
 
 /// `_BaseBtn` is a mixin providing consistent and safe button behavior for Flame.
 ///

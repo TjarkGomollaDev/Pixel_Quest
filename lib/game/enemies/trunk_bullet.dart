@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/collision/world_collision.dart';
-import 'package:pixel_adventure/game/enemies/turtle.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/traps/fire.dart';
-import 'package:pixel_adventure/game/traps/saw.dart';
-import 'package:pixel_adventure/game/traps/saw_circle_single_saw.dart';
-import 'package:pixel_adventure/game/traps/spikes.dart';
-import 'package:pixel_adventure/game/utils/debug_components.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/collision/entity_collision.dart';
+import 'package:pixel_quest/game/collision/world_collision.dart';
+import 'package:pixel_quest/game/enemies/turtle.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/traps/fire.dart';
+import 'package:pixel_quest/game/traps/saw.dart';
+import 'package:pixel_quest/game/traps/saw_circle_single_saw.dart';
+import 'package:pixel_quest/game/traps/spikes.dart';
+import 'package:pixel_quest/game/utils/debug_components.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A simple projectile fired by the Trunk.
 ///

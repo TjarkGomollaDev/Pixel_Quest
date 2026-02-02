@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_quest/game/hud/mini%20map/mini_map.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
 
 /// A thin bar placed below the mini map frame that draws upward-pointing
 /// triangle markers for entities currently obscured by the mini map.

@@ -1,6 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
 
 /// Defines how detailed the collision resolution should be for an entity.
 ///

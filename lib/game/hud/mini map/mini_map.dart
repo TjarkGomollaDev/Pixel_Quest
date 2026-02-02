@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/mini_map_arrow_layer.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/mini_map_view.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_quest/game/hud/mini%20map/mini_map_arrow_layer.dart';
+import 'package:pixel_quest/game/hud/mini%20map/mini_map_view.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A HUD container component that displays the mini map inside a decorative frame.
 ///

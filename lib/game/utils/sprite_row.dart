@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/game_settings.dart';
 
 const List<double> _angles = [0.0, 1.5708, 3.1416, 4.7124]; // in radians
 

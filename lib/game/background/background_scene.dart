@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:pixel_adventure/app_theme.dart';
+import 'package:pixel_quest/app_theme.dart';
 
 /// Enumerates all parallax background scenes and their metadata.
 enum BackgroundScene {

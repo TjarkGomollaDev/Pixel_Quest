@@ -1,5 +1,5 @@
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/data/static/metadata/world_metadata.dart';
 
 /// Central access point for static, read-only game data.
 ///

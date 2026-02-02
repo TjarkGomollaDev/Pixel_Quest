@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
 
 /// A lightweight rounded-rectangle component.
 class RRectComponent extends PositionComponent with VisibleComponent {

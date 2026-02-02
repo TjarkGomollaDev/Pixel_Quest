@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/game_settings.dart';
 
 /// A lightweight page indicator made of dots.
 class DotsIndicator extends PositionComponent {

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/rrect.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A reusable dialog shell that renders a pixel-styled window.
 ///

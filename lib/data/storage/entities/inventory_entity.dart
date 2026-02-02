@@ -1,5 +1,5 @@
-import 'package:pixel_adventure/game/background/background.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
 
 class InventoryEntity {
   // constructor parameters

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
-import 'package:pixel_adventure/game/utils/curves.dart';
-import 'package:pixel_adventure/game/utils/dummy_character.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/cancelable_effects.dart';
+import 'package:pixel_quest/game/utils/curves.dart';
+import 'package:pixel_quest/game/utils/dummy_character.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum _DummyState { hidden, fallingIn, hovering, fallingOut }
 

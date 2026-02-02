@@ -1,5 +1,5 @@
 import 'package:flame/collisions.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Small helpers for checking whether something is currently inside the camera view.
 ///

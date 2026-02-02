@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/background/background.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/background/background.dart';
 
 enum LevelBaseBlock {
   gras,

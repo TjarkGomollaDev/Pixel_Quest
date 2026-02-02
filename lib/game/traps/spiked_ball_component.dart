@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/traps/spiked_ball.dart';
-import 'package:pixel_adventure/game/utils/debug_components.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/traps/spiked_ball.dart';
+import 'package:pixel_quest/game/utils/debug_components.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Small helper model for the spiked-ball chain: keeps a chain sprite component
 /// plus its distance from the swing center so it can be positioned each frame.

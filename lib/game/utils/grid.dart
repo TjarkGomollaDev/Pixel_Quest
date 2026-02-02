@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/game_settings.dart';
 
 /// Mixin to add a `SpriteComponent` in its original size
 /// while keeping the parent `PositionComponent` aligned to a fixed grid size

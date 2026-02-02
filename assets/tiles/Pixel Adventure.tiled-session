@@ -9,7 +9,7 @@
     ],
     "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
-        "/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/Development/Flutter/pixel_adventure/assets/tiles/Pixel Adventure.tsx": {
+        "/Users/tjarkgomolla/Development/Flutter/pixel_quest/assets/Development/Flutter/pixel_quest/assets/tiles/Pixel Adventure.tsx": {
             "scaleInDock": 1
         },
         "/Users/tjarkgomolla/Downloads/Splash_Screen.tmx": {
@@ -167,7 +167,7 @@
             }
         }
     },
-    "last.imagePath": "/Users/tjarkgomolla/Development/Flutter/pixel_adventure/assets/images/Terrain",
+    "last.imagePath": "/Users/tjarkgomolla/Development/Flutter/pixel_quest/assets/images/Terrain",
     "map.height": 23,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,

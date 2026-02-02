@@ -1,4 +1,4 @@
-import 'package:pixel_adventure/game/background/background_scene.dart';
+import 'package:pixel_quest/game/background/background_scene.dart';
 
 /// User-selectable background setting.
 sealed class BackgroundChoice {

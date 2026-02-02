@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/mini_map.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/hud/pause_page.dart';
-import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_quest/game/hud/mini%20map/mini_map.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/hud/pause_page.dart';
+import 'package:pixel_quest/game/level/level.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/utils/rrect.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/game_router.dart';
 
 /// HUD overlay for a running level (buttons, counters, and the mini map).
 class GameHud extends PositionComponent with HasGameReference<PixelQuest> {

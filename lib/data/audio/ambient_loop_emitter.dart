@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/utils/camera_culling.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/utils/camera_culling.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Mixin for entities that should automatically start/stop an ambient loop sound.
 ///

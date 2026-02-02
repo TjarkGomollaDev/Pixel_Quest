@@ -1,4 +1,4 @@
-part of 'package:pixel_adventure/game/events/game_event_bus.dart';
+part of 'package:pixel_quest/game/events/game_event_bus.dart';
 
 enum Lifecycle { paused, resumed }
 

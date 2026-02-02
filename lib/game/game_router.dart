@@ -1,12 +1,12 @@
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/data/static/static_center.dart';
-import 'package:pixel_adventure/game/hud/pause_page.dart';
-import 'package:pixel_adventure/game/inventory/inventory_page.dart';
-import 'package:pixel_adventure/game/settings/settings_page.dart';
-import 'package:pixel_adventure/game/level/level.dart';
-import 'package:pixel_adventure/game/menu/menu_page.dart';
-import 'package:pixel_adventure/game/shop/shop_page.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/data/static/static_center.dart';
+import 'package:pixel_quest/game/hud/pause_page.dart';
+import 'package:pixel_quest/game/inventory/inventory_page.dart';
+import 'package:pixel_quest/game/settings/settings_page.dart';
+import 'package:pixel_quest/game/level/level.dart';
+import 'package:pixel_quest/game/menu/menu_page.dart';
+import 'package:pixel_quest/game/shop/shop_page.dart';
 
 abstract class RouteNames {
   static const String menu = 'menu';

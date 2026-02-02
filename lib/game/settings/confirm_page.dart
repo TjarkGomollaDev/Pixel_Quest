@@ -1,11 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/painting.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/game/utils/dialog_page.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/dialog_container.dart';
+import 'package:pixel_quest/game/utils/dialog_page.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Confirmation dialog route that returns a boolean result.
 ///

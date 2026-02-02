@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/l10n/app_localizations.dart';
-import 'package:pixel_adventure/splash/flutter%20extensions/int_double_extensions.dart';
-import 'package:pixel_adventure/splash/widgets/loading_dots.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/l10n/app_localizations.dart';
+import 'package:pixel_quest/splash/flutter%20extensions/int_double_extensions.dart';
+import 'package:pixel_quest/splash/widgets/loading_dots.dart';
 import 'animated_stars.dart';
 
 class SplashContent extends StatelessWidget {

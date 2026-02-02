@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/game/utils/dialog_page.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/utils/dialog_container.dart';
+import 'package:pixel_quest/game/utils/dialog_page.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Shop overlay route that opens the in-game Shop dialog.
 class ShopPage extends Route {

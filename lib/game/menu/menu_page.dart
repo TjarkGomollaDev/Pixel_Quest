@@ -1,23 +1,23 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/data/static/metadata/world_metadata.dart';
-import 'package:pixel_adventure/game/animations/spotlight.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/game_router.dart';
-import 'package:pixel_adventure/game/menu/components/character_bio.dart';
-import 'package:pixel_adventure/game/menu/components/menu_dummy_character.dart';
-import 'package:pixel_adventure/game/background/background_parallax.dart';
-import 'package:pixel_adventure/game/utils/dots_indicator.dart';
-import 'package:pixel_adventure/game/utils/input_blocker.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/utils/swipe_handler.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/menu/components/level_grid.dart';
-import 'package:pixel_adventure/game/menu/components/menu_top_bar.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/data/static/metadata/world_metadata.dart';
+import 'package:pixel_quest/game/animations/spotlight.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/game_router.dart';
+import 'package:pixel_quest/game/menu/components/character_bio.dart';
+import 'package:pixel_quest/game/menu/components/menu_dummy_character.dart';
+import 'package:pixel_quest/game/background/background_parallax.dart';
+import 'package:pixel_quest/game/utils/dots_indicator.dart';
+import 'package:pixel_quest/game/utils/input_blocker.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/utils/swipe_handler.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/menu/components/level_grid.dart';
+import 'package:pixel_quest/game/menu/components/menu_top_bar.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Menu that renders the selectable worlds + level grids.
 ///

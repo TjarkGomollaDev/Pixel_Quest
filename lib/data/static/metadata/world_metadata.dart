@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:pixel_adventure/game/background/background.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/mini_map_helper.dart';
+import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/hud/mini%20map/mini_map_helper.dart';
 
 class WorldMetadata {
   final String uuid;

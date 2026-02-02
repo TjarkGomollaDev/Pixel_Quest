@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
 
 /// Keeps track of "ambient loop" demand across multiple entities.
 ///

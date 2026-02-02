@@ -3,19 +3,19 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/background/background.dart';
-import 'package:pixel_adventure/game/level/loading/loading_dummy_character.dart';
-import 'package:pixel_adventure/game/traps/air_particle.dart';
-import 'package:pixel_adventure/game/utils/cancelable_effects.dart';
-import 'package:pixel_adventure/game/utils/game_safe_padding.dart';
-import 'package:pixel_adventure/game/utils/input_blocker.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/misc_utils.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/level/loading/loading_dummy_character.dart';
+import 'package:pixel_quest/game/traps/air_particle.dart';
+import 'package:pixel_quest/game/utils/cancelable_effects.dart';
+import 'package:pixel_quest/game/utils/game_safe_padding.dart';
+import 'package:pixel_quest/game/utils/input_blocker.dart';
+import 'package:pixel_quest/game/utils/rrect.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum _OverlayState { notVisible, transition, visible }
 

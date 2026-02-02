@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/collision/world_collision.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/animation_state.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/collision/world_collision.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/animation_state.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum _FinishState implements AnimationState {
   idle('Idle', 1),

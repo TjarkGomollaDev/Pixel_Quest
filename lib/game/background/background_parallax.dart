@@ -3,9 +3,9 @@ import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:pixel_adventure/game/background/background_scene.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/background/background_scene.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
 
 /// Parallax background component.
 ///

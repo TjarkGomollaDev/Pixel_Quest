@@ -4,14 +4,14 @@ import 'package:flame/effects.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/animation_state.dart';
-import 'package:pixel_adventure/game/utils/curves.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/animation_state.dart';
+import 'package:pixel_quest/game/utils/curves.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum _PlayerEffectState implements AnimationState {
   appearing('Appearing', 7, loop: false, special: true),

@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/traps/air_particle.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/traps/fan.dart';
-import 'package:pixel_adventure/game/utils/camera_culling.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/collision/entity_collision.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/traps/air_particle.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/traps/fan.dart';
+import 'package:pixel_quest/game/utils/camera_culling.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Invisible component representing the fan's air stream.
 ///

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/menu/components/level_tile.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/menu/components/level_tile.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
 
 class LevelGrid extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   // constructor parameters

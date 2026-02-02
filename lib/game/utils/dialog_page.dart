@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/utils/dialog_container.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A full-screen overlay page that displays a centered [DialogContainer].
 ///

@@ -1,14 +1,14 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/enemies/slime.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/debug_components.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/collision/entity_collision.dart';
+import 'package:pixel_quest/game/enemies/slime.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/debug_components.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// A short-lived particle spawned by a Slime.
 ///

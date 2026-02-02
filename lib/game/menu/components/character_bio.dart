@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/l10n/app_localizations_extensions.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/l10n/app_localizations_extensions.dart';
+import 'package:pixel_quest/game/game.dart';
 
 class CharacterBio extends PositionComponent with HasGameReference<PixelQuest>, VisibleComponent {
   CharacterBio({required super.position, bool show = true}) {

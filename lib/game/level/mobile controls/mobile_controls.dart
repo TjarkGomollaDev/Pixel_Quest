@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/level/mobile%20controls/joystick.dart';
-import 'package:pixel_adventure/game/level/player/player_input.dart';
-import 'package:pixel_adventure/game/level/mobile%20controls/jump_btn.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/level/mobile%20controls/joystick.dart';
+import 'package:pixel_quest/game/level/player/player_input.dart';
+import 'package:pixel_quest/game/level/mobile%20controls/jump_btn.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum JoystickSetup {
   left,

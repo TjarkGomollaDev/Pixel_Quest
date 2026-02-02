@@ -1,5 +1,5 @@
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/level/mobile%20controls/mobile_controls.dart';
 
 double _clamp01(double value) => value.toDouble().clamp(0, 1);
 

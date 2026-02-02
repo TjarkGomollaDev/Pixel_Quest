@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/animations/spotlight.dart';
-import 'package:pixel_adventure/game/background/background.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/game/utils/dialog_page.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/animations/spotlight.dart';
+import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/dialog_container.dart';
+import 'package:pixel_quest/game/utils/dialog_page.dart';
 
 /// Inventory overlay route that opens the in-game Inventory dialog.
 class InventoryPage extends Route with HasGameReference<PixelQuest> {

@@ -2,18 +2,18 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/collision/collision.dart';
-import 'package:pixel_adventure/game/collision/entity_collision.dart';
-import 'package:pixel_adventure/game/enemies/trunk_bullet.dart';
-import 'package:pixel_adventure/game/hud/mini%20map/entity_on_mini_map.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/animation_state.dart';
-import 'package:pixel_adventure/game/utils/camera_culling.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/collision/entity_collision.dart';
+import 'package:pixel_quest/game/enemies/trunk_bullet.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/animation_state.dart';
+import 'package:pixel_quest/game/utils/camera_culling.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/game.dart';
 
 enum _TrunkState implements AnimationState {
   idle('Idle', 18),

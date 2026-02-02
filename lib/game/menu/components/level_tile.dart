@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:pixel_adventure/game/animations/star.dart';
-import 'package:pixel_adventure/data/static/metadata/level_metadata.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/load_sprites.dart';
-import 'package:pixel_adventure/game/utils/misc_utils.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/animations/star.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/load_sprites.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game.dart';
 
 class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, HasPaint implements OpacityProvider {
   // constructor parameters

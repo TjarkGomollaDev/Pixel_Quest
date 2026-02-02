@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flame/components.dart' hide Timer;
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
-import 'package:pixel_adventure/game/utils/curves.dart';
-import 'package:pixel_adventure/game/utils/dummy_character.dart';
-import 'package:pixel_adventure/game/menu/components/character_bio.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
+import 'package:pixel_quest/game/utils/curves.dart';
+import 'package:pixel_quest/game/utils/dummy_character.dart';
+import 'package:pixel_quest/game/menu/components/character_bio.dart';
+import 'package:pixel_quest/game/game.dart';
 
 class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameReference<PixelQuest>, DummyCharacter {
   // constructor parameters

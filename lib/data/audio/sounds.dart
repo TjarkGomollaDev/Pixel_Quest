@@ -1,4 +1,4 @@
-part of 'package:pixel_adventure/data/audio/audio_center.dart';
+part of 'package:pixel_quest/data/audio/audio_center.dart';
 
 /// One-shot sound effects.
 enum Sfx {

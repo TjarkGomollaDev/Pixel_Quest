@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/l10n/app_localizations.dart';
-import 'package:pixel_adventure/splash/flutter%20extensions/build_context.dart';
-import 'package:pixel_adventure/splash/widgets/animated_stars.dart';
-import 'package:pixel_adventure/splash/widgets/developer_logo.dart';
-import 'package:pixel_adventure/splash/widgets/splash_content.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/l10n/app_localizations.dart';
+import 'package:pixel_quest/splash/flutter%20extensions/build_context.dart';
+import 'package:pixel_quest/splash/widgets/animated_stars.dart';
+import 'package:pixel_quest/splash/widgets/developer_logo.dart';
+import 'package:pixel_quest/splash/widgets/splash_content.dart';
 
 class SplashScreen extends StatefulWidget {
   final AppLocalizations l10n;

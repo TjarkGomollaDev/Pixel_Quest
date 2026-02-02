@@ -2,16 +2,16 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/level/mobile%20controls/mobile_controls.dart';
-import 'package:pixel_adventure/game/settings/confirm_page.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/dialog_container.dart';
-import 'package:pixel_adventure/game/utils/dialog_page.dart';
-import 'package:pixel_adventure/game/utils/slider.dart';
-import 'package:pixel_adventure/game/game.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/data/audio/audio_center.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/level/mobile%20controls/mobile_controls.dart';
+import 'package:pixel_quest/game/settings/confirm_page.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/dialog_container.dart';
+import 'package:pixel_quest/game/utils/dialog_page.dart';
+import 'package:pixel_quest/game/utils/slider.dart';
+import 'package:pixel_quest/game/game.dart';
 
 /// Settings overlay route that opens the in-game Settings dialog.
 class SettingsPage extends Route {

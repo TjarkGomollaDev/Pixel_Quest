@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:pixel_adventure/app_theme.dart';
-import 'package:pixel_adventure/game/animations/star.dart';
-import 'package:pixel_adventure/game/events/game_event_bus.dart';
-import 'package:pixel_adventure/game/game_settings.dart';
-import 'package:pixel_adventure/game/utils/button.dart';
-import 'package:pixel_adventure/game/utils/rrect.dart';
-import 'package:pixel_adventure/game/utils/visible_components.dart';
-import 'package:pixel_adventure/game/game.dart';
-import 'package:pixel_adventure/game/game_router.dart';
+import 'package:pixel_quest/app_theme.dart';
+import 'package:pixel_quest/game/animations/star.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/game_settings.dart';
+import 'package:pixel_quest/game/utils/button.dart';
+import 'package:pixel_quest/game/utils/rrect.dart';
+import 'package:pixel_quest/game/utils/visible_components.dart';
+import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/game_router.dart';
 
 /// Top bar for the menu page. Shows the world's total star count and provides quick navigation buttons.
 class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {

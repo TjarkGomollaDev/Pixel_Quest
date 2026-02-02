@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:pixel_adventure/game/level/player/player.dart';
+import 'package:pixel_quest/game/level/player/player.dart';
 
 /// Exposes the player's hitbox position as a [PositionProvider], e.g. for camera follow logic.
 ///
