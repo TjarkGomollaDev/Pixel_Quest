@@ -71,6 +71,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
 
   @override
   Future<void> onEntityCollision(CollisionSide collisionSide) async {
+    // the checkpoint should only be set if it is further along in the level than the previous respawn point
     if (_reached || _playerRespawn.x < _player.respawnPosition.x) return;
     _reached = true;
     _player.reachedCheckpoint(_playerRespawn);

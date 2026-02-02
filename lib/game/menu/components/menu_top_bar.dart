@@ -63,7 +63,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     // world star counts text
     for (final world in game.staticCenter.allWorlds()) {
       final text = VisibleTextComponent(
-        text: '${game.storageCenter.worldById(world.uuid).stars}/48',
+        text: '${game.storageCenter.worldById(world.uuid).stars}/${world.levelUuids.length * 3}',
         anchor: Anchor.centerLeft,
         position: _starBg.position + Vector2(_starBg.size.x + GameSettings.hudBtnTextSpacing, 0),
         textRenderer: AppTheme.hudText.asTextPaint,
@@ -110,7 +110,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   void _updateStarsCount({required int index, required int stars}) {
-    _worldStarsCounts[index].text = '$stars/48';
+    _worldStarsCounts[index].text = '$stars/${game.staticCenter.allWorlds()[index].levelUuids.length * 3}';
   }
 
   void showStarsCount(int index) {

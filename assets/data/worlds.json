@@ -1,9 +1,9 @@
 [
   {  
     "uuid": "014809d5-8ec5-4171-a82e-df72e7839d45",
-    "titleFileName": "World_1_Title",
+    "titleFileName": "World_01_Title",
     "foregroundFileName": "World_01_Foreground",
-    "miniMapFrameFileName": "MiniMap_Frame_World_1",
+    "miniMapFrameFileName": "MiniMap_Frame_Wood",
     "backgroundScene": "scene6",
     "baseBlock": "mud",
     "levelUuids": [
@@ -23,9 +23,9 @@
   },
   {
     "uuid": "07ee6495-e92a-4845-95a6-500f402420d3",
-    "titleFileName": "World_2_Title",
+    "titleFileName": "World_02_Title",
     "foregroundFileName": "World_02_Foreground",
-    "miniMapFrameFileName": "MiniMap_Frame_World_2",
+    "miniMapFrameFileName": "MiniMap_Frame_Wood",
     "backgroundScene": "scene2",
     "baseBlock": "sand",
     "levelUuids": [

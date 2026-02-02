@@ -105,7 +105,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   // tap down is required before tap up
   bool _hadTapDown = false;
 
-  // cooldwon
+  // cooldown
   static const Duration _cooldown = Duration(milliseconds: 150);
 
   // if the button should be hidden initially

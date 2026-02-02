@@ -42,7 +42,7 @@ Color getMiniMapColor({required int tileId, required bool isPlatform, required L
   return switch (baseBlock) {
     LevelBaseBlock.gras => AppTheme.dirtLightBlock,
     LevelBaseBlock.mud => AppTheme.dirtDarkBlock,
-    LevelBaseBlock.sand => AppTheme.black,
+    LevelBaseBlock.sand => const Color.fromARGB(255, 201, 242, 168),
   };
 }
 

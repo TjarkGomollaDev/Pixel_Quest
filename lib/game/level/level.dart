@@ -633,7 +633,8 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
           case 'Plant':
             final isLeft = spawnPoint.properties.getValue<bool?>('isLeft') ?? GameSettings.isLeftDefault;
             final doubleShot = spawnPoint.properties.getValue<bool?>('doubleShot') ?? GameSettings.doubleShotDefault;
-            spawnObject = Plant(isLeft: isLeft, doubleShot: doubleShot, player: _player, position: gridPosition);
+            final delay = spawnPoint.properties.getValue<double?>('delay') ?? GameSettings.delay;
+            spawnObject = Plant(isLeft: isLeft, doubleShot: doubleShot, delay: delay, player: _player, position: gridPosition);
             break;
           case 'Blue Bird':
             final offsetNeg = spawnPoint.properties.getValue<double?>('offsetNeg') ?? GameSettings.offsetNegDefault;

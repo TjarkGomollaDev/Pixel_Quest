@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/components.dart' hide Timer;
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/data/audio/audio_center.dart';
 import 'package:pixel_adventure/game/level/player/player.dart';
 import 'package:pixel_adventure/game/utils/curves.dart';
 import 'package:pixel_adventure/game/utils/dummy_character.dart';
@@ -174,7 +173,6 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
     // set the new character
     changeChracter(character);
     current = PlayerState.idle;
-    game.audioCenter.playSound(Sfx.changeCharacter, SfxType.ui);
 
     // start new animation loop if needed
     if (_animationEnabled) _startAnimationLoop();

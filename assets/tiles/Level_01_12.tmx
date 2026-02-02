@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="352" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="242">
+ <tileset firstgid="1" source="Pixel Adventure.tsx"/>
+ <layer id="1" name="Background" width="352" height="16">
+  <properties>
+   <property name="BackgroundType" value="Scene 1"/>
+  </properties>
+  <data encoding="csv">
+118,118,118,118,118,35,118,118,118,140,140,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,118,118,118,118,140,118,118,118,118,118,104,118,118,118,118,141,0,0,117,118,118,119,0,0,117,35,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,124,125,16,104,118,118,118,118,118,118,118,140,140,141,0,0,0,0,0,117,118,35,104,118,118,119,0,0,0,139,118,118,118,118,141,0,117,118,35,118,118,118,118,118,118,118,118,141,0,0,139,118,118,104,35,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,35,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,16,124,125,118,118,35,118,118,118,140,140,140,140,118,118,118,118,118,118,118,123,118,118,118,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,140,118,118,118,123,118,118,16,123,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,123,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,123,16,104,118,
+118,118,123,118,118,118,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,13,15,118,118,119,0,117,118,118,118,35,148,118,118,118,119,0,0,0,139,118,118,119,0,0,117,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,123,118,118,118,146,147,38,148,118,118,118,123,118,140,141,0,0,0,0,0,0,0,0,117,118,118,126,118,118,141,0,0,0,0,139,118,118,119,0,0,139,118,118,118,118,140,118,118,123,118,119,0,0,0,0,117,118,148,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,118,38,146,147,118,118,140,140,140,141,0,0,0,0,139,118,118,35,118,118,118,118,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,140,118,118,118,38,118,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,141,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,38,148,118,
+118,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,118,118,119,0,139,118,118,118,118,118,118,118,118,141,0,0,0,0,117,35,119,0,0,117,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,118,118,118,118,118,118,60,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,139,118,118,148,118,119,0,0,0,0,0,0,117,118,119,0,0,0,139,118,118,141,0,117,118,118,118,119,0,0,0,0,117,118,118,118,119,0,0,0,0,0,0,0,0,0,95,96,97,0,0,0,0,0,0,0,0,95,96,96,96,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,35,118,118,16,118,118,141,0,0,0,0,0,95,96,96,96,96,96,96,96,96,96,96,96,96,97,0,0,0,0,95,96,96,96,121,118,118,118,60,118,118,118,141,0,0,0,0,0,0,0,0,0,139,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,60,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,107,107,107,107,107,107,107,108,0,0,0,0,0,0,0,0,0,0,0,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,95,121,120,96,97,0,0,0,0,0,0,0,0,0,0,0,117,118,60,118,118,
+118,35,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,123,118,118,140,118,118,35,119,0,0,117,118,118,140,118,118,35,119,0,0,0,0,0,117,118,119,0,0,117,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,96,96,121,118,118,118,140,140,118,118,118,118,118,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,141,0,0,0,0,0,0,117,118,141,0,0,0,0,117,119,0,0,117,35,118,118,119,0,0,0,0,139,118,118,118,141,0,0,0,0,0,0,0,0,0,139,140,141,0,0,0,0,95,97,0,0,139,140,140,140,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,38,118,119,0,0,0,0,0,95,121,118,118,118,118,118,118,118,118,118,140,140,140,141,0,0,0,0,139,140,118,118,118,118,118,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,119,0,0,0,0,0,0,0,106,107,107,107,107,108,0,0,128,129,129,129,129,129,129,129,130,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,120,97,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,
+118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,141,0,117,118,118,141,0,0,117,35,119,0,139,118,118,119,0,0,0,0,0,139,118,119,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,121,118,118,118,118,118,118,141,0,0,139,118,118,118,123,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,0,0,0,0,0,139,141,0,0,0,0,0,139,141,0,0,139,118,118,118,141,0,0,0,0,0,139,118,119,0,0,0,95,96,96,96,97,0,0,0,0,0,0,0,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,96,96,96,96,97,0,0,0,117,118,118,104,60,118,119,0,0,0,0,95,121,118,118,124,125,118,118,118,140,140,141,0,0,0,0,0,0,0,0,0,0,139,118,118,35,118,118,35,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,35,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,141,0,0,0,0,0,0,0,128,129,129,129,129,130,0,0,128,129,129,129,129,129,109,110,130,0,0,0,106,107,107,107,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,
+118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,117,118,119,0,0,0,117,118,119,0,0,117,118,141,0,0,0,0,0,0,117,119,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,121,118,118,118,118,118,118,118,118,141,0,0,0,0,139,118,118,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,0,0,0,0,0,139,141,0,0,0,139,140,140,140,141,0,0,0,95,96,96,97,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,118,118,141,0,0,0,117,118,118,126,118,118,119,0,0,0,0,117,118,118,118,146,147,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,0,0,0,0,0,0,128,129,109,110,129,130,0,0,150,151,151,151,151,151,151,151,152,0,0,0,128,129,129,129,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,123,
+118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,117,123,119,0,0,0,139,118,119,0,0,117,119,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,96,96,96,96,96,96,96,96,121,118,35,118,13,15,118,118,118,119,0,0,0,0,0,0,117,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,140,141,0,0,117,119,0,95,96,96,96,97,0,0,0,0,0,0,0,139,118,118,118,140,141,0,0,0,0,139,118,104,148,118,118,141,0,0,0,95,121,118,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,35,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,0,0,0,0,0,0,128,129,129,109,110,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,109,110,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,
+118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,119,0,0,117,118,119,0,0,0,0,117,119,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,140,141,0,0,0,0,0,0,139,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,95,96,96,96,96,121,141,0,0,0,0,117,119,0,139,140,140,140,141,0,0,95,96,97,0,0,0,139,140,141,0,0,0,0,0,0,0,117,148,118,118,119,0,0,0,95,121,118,124,125,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,150,151,151,151,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,129,109,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,97,0,0,95,96,97,0,0,0,117,118,118,
+118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,119,0,0,117,118,141,0,0,0,0,139,141,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,121,118,118,118,118,118,118,13,14,15,118,118,118,123,118,118,118,118,140,141,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,120,96,96,97,0,0,139,140,140,140,140,141,0,0,0,0,0,139,141,0,0,0,0,0,0,0,95,121,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,141,0,0,0,117,118,118,146,147,118,35,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,150,151,151,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,120,96,96,96,121,118,119,0,0,0,117,118,118,
+118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,124,125,118,118,118,123,118,118,118,118,118,118,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,121,120,97,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,0,0,117,118,118,140,140,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,107,107,107,107,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,118,141,0,0,0,117,118,118,
+118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,95,96,96,97,0,0,0,0,0,139,118,118,35,118,118,146,147,118,118,118,118,118,118,35,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,121,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,0,95,96,121,119,0,0,139,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,107,107,107,107,107,107,108,0,0,0,0,0,0,0,0,0,0,128,129,109,110,129,130,0,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,0,0,0,0,0,95,96,96,96,96,97,0,0,139,140,118,118,118,119,0,0,0,0,117,123,118,
+120,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,95,96,97,0,0,0,0,0,0,117,119,0,0,117,118,120,96,97,0,0,0,0,0,117,118,118,118,140,140,118,118,118,118,140,118,118,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,96,97,0,0,95,96,97,0,0,95,96,96,96,96,96,96,96,97,0,139,118,35,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,119,0,0,0,117,118,118,141,0,0,0,117,35,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,118,120,96,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,129,129,129,129,129,130,0,0,0,0,0,0,0,0,0,0,128,129,129,109,110,130,0,0,0,0,106,107,107,107,107,108,0,0,0,139,141,0,0,0,95,96,96,96,96,96,96,96,121,118,118,118,141,0,0,0,0,139,140,140,141,0,0,0,0,117,118,118,
+118,118,120,97,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,119,0,0,117,118,119,0,0,0,0,0,95,121,119,0,0,117,118,118,118,120,97,0,0,0,0,139,140,140,141,0,0,139,140,140,141,0,139,141,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,118,118,118,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,140,140,141,0,0,139,140,141,0,0,139,140,140,140,140,140,140,140,141,0,0,117,118,118,118,119,0,0,95,97,0,0,0,0,0,0,0,0,0,0,139,141,0,0,0,117,118,119,0,0,0,0,117,118,119,0,0,95,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,118,118,118,118,118,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,109,110,109,110,129,130,0,0,106,107,107,107,107,108,0,0,150,151,151,151,151,152,0,0,0,0,128,129,129,129,129,130,0,0,0,0,0,0,0,0,117,118,118,13,14,15,118,118,123,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,
+118,118,118,119,0,0,0,0,95,96,96,96,97,0,0,0,117,119,0,0,0,0,0,0,95,97,0,0,0,0,0,95,97,0,0,0,0,0,0,95,121,119,0,0,117,120,96,97,0,0,0,0,117,118,120,96,96,96,118,123,118,118,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,120,97,0,0,0,0,0,0,0,0,0,0,95,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,120,96,97,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,119,0,0,0,0,117,118,141,0,0,117,120,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,139,140,118,118,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,129,109,129,109,110,130,0,0,150,151,151,151,151,152,0,0,0,0,0,0,0,0,0,0,0,0,128,129,109,110,129,130,0,0,0,0,0,0,0,0,139,140,118,118,123,118,118,118,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,
+118,120,96,96,97,0,0,0,117,118,118,120,96,97,0,0,117,119,0,0,0,95,97,0,117,119,0,0,0,0,0,117,119,0,0,0,0,0,95,121,120,96,96,96,96,121,118,119,0,0,0,0,117,118,118,118,118,118,118,118,120,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,119,0,0,0,0,0,0,0,0,0,95,121,120,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,97,121,118,118,119,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,120,96,96,96,96,96,121,119,0,0,95,96,96,121,120,96,97,0,0,0,95,96,97,0,0,0,0,95,97,0,95,97,0,0,0,0,0,0,139,140,140,141,0,0,0,0,0,95,96,96,96,96,96,97,0,0,95,96,96,96,97,0,95,96,96,97,0,95,96,96,96,96,97,0,0,95,97,0,0,0,150,151,151,151,151,151,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,150,151,151,151,151,152,0,0,0,0,0,0,0,0,0,0,139,140,140,140,140,141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,121,118,
+118,118,118,120,96,97,0,0,117,118,118,118,118,119,0,0,117,119,0,0,95,121,119,0,117,119,0,0,95,97,0,117,119,0,0,0,0,95,96,121,118,118,118,118,118,118,118,120,97,0,0,0,117,118,35,118,118,118,118,118,118,118,118,120,96,97,0,95,97,0,95,96,97,0,95,97,0,95,96,96,97,0,0,0,95,97,0,0,0,0,117,120,96,97,0,95,96,97,0,0,0,95,121,118,118,120,96,97,0,0,0,95,96,96,96,96,96,96,97,0,95,96,96,96,96,96,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,96,97,0,0,95,97,0,0,95,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,96,118,118,118,118,35,118,119,0,117,119,0,0,0,0,0,0,95,96,97,0,95,97,0,0,117,118,118,118,118,118,118,118,118,119,0,0,117,118,118,118,118,120,96,97,0,0,117,118,120,97,0,0,0,117,119,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,117,118,118,118,118,120,96,97,0,117,118,118,118,119,0,117,118,118,119,0,117,118,118,118,118,119,0,0,117,119,0,0,0,0,0,0,0,0,0,0,0,0,95,97,0,95,97,0,0,0,0,0,0,95,96,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,96,97,0,0,0,0,95,97,0,95,97,0,95,96,96,121,118,118
+</data>
+ </layer>
+ <objectgroup id="2" name="Spawning">
+  <object id="108" name="Checkpoint" type="Checkpoint" x="2128" y="80" width="64" height="64"/>
+  <object id="109" name="Checkpoint" type="Checkpoint" x="3824" y="96" width="64" height="64"/>
+  <object id="110" name="Finish" type="Finish" x="5200" y="112" width="64" height="64"/>
+  <object id="111" name="SawCircle" type="SawCircle" x="4608" y="48" width="96" height="80">
+   <properties>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="112" name="SawCircle" type="SawCircle" x="4512" y="160" width="128" height="80">
+   <properties>
+    <property name="clockwise" type="bool" value="false"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="113" name="SawCircle" type="SawCircle" x="4736" y="32" width="144" height="64">
+   <properties>
+    <property name="clockwise" type="bool" value="false"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="114" name="SawCircle" type="SawCircle" x="4960" y="176" width="96" height="64">
+   <properties>
+    <property name="clockwise" type="bool" value="false"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="115" name="SawCircle" type="SawCircle" x="4800" y="144" width="96" height="64">
+   <properties>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="116" name="SawCircle" type="SawCircle" x="4672" y="192" width="96" height="32">
+   <properties>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="117" name="SawCircle" type="SawCircle" x="4928" y="64" width="80" height="80">
+   <properties>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="118" name="Blue Bird" type="Blue Bird" x="336" y="16" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="119" name="Blue Bird" type="Blue Bird" x="256" y="64" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="7"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="120" name="Saw" type="Saw" x="496" y="144" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="4"/>
+    <property name="offsetPos" type="float" value="2"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="121" name="Saw" type="Saw" x="672" y="128" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="isVertical" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="3"/>
+    <property name="offsetPos" type="float" value="4"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="122" name="Saw" type="Saw" x="880" y="32" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="9"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="123" name="Saw" type="Saw" x="3472" y="64" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="0"/>
+    <property name="offsetPos" type="float" value="6"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="124" name="Saw" type="Saw" x="3536" y="96" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="4"/>
+    <property name="offsetPos" type="float" value="2"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="125" name="Saw" type="Saw" x="3504" y="128" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="4"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="126" name="Saw" type="Saw" x="3568" y="160" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="6"/>
+    <property name="offsetPos" type="float" value="0"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="127" name="Spike Head" type="Spike Head" x="4048" y="32" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="25"/>
+    <property name="offsetPos" type="float" value="8"/>
+   </properties>
+  </object>
+  <object id="128" name="Spike Head" type="Spike Head" x="4144" y="16" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="0"/>
+    <property name="offsetPos" type="float" value="9"/>
+   </properties>
+  </object>
+  <object id="129" name="Spike Head" type="Spike Head" x="4224" y="16" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="1"/>
+    <property name="offsetPos" type="float" value="9"/>
+   </properties>
+  </object>
+  <object id="130" name="Spike Head" type="Spike Head" x="4320" y="32" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="4"/>
+    <property name="offsetPos" type="float" value="8"/>
+   </properties>
+  </object>
+  <object id="131" name="Plant" type="Plant" x="1360" y="0" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="0"/>
+    <property name="doubleShot" type="bool" value="true"/>
+    <property name="isLeft" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="132" name="Plant" type="Plant" x="1264" y="32" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="2"/>
+    <property name="doubleShot" type="bool" value="false"/>
+    <property name="isLeft" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="133" name="Plant" type="Plant" x="1168" y="48" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="3"/>
+    <property name="doubleShot" type="bool" value="true"/>
+    <property name="isLeft" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="134" name="Slime" type="Slime" x="2496" y="208" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="6"/>
+   </properties>
+  </object>
+  <object id="135" name="Slime" type="Slime" x="2688" y="208" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="136" name="Slime" type="Slime" x="2704" y="144" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="3"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="137" name="Slime" type="Slime" x="2928" y="32" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="1"/>
+    <property name="offsetPos" type="float" value="4"/>
+   </properties>
+  </object>
+  <object id="139" name="Mushroom" type="Mushroom" x="1792" y="208" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="1"/>
+    <property name="offsetPos" type="float" value="5"/>
+   </properties>
+  </object>
+  <object id="140" name="Mushroom" type="Mushroom" x="1968" y="208" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="3"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="141" name="Spikes" type="Spikes" x="32" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="143" name="Spikes" type="Spikes" x="96" y="32" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="144" name="Spikes" type="Spikes" x="48" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="145" name="Spikes" type="Spikes" x="432" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="146" name="Spikes" type="Spikes" x="448" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="147" name="Spikes" type="Spikes" x="576" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="148" name="Spikes" type="Spikes" x="608" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="149" name="Spikes" type="Spikes" x="592" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="150" name="Spikes" type="Spikes" x="624" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="151" name="Spikes" type="Spikes" x="752" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="152" name="Spikes" type="Spikes" x="736" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="153" name="Spikes" type="Spikes" x="816" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="154" name="Spikes" type="Spikes" x="832" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="155" name="Spikes" type="Spikes" x="960" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="156" name="Spikes" type="Spikes" x="1344" y="160" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="157" name="Spikes" type="Spikes" x="1456" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="158" name="Spikes" type="Spikes" x="1488" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="159" name="Spikes" type="Spikes" x="1520" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="160" name="Spikes" type="Spikes" x="1536" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="161" name="Spikes" type="Spikes" x="1600" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="162" name="Spikes" type="Spikes" x="1616" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="163" name="Spikes" type="Spikes" x="1648" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="164" name="Spikes" type="Spikes" x="1680" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="165" name="Spikes" type="Spikes" x="1712" y="16" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="166" name="Spikes" type="Spikes" x="1856" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="167" name="Spikes" type="Spikes" x="1920" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="168" name="Spikes" type="Spikes" x="2000" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="169" name="Spikes" type="Spikes" x="2016" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="170" name="Spikes" type="Spikes" x="2080" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="172" name="Spikes" type="Spikes" x="2192" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="173" name="Spikes" type="Spikes" x="2176" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="174" name="Spikes" type="Spikes" x="2272" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="175" name="Spikes" type="Spikes" x="2288" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="176" name="Spikes" type="Spikes" x="2336" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="177" name="Spikes" type="Spikes" x="2352" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="178" name="Spikes" type="Spikes" x="2432" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="180" name="Spikes" type="Spikes" x="2928" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="181" name="Spikes" type="Spikes" x="3024" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="182" name="Spikes" type="Spikes" x="3072" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="183" name="Spikes" type="Spikes" x="3088" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="184" name="Spikes" type="Spikes" x="3168" y="144" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="185" name="Spikes" type="Spikes" x="3200" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="186" name="Spikes" type="Spikes" x="3408" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="187" name="Spikes" type="Spikes" x="3392" y="96" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="188" name="Spikes" type="Spikes" x="3376" y="144" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="189" name="Spikes" type="Spikes" x="3616" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="191" name="Spikes" type="Spikes" x="3664" y="128" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="192" name="Spikes" type="Spikes" x="3760" y="64" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="193" name="Spikes" type="Spikes" x="3792" y="32" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="194" name="Spikes" type="Spikes" x="3888" y="16" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="195" name="Spikes" type="Spikes" x="3936" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="196" name="Spikes" type="Spikes" x="3968" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="197" name="Spikes" type="Spikes" x="4096" y="16" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="198" name="Spikes" type="Spikes" x="4336" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="199" name="Spikes" type="Spikes" x="4288" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="200" name="Spikes" type="Spikes" x="4400" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="201" name="Spikes" type="Spikes" x="4416" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="202" name="Spikes" type="Spikes" x="4496" y="48" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="203" name="Spikes" type="Spikes" x="4544" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="204" name="Spikes" type="Spikes" x="4480" y="80" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="205" name="Spikes" type="Spikes" x="5056" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="206" name="Spikes" type="Spikes" x="5120" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="207" name="Spikes" type="Spikes" x="5136" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="210" name="Spikes" type="Spikes" x="5520" y="16" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="211" name="Spikes" type="Spikes" x="5536" y="32" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="212" name="Spikes" type="Spikes" x="5568" y="112" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="213" name="Kiwi" type="Fruit" x="32" y="128" width="32" height="32"/>
+  <object id="216" name="Orange" type="Fruit" x="1408" y="0" width="32" height="32"/>
+  <object id="217" name="Apple" type="Fruit" x="784" y="80" width="32" height="32"/>
+  <object id="218" name="Cherries" type="Fruit" x="1344" y="192" width="32" height="32"/>
+  <object id="219" name="Apple" type="Fruit" x="1648" y="160" width="32" height="32"/>
+  <object id="220" name="Orange" type="Fruit" x="1824" y="144" width="32" height="32"/>
+  <object id="221" name="Orange" type="Fruit" x="1968" y="144" width="32" height="32"/>
+  <object id="222" name="Bananas" type="Fruit" x="2480" y="16" width="32" height="32"/>
+  <object id="223" name="Bananas" type="Fruit" x="2784" y="0" width="32" height="32"/>
+  <object id="224" name="Bananas" type="Fruit" x="2800" y="192" width="32" height="32"/>
+  <object id="225" name="Apple" type="Fruit" x="2944" y="144" width="32" height="32"/>
+  <object id="226" name="Strawberry" type="Fruit" x="3408" y="144" width="32" height="32"/>
+  <object id="227" name="Strawberry" type="Fruit" x="4112" y="144" width="32" height="32"/>
+  <object id="228" name="Strawberry" type="Fruit" x="4288" y="144" width="32" height="32"/>
+  <object id="229" name="Strawberry" type="Fruit" x="5536" y="176" width="32" height="32"/>
+  <object id="230" name="Apple" type="Fruit" x="5456" y="64" width="32" height="32"/>
+  <object id="231" name="Orange" type="Fruit" x="4640" y="0" width="32" height="32"/>
+  <object id="232" name="Apple" type="Fruit" x="3600" y="0" width="32" height="32"/>
+  <object id="233" name="Apple" type="Fruit" x="3328" y="0" width="32" height="32"/>
+  <object id="234" name="Apple" type="Fruit" x="3376" y="0" width="32" height="32"/>
+  <object id="235" name="Spikes" type="Spikes" x="1136" y="192" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="237" name="Fire" type="Fire" x="3264" y="208" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="238" name="Fire" type="Fire" x="3312" y="208" width="16" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="239" name="ArrowUp" type="ArrowUp" x="4560" y="64" width="32" height="32"/>
+  <object id="241" name="Start" type="Start" x="128" y="144" width="64" height="64"/>
+ </objectgroup>
+</map>

@@ -39,11 +39,13 @@ class Plant extends PositionComponent
   // constructor parameters
   final bool _isLeft;
   final bool _doubleShot;
+  double _delay;
   final Player _player;
 
-  Plant({required bool isLeft, required bool doubleShot, required Player player, required super.position})
+  Plant({required bool isLeft, required bool doubleShot, required double delay, required Player player, required super.position})
     : _isLeft = isLeft,
       _doubleShot = doubleShot,
+      _delay = delay,
       _player = player,
       super(size: gridSize);
 
@@ -79,10 +81,15 @@ class Plant extends PositionComponent
 
   @override
   void update(double dt) {
-    if (_gotStomped) return super.update(dt);
-    if (!_isAttacking) {
-      _timeSinceLastAttack += dt;
-      if (_timeSinceLastAttack >= _timeUntilNextAttack) unawaited(_startAttack());
+    if (!_gotStomped) {
+      if (_delay > 0) {
+        _delay -= dt;
+        return super.update(dt);
+      }
+      if (!_isAttacking) {
+        _timeSinceLastAttack += dt;
+        if (_timeSinceLastAttack >= _timeUntilNextAttack) unawaited(_startAttack());
+      }
     }
     super.update(dt);
   }
@@ -150,6 +157,7 @@ class Plant extends PositionComponent
   }
 
   Future<bool> _attack() async {
+    if (_gotStomped) return false;
     animationGroupComponent.current = _PlantState.attack;
 
     // the sound should start during the attack animation, not before or after

@@ -81,11 +81,13 @@ class Turtle extends PositionComponent
 
   @override
   void update(double dt) {
-    if (_delay > 0) {
-      _delay -= dt;
-      return super.update(dt);
+    if (!_gotStomped) {
+      if (_delay > 0) {
+        _delay -= dt;
+        return super.update(dt);
+      }
+      _spikeTimer.update(dt);
     }
-    if (!_gotStomped) _spikeTimer.update(dt);
     super.update(dt);
   }
 

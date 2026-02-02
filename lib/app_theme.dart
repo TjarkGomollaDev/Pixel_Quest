@@ -90,7 +90,7 @@ abstract class AppTheme {
   static const entityMarkerStandard = white;
   static const entityMarkerSpecial = grayLight4;
 
-  // Mini Map Background Colors
+  // Mini Map Background Colors for Parallax Backgrounds
   static const ({Color a, Color b, Color c}) miniMapBgScene1 = (
     a: Color.fromARGB(255, 2, 121, 247),
     b: Color.fromARGB(255, 8, 117, 251),

@@ -41,7 +41,7 @@ class SwipeHandler extends PositionComponent with DragCallbacks {
        _minSwipeDistance = minSwipeDistance,
        _minSwipeVelocity = minSwipeVelocity;
 
-  // cooldwon
+  // cooldownn
   static const Duration _cooldown = Duration(milliseconds: 150);
 
   // flags to block further swipes during cooldown or while awaiting async callbacks
