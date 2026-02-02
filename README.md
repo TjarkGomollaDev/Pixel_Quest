@@ -1,6 +1,6 @@
 # pixel_quest
 
-A new Flutter project.
+A retro pixel game.
 
 ## Getting Started
 

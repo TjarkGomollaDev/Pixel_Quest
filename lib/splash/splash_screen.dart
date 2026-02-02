@@ -52,10 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         // content
-        Positioned(
-          top: context.sizeOf.height * 0.25,
-          left: 0,
-          right: 0,
+        Center(
           child: SplashContent(starsKey: _starsKey, l10n: widget.l10n),
         ),
         // developer logo

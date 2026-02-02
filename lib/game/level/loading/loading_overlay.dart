@@ -155,7 +155,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   void _setUpStageInfo() {
     // stage info text
     _stageInfoText = VisibleTextComponent(
-      text: game.l10n.loadingLevel(0, 0),
+      text: game.l10n.loadingLevel(0, 12),
       anchor: Anchor.center,
       textRenderer: AppTheme.hudText.asTextPaint,
     );

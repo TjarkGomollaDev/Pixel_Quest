@@ -63,9 +63,10 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
                       child: Transform.translate(
                         offset: offset,
                         child: Image.asset(
+                          fit: BoxFit.cover,
                           'assets/images/Other/Star (32x32).png',
-                          width: 30,
-                          height: 30,
+                          width: 64,
+                          height: 64,
                           filterQuality: FilterQuality.none,
                         ),
                       ),

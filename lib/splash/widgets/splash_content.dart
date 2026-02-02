@@ -15,39 +15,39 @@ class SplashContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // stars
         AnimatedStars(key: starsKey),
-        16.heightSizedBox,
+        12.heightSizedBox,
         //  game title
         Image.asset('assets/images/Splash/Splash_Title.png', height: 68, filterQuality: FilterQuality.none),
-        34.heightSizedBox,
+        38.heightSizedBox,
         // loading container
-        Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: AppTheme.tileBlur),
-            child: Builder(
-              builder: (context) {
-                final screenHeight = MediaQuery.of(context).size.height;
-                final offsetY = screenHeight * 0.002; // correction, as the font has a slight vertical offset
-                return Transform.translate(
-                  offset: Offset(0, offsetY),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(l10n.loadingGame, style: AppTheme.splashText),
-                      8.widthSizedBox,
-                      LoadingDots(textStyle: AppTheme.splashText),
-                    ],
-                  ),
-                );
-              },
-            ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: AppTheme.tileBlur),
+          child: Builder(
+            builder: (context) {
+              final screenHeight = MediaQuery.of(context).size.height;
+              final offsetY = screenHeight * 0.002; // correction, as the font has a slight vertical offset
+              return Transform.translate(
+                offset: Offset(0, offsetY),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(l10n.loadingGame, style: AppTheme.splashText),
+                    8.widthSizedBox,
+                    LoadingDots(textStyle: AppTheme.splashText),
+                  ],
+                ),
+              );
+            },
           ),
         ),
+        16.heightSizedBox,
       ],
     );
   }

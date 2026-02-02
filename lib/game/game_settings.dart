@@ -2,7 +2,7 @@ import 'package:flame/extensions.dart';
 
 abstract class GameSettings {
   // custom debug mode
-  static const bool testMode = true;
+  static const bool testMode = false;
   static const bool customDebugMode = false;
 
   // mobile cotrols

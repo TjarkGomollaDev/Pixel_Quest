@@ -6,7 +6,6 @@ import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_quest/data/audio/ambient_loop_manager.dart';
-import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
 import 'package:pixel_quest/data/static/static_center.dart';
 import 'package:pixel_quest/data/storage/storage_events.dart';
 import 'package:pixel_quest/data/storage/storage_center.dart';
@@ -166,7 +165,7 @@ class PixelQuest extends FlameGame
   Future<void> _completeLoading() async {
     if (GameSettings.testMode) return;
     final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
-    final delayMs = 5200;
+    final delayMs = 4600;
     if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
   }
 
