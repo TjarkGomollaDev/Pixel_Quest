@@ -15,7 +15,9 @@ const _prefLangCode = 'lang_code';
 void main() async {
   // ensure Flutter bindings and Flame device setup are ready before running the app
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  // basic config
+  await _configureSystsemChrome();
   await _configureFlame();
 
   // load persisted locale once at startup (null = follow system locale)
@@ -23,6 +25,11 @@ void main() async {
   final initialLocale = _localeFromCodeOrNull(prefs.getString(_prefLangCode));
 
   runApp(GameWrapper(prefs: prefs, initialLocale: initialLocale));
+}
+
+Future<void> _configureSystsemChrome() async {
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 }
 
 Future<void> _configureFlame() async {

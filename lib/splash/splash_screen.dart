@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/l10n/app_localizations.dart';
-import 'package:pixel_quest/splash/flutter%20extensions/build_context.dart';
 import 'package:pixel_quest/splash/widgets/animated_stars.dart';
 import 'package:pixel_quest/splash/widgets/developer_logo.dart';
 import 'package:pixel_quest/splash/widgets/splash_content.dart';
@@ -38,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
       children: [
         // background image
         Positioned.fill(
-          child: Image.asset('assets/images/Splash/Splash_Background.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
+          child: Image.asset('assets/images/Splash/Splash_Background2.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
         ),
         // foreground image
         Positioned.fill(

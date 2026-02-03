@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="278" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="107">
- <tileset firstgid="1" source="Pixel Adventure.tsx"/>
+ <tileset firstgid="1" source="Pixel Quest.tsx"/>
  <layer id="1" name="Background" width="278" height="16">
   <properties>
    <property name="BackgroundType" value="Scene 1"/>

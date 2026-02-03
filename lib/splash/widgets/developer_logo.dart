@@ -28,12 +28,7 @@ class DeveloperLogoState extends State<DeveloperLogo> {
               border: BoxBorder.all(color: AppTheme.white),
               borderRadius: BorderRadius.circular(50).copyWith(bottomLeft: Radius.zero),
             ),
-            child: Center(
-              child: Text(
-                'by',
-                style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white),
-              ),
-            ),
+            child: Center(child: Text('by', style: AppTheme.splashDeveloperText)),
           ),
           6.widthSizedBox,
           Shimmer.fromColors(
@@ -42,10 +37,7 @@ class DeveloperLogoState extends State<DeveloperLogo> {
             period: Duration(milliseconds: 1000),
             loop: 1,
             enabled: _shimmerEnabled,
-            child: Text(
-              'tj.studios',
-              style: TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white),
-            ),
+            child: Text('tj.studios', style: AppTheme.splashDeveloperText),
           ),
         ],
       ),

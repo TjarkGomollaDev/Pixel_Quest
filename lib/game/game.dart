@@ -164,6 +164,7 @@ class PixelQuest extends FlameGame
 
   Future<void> _completeLoading() async {
     if (GameSettings.testMode) return;
+    await Future.delayed(Duration(seconds: 200));
     final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
     final delayMs = 4600;
     if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));

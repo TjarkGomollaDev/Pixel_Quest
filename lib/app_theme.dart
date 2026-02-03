@@ -137,7 +137,14 @@ abstract class AppTheme {
   static const TextStyle jumpBtn = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.8);
 
   // Splash Text Styles
-  static const TextStyle splashText = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.4);
+  static const TextStyle splashText = TextStyle(
+    fontFamily: 'Pixel Font',
+    fontSize: 12,
+    color: AppTheme.white,
+    height: 1.2,
+    decoration: TextDecoration.none,
+  );
+  static final TextStyle splashDeveloperText = splashText.copyWith(fontSize: 8);
 }
 
 extension TextStyleExtension on TextStyle {

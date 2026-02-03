@@ -19,10 +19,10 @@ class SplashContent extends StatelessWidget {
       children: [
         // stars
         AnimatedStars(key: starsKey),
-        12.heightSizedBox,
+        26.heightSizedBox,
         //  game title
         Image.asset('assets/images/Splash/Splash_Title.png', height: 68, filterQuality: FilterQuality.none),
-        38.heightSizedBox,
+        52.heightSizedBox,
         // loading container
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),

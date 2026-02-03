@@ -52,7 +52,7 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
                   : (i == 2)
                   ? 0.1
                   : 0.0;
-              final offset = (i == 1) ? const Offset(0, -5) : Offset.zero;
+              final offset = (i != 1) ? const Offset(0, 12) : Offset.zero;
               return AnimatedBuilder(
                 animation: _animations[i],
                 builder: (context, child) {
@@ -76,7 +76,7 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
               );
             }).expand((widget) sync* {
               yield widget;
-              yield const SizedBox(width: 16);
+              yield const SizedBox(width: 2);
             }).toList()
             ..removeLast(), //  remove last spacing
     );
