@@ -5,7 +5,9 @@ This repository contains everything you need to run the game locally.
 
 ---
 
-## ✨ Core Features
+<div style="font-size: 1.6em; font-weight: 700;">✨ Core Features</div>
+
+---
 
 ### Gameplay & Content
 - **Content-rich and scalable entity system**
@@ -91,7 +93,10 @@ This repository contains everything you need to run the game locally.
 
 ---
 
-## 🧱 Project Structure
+<div style="font-size: 1.6em; font-weight: 700;">🧱 Project Structure</div>
+
+---
+
 A quick overview of the most important folders:
 
 - `lib/game/` – core game code (level, player, entities, systems...)
@@ -103,7 +108,9 @@ A quick overview of the most important folders:
 
 ---
 
-## 🧰 Getting Started
+<div style="font-size: 1.6em; font-weight: 700;">🧰 Getting Started</div>
+
+---
 
 ### Prerequisites
 - Flutter SDK installed
@@ -127,7 +134,9 @@ flutter run -d <device-id>
 
 ---
 
-## 🖼️ Screenshots
+<div style="font-size: 1.6em; font-weight: 700;">🖼️ Screenshots</div>
+
+---
 
 <p align="center">
   <img src="assets/screenshots/Screenshot_Level_01.png"/>
