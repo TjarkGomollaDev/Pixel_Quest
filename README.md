@@ -1,7 +1,7 @@
 <img src="assets/screenshots/Screenshot_Level_01.png"/>
-<br/><br/>
+<br/>
 <img src="assets/images/Splash/Splash_Title.png" width="65%"/>
-<br/><br/>
+<br/>
 
 
 Pixel Quest is a retro-inspired **2D platformer** built with the Flutter **Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style. Levels are built with **Tiled**.
