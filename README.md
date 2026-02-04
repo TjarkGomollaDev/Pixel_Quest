@@ -1,13 +1,9 @@
 # Pixel Quest
 
-Pixel Quest is a retro-inspired **2D platformer** built with the **Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style.  
+Pixel Quest is a retro-inspired **2D platformer** built with the **Flutter Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style.  
 This repository contains everything you need to run the game locally.
 
----
-
-<div style="font-size: 1.6em; font-weight: 700;">✨ Core Features</div>
-
----
+## ✨ Core Features
 
 ### Gameplay & Content
 - **Content-rich and scalable entity system**
@@ -91,12 +87,7 @@ This repository contains everything you need to run the game locally.
   - **Static Center**: provides static game data (worlds, levels, metadata).
   - **Audio Center**: loads and manages audio assets and playback.
 
----
-
-<div style="font-size: 1.6em; font-weight: 700;">🧱 Project Structure</div>
-
----
-
+## 🧱 Project Structure
 A quick overview of the most important folders:
 
 - `lib/game/` – core game code (level, player, entities, systems...)
@@ -106,18 +97,14 @@ A quick overview of the most important folders:
 - `lib/l10n/` – localization files
 - `assets/` – sprites, tilemaps, audio, fonts, json data
 
----
-
-<div style="font-size: 1.6em; font-weight: 700;">🧰 Getting Started</div>
-
----
+## 🧰 Getting Started
 
 ### Prerequisites
 - Flutter SDK installed
 - A working Flutter environment for your target platform (iOS/Android/Desktop)
 - Recommended: a physical device or emulator/simulator
 
-### Clone & run
+### Clone & Run
 ```bash
 # 1) Clone the repository
 git clone <YOUR_REPO_URL>
@@ -132,18 +119,15 @@ flutter run
 flutter run -d <device-id>
 ```
 
----
+## 📸 Screenshots
 
-<div style="font-size: 1.6em; font-weight: 700;">🖼️ Screenshots</div>
+<img src="assets/screenshots/Screenshot_Level_01.png"/>
+<img src="assets/screenshots/Screenshot_Menu.png"/>
+<img src="assets/screenshots/Screenshot_Level_02.png"/>
+<img src="assets/screenshots/Screenshot_Level_03.png"/>
+<img src="assets/screenshots/Screenshot_Level_04.png"/>
+<img src="assets/screenshots/Screenshot_Settings.png"/>
+<img src="assets/screenshots/Screenshot_Level_05.png"/>
 
----
 
-<p align="center">
-  <img src="assets/screenshots/Screenshot_Level_01.png"/>
-  <img src="assets/screenshots/Screenshot_Menu.png"/>
-  <img src="assets/screenshots/Screenshot_Level_02.png"/>
-  <img src="assets/screenshots/Screenshot_Level_03.png"/>
-  <img src="assets/screenshots/Screenshot_Level_04.png"/>
-  <img src="assets/screenshots/Screenshot_Settings.png"/>
-  <img src="assets/screenshots/Screenshot_Level_05.png"/>
-</p>
+[![Powered by Flame](https://img.shields.io/badge/Powered%20by-%F0%9F%94%A5-272727.svg?style=for-the-badge)](https://flame-engine.org)

@@ -159,7 +159,7 @@
     <property name="side" type="int" value="3"/>
    </properties>
   </object>
-  <object id="174" name="Spikes" type="Spikes" x="320" y="48" width="16" height="16">
+  <object id="174" name="Spikes" type="Spikes" x="432" y="64" width="16" height="16">
    <properties>
     <property name="side" type="int" value="3"/>
    </properties>

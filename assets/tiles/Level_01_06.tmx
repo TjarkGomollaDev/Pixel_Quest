@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="363" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="216">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="363" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="217">
  <tileset firstgid="1" source="Pixel Quest.tsx"/>
  <layer id="1" name="Background" width="363" height="16">
   <properties>
@@ -321,7 +321,7 @@
    </properties>
   </object>
   <object id="187" name="Bananas" type="Fruit" x="5216" y="96" width="32" height="32"/>
-  <object id="188" name="Bananas" type="Fruit" x="5648" y="96" width="32" height="32"/>
+  <object id="188" name="Cherries" type="Fruit" x="5648" y="96" width="32" height="32"/>
   <object id="189" name="Finish" type="Finish" x="5472" y="112" width="64" height="64"/>
   <object id="192" name="Spikes" type="Spikes" x="5536" y="224" width="16" height="16">
    <properties>
@@ -456,5 +456,6 @@
     <property name="offsetPos" type="float" value="3"/>
    </properties>
   </object>
+  <object id="216" name="Bananas" type="Fruit" x="3824" y="192" width="32" height="32"/>
  </objectgroup>
 </map>
