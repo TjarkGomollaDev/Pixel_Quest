@@ -1,6 +1,6 @@
 # Pixel Quest
 
-Pixel Quest is a retro-inspired **2D platformer** built with the **Flutter Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style.  
+Pixel Quest is a retro-inspired **2D platformer** built with the Flutter **Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style. Levels are built with **Tiled**.
 This repository contains everything you need to run the game locally.
 
 ## ✨ Core Features
@@ -90,10 +90,15 @@ This repository contains everything you need to run the game locally.
 ## 🧱 Project Structure
 A quick overview of the most important folders:
 
-- `lib/game/` – core game code (level, player, entities, systems...)
+- `lib/game/` – core game runtime (router, camera, systems)
+- `lib/game/level/` - level loading (Tiled), spawning, add collisions, mini map recording
+- `lib/game/level/player/` - player logic (input, movement, gravity, collision checks, animations)
+- `lib/game/enemies/` - a variety of enemy components
+- `lib/game/traps/` - a variety of trap components
+- `lib/game/hud/mini map/` - mini map view, markers, arrows, scrolling
 - `lib/game/events/` – event definitions and event bus wiring
-- `lib/game/utils/` – reusable Flame utilities (buttons, effects, helpers)
-- `lib/data/` – storage, static und audio centers
+- `lib/game/utils/` – reusable Flame utilities (buttons, effects, components, helpers)
+- `lib/data/` – storage, static and audio centers
 - `lib/l10n/` – localization files
 - `assets/` – sprites, tilemaps, audio, fonts, json data
 
@@ -104,18 +109,26 @@ A quick overview of the most important folders:
 - A working Flutter environment for your target platform (iOS/Android/Desktop)
 - Recommended: a physical device or emulator/simulator
 
-### Clone & Run
+### 1) Clone the repository
 ```bash
-# 1) Clone the repository
-git clone <YOUR_REPO_URL>
+git clone https://github.com/TjarkGomollaDev/Pixel_Quest.git
+```
+```bash
 cd pixel_quest
+```
 
-# 2) Install dependencies
+### 2) Install dependencies
+```bash
 flutter pub get
+```
 
-# 3) Run
+### 3) Run
+```bash
 flutter run
-# or specify a device:
+```
+
+### Optional: Run on a specific device
+```bash
 flutter run -d <device-id>
 ```
 
