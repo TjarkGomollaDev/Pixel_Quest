@@ -1,9 +1,13 @@
-# Pixel Quest
+<img src="assets/screenshots/Screenshot_Level_01.png"/>
+<br/><br/>
+<img src="assets/images/Splash/Splash_Title.png" width="65%"/>
+<br/><br/>
+
 
 Pixel Quest is a retro-inspired **2D platformer** built with the Flutter **Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style. Levels are built with **Tiled**.
 This repository contains everything you need to run the game locally.
 
-## ✨ Core Features
+## 🧩 Core Features
 
 ### Gameplay & Content
 - **Content-rich and scalable entity system**
@@ -87,7 +91,7 @@ This repository contains everything you need to run the game locally.
   - **Static Center**: provides static game data (worlds, levels, metadata).
   - **Audio Center**: loads and manages audio assets and playback.
 
-## 🧱 Project Structure
+## ⚙️ Project Structure
 A quick overview of the most important folders:
 
 - `lib/game/` – core game runtime (router, camera, systems)
@@ -134,13 +138,13 @@ flutter run -d <device-id>
 
 ## 📸 Screenshots
 
-<img src="assets/screenshots/Screenshot_Level_01.png"/>
+<img src="assets/screenshots/Screenshot_Level_06.png"/>
 <img src="assets/screenshots/Screenshot_Menu.png"/>
 <img src="assets/screenshots/Screenshot_Level_02.png"/>
+<img src="assets/screenshots/Screenshot_Level_05.png"/>
+<img src="assets/screenshots/Screenshot_Settings.png"/>
 <img src="assets/screenshots/Screenshot_Level_03.png"/>
 <img src="assets/screenshots/Screenshot_Level_04.png"/>
-<img src="assets/screenshots/Screenshot_Settings.png"/>
-<img src="assets/screenshots/Screenshot_Level_05.png"/>
 
 
 [![Powered by Flame](https://img.shields.io/badge/Powered%20by-%F0%9F%94%A5-272727.svg?style=for-the-badge)](https://flame-engine.org)
