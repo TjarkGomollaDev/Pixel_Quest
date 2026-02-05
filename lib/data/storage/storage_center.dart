@@ -10,6 +10,7 @@ import 'package:pixel_quest/data/storage/entities/settings_entity.dart';
 import 'package:pixel_quest/data/storage/entities/world_entity.dart';
 import 'package:pixel_quest/data/storage/storage_events.dart';
 import 'package:pixel_quest/game/background/background.dart';
+import 'package:pixel_quest/game/game_settings.dart';
 import 'package:pixel_quest/game/level/mobile%20controls/mobile_controls.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,10 +31,12 @@ class StorageCenter {
   static Future<StorageCenter> init({required StaticCenter staticCenter}) async {
     final prefs = await SharedPreferences.getInstance();
     final dataCenter = StorageCenter._(prefs, staticCenter);
-    await dataCenter.clearAllLevels(); // for testing
-    await dataCenter.clearAllWorlds(); // for testing
-    // await dataCenter.clearSettings(); // for testing
-    // await dataCenter.clearInventory(); // for testing
+    if (GameSettings.testMode) {
+      await dataCenter.clearAllLevels(); // for testing
+      await dataCenter.clearAllWorlds(); // for testing
+      await dataCenter.clearSettings(); // for testing
+      await dataCenter.clearInventory(); // for testing
+    }
     dataCenter._loadAllLevels();
     dataCenter._loadAllWorlds();
     dataCenter._loadSettings();
