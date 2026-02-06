@@ -19,7 +19,7 @@ mixin EntityCollision on PositionComponent {
   /// Determines whether the player should resolve a collision side (`side`) or just send `any`.
   ///
   /// Defaults to `side`. Use `any` for entities where the exact side doesn't matter (and you want to skip extra collision math).
-  EntityCollisionType get collisionType => EntityCollisionType.side;
+  EntityCollisionType get collisionType => .side;
 
   /// The hitbox used for entity collision checks (absolute rect is derived from this).
   ShapeHitbox get entityHitbox;

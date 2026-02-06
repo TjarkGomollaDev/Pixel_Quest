@@ -34,13 +34,13 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
   }
 
   // size
-  static final Vector2 gridSize = Vector2.all(64);
+  static final Vector2 gridSize = .all(64);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(26, 56), size: Vector2(34, 8));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(64);
+  static final Vector2 _textureSize = .all(64);
   static const String _path = 'Items/Checkpoints/Start/';
   static const String _pathEnd = ' (64x64).png';
 
@@ -70,7 +70,7 @@ class Start extends SpriteAnimationGroupComponent with HasGameReference<PixelQue
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 

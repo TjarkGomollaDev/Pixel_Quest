@@ -3,7 +3,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/ambient_loop_emitter.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/enemies/ghost_particle.dart';
@@ -125,10 +124,10 @@ class Ghost extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped || !_isVisible) return;
-    if (collisionSide == CollisionSide.top) {
+    if (collisionSide == .top) {
       _gotStomped = true;
       _player.bounceUp();
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
 
       // play hit animation and then remove from level
       animationGroupComponent.current = _GhostState.hit;
@@ -151,9 +150,9 @@ class Ghost extends PositionComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    configureAmbientLoop(loop: LoopSfx.ghost, hitbox: _hitbox);
+    configureAmbientLoop(loop: .ghost, hitbox: _hitbox);
   }
 
   void _loadAllSpriteAnimations() {

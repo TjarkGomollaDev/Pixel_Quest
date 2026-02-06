@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -49,13 +48,13 @@ class ArrowUp extends PositionComponent
   ArrowUp({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(11, 11), size: Vector2(10, 10));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(18);
+  static final Vector2 _textureSize = .all(18);
   static const String _path = 'Traps/Arrow/';
   static const String _pathEnd = ' (18x18).png';
 
@@ -83,7 +82,7 @@ class ArrowUp extends PositionComponent
       _player.bounceUp(jumpForce: _bounceHeight);
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
+      game.audioCenter.playSound(.jumpBoost, .game);
       animationGroupComponent.current = ArrowUpState.hit;
       animationGroupComponent.animationTickers![ArrowUpState.hit]!.completed.whenComplete(() {
         world.queueForRespawn(this);
@@ -93,7 +92,7 @@ class ArrowUp extends PositionComponent
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
+  EntityCollisionType get collisionType => .any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
@@ -108,9 +107,9 @@ class ArrowUp extends PositionComponent
 
     // general
     priority = GameSettings.collectiblesLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
+    marker = EntityMiniMapMarker(layer: .none);
   }
 
   void _loadAllSpriteAnimations() {

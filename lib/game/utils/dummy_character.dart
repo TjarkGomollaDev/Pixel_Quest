@@ -24,7 +24,7 @@ import 'package:pixel_quest/game/game.dart';
 /// - Must have access to the game via [HasGameReference]
 mixin DummyCharacter on SpriteAnimationGroupComponent, HasGameReference<PixelQuest> {
   // animation settings
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
   static final Vector2 _textureSize = Vector2(32, 32);
   static const String _path = 'Main Characters/';
   static const String _pathEnd = ' (32x32).png';

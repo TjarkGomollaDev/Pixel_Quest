@@ -18,14 +18,14 @@ class DeveloperLogoState extends State<DeveloperLogo> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: .symmetric(horizontal: 10, vertical: 6),
       color: AppTheme.black,
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(4),
+            padding: .all(4),
             decoration: BoxDecoration(
-              border: BoxBorder.all(color: AppTheme.white),
+              border: .all(color: AppTheme.white),
               borderRadius: BorderRadius.circular(50).copyWith(bottomLeft: Radius.zero),
             ),
             child: Center(child: Text('by', style: AppTheme.splashDeveloperText)),

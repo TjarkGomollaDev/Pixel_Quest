@@ -15,18 +15,18 @@ class SplashContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         // stars
         AnimatedStars(key: starsKey),
         26.heightSizedBox,
         //  game title
-        Image.asset('assets/images/Splash/Splash_Title.png', height: 68, filterQuality: FilterQuality.none),
+        Image.asset('assets/images/Splash/Splash_Title.png', height: 68, filterQuality: .none),
         52.heightSizedBox,
         // loading container
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: AppTheme.tileBlur),
+          padding: const .symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(borderRadius: .circular(4), color: AppTheme.tileBlur),
           child: Builder(
             builder: (context) {
               final screenHeight = MediaQuery.of(context).size.height;
@@ -34,9 +34,9 @@ class SplashContent extends StatelessWidget {
               return Transform.translate(
                 offset: Offset(0, offsetY),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: .min,
+                  mainAxisAlignment: .center,
+                  crossAxisAlignment: .center,
                   children: [
                     Text(l10n.loadingGame, style: AppTheme.splashText),
                     8.widthSizedBox,

@@ -3,7 +3,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/ambient_loop_emitter.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -49,14 +48,14 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
        super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final CircleHitbox _hitbox = CircleHitbox(radius: gridSize.x / 2);
 
   // animation settings
   static const double _stepTime = 0.03;
-  static final Vector2 _textureSize = Vector2.all(38);
+  static final Vector2 _textureSize = .all(38);
   static const int _amount = 8;
   static const String _pathSaw = 'Traps/Saw/On (38x38).png';
   static const String _pathChain = 'Traps/Platforms/Chain.png';
@@ -101,14 +100,10 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
     // general
     priority = _showPath ? GameSettings.trapLayerLevel : GameSettings.trapBehindLayerLevel;
     anchor = Anchor.topCenter;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(
-      size: _hitbox.height,
-      color: AppTheme.entityMarkerSpecial,
-      layer: EntityMiniMapMarkerLayer.behindForeground,
-    );
-    configureAmbientLoop(loop: LoopSfx.saw, hitbox: _hitbox);
+    marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial, layer: .behindForeground);
+    configureAmbientLoop(loop: .saw, hitbox: _hitbox);
   }
 
   void _loadSpriteAnimation() => animation = loadSpriteAnimation(game, _pathSaw, _amount, _stepTime, _textureSize);
@@ -148,7 +143,7 @@ class Saw extends SpriteAnimationComponent with EntityCollision, EntityOnMiniMap
       final chain =
           DebugSpriteComponent(
               sprite: chainSprite,
-              size: Vector2.all(chainSize),
+              size: .all(chainSize),
               position: _isVertical ? Vector2(startPoint.x, startPoint.y + offset) : Vector2(startPoint.x + offset, startPoint.y),
               priority: GameSettings.trapParticlesLayerLevel,
             )

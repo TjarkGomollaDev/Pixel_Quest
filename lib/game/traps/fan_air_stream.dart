@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/events/game_event_bus.dart';
@@ -56,7 +55,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
 
   // push player when in stream
   bool _playerInStream = false;
-  final _pushStrength = 150.0; // [Adjustable]
+  final double _pushStrength = 150; // [Adjustable]
 
   // particle
   late Timer _particleTimer;
@@ -106,7 +105,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
   void onEntityCollisionEnd() => _playerInStream = false;
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
+  EntityCollisionType get collisionType => .any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
@@ -121,7 +120,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -165,7 +164,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _particleTimer.start();
     _isFanOn = true;
     _fan.activateFan();
-    game.audioCenter.playSoundIf(Sfx.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+    game.audioCenter.playSoundIf(.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), .game);
     _fanTimer!
       ..limit = _durationFanOff
       ..onTick = _switchOff
@@ -176,7 +175,7 @@ class FanAirStream extends PositionComponent with EntityCollision, EntityCollisi
     _particleTimer.pause();
     _isFanOn = false;
     _fan.deactivateFan();
-    game.audioCenter.playSoundIf(Sfx.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+    game.audioCenter.playSoundIf(.fanSwitch, game.isEntityInVisibleWorldRectX(_hitbox), .game);
     _fanTimer!
       ..limit = _durationFanOn
       ..onTick = _switchOn

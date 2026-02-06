@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -46,7 +45,7 @@ class SpikeHead extends PositionComponent
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(64);
+  static final Vector2 gridSize = .all(64);
 
   // actual hitbox
   late final CompositeHitbox _hitbox;
@@ -117,7 +116,7 @@ class SpikeHead extends PositionComponent
   }
 
   RectangleHitbox _makeHitbox(Vector2 position, Vector2 size) =>
-      RectangleHitbox(position: position, size: size, collisionType: CollisionType.passive)..debugColor = AppTheme.debugColorTrapHitbox;
+      RectangleHitbox(position: position, size: size, collisionType: .passive)..debugColor = AppTheme.debugColorTrapHitbox;
 
   void _initialSetup() {
     // debug
@@ -130,7 +129,7 @@ class SpikeHead extends PositionComponent
     // general
     priority = GameSettings.trapLayerLevel;
     add(_hitbox);
-    marker = EntityMiniMapMarker(size: _hitbox.height, type: EntityMiniMapMarkerType.square, color: AppTheme.entityMarkerSpecial);
+    marker = EntityMiniMapMarker(size: _hitbox.height, type: .square, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadAllSpriteAnimations() {
@@ -177,12 +176,12 @@ class SpikeHead extends PositionComponent
     // depending on whether we hit the top or bottom, we choose the animation and the new speed
     final _SpikeHeadState hitAnimation;
     if (newDirection == 1) {
-      hitAnimation = _SpikeHeadState.topHit;
+      hitAnimation = .topHit;
       _moveSpeed = _moveSpeedDown;
     } else {
-      hitAnimation = _SpikeHeadState.bottomHit;
+      hitAnimation = .bottomHit;
       _moveSpeed = _moveSpeedUp;
-      game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(entityHitbox), SfxType.game);
+      game.audioCenter.playSoundIf(.stompRock, game.isEntityInVisibleWorldRectX(entityHitbox), .game);
     }
 
     // animation sequence

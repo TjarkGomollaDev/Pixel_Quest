@@ -65,10 +65,10 @@ class _ConfirmContent extends PositionComponent with HasGameReference<PixelQuest
     // message
     final message = TextBoxComponent(
       text: this.message,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: Vector2(centerX, 0),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
-      boxConfig: TextBoxConfig(maxWidth: size.x, margins: EdgeInsets.zero),
+      boxConfig: TextBoxConfig(maxWidth: size.x, margins: .zero),
       align: Anchor.topCenter,
     );
 

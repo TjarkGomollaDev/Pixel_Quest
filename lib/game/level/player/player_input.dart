@@ -20,7 +20,7 @@ class PlayerInput extends Component with KeyboardHandler {
 
   // joystick state tracking
   JoystickComponent? _joystick;
-  JoystickDirection _lastJoystickDirection = JoystickDirection.idle;
+  JoystickDirection _lastJoystickDirection = .idle;
   double _joystickMoveX = 0;
 
   @override
@@ -35,7 +35,7 @@ class PlayerInput extends Component with KeyboardHandler {
     final left = keysPressed.contains(LogicalKeyboardKey.keyA) || keysPressed.contains(LogicalKeyboardKey.arrowLeft);
     final right = keysPressed.contains(LogicalKeyboardKey.keyD) || keysPressed.contains(LogicalKeyboardKey.arrowRight);
     _keyboardMoveX = (left ? -1 : 0) + (right ? 1 : 0);
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) _jumped = true;
+    if (event is KeyDownEvent && event.logicalKey == .space) _jumped = true;
     return super.onKeyEvent(event, keysPressed);
   }
 
@@ -44,17 +44,17 @@ class PlayerInput extends Component with KeyboardHandler {
     if (_joystick!.direction == _lastJoystickDirection) return;
     _lastJoystickDirection = _joystick!.direction;
     switch (_joystick!.direction) {
-      case JoystickDirection.left:
-      case JoystickDirection.upLeft:
-      case JoystickDirection.downLeft:
+      case .left:
+      case .upLeft:
+      case .downLeft:
         _joystickMoveX = -1;
         break;
-      case JoystickDirection.right:
-      case JoystickDirection.upRight:
-      case JoystickDirection.downRight:
+      case .right:
+      case .upRight:
+      case .downRight:
         _joystickMoveX = 1;
         break;
-      case JoystickDirection.idle:
+      case .idle:
         _joystickMoveX = 0;
         break;
       default:
@@ -79,12 +79,12 @@ class PlayerInput extends Component with KeyboardHandler {
   /// Attaches a joystick as an input source and resets the cached direction state.
   void attachJoystick(JoystickComponent joystick) {
     _joystick = joystick;
-    _lastJoystickDirection = JoystickDirection.idle;
+    _lastJoystickDirection = .idle;
   }
 
   /// Detaches the current joystick input source and clears related cached state.
   void detachJoystick() {
     _joystick = null;
-    _lastJoystickDirection = JoystickDirection.idle;
+    _lastJoystickDirection = .idle;
   }
 }

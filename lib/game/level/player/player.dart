@@ -59,8 +59,8 @@ enum PlayerCharacter {
   final String fileName;
   const PlayerCharacter(this.fileName);
 
-  static const PlayerCharacter defaultCharacter = PlayerCharacter.maskDude;
-  static PlayerCharacter fromName(String name) => PlayerCharacter.values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
+  static const PlayerCharacter defaultCharacter = maskDude;
+  static PlayerCharacter fromName(String name) => values.firstWhere((c) => c.name == name, orElse: () => defaultCharacter);
 }
 
 /// The controllable player character within a level.
@@ -96,7 +96,7 @@ class Player extends SpriteAnimationGroupComponent
       super(position: startPosition, size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(9, 4), size: Vector2(14, 28));
@@ -125,7 +125,7 @@ class Player extends SpriteAnimationGroupComponent
   // movement
   double _moveX = 0; // -1, 0, or 1
   final double _moveSpeed = 100; // [Adjustable]
-  Vector2 _velocity = Vector2.zero();
+  Vector2 _velocity = .zero();
 
   // jump
   bool _hasJumped = false;
@@ -165,7 +165,7 @@ class Player extends SpriteAnimationGroupComponent
   Vector2 get hitboxLocalPosition => _hitbox.position;
   Vector2 get hitboxLocalSize => _hitbox.size;
   Vector2 get hitboxAbsolutePosition => Vector2(_hitboxLeft, _hitboxTop);
-  Rect get hitboxAbsoluteRect => Rect.fromLTRB(_hitboxLeft, _hitboxTop, _hitboxRight, _hitboxBottom);
+  Rect get hitboxAbsoluteRect => .fromLTRB(_hitboxLeft, _hitboxTop, _hitboxRight, _hitboxBottom);
   double get hitboxAbsoluteLeft => _hitboxLeft;
   double get hitboxAbsoluteRight => _hitboxRight;
   double get hitboxAbsoluteTop => _hitboxTop;
@@ -230,7 +230,7 @@ class Player extends SpriteAnimationGroupComponent
     if (!(hasVerticalIntersection && hasHorizontalIntersection)) return;
 
     // if the exact side is not required, we can simply pass "Any" as the collision side and save ourselves computing costs
-    if (other.collisionType == EntityCollisionType.any) return other.onEntityCollision(CollisionSide.any);
+    if (other.collisionType == .any) return other.onEntityCollision(.any);
 
     // overlap calculation
     final overlapX = calculateOverlapX(playerRect, otherRect);
@@ -246,7 +246,7 @@ class Player extends SpriteAnimationGroupComponent
       hasHorizontalIntersection,
       false,
     );
-    if (result == CollisionSide.none) return;
+    if (result == .none) return;
     other.onEntityCollision(result);
   }
 
@@ -283,16 +283,16 @@ class Player extends SpriteAnimationGroupComponent
       hasHorizontalIntersection,
       forceVertical,
     )) {
-      case CollisionSide.top:
+      case .top:
         _resolveTopWorldCollision(worldBlockRect.top, other);
         break;
-      case CollisionSide.bottom:
+      case .bottom:
         _resolveBottomWorldCollision(worldBlockRect.bottom, other);
         break;
-      case CollisionSide.left:
+      case .left:
         _resolveLeftWorldCollision(worldBlockRect.left);
         break;
-      case CollisionSide.right:
+      case .right:
         _resolveRightWorldCollision(worldBlockRect.right);
         break;
       default:
@@ -315,7 +315,7 @@ class Player extends SpriteAnimationGroupComponent
   void _resolveBottomWorldCollision(double blockBottom, WorldCollision other) {
     if (_isOnGround) {
       // if we are standing on the ground and still have a collision with our head above, we were crushed, for example, by a trap
-      _respawn(CollisionSide.bottom);
+      _respawn(.bottom);
     } else {
       position.y = blockBottom - _hitbox.position.y;
       _velocity.y = 0;
@@ -394,7 +394,7 @@ class Player extends SpriteAnimationGroupComponent
 
   void _checkFallOutOfMap() {
     if (position.y > game.camera.visibleWorldRect.bottom && !_isSpawnProtectionActive) {
-      _respawn(CollisionSide.none);
+      _respawn(.none);
     }
   }
 
@@ -428,9 +428,9 @@ class Player extends SpriteAnimationGroupComponent
     _velocity.x = _moveX * _moveSpeed;
     if (_isAtXCompleter != null && _targetX != null) {
       if (_moveX == 1) {
-        position.x = (position.x + _velocity.x * dt).clamp(double.negativeInfinity, _targetX!);
+        position.x = (position.x + _velocity.x * dt).clamp(.negativeInfinity, _targetX!);
       } else if (_moveX == -1) {
-        position.x = (position.x + _velocity.x * dt).clamp(_targetX!, double.infinity);
+        position.x = (position.x + _velocity.x * dt).clamp(_targetX!, .infinity);
       }
       if (position.x == _targetX) {
         _moveX = 0;
@@ -446,7 +446,7 @@ class Player extends SpriteAnimationGroupComponent
     _hasJumped = false;
 
     // jump animation
-    game.audioCenter.playSound(Sfx.jump, SfxType.player);
+    game.audioCenter.playSound(.jump, .player);
   }
 
   void _playerDoubleJump(double dt) {
@@ -455,12 +455,12 @@ class Player extends SpriteAnimationGroupComponent
 
     // double jump animation
     current = PlayerState.doubleJump;
-    game.audioCenter.playSound(Sfx.doubleJump, SfxType.player);
+    game.audioCenter.playSound(.doubleJump, .player);
   }
 
   void _updateGravity(double dt) {
     if (!_isGravityActive) return;
-    _velocity.y = (_velocity.y + _gravity * dt).clamp(double.negativeInfinity, _terminalVelocity);
+    _velocity.y = (_velocity.y + _gravity * dt).clamp(.negativeInfinity, _terminalVelocity);
     position.y += _velocity.y * dt;
   }
 
@@ -483,10 +483,10 @@ class Player extends SpriteAnimationGroupComponent
     }
 
     // update animation state
-    PlayerState playerState = PlayerState.idle;
-    if (_velocity.x > 0 || _velocity.x < 0 && _isOnGround) playerState = PlayerState.run;
-    if (_velocity.y > 0 && !_isOnGround) playerState = PlayerState.fall;
-    if (_velocity.y < 0 && !_isOnGround) playerState = PlayerState.jump;
+    PlayerState playerState = .idle;
+    if (_velocity.x > 0 || _velocity.x < 0 && _isOnGround) playerState = .run;
+    if (_velocity.y > 0 && !_isOnGround) playerState = .fall;
+    if (_velocity.y < 0 && !_isOnGround) playerState = .jump;
     current = playerState;
   }
 
@@ -500,7 +500,7 @@ class Player extends SpriteAnimationGroupComponent
 
   Future<void> appearInLevel() async {
     // play appearing animation
-    game.audioCenter.playSound(Sfx.appearing, SfxType.level);
+    game.audioCenter.playSound(.appearing, .level);
     await _effect.playAppearing(_spawnInLevelPosition);
 
     // the player should only fall after the appearing animation and after he is visible
@@ -525,7 +525,7 @@ class Player extends SpriteAnimationGroupComponent
       _moveX = -1;
       _targetX = newTargetX + width - _hitbox.position.x - _hitbox.width / 2;
     } else {
-      return Future.value();
+      return .value();
     }
     _isAtXCompleter = Completer<void>();
     return _isAtXCompleter!.future.whenComplete(() => _updateHitboxEdges());
@@ -535,7 +535,7 @@ class Player extends SpriteAnimationGroupComponent
     _respawnPosition = checkpointPosition;
   }
 
-  Future<void> _delayAnimation(int milliseconds) => Future.delayed(Duration(milliseconds: milliseconds));
+  Future<void> _delayAnimation(int milliseconds) => .delayed(Duration(milliseconds: milliseconds));
 
   Future<void> reachedFinish(ShapeHitbox finish) async {
     _moveX = 0;
@@ -569,7 +569,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // outline stars
     for (final position in starPositions) {
-      final outlineStar = Star(variant: StarVariant.outline, size: Vector2.all(38), position: position, spawnSizeZero: true);
+      final outlineStar = Star(variant: .outline, size: .all(38), position: position, spawnSizeZero: true);
       world.add(outlineStar);
       outlineStars.add(outlineStar);
       unawaited(outlineStar.scaleIn());
@@ -578,7 +578,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // earned stars
     for (int i = 0; i < world.earnedStars; i++) {
-      final star = Star(variant: StarVariant.filled, size: Vector2.all(38), position: playerCenter, spawnSizeZero: true);
+      final star = Star(variant: .filled, size: .all(38), position: playerCenter, spawnSizeZero: true);
       world.add(star);
       stars.add(star);
 
@@ -596,7 +596,7 @@ class Player extends SpriteAnimationGroupComponent
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
     // jump animation
-    game.audioCenter.playSound(Sfx.jump, SfxType.player);
+    game.audioCenter.playSound(.jump, .player);
     bounceUp(jumpForce: 320);
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
     current = PlayerState.doubleJump;
@@ -606,7 +606,7 @@ class Player extends SpriteAnimationGroupComponent
 
     // player disapperaing animation
     isVisible = false;
-    game.audioCenter.playSound(Sfx.disappearing, SfxType.level);
+    game.audioCenter.playSound(.disappearing, .level);
     await _effect.playDisappearing(scale.x > 0 ? position : position - Vector2(width, 0));
     await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
 
@@ -626,7 +626,7 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _respawn(CollisionSide collisionSide) async {
-    final gotHit = collisionSide != CollisionSide.any && collisionSide != CollisionSide.none;
+    final gotHit = collisionSide != .any && collisionSide != .none;
 
     // hit
     _isSpawnProtectionActive = true;
@@ -634,14 +634,14 @@ class Player extends SpriteAnimationGroupComponent
     _isAnimationStateActive = false;
     _isWorldCollisionActive = false;
     _moveX = 0;
-    _velocity = Vector2.zero();
+    _velocity = .zero();
     animationTickers![PlayerState.doubleJump]?.onComplete?.call(); // prevents race condition during respawn
     game.eventBus.emit(const PlayerRespawned());
 
     // play death effects
     current = PlayerState.hit;
-    if (gotHit) game.audioCenter.playSound(Sfx.playerHit, SfxType.player);
-    game.audioCenter.playSound(Sfx.playerDeath, SfxType.player);
+    if (gotHit) game.audioCenter.playSound(.playerHit, .player);
+    game.audioCenter.playSound(.playerDeath, .player);
     if (gotHit) {
       _effect.playFlashScreen();
 

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/utils/cancelable_effects.dart';
 import 'package:pixel_quest/game/utils/load_sprites.dart';
 import 'package:pixel_quest/game/game_settings.dart';
@@ -23,11 +22,11 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
       _spawnSizeZero = spawnSizeZero {
     this.size = size ?? defaultSize;
     priority = GameSettings.spotlightAnimationContentLayer;
-    anchor = Anchor.center;
+    anchor = .center;
   }
 
   // size
-  static final Vector2 defaultSize = Vector2.all(26);
+  static final Vector2 defaultSize = .all(26);
 
   // animation settings
   static const String _pathFilled = 'Other/Star (32x32).png';
@@ -63,8 +62,8 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
   }
 
   void _loadSprite() {
-    sprite = loadSprite(game, _variant == StarVariant.filled ? _pathFilled : _pathOutline);
-    if (_spawnSizeZero) scale = Vector2.zero();
+    sprite = loadSprite(game, _variant == .filled ? _pathFilled : _pathOutline);
+    if (_spawnSizeZero) scale = .zero();
   }
 
   /// Animates the star flying to a target position while scaling up to full size.
@@ -82,7 +81,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
       additionallyOnStart: () => _resetPositions[_keyFlyToAndScaleIn] = position.clone(),
       additionallyInOnComplete: () {
         _resetPositions.remove(_keyFlyToAndScaleIn);
-        if (playSound) game.audioCenter.playSound(Sfx.star, SfxType.level);
+        if (playSound) game.audioCenter.playSound(.star, .level);
       },
     );
   }
@@ -92,8 +91,8 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
     // create effect
     final effect = SequenceEffect([
       MoveEffect.to(target, EffectController(duration: fallDuration, curve: Curves.easeOutBack)),
-      ScaleEffect.to(Vector2.all(1.4), EffectController(duration: popInDuration * 0.5, curve: Curves.easeOut)),
-      ScaleEffect.to(Vector2.all(1.0), EffectController(duration: popInDuration * 0.5, curve: Curves.easeIn)),
+      ScaleEffect.to(.all(1.4), EffectController(duration: popInDuration * 0.5, curve: Curves.easeOut)),
+      ScaleEffect.to(.all(1.0), EffectController(duration: popInDuration * 0.5, curve: Curves.easeIn)),
     ]);
 
     // register effect and return future
@@ -103,7 +102,7 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
       effect,
       additionallyOnStart: () {
         _resetPositions[_keyFallToPopIn] = startPosition;
-        if (playSound) game.audioCenter.playSound(Sfx.collected, SfxType.level);
+        if (playSound) game.audioCenter.playSound(.collected, .level);
       },
       additionallyInOnComplete: () {
         position = startPosition;
@@ -116,22 +115,18 @@ class Star extends SpriteComponent with HasGameReference<PixelQuest>, Cancelable
   Future<void> popIn({double duration = 0.6, bool playSound = true}) {
     // create effect
     final effect = SequenceEffect([
-      ScaleEffect.to(Vector2.all(1.3), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
-      ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration * 0.5, curve: Curves.easeIn)),
+      ScaleEffect.to(.all(1.3), EffectController(duration: duration * 0.5, curve: Curves.easeOutBack)),
+      ScaleEffect.to(.all(1.0), EffectController(duration: duration * 0.5, curve: Curves.easeIn)),
     ]);
 
     // register effect and return future
-    return registerEffect(
-      _keyPopIn,
-      effect,
-      additionallyOnStart: playSound ? () => game.audioCenter.playSound(Sfx.star, SfxType.level) : null,
-    );
+    return registerEffect(_keyPopIn, effect, additionallyOnStart: playSound ? () => game.audioCenter.playSound(.star, .level) : null);
   }
 
   /// Smooth scale-in to full size, useful when the star spawns at zero scale.
   Future<void> scaleIn({double duration = 0.6}) {
     // create effect
-    final effect = ScaleEffect.to(Vector2.all(1.0), EffectController(duration: duration, curve: Curves.fastEaseInToSlowEaseOut));
+    final effect = ScaleEffect.to(.all(1.0), EffectController(duration: duration, curve: Curves.fastEaseInToSlowEaseOut));
 
     // register effect and return future
     return registerEffect(_keyScaleIn, effect);

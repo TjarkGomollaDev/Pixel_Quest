@@ -79,7 +79,7 @@ class DotsIndicator extends PositionComponent {
 
     // render optional background
     if (_bgPaint != null) {
-      final rrect = RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.x, size.y), Radius.circular(_bgRadius));
+      final rrect = RRect.fromRectAndRadius(.fromLTWH(0, 0, size.x, size.y), .circular(_bgRadius));
       canvas.drawRRect(rrect, _bgPaint);
     }
 
@@ -104,7 +104,7 @@ class DotsIndicator extends PositionComponent {
         canvas.drawCircle(Offset(cx, centerY), _dotRadius, paint);
       } else {
         final px = x.roundToDouble();
-        canvas.drawRect(Rect.fromLTWH(px, py, s, s), paint);
+        canvas.drawRect(.fromLTWH(px, py, s, s), paint);
       }
     }
   }

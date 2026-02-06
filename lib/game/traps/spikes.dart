@@ -61,7 +61,7 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -82,8 +82,8 @@ class Spikes extends PositionComponent with EntityCollision, HasGameReference<Pi
   void _setupHitbox() {
     _hitbox = switch (_side) {
       // right, bottom, left and default top
-      2 => RectangleHitbox(position: Vector2.zero(), size: Vector2(8, height)),
-      3 => RectangleHitbox(position: Vector2.zero(), size: Vector2(width, 8)),
+      2 => RectangleHitbox(position: .zero(), size: Vector2(8, height)),
+      3 => RectangleHitbox(position: .zero(), size: Vector2(width, 8)),
       4 => RectangleHitbox(position: Vector2(8, 0), size: Vector2(8, height)),
       _ => RectangleHitbox(position: Vector2(0, 8), size: Vector2(width, 8)),
     };

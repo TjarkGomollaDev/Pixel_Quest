@@ -47,7 +47,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
   }
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(8);
+  static final Vector2 _textureSize = .all(8);
   static const String _pathChain = 'Traps/Spiked Ball/Chain (8x8).png';
 
   // center point
@@ -139,7 +139,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
     final chainSprite = loadSprite(game, _pathChain);
     for (int i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
-        ..anchor = Anchor.center
+        ..anchor = .center
         ..debugMode = GameSettings.customDebugMode
         ..debugColor = AppTheme.debugColorTrapHitbox;
 

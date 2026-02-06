@@ -63,8 +63,8 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
        _miniMapEntities = miniMapEntities,
        _inistialState = initialState,
        _showAtStart = show {
-    size = miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
-    anchor = Anchor.topRight;
+    size = miniMapTargetViewSize + .all(_frameBorderWidth * 2) + Vector2(SpriteBtnType.btnSizeSmallCorrected.x + _btnLeftMargin, 0);
+    anchor = .topRight;
 
     // optical adjustment to compensate for the protruding ends of the frame
     position.y -= _frameOverhangAdjust;
@@ -178,8 +178,8 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// and the X scale is increased proportionally to preserve aspect ratio and
   /// hide left/right borders without stretching the sprite.
   void _setUpMiniMapView() {
-    Vector2 targetSize;
-    Vector2 viewPosition;
+    final Vector2 targetSize;
+    final Vector2 viewPosition;
 
     if (GameSettings.hasBorder) {
       // calculate vertical scale to hide top and bottom borders
@@ -194,18 +194,18 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
 
       // scaled target size and an offset so that the view remains centered
       targetSize = Vector2(scaledWidth, scaledHeight);
-      viewPosition = Vector2.all(_frameBorderWidth) + (miniMapTargetViewSize - targetSize) / 2;
+      viewPosition = (miniMapTargetViewSize - targetSize) / 2 + .all(_frameBorderWidth);
     } else {
       targetSize = miniMapTargetViewSize;
-      viewPosition = Vector2.all(_frameBorderWidth);
+      viewPosition = .all(_frameBorderWidth);
 
       // add bleed guard to hide background seams from subpixel rounding at the frame cutout edges,
       // only relevant if the view is the same size as the inside of the frame
       final pad = 1.0;
       _bleedGuard = VisibleRectangleComponent(
         paint: Paint()..color = AppTheme.backgroundColor,
-        size: targetSize + Vector2.all(pad * 2),
-        position: viewPosition - Vector2.all(pad),
+        size: targetSize + .all(pad * 2),
+        position: viewPosition - .all(pad),
         show: _showAtStart ? _inistialState : false,
       );
       add(_bleedGuard!);
@@ -232,9 +232,9 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   /// until the player moves again.
   void _setUpBtns() {
     // hide btn
-    _hideBtn = SpriteToggleBtn.fromType(
-      type: SpriteBtnType.downSmall,
-      type_2: SpriteBtnType.upSmall,
+    _hideBtn = .fromType(
+      type: .downSmall,
+      type_2: .upSmall,
       onPressed: _foldInAnimated,
       onPressed_2: _foldOutAnimated,
       position: Vector2(
@@ -246,8 +246,8 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // scroll right btn
-    _scrollRightBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.nextSmall,
+    _scrollRightBtn = .fromType(
+      type: .nextSmall,
       onPressed: () => _miniMapView.scrollManual(1),
       holdMode: true,
       position: Vector2(_hideBtn.position.x, size.y - _frameOverhangAdjust - SpriteBtnType.btnSizeSmallCorrected.y / 2),
@@ -255,8 +255,8 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // scroll left btn
-    _scrollLeftBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.previousSmall,
+    _scrollLeftBtn = .fromType(
+      type: .previousSmall,
       onPressed: () => _miniMapView.scrollManual(-1),
       holdMode: true,
       position: Vector2(
@@ -313,7 +313,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   }
 
   /// Size of the mini map with frame and without overhang.
-  static Vector2 get frameSize => miniMapTargetViewSize + Vector2.all(_frameBorderWidth * 2 - _frameOverhangAdjust * 2);
+  static Vector2 get frameSize => miniMapTargetViewSize + .all(_frameBorderWidth * 2 - _frameOverhangAdjust * 2);
 
   /// Offset from the frame's top-left corner to the screen top-right.
   Vector2 get frameTopLeftToScreenTopRightOffset => Vector2(

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
@@ -40,7 +39,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
   Trampoline({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 21), size: Vector2(23, 11));
@@ -71,7 +70,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
 
       // bounce player
       _player.bounceUp(jumpForce: _bounceHeight);
-      game.audioCenter.playSound(Sfx.jumpBoost, SfxType.game);
+      game.audioCenter.playSound(.jumpBoost, .game);
 
       // play animation
       animationGroupComponent.current = _TrampolineState.jump;
@@ -84,7 +83,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
+  EntityCollisionType get collisionType => .any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
@@ -99,7 +98,7 @@ class Trampoline extends PositionComponent with FixedGridOriginalSizeGroupAnimat
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 

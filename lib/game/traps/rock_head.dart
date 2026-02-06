@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -48,7 +47,7 @@ class RockHead extends PositionComponent
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(48);
+  static final Vector2 gridSize = .all(48);
 
   // only relevant for world collision in the player
   late double _previousY;
@@ -117,9 +116,9 @@ class RockHead extends PositionComponent
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(size: _hitbox.height, type: EntityMiniMapMarkerType.square, color: AppTheme.entityMarkerSpecial);
+    marker = EntityMiniMapMarker(size: _hitbox.height, type: .square, color: AppTheme.entityMarkerSpecial);
   }
 
   void _loadAllSpriteAnimations() {
@@ -168,12 +167,12 @@ class RockHead extends PositionComponent
     // depending on whether we hit the top or bottom, we choose the animation and the new speed
     final _RockHeadState hitAnimation;
     if (newDirection == 1) {
-      hitAnimation = _RockHeadState.topHit;
+      hitAnimation = .topHit;
       _moveSpeed = _moveSpeedDown;
     } else {
-      hitAnimation = _RockHeadState.bottomHit;
+      hitAnimation = .bottomHit;
       _moveSpeed = _moveSpeedUp;
-      game.audioCenter.playSoundIf(Sfx.stompRock, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+      game.audioCenter.playSoundIf(.stompRock, game.isEntityInVisibleWorldRectX(_hitbox), .game);
     }
 
     // animation sequence

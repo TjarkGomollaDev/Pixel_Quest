@@ -3,7 +3,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/ambient_loop_emitter.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -37,14 +36,14 @@ class SawCircleSingleSaw extends SpriteAnimationComponent
   }
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final CircleHitbox _hitbox = CircleHitbox(radius: gridSize.x / 2);
 
   // animation settings
   static const double _stepTime = 0.03;
-  static final Vector2 _textureSize = Vector2.all(38);
+  static final Vector2 _textureSize = .all(38);
   static const int _amount = 8;
   static const String _path = 'Traps/Saw/On (38x38).png';
 
@@ -70,17 +69,13 @@ class SawCircleSingleSaw extends SpriteAnimationComponent
     }
 
     // general
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     anchor = Anchor.center;
     add(_hitbox);
-    configureAmbientLoop(loop: LoopSfx.saw, hitbox: _hitbox);
+    configureAmbientLoop(loop: .saw, hitbox: _hitbox);
   }
 
-  void _setUpMarker() => marker = EntityMiniMapMarker(
-    size: _hitbox.height,
-    color: AppTheme.entityMarkerSpecial,
-    layer: EntityMiniMapMarkerLayer.behindForeground,
-  );
+  void _setUpMarker() => marker = EntityMiniMapMarker(size: _hitbox.height, color: AppTheme.entityMarkerSpecial, layer: .behindForeground);
 
   void _loadSpriteAnimation() {
     animation = loadSpriteAnimation(game, _path, _amount, _stepTime, _textureSize);

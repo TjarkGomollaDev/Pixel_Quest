@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/enemies/plant_bullet.dart';
@@ -50,7 +49,7 @@ class Plant extends PositionComponent
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(48);
+  static final Vector2 gridSize = .all(48);
 
   // actual hitbox
   final _hitbox = RectangleHitbox(position: Vector2(18, 18), size: Vector2(20, 30));
@@ -105,7 +104,7 @@ class Plant extends PositionComponent
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationGroupComponent.animationTickers![_PlantState.attack]?.onComplete?.call();
       animationGroupComponent.current = _PlantState.hit;
       animationGroupComponent.animationTickers![_PlantState.hit]!.completed.whenComplete(() => removeFromParent());
@@ -127,7 +126,7 @@ class Plant extends PositionComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -164,7 +163,7 @@ class Plant extends PositionComponent
     final ticker = animationGroupComponent.animationTickers![_PlantState.attack]!;
     ticker.onFrame = (frame) {
       if (frame == _startShotSoundFrame) {
-        game.audioCenter.playSoundIf(Sfx.plantShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+        game.audioCenter.playSoundIf(.plantShot, game.isEntityInVisibleWorldRectX(_hitbox), .game);
         ticker.onFrame = null;
       }
     };

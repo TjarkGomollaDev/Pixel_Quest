@@ -32,8 +32,8 @@ class WorldMetadata {
       titleFileName: map['titleFileName'] as String,
       foregroundFileName: map['foregroundFileName'] as String,
       miniMapFrameFileName: map['miniMapFrameFileName'] as String,
-      backgroundScene: BackgroundScene.fromName(map['backgroundScene'] as String)!,
-      baseBlock: LevelBaseBlock.fromName(map['baseBlock'] as String),
+      backgroundScene: .fromName(map['backgroundScene'] as String)!,
+      baseBlock: .fromName(map['baseBlock'] as String),
     );
   }
 

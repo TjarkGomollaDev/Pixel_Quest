@@ -17,12 +17,12 @@ class PausePage extends Route with HasGameReference<PixelQuest> {
 
   @override
   void onPush(Route? previousRoute) {
-    game.eventBus.emit(const LevelLifecycleChanged(Lifecycle.paused));
+    game.eventBus.emit(const LevelLifecycleChanged(.paused));
   }
 
   @override
   void onPop(Route nextRoute) {
-    game.eventBus.emit(const LevelLifecycleChanged(Lifecycle.resumed));
+    game.eventBus.emit(const LevelLifecycleChanged(.resumed));
   }
 }
 
@@ -75,7 +75,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
   }
 
   void _setUpRoot() {
-    _root = PositionComponent(size: game.size)..scale = Vector2.all(game.worldToScreenScale);
+    _root = PositionComponent(size: game.size)..scale = .all(game.worldToScreenScale);
     add(_root);
   }
 
@@ -84,7 +84,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
     _pauseText = TextComponent(
       text: game.l10n.pauseTitel.toUpperCase(),
       position: Vector2(0, -12),
-      anchor: Anchor.center,
+      anchor: .center,
       textRenderer: AppTheme.pausedHeading.asTextPaint,
     );
 
@@ -94,16 +94,16 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
       borderRadius: 4,
       position: _pauseText.position,
       size: Vector2(_pauseText.size.x + 30, 32),
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     // outline
     _pauseOutline = CornerOutline(
-      size: _pauseBg.size + Vector2.all(12),
+      size: _pauseBg.size + .all(12),
       cornerLength: 10,
       strokeWidth: 2.6,
       color: AppTheme.white,
-      anchor: Anchor.center,
+      anchor: .center,
       position: _pauseText.position,
     );
 
@@ -129,7 +129,7 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
     );
 
     _btns.addAll([_settingsBtn, _menuBtn]);
-    _pauseContainer = PositionComponent(position: _root.size / 2, anchor: Anchor.center);
+    _pauseContainer = PositionComponent(position: _root.size / 2, anchor: .center);
     _pauseContainer.addAll([_pauseBg, _pauseText, _pauseOutline, _settingsBtn, _menuBtn]);
     _root.add(_pauseContainer);
   }
@@ -145,10 +145,10 @@ class _PauseContent extends Component with HasGameReference<PixelQuest> {
 
   /// Starts the pause page scale-in and pop-in button animations.
   void _startShowAnimation() {
-    _pauseContainer.scale = Vector2.all(0.92);
+    _pauseContainer.scale = .all(0.92);
 
     // add scale-in effect
-    _pauseContainer.add(ScaleEffect.to(Vector2.all(1.0), EffectController(duration: 0.18, curve: Curves.easeOutQuad)));
+    _pauseContainer.add(ScaleEffect.to(.all(1.0), EffectController(duration: 0.18, curve: Curves.easeOutQuad)));
 
     // add pop-in effect for all buttons
     for (int i = 0; i < _btns.length; i++) {

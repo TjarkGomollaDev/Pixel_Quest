@@ -133,11 +133,11 @@ class PixelQuest extends FlameGame
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
-      case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
+      case .paused:
+      case .inactive:
         eventBus.emit(const GameLifecycleChanged(Lifecycle.paused));
         break;
-      case AppLifecycleState.resumed:
+      case .resumed:
         eventBus.emit(const GameLifecycleChanged(Lifecycle.resumed));
         break;
       default:
@@ -164,16 +164,15 @@ class PixelQuest extends FlameGame
 
   Future<void> _completeLoading() async {
     if (GameSettings.testMode) return;
-    // await Future.delayed(Duration(seconds: 200));
     final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
     final delayMs = 4600;
     if (elapsedMs < delayMs) await Future.delayed(Duration(milliseconds: delayMs - elapsedMs));
   }
 
   Future<void> _loadCenters() async {
-    staticCenter = await StaticCenter.init();
-    storageCenter = await StorageCenter.init(staticCenter: staticCenter);
-    audioCenter = await AudioCenter.init(storageCenter: storageCenter);
+    staticCenter = await .init();
+    storageCenter = await .init(staticCenter: staticCenter);
+    audioCenter = await .init(storageCenter: storageCenter);
   }
 
   Future<void> _loadImagesIntoCache() async {
@@ -212,7 +211,7 @@ class PixelQuest extends FlameGame
     final dynamicWidth = fixedHeight * aspectRatio;
 
     // create a camera with fixed resolution that is used for both a level and the menu page
-    camera = CameraComponent.withFixedResolution(width: dynamicWidth, height: fixedHeight);
+    camera = .withFixedResolution(width: dynamicWidth, height: fixedHeight);
     add(camera);
 
     // calculate scale factor
@@ -221,7 +220,7 @@ class PixelQuest extends FlameGame
 
   /// Configures the camera for the menu: no world-follow, full-screen bounds, anchored top-left.
   void setUpCameraForMenu() {
-    camera.viewfinder.anchor = Anchor.topLeft;
+    camera.viewfinder.anchor = .topLeft;
     camera.setBounds(Rectangle.fromLTRB(0, 0, size.x, size.y));
     camera.follow(PositionComponent());
   }

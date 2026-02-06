@@ -21,7 +21,7 @@ class ArrowIndicator extends PositionComponent {
     final h = arrowSize.y;
 
     final path = Path();
-    if (dir == ArrowDir.left) {
+    if (dir == .left) {
       // tip left
       path.moveTo(-w / 2, 0);
       path.lineTo(w / 2, -h / 2);

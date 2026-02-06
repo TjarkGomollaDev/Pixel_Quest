@@ -36,10 +36,10 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
   // constructor parameters
   final Player player;
 
-  PlayerEffects({required this.player}) : super(position: Vector2.zero(), size: gridSize);
+  PlayerEffects({required this.player}) : super(position: .zero(), size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(96);
+  static final Vector2 gridSize = .all(96);
 
   // offset
   static final Vector2 _offset = (gridSize - Player.gridSize) / 2;
@@ -138,7 +138,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
   /// Horizontal collisions launch the player along a curved bezier arc with rotation,
   /// while vertical collisions drop the player down (optionally with a small hop first).
   Future<void> playDeathTrajectory(CollisionSide collisionSide) async {
-    if (collisionSide == CollisionSide.left || collisionSide == CollisionSide.right) {
+    if (collisionSide == .left || collisionSide == .right) {
       await _deathOnHorizontalCollision(collisionSide);
     } else {
       await _deathOnVerticalCollision(collisionSide);
@@ -150,15 +150,13 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final completer = Completer<void>();
 
     // control point
-    final controlPointX = collisionSide == CollisionSide.left ? player.x - _offsetControlPoint.x : player.x + _offsetControlPoint.x;
+    final controlPointX = collisionSide == .left ? player.x - _offsetControlPoint.x : player.x + _offsetControlPoint.x;
     final controlPointY = player.y - _offsetControlPoint.y;
 
     // end point
     final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
     final verticalDistance = endPointY - controlPointY;
-    final endPointX = collisionSide == CollisionSide.left
-        ? controlPointX - (verticalDistance * 0.02)
-        : controlPointX + (verticalDistance * 0.02);
+    final endPointX = collisionSide == .left ? controlPointX - (verticalDistance * 0.02) : controlPointX + (verticalDistance * 0.02);
 
     // duration depends on distance
     final durationMs = _calculateDuration(verticalDistance, _msPerPixelHorizontal);
@@ -172,7 +170,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
     final moveEffect = MoveAlongPathEffect(path, _deathController(durationMs), absolute: true, onComplete: () => completer.complete());
 
     // rotate player while moving
-    final rotateEffect = RotateEffect.by((collisionSide == CollisionSide.right) ? -tau / 4 : tau / 4, _deathController(durationMs));
+    final rotateEffect = RotateEffect.by((collisionSide == .right) ? -tau / 4 : tau / 4, _deathController(durationMs));
 
     // add effects
     player.add(moveEffect);
@@ -186,7 +184,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
 
     // end point
     final endPointY = game.camera.visibleWorldRect.bottom + _bufferPlayerOutsideScreen;
-    final verticalDistance = collisionSide == CollisionSide.top ? endPointY - player.y + _hopHeight : endPointY - player.y;
+    final verticalDistance = collisionSide == .top ? endPointY - player.y + _hopHeight : endPointY - player.y;
 
     // duration depends on distance
     final durationMs = _calculateDuration(verticalDistance, _msPerPixelVertical);

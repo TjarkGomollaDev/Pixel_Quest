@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -72,14 +71,14 @@ class Chicken extends PositionComponent
   late double _rightBorder;
 
   // movement
-  final Vector2 _velocity = Vector2.zero();
+  final Vector2 _velocity = .zero();
   late int _moveDirection;
   final double _runSpeed = 80; // [Adjustable]
 
   // attack sound
   bool _attackSoundPlayedThisRange = false;
   static const double _attackSoundCooldown = 0.4; // [Adjustable]
-  double _timeSinceLastAttackSound = double.infinity;
+  double _timeSinceLastAttackSound = .infinity;
 
   // got stomped
   bool _gotStomped = false;
@@ -107,12 +106,12 @@ class Chicken extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.top) {
+    if (collisionSide == .top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationGroupComponent.current = _ChickenState.hit;
       animationGroupComponent.animationTickers![_ChickenState.hit]!.completed.whenComplete(() => removeFromParent());
     } else {
@@ -133,7 +132,7 @@ class Chicken extends PositionComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -176,7 +175,7 @@ class Chicken extends PositionComponent
     // first, we check whether the player is within the range in which the chicken can move
     if (_playerInRange(_player.hitboxAbsoluteLeft, _player.hitboxAbsoluteRight, _player.hitboxAbsoluteBottom) && !_player.spawnProtection) {
       if (!_attackSoundPlayedThisRange && _timeSinceLastAttackSound >= _attackSoundCooldown) {
-        game.audioCenter.playSound(Sfx.chicken, SfxType.game);
+        game.audioCenter.playSound(.chicken, .game);
         _timeSinceLastAttackSound = 0;
       }
       _attackSoundPlayedThisRange = true;

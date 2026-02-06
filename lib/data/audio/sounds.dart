@@ -77,7 +77,7 @@ enum SoundState {
   on,
   off;
 
-  bool get enabled => this == SoundState.on;
-  static const SoundState defaultState = SoundState.on;
-  static SoundState fromName(String name) => SoundState.values.firstWhere((s) => s.name == name, orElse: () => defaultState);
+  bool get enabled => this == on;
+  static const SoundState defaultState = on;
+  static SoundState fromName(String name) => values.firstWhere((s) => s.name == name, orElse: () => defaultState);
 }

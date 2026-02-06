@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/data/static/metadata/world_metadata.dart';
 import 'package:pixel_quest/game/animations/spotlight.dart';
 import 'package:pixel_quest/game/events/game_event_bus.dart';
@@ -108,15 +107,15 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _addSubscription() {
     _sub = game.eventBus.listenMany((on) {
       on<GameLifecycleChanged>((event) {
-        if (_menuActive && event.lifecycle == Lifecycle.paused) return _pause(audioReset: event.reset);
-        if (_menuActive && event.lifecycle == Lifecycle.resumed) return _resume();
+        if (_menuActive && event.lifecycle == .paused) return _pause(audioReset: event.reset);
+        if (_menuActive && event.lifecycle == .resumed) return _resume();
       });
       on<NewStarsEarned>((event) {
         _pendingNewStarsEarnedEvent = event;
       });
       on<InventoryStateChanged>((event) {
-        if (event.action == PageAction.opend) return unawaited(_openInventory());
-        if (event.action == PageAction.closed) return unawaited(_closeInventory());
+        if (event.action == .opend) return unawaited(_openInventory());
+        if (event.action == .closed) return unawaited(_closeInventory());
       });
       on<InventoryChangedCharacter>((event) {
         _dummy.setCharacter(event.character);
@@ -141,7 +140,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
     for (final world in game.staticCenter.allWorlds()) {
       final background = BackgroundParallax.scene(
         scene: world.backgroundScene,
-        position: Vector2.zero(),
+        position: .zero(),
         size: game.size,
         show: world.index == _currentWorldIndex,
       );
@@ -158,7 +157,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
         sprite: sprite,
         position: game.size / 2,
         size: size,
-        anchor: Anchor.center,
+        anchor: .center,
         show: world.index == _currentWorldIndex,
       );
       add(foreground);
@@ -174,7 +173,7 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
         sprite: sprite,
         position: Vector2(game.size.x / 2, GameSettings.hudVerticalMargin),
         size: size,
-        anchor: Anchor.topCenter,
+        anchor: .topCenter,
         show: world.index == _currentWorldIndex,
       );
       add(title);
@@ -330,12 +329,12 @@ class MenuPage extends World with HasGameReference<PixelQuest>, HasTimeScale {
   void _resume() {
     timeScale = 1;
     _dummy.start();
-    _audioWasReset ? game.audioCenter.startBackgroundMusic(BackgroundMusic.menu) : game.audioCenter.resumeBackgroundMusic();
+    _audioWasReset ? game.audioCenter.startBackgroundMusic(.menu) : game.audioCenter.resumeBackgroundMusic();
     if (_audioWasReset) _audioWasReset = false;
   }
 
   void _start() {
-    game.audioCenter.startBackgroundMusic(BackgroundMusic.menu);
+    game.audioCenter.startBackgroundMusic(.menu);
   }
 
   void _stop() {

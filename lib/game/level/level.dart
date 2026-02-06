@@ -238,7 +238,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   Future<void> _loadLevelMap(int token) async {
-    _levelMap = await TiledComponent.load('${_levelMetadata.tmxFileName}.tmx', Vector2.all(GameSettings.tileSize))
+    _levelMap = await TiledComponent.load('${_levelMetadata.tmxFileName}.tmx', .all(GameSettings.tileSize))
       ..priority = GameSettings.mapLayerLevel;
     add(_levelMap);
     await _guardYield(token);
@@ -264,13 +264,13 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
       isPlatform: isPlatform,
       baseBlock: game.staticCenter.worldById(_levelMetadata.worldUuid).baseBlock,
     );
-    _miniMapCanvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
+    _miniMapCanvas.drawRect(.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), _miniMapPaint);
   }
 
   void _addSpecialTileToMiniMap(Vector2 position, Vector2 mapOffset, Color color) {
     final mapPosition = position / GameSettings.tileSize + mapOffset;
     _miniMapPaint.color = color;
-    _miniMapCanvas.drawRect(Rect.fromLTWH(mapPosition.x, mapPosition.y, 1, 1), _miniMapPaint);
+    _miniMapCanvas.drawRect(.fromLTWH(mapPosition.x, mapPosition.y, 1, 1), _miniMapPaint);
   }
 
   void _addPatternToMiniMap(Vector2 position, List<List<Color?>> pattern) {
@@ -279,7 +279,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         final color = pattern[y][x];
         if (color == null) continue;
         _miniMapPaint.color = color;
-        _miniMapCanvas.drawRect(Rect.fromLTWH(position.x + x, position.y + y, 1, 1), _miniMapPaint);
+        _miniMapCanvas.drawRect(.fromLTWH(position.x + x, position.y + y, 1, 1), _miniMapPaint);
       }
     }
   }
@@ -320,11 +320,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
 
     // if none of these apply, use the scene set in the world of the leve
     _addBackgroundHelper(
-      BackgroundParallax.scene(
-        scene: game.staticCenter.worldById(_levelMetadata.worldUuid).backgroundScene,
-        position: position,
-        size: size,
-      ),
+      .scene(scene: game.staticCenter.worldById(_levelMetadata.worldUuid).backgroundScene, position: position, size: size),
     );
   }
 
@@ -795,8 +791,8 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void _handleLevelLifecycleChanged(LevelLifecycleChanged event) {
-    if (event.lifecycle == Lifecycle.paused) return _pause();
-    if (event.lifecycle == Lifecycle.resumed) return _resume();
+    if (event.lifecycle == .paused) return _pause();
+    if (event.lifecycle == .resumed) return _resume();
   }
 
   void _handleGameLifecycleChanged(GameLifecycleChanged event) {
@@ -814,7 +810,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     }
 
     // pause level
-    if (event.lifecycle == Lifecycle.paused && !_levelPaused) {
+    if (event.lifecycle == .paused && !_levelPaused) {
       if (_isGameplayActive) {
         // if we are in gameplay, pause with pause page
         return _gameHud.triggerPause();
@@ -825,7 +821,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     }
 
     // resume level only when we are not in gameplay, otherwise the user should do this manually
-    if (event.lifecycle == Lifecycle.resumed && !_isGameplayActive) return _resume();
+    if (event.lifecycle == .resumed && !_isGameplayActive) return _resume();
   }
 
   void _pause() {

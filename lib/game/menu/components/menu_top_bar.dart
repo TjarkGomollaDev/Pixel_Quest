@@ -52,19 +52,19 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
       color: AppTheme.tileBlur,
       borderRadius: GameSettings.hugBgTileRadius,
       position: Vector2(0, size.y / 2),
-      size: Vector2.all(GameSettings.hudBgTileSize),
-      anchor: Anchor.centerLeft,
+      size: .all(GameSettings.hudBgTileSize),
+      anchor: .centerLeft,
     );
 
     // star item
-    _starItem = Star(variant: StarVariant.filled, position: _starBg.position + Vector2(_starBg.size.x / 2, 0));
+    _starItem = Star(variant: .filled, position: _starBg.position + Vector2(_starBg.size.x / 2, 0));
     addAll([_starBg, _starItem]);
 
     // world star counts text
     for (final world in game.staticCenter.allWorlds()) {
       final text = VisibleTextComponent(
         text: '${game.storageCenter.worldById(world.uuid).stars}/${world.levelUuids.length * 3}',
-        anchor: Anchor.centerLeft,
+        anchor: .centerLeft,
         position: _starBg.position + Vector2(_starBg.size.x + GameSettings.hudBtnTextSpacing, 0),
         textRenderer: AppTheme.hudText.asTextPaint,
         show: world.index == _startWorldIndex,
@@ -76,7 +76,7 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
 
   void _setUpAnimatedStar() {
     _animatedStarStart = Vector2(_starItem.position.x, -position.y - _starItem.size.y / 2);
-    _animatedStar = Star(variant: StarVariant.filled, position: _animatedStarStart, size: _starItem.size);
+    _animatedStar = Star(variant: .filled, position: _animatedStarStart, size: _starItem.size);
     add(_animatedStar);
   }
 
@@ -86,22 +86,18 @@ class MenuTopBar extends PositionComponent with HasGameReference<PixelQuest> {
     final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + GameSettings.hudBtnSpacing, 0);
 
     // shop btn
-    _shopBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.dollar,
-      onPressed: () => game.router.pushNamed(RouteNames.shop),
-      position: btnBasePosition,
-    );
+    _shopBtn = .fromType(type: .dollar, onPressed: () => game.router.pushNamed(RouteNames.shop), position: btnBasePosition);
 
     // inventory btn
-    _inventoryBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.edit,
+    _inventoryBtn = .fromType(
+      type: .edit,
       onPressed: () => game.eventBus.emit(InventoryStateChanged(PageAction.opend)),
       position: _shopBtn.position + btnOffset,
     );
 
     // settings btn
-    _settingsBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.settings,
+    _settingsBtn = .fromType(
+      type: .settings,
       onPressed: () => game.router.pushNamed(RouteNames.settings),
       position: _inventoryBtn.position + btnOffset,
     );

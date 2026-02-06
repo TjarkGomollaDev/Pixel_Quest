@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -44,13 +43,13 @@ class Fruit extends SpriteAnimationGroupComponent
   Fruit({required String name, required super.position}) : _name = name, super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(10, 10), size: Vector2(12, 12));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(32);
+  static final Vector2 _textureSize = .all(32);
   static const String _path = 'Items/Fruits/';
   static const String _pathEnd = '.png';
 
@@ -71,14 +70,14 @@ class Fruit extends SpriteAnimationGroupComponent
       world.increaseFruitsCount();
 
       // play collected animation and then remove from level
-      game.audioCenter.playSound(Sfx.collected, SfxType.game);
+      game.audioCenter.playSound(.collected, .game);
       current = _FruitState.collected;
       animationTickers![_FruitState.collected]!.completed.whenComplete(() => removeFromParent());
     }
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
+  EntityCollisionType get collisionType => .any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
@@ -93,9 +92,9 @@ class Fruit extends SpriteAnimationGroupComponent
 
     // general
     priority = GameSettings.collectiblesLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
+    marker = EntityMiniMapMarker(layer: .none);
   }
 
   void _loadAllSpriteAnimations() {
@@ -103,7 +102,7 @@ class Fruit extends SpriteAnimationGroupComponent
     animations = {
       for (final state in _FruitState.values)
         // small adjustment here, as we are not using the enum name for the fruit but the name from the class
-        state: state == _FruitState.idle
+        state: state == .idle
             ? loadSpriteAnimation(game, '$_path$_name$_pathEnd', state.amount, GameSettings.stepTime, _textureSize)
             : loadAnimation(state),
     };

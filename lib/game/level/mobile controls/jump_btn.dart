@@ -15,7 +15,7 @@ class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
   final VoidCallback _onJump;
 
   JumpBtn({required VoidCallback onJump, super.position, bool show = true}) : _onJump = onJump {
-    size = Vector2.all(GameSettings.jumpBtnRadius * 2);
+    size = .all(GameSettings.jumpBtnRadius * 2);
     initVisibility(show);
   }
 
@@ -34,12 +34,7 @@ class JumpBtn extends PositionComponent with HasGameReference<PixelQuest>, TapCa
 
   void _setUpButton() {
     final background = CircleComponent(radius: GameSettings.jumpBtnRadius, paint: Paint()..color = AppTheme.tileBlur);
-    final text = TextComponent(
-      text: 'UP',
-      textRenderer: AppTheme.jumpBtn.asTextPaint,
-      anchor: Anchor.center,
-      position: size / 2 + Vector2.all(1),
-    );
+    final text = TextComponent(text: 'UP', textRenderer: AppTheme.jumpBtn.asTextPaint, anchor: .center, position: size / 2 + .all(1));
     addAll([background, text]);
   }
 }

@@ -19,20 +19,20 @@ class SpikedBall extends PositionComponent
   // constructor parameters
   final Player _player;
 
-  SpikedBall({required Player player}) : _player = player, super(position: Vector2.zero(), size: gridSize) {
+  SpikedBall({required Player player}) : _player = player, super(position: .zero(), size: gridSize) {
     // marker is set here because the ball is not added directly to the level,
     // but via the parent SpikedBallComponent, and we need direct access before onLoad()
     _setUpMarker();
   }
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final CircleHitbox _hitbox = CircleHitbox(position: (gridSize - _textureSize) / 2, radius: _textureSize.x / 2);
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(28);
+  static final Vector2 _textureSize = .all(28);
   static const String _path = 'Traps/Spiked Ball/Spiked Ball (28x28).png';
 
   @override
@@ -58,7 +58,7 @@ class SpikedBall extends PositionComponent
 
     // general
     anchor = Anchor.center;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 

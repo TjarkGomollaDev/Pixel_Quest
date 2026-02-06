@@ -33,7 +33,7 @@ class PlantBullet extends SpriteComponent
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(16);
+  static final Vector2 gridSize = .all(16);
   static final Vector2 hitboxOffset = Vector2(4, 4);
   static const double hitboxRadius = 4;
 
@@ -90,7 +90,7 @@ class PlantBullet extends SpriteComponent
     priority = GameSettings.enemieBulletLayerLevel;
     add(_hitbox);
     _moveDirection = _isLeft ? -1 : 1;
-    marker = EntityMiniMapMarker(layer: EntityMiniMapMarkerLayer.none);
+    marker = EntityMiniMapMarker(layer: .none);
   }
 
   void _loadSprite() {

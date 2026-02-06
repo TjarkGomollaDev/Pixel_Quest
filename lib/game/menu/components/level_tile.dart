@@ -14,7 +14,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   final LevelMetadata _levelMetadata;
 
   LevelTile({required LevelMetadata levelMetadata, required super.position}) : _levelMetadata = levelMetadata, super(size: tileSize) {
-    anchor = Anchor.center;
+    anchor = .center;
   }
 
   // size
@@ -30,7 +30,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
   late final SpriteBtn _levelBtn;
 
   // stars
-  static final Vector2 _starSize = Vector2.all(20); // [Adjustable]
+  static final Vector2 _starSize = .all(20); // [Adjustable]
   late final List<Vector2> _starPositions;
   final List<double> _starAngles = [-0.1, 0, 0.1]; // [Adjustable]
   final List<Star> _outlineStars = [];
@@ -65,7 +65,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   void _setUpTileBg() {
     final sprite = loadSprite(game, _pathTile);
-    _tileBg = VisibleSpriteComponent(sprite: sprite, anchor: Anchor.center, position: size / 2);
+    _tileBg = VisibleSpriteComponent(sprite: sprite, anchor: .center, position: size / 2);
     add(_tileBg);
   }
 
@@ -95,11 +95,11 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
 
   void _rebuildStars(int stars) {
     for (int i = 0; i < stars; i++) {
-      final star = Star(variant: StarVariant.filled, position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
+      final star = Star(variant: .filled, position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
       _stars.add(star);
     }
     for (int i = stars; i < stars + 3 - stars; i++) {
-      final outlineStar = Star(variant: StarVariant.outline, position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
+      final outlineStar = Star(variant: .outline, position: _starPositions[i], size: _starSize)..angle = _starAngles[i];
       _outlineStars.add(outlineStar);
     }
     addAll([..._stars, ..._outlineStars]);
@@ -133,7 +133,7 @@ class LevelTile extends PositionComponent with HasGameReference<PixelQuest>, Has
       if (_stars.length >= 3) return;
 
       // add new star with animation
-      final star = Star(variant: StarVariant.filled, position: _starPositions[_stars.length], size: _starSize, spawnSizeZero: true)
+      final star = Star(variant: .filled, position: _starPositions[_stars.length], size: _starSize, spawnSizeZero: true)
         ..angle = _starAngles[_stars.length];
       add(star);
       _stars.add(star);

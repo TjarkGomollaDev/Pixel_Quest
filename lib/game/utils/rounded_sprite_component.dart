@@ -29,7 +29,7 @@ class RoundedSpriteComponent extends SpriteComponent {
     // use clip rrect
     final rect = Rect.fromLTWH(0, 0, size.x, size.y);
     canvas.save();
-    canvas.clipRRect(RRect.fromRectAndRadius(rect, Radius.circular(cornerRadius)), doAntiAlias: true);
+    canvas.clipRRect(.fromRectAndRadius(rect, .circular(cornerRadius)), doAntiAlias: true);
     super.render(canvas);
     canvas.restore();
   }

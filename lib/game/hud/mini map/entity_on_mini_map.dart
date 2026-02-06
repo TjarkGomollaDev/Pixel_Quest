@@ -62,7 +62,7 @@ mixin EntityOnMiniMap on PositionComponent {
   Vector2? _yMoveRange;
 
   /// Optional hint range for entities that can move vertically (used for quick mini map filtering).
-  Vector2 get yMoveRange => _yMoveRange ?? Vector2.all(occlusionPosition.y);
+  Vector2 get yMoveRange => _yMoveRange ?? .all(occlusionPosition.y);
   set yMoveRange(Vector2 range) => _yMoveRange = range;
 
   // marker
@@ -84,10 +84,9 @@ enum PlayerMiniMapMarkerType {
   circle,
   triangel;
 
-  static const PlayerMiniMapMarkerType defaultMarker = PlayerMiniMapMarkerType.triangel;
+  static const PlayerMiniMapMarkerType defaultMarker = triangel;
 
-  static PlayerMiniMapMarkerType fromName(String name) =>
-      PlayerMiniMapMarkerType.values.firstWhere((c) => c.name == name, orElse: () => defaultMarker);
+  static PlayerMiniMapMarkerType fromName(String name) => values.firstWhere((c) => c.name == name, orElse: () => defaultMarker);
 }
 
 /// Marker style for various entities on the mini map.

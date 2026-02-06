@@ -132,20 +132,20 @@ class AudioCenter {
   }
 
   Future<void> _createPools() async {
-    _pools[Sfx.jump] = await FlameAudio.createPool(Sfx.jump.path, maxPlayers: 6);
-    _pools[Sfx.doubleJump] = await FlameAudio.createPool(Sfx.doubleJump.path, maxPlayers: 4);
-    _pools[Sfx.popIn] = await FlameAudio.createPool(Sfx.popIn.path, maxPlayers: 4);
-    _pools[Sfx.popOut] = await FlameAudio.createPool(Sfx.popOut.path, maxPlayers: 4);
-    _pools[Sfx.enemieHit] = await FlameAudio.createPool(Sfx.enemieHit.path, maxPlayers: 6);
-    _pools[Sfx.enemieWallHit] = await FlameAudio.createPool(Sfx.enemieWallHit.path, maxPlayers: 8);
-    _pools[Sfx.trunkShot] = await FlameAudio.createPool(Sfx.trunkShot.path, maxPlayers: 8);
-    _pools[Sfx.plantShot] = await FlameAudio.createPool(Sfx.plantShot.path, maxPlayers: 8);
-    _pools[Sfx.collected] = await FlameAudio.createPool(Sfx.collected.path, maxPlayers: 8);
-    _pools[Sfx.jumpBoost] = await FlameAudio.createPool(Sfx.jumpBoost.path, maxPlayers: 6);
-    _pools[Sfx.pressurePlate] = await FlameAudio.createPool(Sfx.pressurePlate.path, maxPlayers: 8);
-    _pools[Sfx.stompRock] = await FlameAudio.createPool(Sfx.stompRock.path, maxPlayers: 8);
-    _pools[Sfx.tap] = await FlameAudio.createPool(Sfx.tap.path, maxPlayers: 8);
-    _pools[Sfx.jetFlame] = await FlameAudio.createPool(Sfx.jetFlame.path, maxPlayers: 10);
+    _pools[.jump] = await FlameAudio.createPool(Sfx.jump.path, maxPlayers: 6);
+    _pools[.doubleJump] = await FlameAudio.createPool(Sfx.doubleJump.path, maxPlayers: 4);
+    _pools[.popIn] = await FlameAudio.createPool(Sfx.popIn.path, maxPlayers: 4);
+    _pools[.popOut] = await FlameAudio.createPool(Sfx.popOut.path, maxPlayers: 4);
+    _pools[.enemieHit] = await FlameAudio.createPool(Sfx.enemieHit.path, maxPlayers: 6);
+    _pools[.enemieWallHit] = await FlameAudio.createPool(Sfx.enemieWallHit.path, maxPlayers: 8);
+    _pools[.trunkShot] = await FlameAudio.createPool(Sfx.trunkShot.path, maxPlayers: 8);
+    _pools[.plantShot] = await FlameAudio.createPool(Sfx.plantShot.path, maxPlayers: 8);
+    _pools[.collected] = await FlameAudio.createPool(Sfx.collected.path, maxPlayers: 8);
+    _pools[.jumpBoost] = await FlameAudio.createPool(Sfx.jumpBoost.path, maxPlayers: 6);
+    _pools[.pressurePlate] = await FlameAudio.createPool(Sfx.pressurePlate.path, maxPlayers: 8);
+    _pools[.stompRock] = await FlameAudio.createPool(Sfx.stompRock.path, maxPlayers: 8);
+    _pools[.tap] = await FlameAudio.createPool(Sfx.tap.path, maxPlayers: 8);
+    _pools[.jetFlame] = await FlameAudio.createPool(Sfx.jetFlame.path, maxPlayers: 10);
   }
 
   Future<void> _ensureLoopLoaded(LoopSfx loop) async {
@@ -172,7 +172,7 @@ class AudioCenter {
   /// Plays a one-shot sound effect, respecting global sound state and channel-specific muting.
   void playSound(Sfx sound, SfxType type) {
     if (effectiveSfxVolume == 0) return;
-    if (type == SfxType.game && _gameSfxMuted) return;
+    if (type == .game && _gameSfxMuted) return;
 
     final pool = _pools[sound];
     if (pool != null) {
@@ -320,7 +320,7 @@ class AudioCenter {
     final end = target.clamp(0.0, 1.0);
 
     // cancel and set target volume without fade if it doesn't make sense
-    if (duration <= Duration.zero || (start - end).abs() < 0.001) {
+    if (duration <= .zero || (start - end).abs() < 0.001) {
       _loopVolumes[loop] = end;
       await player.setVolume(end);
       return;
@@ -409,7 +409,7 @@ class AudioCenter {
     await _applyBgmVolume();
 
     // depending on the situation, a new sync event is triggered or all loops are removed
-    soundState == SoundState.on ? _bumpAmbientSyncToken() : await _stopAllLoops();
+    soundState.enabled ? _bumpAmbientSyncToken() : await _stopAllLoops();
 
     await _storageCenter.saveSettings(soundState: soundState);
   }

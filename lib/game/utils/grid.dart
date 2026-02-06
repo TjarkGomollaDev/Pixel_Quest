@@ -23,7 +23,7 @@ mixin FixedGridOriginalSizeSprite on PositionComponent {
         SpriteComponent(
             size: textureSize,
             position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
-            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
+            anchor: isBottomCenter ? .bottomCenter : .center,
             sprite: sprite,
           )
           ..debugColor = AppTheme.transparent
@@ -53,7 +53,7 @@ mixin FixedGridOriginalSizeAnimation on PositionComponent {
         SpriteAnimationComponent(
             size: textureSize,
             position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
-            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
+            anchor: isBottomCenter ? .bottomCenter : .center,
             animation: animation,
           )
           ..debugColor = AppTheme.transparent
@@ -89,7 +89,7 @@ mixin FixedGridOriginalSizeGroupAnimation on PositionComponent {
         SpriteAnimationGroupComponent<T>(
             size: textureSize,
             position: isBottomCenter ? Vector2(width / 2, height) : Vector2(width / 2, height / 2),
-            anchor: isBottomCenter ? Anchor.bottomCenter : Anchor.center,
+            anchor: isBottomCenter ? .bottomCenter : .center,
             animations: animations,
             current: current,
           )

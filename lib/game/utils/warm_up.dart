@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:pixel_quest/game/background/background.dart';
 import 'package:pixel_quest/game/utils/misc_utils.dart';
 import 'package:pixel_quest/game/game_settings.dart';
 import 'package:pixel_quest/game/game.dart';
@@ -26,7 +25,7 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
     // forces an early GPU sync by creating a tiny image from a recorded picture
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);
-    canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), Paint());
+    canvas.drawRect(const .fromLTWH(0, 0, 1, 1), Paint());
     final img = await recorder.endRecording().toImage(1, 1);
     img.dispose();
 
@@ -34,12 +33,7 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
     final shaderMatrix = math64.Matrix4.identity(); // scale ist egal fürs warmup
     final paint = Paint()
       ..color = const Color(0x00000000)
-      ..shader = ImageShader(
-        game.miniMapPatternFor(BackgroundScene.defaultScene),
-        TileMode.repeated,
-        TileMode.repeated,
-        shaderMatrix.storage,
-      );
+      ..shader = ImageShader(game.miniMapPatternFor(.defaultScene), .repeated, .repeated, shaderMatrix.storage);
     final shaderWarm = _WarmUpDraw(paint);
     await game.camera.viewport.add(shaderWarm);
     await yieldFrame();
@@ -49,10 +43,7 @@ class WarmUpRunner extends Component with HasGameReference<PixelQuest> {
 
     // warms up flame_tiled parsing and atlas/material setup by loading one TMX once
     final map =
-        await TiledComponent.load(
-            '${game.staticCenter.allLevelsInWorldByIndex(0).first.tmxFileName}.tmx',
-            Vector2.all(GameSettings.tileSize),
-          )
+        await TiledComponent.load('${game.staticCenter.allLevelsInWorldByIndex(0).first.tmxFileName}.tmx', .all(GameSettings.tileSize))
           ..priority = -99999;
 
     // ensures the loaded map gets at least one render pass so caches/shaders are actually touched

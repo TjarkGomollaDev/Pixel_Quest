@@ -131,9 +131,9 @@ class MovingPlatform extends SpriteAnimationGroupComponent
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    marker = EntityMiniMapMarker(type: EntityMiniMapMarkerType.platform, color: AppTheme.entityMarkerSpecial);
+    marker = EntityMiniMapMarker(type: .platform, color: AppTheme.entityMarkerSpecial);
   }
 
   void _addSubscription() {

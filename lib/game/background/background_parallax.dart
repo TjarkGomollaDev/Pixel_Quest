@@ -50,8 +50,8 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
       layers: [for (int i = 1; i <= scene.amount; i++) ParallaxImageData('$_path${scene.fileName}/$i$_pathEnd')],
       baseVelocity: baseVelocity ?? GameSettings.parallaxBaseVelocityLevel,
       velocityMultiplierDelta: velocityMultiplierDelta ?? GameSettings.velocityMultiplierDelta,
-      repeat: ImageRepeat.repeatX,
-      fill: LayerFill.height,
+      repeat: .repeatX,
+      fill: .height,
       position: position,
       size: size,
       show: show,
@@ -69,8 +69,8 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     return BackgroundParallax._(
       layers: [ParallaxImageData('$_path$_pathAddColored${color.fileName}$_pathEnd')],
       baseVelocity: baseVelocity ?? GameSettings.coloredBaseVelocity,
-      repeat: ImageRepeat.repeat,
-      fill: LayerFill.none,
+      repeat: .repeat,
+      fill: .none,
       position: position,
       size: size,
       show: show,
@@ -115,7 +115,7 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
 
     final scene = BackgroundScene.fromName(trimmed, orNull: true);
     if (scene != null) {
-      return BackgroundParallax.scene(
+      return .scene(
         scene: scene,
         baseVelocity: baseVelocity,
         velocityMultiplierDelta: velocityMultiplierDelta,
@@ -126,8 +126,6 @@ class BackgroundParallax extends ParallaxComponent with VisibleComponent {
     }
 
     final color = BackgroundColor.fromName(trimmed, orNull: true);
-    return color == null
-        ? null
-        : BackgroundParallax.colored(color: color, baseVelocity: baseVelocity, position: position, size: size, show: show);
+    return color == null ? null : .colored(color: color, baseVelocity: baseVelocity, position: position, size: size, show: show);
   }
 }

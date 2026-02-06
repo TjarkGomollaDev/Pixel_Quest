@@ -19,10 +19,10 @@ class RRectComponent extends PositionComponent with VisibleComponent {
   void render(Canvas canvas) {
     if (color == null) return;
     canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, width, height), Radius.circular(borderRadius)),
+      .fromRectAndRadius(.fromLTWH(0, 0, width, height), .circular(borderRadius)),
       Paint()
         ..color = color!.withAlpha((color!.a * 255 * opacity).toInt())
-        ..style = PaintingStyle.fill,
+        ..style = .fill,
     );
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
@@ -47,7 +46,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
   static final Vector2 gridSize = Vector2(16, 32);
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 16), size: Vector2.all(16));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 16), size: .all(16));
 
   // animation settings
   static final Vector2 _textureSize = Vector2(16, 32);
@@ -81,7 +80,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
     // general
     priority = GameSettings.trapBehindLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
 
     // entity collider
@@ -106,14 +105,14 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
     _isFireActivated = true;
 
     // hit pressure plate
-    game.audioCenter.playSound(Sfx.pressurePlate, SfxType.game);
+    game.audioCenter.playSound(.pressurePlate, .game);
     current = _FireTrapState.hit;
     await animationTickers![_FireTrapState.hit]!.completed;
 
     // fire on
     await Future.delayed(_fireDelayAfterHit);
     _isDamageOn = true;
-    game.audioCenter.playSound(Sfx.jetFlame, SfxType.game);
+    game.audioCenter.playSound(.jetFlame, .game);
     current = _FireTrapState.on;
 
     // fire off
@@ -134,10 +133,10 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
 
   _FireTrapEntityCollider({required void Function(CollisionSide) onCollide})
     : _onCollide = onCollide,
-      super(position: Vector2.zero(), size: Vector2.all(16));
+      super(position: .zero(), size: .all(16));
 
   // actual hitbox
-  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: Vector2.all(16));
+  final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(0, 0), size: .all(16));
 
   @override
   FutureOr<void> onLoad() {
@@ -159,7 +158,7 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
     }
 
     // general
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 }

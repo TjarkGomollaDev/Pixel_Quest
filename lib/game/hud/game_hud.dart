@@ -83,8 +83,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     final btnOffset = Vector2(SpriteBtnType.btnSizeCorrected.x + GameSettings.hudBtnSpacing, 0);
 
     // menu btn
-    _menuBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.levels,
+    _menuBtn = .fromType(
+      type: .levels,
       onPressed: () {
         if (game.router.currentRoute is PausePage) game.router.pop();
         game.router.pushReplacementNamed(RouteNames.menu);
@@ -94,9 +94,9 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // pause btn
-    _pauseBtn = SpriteToggleBtn.fromType(
-      type: SpriteBtnType.pause,
-      type_2: SpriteBtnType.play,
+    _pauseBtn = .fromType(
+      type: .pause,
+      type_2: .play,
       onPressed: () => game.router.pushNamed(RouteNames.pause),
       onPressed_2: () => game.router.pop(),
       position: _menuBtn.position + btnOffset,
@@ -104,12 +104,7 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     );
 
     // restart the level btn
-    _restartBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.restart,
-      onPressed: _restartLevel,
-      position: _pauseBtn.position + btnOffset,
-      show: _showAtStart,
-    );
+    _restartBtn = .fromType(type: .restart, onPressed: _restartLevel, position: _pauseBtn.position + btnOffset, show: _showAtStart);
 
     addAll([_menuBtn, _pauseBtn, _restartBtn]);
   }
@@ -120,8 +115,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       color: AppTheme.tileBlur,
       borderRadius: GameSettings.hugBgTileRadius,
       position: _restartBtn.position + Vector2(SpriteBtnType.btnSizeCorrected.x / 2 + GameSettings.hudSectionSpacing, 0),
-      size: Vector2.all(GameSettings.hudBgTileSize),
-      anchor: Anchor.centerLeft,
+      size: .all(GameSettings.hudBgTileSize),
+      anchor: .centerLeft,
       show: _showAtStart,
     );
 
@@ -129,16 +124,16 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _fruitItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Apple (32x32).png'),
       position: _fruitBg.position + Vector2(_fruitBg.size.x / 2, 0),
-      anchor: Anchor.center,
+      anchor: .center,
       show: _showAtStart,
     );
 
     // count text
     _fruitsCount = VisibleTextComponent(
       text: '0/$_totalFruitsCount',
-      anchor: Anchor.centerLeft,
       position: _fruitBg.position + Vector2(_fruitBg.size.x + GameSettings.hudBtnTextSpacing, 0),
       textRenderer: AppTheme.hudText.asTextPaint,
+      anchor: .centerLeft,
       show: _showAtStart,
     );
 
@@ -151,8 +146,8 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
       color: AppTheme.tileBlur,
       borderRadius: GameSettings.hugBgTileRadius,
       position: _fruitsCount.position + Vector2(_fruitsCount.size.x + GameSettings.hudSectionSpacing, 0),
-      size: Vector2.all(GameSettings.hudBgTileSize),
-      anchor: Anchor.centerLeft,
+      size: .all(GameSettings.hudBgTileSize),
+      anchor: .centerLeft,
       show: _showAtStart,
     );
 
@@ -160,16 +155,16 @@ class GameHud extends PositionComponent with HasGameReference<PixelQuest> {
     _deathItem = VisibleSpriteComponent(
       sprite: loadSprite(game, 'Other/Bone (32x32).png'),
       position: _deathBg.position + Vector2(_deathBg.size.x / 2, 0),
-      anchor: Anchor.center,
+      anchor: .center,
       show: _showAtStart,
     );
 
     // count text
     _deathCount = VisibleTextComponent(
       text: '0',
-      anchor: Anchor.centerLeft,
       position: _deathBg.position + Vector2(_deathBg.size.x + GameSettings.hudBtnTextSpacing, 0),
       textRenderer: AppTheme.hudText.asTextPaint,
+      anchor: .centerLeft,
       show: _showAtStart,
     );
 

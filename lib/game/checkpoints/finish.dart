@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
 import 'package:pixel_quest/game/utils/animation_state.dart';
@@ -35,13 +34,13 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
   Finish({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(64);
+  static final Vector2 gridSize = .all(64);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(15, 20), size: Vector2(34, 44));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(64);
+  static final Vector2 _textureSize = .all(64);
   static const String _path = 'Items/Checkpoints/End/';
   static const String _pathEnd = ' (64x64).png';
 
@@ -68,7 +67,7 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -85,7 +84,7 @@ class Finish extends SpriteAnimationGroupComponent with HasGameReference<PixelQu
 
     // finish sound
     game.audioCenter.stopBackgroundMusic();
-    game.audioCenter.playSound(Sfx.finish, SfxType.level);
+    game.audioCenter.playSound(.finish, .level);
 
     // play reached finish animation
     current = _FinishState.pressed;

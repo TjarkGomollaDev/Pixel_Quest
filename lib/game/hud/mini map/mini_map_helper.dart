@@ -10,7 +10,7 @@ enum LevelBaseBlock {
   sand;
 
   static const LevelBaseBlock defaultBaseBlock = mud;
-  static LevelBaseBlock fromName(String name) => LevelBaseBlock.values.firstWhere((e) => e.name == name, orElse: () => defaultBaseBlock);
+  static LevelBaseBlock fromName(String name) => values.firstWhere((e) => e.name == name, orElse: () => defaultBaseBlock);
 }
 
 const grasDarkBlockIds = {95, 96, 97};
@@ -27,9 +27,9 @@ Color getMiniMapColor({required int tileId, required bool isPlatform, required L
   // base block (surface)
   if (grasDarkBlockIds.contains(tileId)) {
     return switch (baseBlock) {
-      LevelBaseBlock.gras => AppTheme.grasLightBlock,
-      LevelBaseBlock.mud => AppTheme.grasDarkBlock,
-      LevelBaseBlock.sand => AppTheme.white,
+      .gras => AppTheme.grasLightBlock,
+      .mud => AppTheme.grasDarkBlock,
+      .sand => AppTheme.white,
     };
   }
 
@@ -40,9 +40,9 @@ Color getMiniMapColor({required int tileId, required bool isPlatform, required L
 
   // base block (fallback)
   return switch (baseBlock) {
-    LevelBaseBlock.gras => AppTheme.dirtLightBlock,
-    LevelBaseBlock.mud => AppTheme.dirtDarkBlock,
-    LevelBaseBlock.sand => const Color.fromARGB(255, 201, 242, 168),
+    .gras => AppTheme.dirtLightBlock,
+    .mud => AppTheme.dirtDarkBlock,
+    .sand => const .fromARGB(255, 201, 242, 168),
   };
 }
 
@@ -70,7 +70,7 @@ Future<Map<BackgroundScene, Image>> createMiniMapBackgroundPatterns(List<Backgro
     for (int y = 0; y < patternSize.y; y++) {
       for (int x = 0; x < patternSize.x; x++) {
         paint.color = colors[random.nextInt(colors.length)];
-        canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
+        canvas.drawRect(.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
       }
     }
     // convert pattern to image

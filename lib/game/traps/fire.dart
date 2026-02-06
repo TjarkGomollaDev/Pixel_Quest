@@ -3,7 +3,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/ambient_loop_emitter.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
@@ -78,9 +77,9 @@ class Fire extends PositionComponent with EntityCollision, HasGameReference<Pixe
 
     // general
     priority = GameSettings.trapBehindLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    configureAmbientLoop(loop: LoopSfx.fire, hitbox: _hitbox);
+    configureAmbientLoop(loop: .fire, hitbox: _hitbox);
   }
 
   void _loadSpriteAnimation() {

@@ -165,8 +165,8 @@ class Snail extends PositionComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
-    _shellHitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
+    _shellHitbox.collisionType = .passive;
     add(_hitbox);
     GameEventBus;
   }
@@ -290,12 +290,12 @@ class Snail extends PositionComponent
   }
 
   Future<void> _handleSnailStomp(CollisionSide collisionSide) async {
-    if (collisionSide == CollisionSide.top) {
+    if (collisionSide == .top) {
       _snailGotStomped = true;
       _player.bounceUp();
 
       // play hit animation
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationGroupComponent.current = _SnailState.snailHit;
       await animationGroupComponent.animationTickers![_SnailState.snailHit]!.completed;
       if (_shellGotStomped) return;
@@ -315,13 +315,13 @@ class Snail extends PositionComponent
 
     // depending on the collisionSide, the shell is kicked in the corresponding direction
     switch (collisionSide) {
-      case CollisionSide.left:
+      case .left:
         _shellMoveDirection = 1;
         break;
-      case CollisionSide.right:
+      case .right:
         _shellMoveDirection = -1;
         break;
-      case CollisionSide.top:
+      case .top:
         final shellLeft = scale.x > 0 ? position.x + _hitbox.position.x : position.x - _hitbox.position.x - _hitbox.width;
         final shellCenter = shellLeft + _hitbox.width / 2;
         final playerCenter = (_player.hitboxAbsoluteLeft + _player.hitboxAbsoluteRight) / 2;
@@ -335,7 +335,7 @@ class Snail extends PositionComponent
     // flip shell if direction changes and update borders
     if (_shellMoveDirection != _moveDirection) flipHorizontallyAroundCenter();
     _updateActualBorders();
-    game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+    game.audioCenter.playSound(.enemieHit, .game);
   }
 
   void _handleShellStomp(CollisionSide collisionSide) {
@@ -344,7 +344,7 @@ class Snail extends PositionComponent
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationGroupComponent.animationTickers![_SnailState.snailHit]?.onComplete?.call();
       animationGroupComponent.current = _SnailState.shellTopHit;
       animationGroupComponent.animationTickers![_SnailState.shellTopHit]!.completed.then((_) => removeFromParent());

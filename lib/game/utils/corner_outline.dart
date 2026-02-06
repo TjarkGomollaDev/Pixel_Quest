@@ -27,7 +27,7 @@ class CornerOutline extends PositionComponent with VisibleComponent {
     final paint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+      ..style = .stroke;
 
     final halfStroke = strokeWidth / 2;
     final w = size.x;

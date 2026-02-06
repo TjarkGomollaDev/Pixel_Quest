@@ -11,10 +11,10 @@ enum BackgroundScene {
   scene6('Scene 6', 4, AppTheme.miniMapBgScene6);
 
   /// Scene sublist used for the level background picker.
-  static const List<BackgroundScene> levelChoices = [BackgroundScene.scene1, BackgroundScene.scene6, BackgroundScene.scene2];
+  static const List<BackgroundScene> levelChoices = [.scene1, .scene6, .scene2];
 
   /// Scene sublist used for the loading overlay background picker.
-  static const List<BackgroundScene> loadingChoices = [BackgroundScene.scene3, BackgroundScene.scene4, BackgroundScene.scene5];
+  static const List<BackgroundScene> loadingChoices = [.scene3, .scene4, .scene5];
 
   // path
   static const String _basePath = 'Background/';
@@ -29,7 +29,7 @@ enum BackgroundScene {
   final ({Color a, Color b, Color c}) miniMapBg;
   const BackgroundScene(this.fileName, this.amount, this.miniMapBg);
 
-  static const BackgroundScene defaultScene = BackgroundScene.scene1;
+  static const BackgroundScene defaultScene = scene1;
 
   /// Returns the three minimap background colors as a list.
   List<Color> get miniMapBackgroundColors => [miniMapBg.a, miniMapBg.b, miniMapBg.c];
@@ -61,7 +61,7 @@ enum BackgroundColor {
   final String fileName;
   const BackgroundColor(this.fileName);
 
-  static const BackgroundColor defaultColor = BackgroundColor.blue;
+  static const BackgroundColor defaultColor = blue;
 
   /// Parse by enum name.
   /// - If [orNull] is true: returns null when not found.

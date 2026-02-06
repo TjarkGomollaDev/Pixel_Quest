@@ -15,10 +15,10 @@ sealed class BackgroundChoice {
   static BackgroundChoice fromMap(Map<String, dynamic> map) {
     final type = map['type'] as String?;
     return switch (type) {
-      'scene' => BackgroundChoice.scene(BackgroundScene.fromName(map['scene'] as String)!),
-      'worldDefault' => BackgroundChoice.worldDefault(),
-      'random' => BackgroundChoice.random(),
-      _ => BackgroundChoice.scene(BackgroundScene.defaultScene), // fallback
+      'scene' => .scene(.fromName(map['scene'] as String)!),
+      'worldDefault' => .worldDefault(),
+      'random' => .random(),
+      _ => .scene(.defaultScene), // fallback
     };
   }
 }
@@ -71,8 +71,8 @@ extension BackgroundChoiceIndex on BackgroundChoice {
 
     return switch (this) {
       BackgroundChoiceScene(:final scene) => scenes.indexOf(scene).clamp(0, tailIndex - 1),
-      BackgroundChoiceWorldDefault() => tail == BackgroundChoiceTail.worldDefault ? tailIndex : fallbackIndex,
-      BackgroundChoiceRandom() => tail == BackgroundChoiceTail.random ? tailIndex : fallbackIndex,
+      BackgroundChoiceWorldDefault() => tail == .worldDefault ? tailIndex : fallbackIndex,
+      BackgroundChoiceRandom() => tail == .random ? tailIndex : fallbackIndex,
     };
   }
 }

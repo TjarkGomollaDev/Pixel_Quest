@@ -4,7 +4,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/ambient_loop_emitter.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -49,13 +48,13 @@ class Mushroom extends SpriteAnimationGroupComponent
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(32);
+  static final Vector2 gridSize = .all(32);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(4, 14), size: Vector2(24, 18));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(32);
+  static final Vector2 _textureSize = .all(32);
   static const String _path = 'Enemies/Mushroom/';
   static const String _pathEnd = ' (32x32).png';
 
@@ -101,12 +100,12 @@ class Mushroom extends SpriteAnimationGroupComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.top) {
+    if (collisionSide == .top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       stopAmbientLoop();
       current = _MushroomState.hit;
       animationTickers![_MushroomState.hit]!.completed.whenComplete(() => removeFromParent());
@@ -128,9 +127,9 @@ class Mushroom extends SpriteAnimationGroupComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
-    configureAmbientLoop(loop: LoopSfx.mushroom, hitbox: _hitbox, guard: () => _speedFactor > 0.0001, guardFadeOut: false);
+    configureAmbientLoop(loop: .mushroom, hitbox: _hitbox, guard: () => _speedFactor > 0.0001, guardFadeOut: false);
   }
 
   void _loadAllSpriteAnimations() {

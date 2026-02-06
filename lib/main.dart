@@ -28,8 +28,8 @@ void main() async {
 }
 
 Future<void> _configureSystsemChrome() async {
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  await SystemChrome.setEnabledSystemUIMode(.immersiveSticky);
+  await SystemChrome.setPreferredOrientations([.landscapeLeft, .landscapeRight]);
 }
 
 Future<void> _configureFlame() async {
@@ -99,7 +99,7 @@ class _GameWrapperState extends State<GameWrapper> {
                 'Fatal error while loading the game',
                 name: 'Pixel Quest',
                 error: error,
-                stackTrace: error is Error ? error.stackTrace : StackTrace.current,
+                stackTrace: error is Error ? error.stackTrace : .current,
                 level: 1000, // severe fault
               );
               SchedulerBinding.instance.addPostFrameCallback((_) => SystemNavigator.pop());

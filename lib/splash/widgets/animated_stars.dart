@@ -43,8 +43,8 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: .min,
+      mainAxisAlignment: .center,
       children:
           List.generate(3, (i) {
               final rotation = (i == 0)
@@ -63,11 +63,11 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
                       child: Transform.translate(
                         offset: offset,
                         child: Image.asset(
-                          fit: BoxFit.cover,
+                          fit: .cover,
                           'assets/images/Other/Star (32x32).png',
                           width: 64,
                           height: 64,
-                          filterQuality: FilterQuality.none,
+                          filterQuality: .none,
                         ),
                       ),
                     ),

@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/l10n/app_localizations.dart';
@@ -16,8 +15,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final GlobalKey<DeveloperLogoState> _developerLogoKey = GlobalKey<DeveloperLogoState>();
-  final GlobalKey<AnimatedStarsState> _starsKey = GlobalKey<AnimatedStarsState>();
+  final GlobalKey<DeveloperLogoState> _developerLogoKey = .new();
+  final GlobalKey<AnimatedStarsState> _starsKey = .new();
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // blur layer
         Positioned.fill(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+            filter: .blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(color: AppTheme.screenBlur),
           ),
         ),
@@ -60,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
           bottom: 20,
           child: SafeArea(
             bottom: false,
-            minimum: EdgeInsets.only(left: 40),
+            minimum: .only(left: 40),
             child: DeveloperLogo(key: _developerLogoKey),
           ),
         ),

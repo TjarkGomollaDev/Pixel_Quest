@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
@@ -94,12 +93,12 @@ class Turtle extends PositionComponent
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (!_spikesAreOut && collisionSide == CollisionSide.top) {
+    if (!_spikesAreOut && collisionSide == .top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationGroupComponent.animationTickers![_TurtleState.spikesOut]?.onComplete?.call();
       animationGroupComponent.animationTickers![_TurtleState.spikesIn]?.onComplete?.call();
       animationGroupComponent.current = _TurtleState.hit;
@@ -122,7 +121,7 @@ class Turtle extends PositionComponent
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -147,7 +146,7 @@ class Turtle extends PositionComponent
         _spikesAreOut = true;
         ticker.onFrame = null;
       } else if (frame == _spikesOutActivationFrame - 1) {
-        game.audioCenter.playSoundIf(Sfx.popIn, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+        game.audioCenter.playSoundIf(.popIn, game.isEntityInVisibleWorldRectX(_hitbox), .game);
       }
     };
     await ticker.completed;
@@ -163,7 +162,7 @@ class Turtle extends PositionComponent
         _spikesAreOut = false;
         ticker.onFrame = null;
       } else if (frame == _spikesInActivationFrame - 2) {
-        game.audioCenter.playSoundIf(Sfx.popOut, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+        game.audioCenter.playSoundIf(.popOut, game.isEntityInVisibleWorldRectX(_hitbox), .game);
       }
     };
     if (_gotStomped) return;

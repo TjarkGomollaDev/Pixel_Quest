@@ -69,9 +69,9 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
   late final RadioComponent _loadingBgPickerSelector;
 
   // styling
-  static final Vector2 _optionSize = Vector2.all((DialogContainer.contentWidth - _spacingBetweenOptions * 3) / 4);
+  static final Vector2 _optionSize = .all((DialogContainer.contentWidth - _spacingBetweenOptions * 3) / 4);
   static final double _spacingBetweenOptions = 4; // [Adjustable]
-  static final Vector2 _bgSpriteSize = Vector2.all(29); // [Adjustable]
+  static final Vector2 _bgSpriteSize = .all(29); // [Adjustable]
   static const double _bgSpriteCornerRadius = 3.5; // [Adjustable]
 
   @override
@@ -86,14 +86,14 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // character picker text
     _characterPickerText = TextComponent(
       text: game.l10n.inventoryLabelCharacter,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: Vector2(size.x / 2, 0),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
 
     // character picker selector
     _characterPickerSelector = RadioComponent(
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _characterPickerText.position + Vector2(0, _characterPickerText.height + DialogContainer.subHeadlineMarginBottom),
       initialIndex: game.storageCenter.inventory.character.index,
       optionSize: _optionSize,
@@ -112,30 +112,24 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // level background picker text
     _levelBgPickerText = TextComponent(
       text: game.l10n.inventoryLabelLevelBackground,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _characterPickerSelector.position + Vector2(0, _characterPickerSelector.height + DialogContainer.spacingBetweenSections),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
 
     // level background picker selector
     _levelBgPickerSelector = RadioComponent(
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _levelBgPickerText.position + Vector2(0, _levelBgPickerText.height + DialogContainer.subHeadlineMarginBottom),
-      initialIndex: game.storageCenter.inventory.levelBackground.indexForScenes(
-        BackgroundScene.levelChoices,
-        tail: BackgroundChoiceTail.worldDefault,
-      ),
+      initialIndex: game.storageCenter.inventory.levelBackground.indexForScenes(BackgroundScene.levelChoices, tail: .worldDefault),
       optionSize: _optionSize,
       spacingBetweenOptions: _spacingBetweenOptions,
       spriteSize: _bgSpriteSize,
       spriteCornerRadius: _bgSpriteCornerRadius,
       options: [
         for (final scene in BackgroundScene.levelChoices)
-          RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLevelBg(BackgroundChoice.scene(scene))),
-        RadioOptionText(
-          text: game.l10n.inventoryOptionDefault,
-          onSelected: nonBlocking(() => _storeLevelBg(BackgroundChoice.worldDefault())),
-        ),
+          RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLevelBg(.scene(scene))),
+        RadioOptionText(text: game.l10n.inventoryOptionDefault, onSelected: nonBlocking(() => _storeLevelBg(.worldDefault()))),
       ],
     );
 
@@ -146,27 +140,24 @@ class _InventoryContent extends PositionComponent with HasGameReference<PixelQue
     // loading background picker text
     _loadingBgPickerText = TextComponent(
       text: game.l10n.inventoryLabelLoadingBackground,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _levelBgPickerSelector.position + Vector2(0, _levelBgPickerSelector.height + DialogContainer.spacingBetweenSections),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
 
     // loading background picker selector
     _loadingBgPickerSelector = RadioComponent(
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _loadingBgPickerText.position + Vector2(0, _loadingBgPickerText.height + DialogContainer.subHeadlineMarginBottom),
-      initialIndex: game.storageCenter.inventory.loadingBackground.indexForScenes(
-        BackgroundScene.loadingChoices,
-        tail: BackgroundChoiceTail.random,
-      ),
+      initialIndex: game.storageCenter.inventory.loadingBackground.indexForScenes(BackgroundScene.loadingChoices, tail: .random),
       optionSize: _optionSize,
       spacingBetweenOptions: _spacingBetweenOptions,
       spriteSize: _bgSpriteSize,
       spriteCornerRadius: _bgSpriteCornerRadius,
       options: [
         for (final scene in BackgroundScene.loadingChoices)
-          RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLoadingBg(BackgroundChoice.scene(scene))),
-        RadioOptionText(text: game.l10n.inventoryOptionRandom, onSelected: nonBlocking(() => _storeLoadingBg(BackgroundChoice.random()))),
+          RadioOptionSprite(path: scene.pathOrig, onSelected: () => _storeLoadingBg(.scene(scene))),
+        RadioOptionText(text: game.l10n.inventoryOptionRandom, onSelected: nonBlocking(() => _storeLoadingBg(.random()))),
       ],
     );
 

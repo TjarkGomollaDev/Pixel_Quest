@@ -11,9 +11,9 @@ enum JoystickSetup {
   left,
   right;
 
-  bool get isLeft => this == JoystickSetup.left;
-  static const JoystickSetup defaultSetup = JoystickSetup.left;
-  static JoystickSetup fromName(String name) => JoystickSetup.values.firstWhere((s) => s.name == name, orElse: () => defaultSetup);
+  bool get isLeft => this == left;
+  static const JoystickSetup defaultSetup = left;
+  static JoystickSetup fromName(String name) => values.firstWhere((s) => s.name == name, orElse: () => defaultSetup);
 }
 
 /// Container that owns and lays out the mobile on-screen controls (joystick + jump button).

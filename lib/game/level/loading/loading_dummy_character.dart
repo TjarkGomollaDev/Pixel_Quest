@@ -22,7 +22,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   // current state
-  _DummyState _state = _DummyState.hidden;
+  _DummyState _state = .hidden;
 
   // fixed positions outside the screen and hover position
   late final Vector2 _startPosition;
@@ -76,12 +76,12 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     _hoverCompleter = null;
 
     // initial state
-    _state = _DummyState.hidden;
+    _state = .hidden;
   }
 
   Future<void> fallIn() async {
-    if (_state != _DummyState.hidden) return;
-    _state = _DummyState.fallingIn;
+    if (_state != .hidden) return;
+    _state = .fallingIn;
     final token = bumpToken();
 
     // reset position in every fall in
@@ -102,8 +102,8 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
   }
 
   Future<void> fallOut() async {
-    if (_state != _DummyState.hovering) return;
-    _state = _DummyState.fallingOut;
+    if (_state != .hovering) return;
+    _state = .fallingOut;
     final token = bumpToken();
 
     // since we are no longer in the over state, the hover loop ends itself
@@ -115,17 +115,17 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     if (token != animationToken) return;
 
     // update state
-    _state = _DummyState.hidden;
+    _state = .hidden;
   }
 
   void _startHoverLoop(int token) {
-    _state = _DummyState.hovering;
+    _state = .hovering;
     _hoverCompleter = Completer<void>();
     _runHoverLoop(token);
   }
 
   Future<void> _runHoverLoop(int token) async {
-    while (_state == _DummyState.hovering && token == animationToken) {
+    while (_state == .hovering && token == animationToken) {
       await _singleSwing(token);
     }
     if (_hoverCompleter != null && !_hoverCompleter!.isCompleted) _hoverCompleter!.complete();

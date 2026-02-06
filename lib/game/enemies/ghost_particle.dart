@@ -21,10 +21,10 @@ class GhostParticle extends SpriteAnimationComponent with HasGameReference<Pixel
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(16);
+  static final Vector2 gridSize = .all(16);
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(16);
+  static final Vector2 _textureSize = .all(16);
   static const int _amount = 4;
   static const String _path = 'Enemies/Ghost/Ghost Particles (16x16).png';
 

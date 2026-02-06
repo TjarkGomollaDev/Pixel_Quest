@@ -57,7 +57,7 @@ class _WorldBlockHitbox extends RectangleHitbox with HasGameReference<PixelQuest
   _WorldBlockHitbox({required super.size}) {
     debugMode = GameSettings.customDebugMode;
     debugColor = AppTheme.debugColorWorldBlock;
-    collisionType = CollisionType.passive;
+    collisionType = .passive;
   }
 
   @override

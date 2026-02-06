@@ -31,19 +31,19 @@ CollisionSide resolveAABBCollision(
   if (overlapX < overlapY && hasVerticalIntersection && !forceVertical) {
     // horizontal collision
     if (playerRect.center.dx < otherRect.center.dx) {
-      return CollisionSide.left;
+      return .left;
     } else {
-      return CollisionSide.right;
+      return .right;
     }
   } else if (hasHorizontalIntersection) {
     // vertical collision
     if (playerRect.center.dy < otherRect.center.dy) {
-      return CollisionSide.top;
+      return .top;
     } else {
-      return CollisionSide.bottom;
+      return .bottom;
     }
   }
-  return CollisionSide.none;
+  return .none;
 }
 
 /// Mixin for fast-moving colliders that expose their previous Y position for swept collision checks.

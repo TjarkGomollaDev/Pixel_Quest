@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/events/game_event_bus.dart';
 import 'package:pixel_quest/game/level/mobile%20controls/mobile_controls.dart';
 import 'package:pixel_quest/game/settings/confirm_page.dart';
@@ -75,7 +74,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // music text
     _musicVolumeText = TextComponent(
       text: game.l10n.settingsLabelMusicVolume,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: Vector2(size.x / 2, 0),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
@@ -93,7 +92,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // sfx text
     _sfxVolumeText = TextComponent(
       text: game.l10n.settingsLabelSfxVolume,
-      anchor: Anchor.topCenter,
+      anchor: .topCenter,
       position: _musicSlider.position + Vector2(0, _musicSlider.size.y + DialogContainer.spacingBetweenSections),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
@@ -105,7 +104,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
       position: _sfxVolumeText.position + Vector2(0, _sfxVolumeText.size.y + DialogContainer.subHeadlineMarginBottom),
       onChanged: (value) {
         game.audioCenter.setSfxVolume(value);
-        game.audioCenter.playSound(Sfx.collected, SfxType.ui);
+        game.audioCenter.playSound(.collected, .ui);
       },
       enabled: game.audioCenter.soundState.enabled,
     );
@@ -123,7 +122,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
           onSelected: () {
             _sfxSlider.enable();
             _musicSlider.enable();
-            game.audioCenter.toggleSound(SoundState.on);
+            game.audioCenter.toggleSound(.on);
           },
         ),
         RadioOptionText(
@@ -131,7 +130,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
           onSelected: () {
             _sfxSlider.disable();
             _musicSlider.disable();
-            game.audioCenter.toggleSound(SoundState.off);
+            game.audioCenter.toggleSound(.off);
           },
         ),
       ],
@@ -140,7 +139,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // sound state text
     _soundStateText = TextComponent(
       text: game.l10n.settingsLabelMainVolume,
-      anchor: Anchor.centerLeft,
+      anchor: .centerLeft,
       position: Vector2(0, _soundStateSelector.position.y + _soundStateSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
@@ -173,7 +172,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // language text
     _languageText = TextComponent(
       text: game.l10n.settingsLabelLanguage,
-      anchor: Anchor.centerLeft,
+      anchor: .centerLeft,
       position: Vector2(0, _languageSelector.position.y + _languageSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
@@ -198,7 +197,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // control text
     _controlText = TextComponent(
       text: game.l10n.settingsLabelJoystick,
-      anchor: Anchor.centerLeft,
+      anchor: .centerLeft,
       position: Vector2(0, _controlSelector.position.y + _controlSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );
@@ -229,7 +228,7 @@ class _SettingsContent extends PositionComponent with HasGameReference<PixelQues
     // mini map text
     _miniMapText = TextComponent(
       text: game.l10n.settingsLabelMiniMap,
-      anchor: Anchor.centerLeft,
+      anchor: .centerLeft,
       position: Vector2(0, _miniMapSelector.position.y + _miniMapSelector.size.y / 2),
       textRenderer: AppTheme.dialogTextStandard.asTextPaint,
     );

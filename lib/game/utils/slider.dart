@@ -157,7 +157,7 @@ class Slider extends PositionComponent with HasGameReference<PixelQuest>, DragCa
 
 /// Visual thumb used by [Slider]. Purely a UI component (no input handling).
 class _SliderThumb extends PositionComponent {
-  _SliderThumb({super.position}) : super(size: _thumbSize, anchor: Anchor.center);
+  _SliderThumb({super.position}) : super(size: _thumbSize, anchor: .center);
 
   // styling
   static final Vector2 _thumbSize = Vector2(7, 11); // [Adjustable]
@@ -172,7 +172,7 @@ class _SliderThumb extends PositionComponent {
 
   void _setUpThumb() {
     // background
-    final bg = RRectComponent(size: size, anchor: Anchor.topLeft, borderRadius: 2.5, color: _thumbColor);
+    final bg = RRectComponent(size: size, borderRadius: 2.5, color: _thumbColor);
 
     // lines
     final upperLine = RRectComponent(
@@ -180,7 +180,7 @@ class _SliderThumb extends PositionComponent {
       size: Vector2(size.x - 4, 1),
       position: Vector2(size.x / 2, 2 / 5 * size.y),
       borderRadius: 2,
-      anchor: Anchor.center,
+      anchor: .center,
     );
     final lowerLine = RRectComponent(
       color: _lineColor,

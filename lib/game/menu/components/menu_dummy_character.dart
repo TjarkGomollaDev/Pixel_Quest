@@ -42,18 +42,18 @@ class MenuDummyCharacter extends SpriteAnimationGroupComponent with HasGameRefer
   void _setUpAnimationLoop() {
     // sequence of animations performed by the dummy character
     _animationSequence.addAll([
-      (id) => _playState(PlayerState.idle, 8, id),
-      (id) => _playState(PlayerState.run, 6, id),
-      (id) => _playState(PlayerState.idle, 4, id),
+      (id) => _playState(.idle, 8, id),
+      (id) => _playState(.run, 6, id),
+      (id) => _playState(.idle, 4, id),
       (id) => _jumpAnimation(id),
-      (id) => _playState(PlayerState.idle, 5, id),
-      (id) => _playState(PlayerState.run, 5, id),
-      (id) => _playState(PlayerState.idle, 3, id),
+      (id) => _playState(.idle, 5, id),
+      (id) => _playState(.run, 5, id),
+      (id) => _playState(.idle, 3, id),
       (id) => _jumpAnimation(id),
-      (id) => _playState(PlayerState.idle, 2, id),
+      (id) => _playState(.idle, 2, id),
       (id) => _jumpAnimation(id),
-      (id) => _playState(PlayerState.idle, 3, id),
-      (id) => _playState(PlayerState.run, 8, id),
+      (id) => _playState(.idle, 3, id),
+      (id) => _playState(.run, 8, id),
     ]);
 
     // calculate jump durations

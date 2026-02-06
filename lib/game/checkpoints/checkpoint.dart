@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
@@ -42,13 +41,13 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
   Checkpoint({required Player player, required super.position}) : _player = player, super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(64);
+  static final Vector2 gridSize = .all(64);
 
   // actual hitbox
   final RectangleHitbox _hitbox = RectangleHitbox(position: Vector2(19, 18), size: Vector2(9, 46));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(64);
+  static final Vector2 _textureSize = .all(64);
   static const String _path = 'Items/Checkpoints/Checkpoint/Checkpoint (';
   static const String _pathEnd = ').png';
 
@@ -75,7 +74,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
     if (_reached || _playerRespawn.x < _player.respawnPosition.x) return;
     _reached = true;
     _player.reachedCheckpoint(_playerRespawn);
-    game.audioCenter.playSound(Sfx.checkpoint, SfxType.level);
+    game.audioCenter.playSound(.checkpoint, .level);
 
     // play reached checkpoint animation
     current = _CheckpointState.flagOut;
@@ -84,7 +83,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
   }
 
   @override
-  EntityCollisionType get collisionType => EntityCollisionType.any;
+  EntityCollisionType get collisionType => .any;
 
   @override
   ShapeHitbox get entityHitbox => _hitbox;
@@ -99,7 +98,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
 
     // general
     priority = GameSettings.trapLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 

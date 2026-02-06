@@ -61,13 +61,13 @@ class _LoadingDotsState extends State<LoadingDots> with SingleTickerProviderStat
     return SizedBox(
       height: widget.textStyle.fontSize! * 1.5,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         children: List.generate(3, (i) {
           return AnimatedBuilder(
             animation: _controller,
             builder: (_, __) {
               return Padding(
-                padding: EdgeInsets.symmetric(horizontal: widget.dotSpacing / 2),
+                padding: .symmetric(horizontal: widget.dotSpacing / 2),
                 child: Transform.translate(
                   offset: Offset(0, -_animations[i].value),
                   child: Text('.', style: widget.textStyle),

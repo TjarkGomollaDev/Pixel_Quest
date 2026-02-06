@@ -20,13 +20,7 @@ class SettingsEntity {
   });
 
   SettingsEntity.defaultSettings()
-    : this(
-        soundState: SoundState.defaultState,
-        sfxVolume: 0.9,
-        musicVolume: 0.2,
-        joystickSetup: JoystickSetup.defaultSetup,
-        showMiniMapAtStart: true,
-      );
+    : this(soundState: .defaultState, sfxVolume: 0.9, musicVolume: 0.2, joystickSetup: .defaultSetup, showMiniMapAtStart: true);
 
   Map<String, dynamic> toMap() => {
     'soundState': soundState.name,
@@ -38,10 +32,10 @@ class SettingsEntity {
 
   factory SettingsEntity.fromMap(Map<String, dynamic> map) {
     return SettingsEntity(
-      soundState: SoundState.fromName(map['soundState'] as String),
+      soundState: .fromName(map['soundState'] as String),
       sfxVolume: map['sfxVolume'] as double,
       musicVolume: map['musicVolume'] as double,
-      joystickSetup: JoystickSetup.fromName(map['joystickSetup'] as String),
+      joystickSetup: .fromName(map['joystickSetup'] as String),
       showMiniMapAtStart: map['showMiniMapAtStart'] as bool,
     );
   }

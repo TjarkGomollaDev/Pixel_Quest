@@ -31,7 +31,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(16);
+  static final Vector2 gridSize = .all(16);
 
   // actual hitbox
   final DebugCircleHitbox _hitbox = DebugCircleHitbox(position: Vector2(4, 4), radius: 4);

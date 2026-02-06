@@ -22,7 +22,7 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest>, Can
     super.position,
     super.priority = GameSettings.spotlightAnimationLayer,
   }) : _targetRadius = targetRadius,
-       _targetCenter = localTargetCenter + Vector2.all(_bufferPad);
+       _targetCenter = localTargetCenter + .all(_bufferPad);
 
   // default target radius for player
   static const double playerTargetRadius = 60; // [Adjustable]
@@ -60,8 +60,8 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest>, Can
 
     // draw a transparent circle to "cut out" the spotlight
     final clearPaint = Paint()
-      ..blendMode = BlendMode.clear
-      ..style = PaintingStyle.fill;
+      ..blendMode = .clear
+      ..style = .fill;
     canvas.drawCircle(_targetCenter.toOffset(), _radius, clearPaint);
 
     canvas.restore();
@@ -75,9 +75,9 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest>, Can
   }
 
   void _setUpSpotlight() {
-    size = game.camera.visibleWorldRect.toVector2() + Vector2.all(_bufferPad * 2);
-    position -= Vector2.all(_bufferPad);
-    _spotlightRect = Rect.fromLTWH(0, 0, size.x, size.y);
+    size = game.camera.visibleWorldRect.toVector2() + .all(_bufferPad * 2);
+    position -= .all(_bufferPad);
+    _spotlightRect = .fromLTWH(0, 0, size.x, size.y);
     _fullRadius = _computeFullRadius();
     _radius = _fullRadius;
   }

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/enemies/trunk_bullet.dart';
@@ -169,12 +168,12 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
   @override
   void onEntityCollision(CollisionSide collisionSide) {
     if (_gotStomped) return;
-    if (collisionSide == CollisionSide.top) {
+    if (collisionSide == .top) {
       _gotStomped = true;
       _player.bounceUp();
 
       // play hit animation and then remove from level
-      game.audioCenter.playSound(Sfx.enemieHit, SfxType.game);
+      game.audioCenter.playSound(.enemieHit, .game);
       animationTickers![_TrunkState.attack]?.onComplete?.call();
       current = _TrunkState.hit;
       animationTickers![_TrunkState.hit]!.completed.whenComplete(() => removeFromParent());
@@ -196,7 +195,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
 
     // general
     priority = GameSettings.enemieLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 
@@ -344,7 +343,7 @@ class Trunk extends SpriteAnimationGroupComponent with EntityCollision, EntityOn
     await animationTickers![_TrunkState.attack]!.completed;
     if (!_isShooting || _gotStomped) return;
     _spawnBullet();
-    game.audioCenter.playSoundIf(Sfx.trunkShot, game.isEntityInVisibleWorldRectX(_hitbox), SfxType.game);
+    game.audioCenter.playSoundIf(.trunkShot, game.isEntityInVisibleWorldRectX(_hitbox), .game);
     current = _TrunkState.idle;
   }
 

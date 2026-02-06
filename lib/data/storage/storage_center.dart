@@ -79,13 +79,13 @@ class StorageCenter {
   void _loadLevel(String key) {
     final json = _prefs.getString(key);
     if (json == null) {
-      _cacheLevelData[key] = LevelEntity.defaultLevel(uuid: key);
+      _cacheLevelData[key] = .defaultLevel(uuid: key);
     } else {
       try {
         final map = jsonDecode(json) as Map<String, dynamic>;
-        _cacheLevelData[key] = LevelEntity.fromMap(map, key);
+        _cacheLevelData[key] = .fromMap(map, key);
       } catch (_) {
-        _cacheLevelData[key] = LevelEntity.defaultLevel(uuid: key);
+        _cacheLevelData[key] = .defaultLevel(uuid: key);
       }
     }
   }
@@ -100,13 +100,13 @@ class StorageCenter {
   void _loadWorld(String key, int index) {
     final json = _prefs.getString(key);
     if (json == null) {
-      _cacheWorldData[key] = WorldEntity.defaultWorld(uuid: key, locked: index != 1);
+      _cacheWorldData[key] = .defaultWorld(uuid: key, locked: index != 1);
     } else {
       try {
         final map = jsonDecode(json) as Map<String, dynamic>;
-        _cacheWorldData[key] = WorldEntity.fromMap(map, key);
+        _cacheWorldData[key] = .fromMap(map, key);
       } catch (_) {
-        _cacheWorldData[key] = WorldEntity.defaultWorld(uuid: key, locked: index != 1);
+        _cacheWorldData[key] = .defaultWorld(uuid: key, locked: index != 1);
       }
     }
   }
@@ -114,13 +114,13 @@ class StorageCenter {
   void _loadSettings() {
     final json = _prefs.getString(_storageKeySettings);
     if (json == null) {
-      _cacheSettings = SettingsEntity.defaultSettings();
+      _cacheSettings = .defaultSettings();
     } else {
       try {
         final map = jsonDecode(json) as Map<String, dynamic>;
-        _cacheSettings = SettingsEntity.fromMap(map);
+        _cacheSettings = .fromMap(map);
       } catch (_) {
-        _cacheSettings = SettingsEntity.defaultSettings();
+        _cacheSettings = .defaultSettings();
       }
     }
   }
@@ -128,13 +128,13 @@ class StorageCenter {
   void _loadInventory() {
     final json = _prefs.getString(_storageKeyInventory);
     if (json == null) {
-      _cacheInventory = InventoryEntity.defaultInventory();
+      _cacheInventory = .defaultInventory();
     } else {
       try {
         final map = jsonDecode(json) as Map<String, dynamic>;
-        _cacheInventory = InventoryEntity.fromMap(map);
+        _cacheInventory = .fromMap(map);
       } catch (_) {
-        _cacheInventory = InventoryEntity.defaultInventory();
+        _cacheInventory = .defaultInventory();
       }
     }
   }

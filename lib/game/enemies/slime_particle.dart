@@ -27,13 +27,13 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
       super(size: gridSize);
 
   // size
-  static final Vector2 gridSize = Vector2.all(16);
+  static final Vector2 gridSize = .all(16);
 
   // actual hitbox
   final DebugRectangleHitbox _hitbox = DebugRectangleHitbox(position: Vector2(5, 7), size: Vector2(6, 3));
 
   // animation settings
-  static final Vector2 _textureSize = Vector2.all(16);
+  static final Vector2 _textureSize = .all(16);
   static const int _amount = 4;
   static const String _path = 'Enemies/Slime/Particles (16x16).png';
 
@@ -63,7 +63,7 @@ class SlimeParticle extends SpriteAnimationComponent with EntityCollision, HasGa
 
     // general
     priority = GameSettings.enemieParticleLayerLevel;
-    _hitbox.collisionType = CollisionType.passive;
+    _hitbox.collisionType = .passive;
     add(_hitbox);
   }
 

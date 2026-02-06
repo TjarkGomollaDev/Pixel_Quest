@@ -10,11 +10,7 @@ class InventoryEntity {
   const InventoryEntity({required this.character, required this.levelBackground, required this.loadingBackground});
 
   InventoryEntity.defaultInventory()
-    : this(
-        character: PlayerCharacter.defaultCharacter,
-        levelBackground: BackgroundChoice.worldDefault(),
-        loadingBackground: BackgroundChoice.scene(BackgroundScene.scene3),
-      );
+    : this(character: .defaultCharacter, levelBackground: .worldDefault(), loadingBackground: .scene(.scene3));
 
   Map<String, dynamic> toMap() => {
     'character': character.name,
@@ -24,9 +20,9 @@ class InventoryEntity {
 
   factory InventoryEntity.fromMap(Map<String, dynamic> map) {
     return InventoryEntity(
-      character: PlayerCharacter.fromName(map['character'] as String),
-      levelBackground: BackgroundChoice.fromMap(map['levelBackground'] as Map<String, dynamic>),
-      loadingBackground: BackgroundChoice.fromMap(map['loadingBackground'] as Map<String, dynamic>),
+      character: .fromName(map['character'] as String),
+      levelBackground: .fromMap(map['levelBackground'] as Map<String, dynamic>),
+      loadingBackground: .fromMap(map['loadingBackground'] as Map<String, dynamic>),
     );
   }
 

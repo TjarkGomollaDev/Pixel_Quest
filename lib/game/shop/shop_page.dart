@@ -29,14 +29,7 @@ class _ShopContent extends PositionComponent with HasGameReference<PixelQuest> {
 
   @override
   FutureOr<void> onLoad() {
-    add(
-      TextComponent(
-        position: size / 2,
-        anchor: Anchor.center,
-        text: 'Coming Soon...',
-        textRenderer: AppTheme.dialogTextStandard.asTextPaint,
-      ),
-    );
+    add(TextComponent(position: size / 2, anchor: .center, text: 'Coming Soon...', textRenderer: AppTheme.dialogTextStandard.asTextPaint));
     return super.onLoad();
   }
 }

@@ -108,7 +108,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
       borderRadius: _layerOutlineRadius,
       size: _layerOutlineSize,
       position: size / 2,
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     // outline hightlight
@@ -117,7 +117,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
       borderRadius: _layerFrameRadius,
       size: _layerOutlineHighlightSize,
       position: size / 2,
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     // frame
@@ -126,7 +126,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
       borderRadius: _layerFrameRadius,
       size: _layerFrameSize,
       position: size / 2 + Vector2(0, _outlineHighlighStrokeWidth / 2),
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     // content box
@@ -135,7 +135,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
       borderRadius: _layerContentBoxRadius,
       size: _layerContentBoxSize,
       position: size / 2 + Vector2(0, (SpriteBtnType.btnSizeSmallCorrected.y + _closeBtnVerticalMargin * 2) / 2 - _contentBoxMargin / 2),
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     // title bar shadow
@@ -147,7 +147,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
         size.x / 2,
         _layerFrame.position.y - _layerFrame.size.y / 2 + _layerTitleBarShadowSize.y / 2 + _titleBarShadowMargin,
       ),
-      anchor: Anchor.center,
+      anchor: .center,
     );
 
     addAll([_layerOutline, _layerOutlineHightlight, _layerFrame, _layerContentBox, _layerTitleBarShadow]);
@@ -156,7 +156,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
   void _setUpTitleBar() {
     // close btn
     _closeBtn = SpriteBtn.fromType(
-      type: SpriteBtnType.closeSmall,
+      type: .closeSmall,
       onPressed: () => game.router.pop(),
       position: Vector2(
         _layerFrame.position.x + _layerFrame.size.x / 2 - SpriteBtnType.btnSizeSmallCorrected.x / 2 - _contentBoxMargin,
@@ -167,7 +167,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
     // title
     _title = TextComponent(
       text: _titleText,
-      anchor: Anchor.center,
+      anchor: .center,
       position: Vector2(size.x / 2, _closeBtn.y),
       textRenderer: AppTheme.dialogHeadingStandard.asTextPaint,
     );
@@ -176,7 +176,7 @@ class DialogContainer extends PositionComponent with HasGameReference<PixelQuest
   }
 
   void _setUpContent() {
-    _content.anchor = Anchor.topCenter;
+    _content.anchor = .topCenter;
     _content.position = Vector2(size.x / 2, _layerContentBox.position.y - _layerContentBox.size.y / 2 + _contentBoxPaddingVertical);
     add(_content);
   }

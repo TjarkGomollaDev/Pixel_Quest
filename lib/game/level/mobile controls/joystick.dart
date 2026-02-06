@@ -54,16 +54,13 @@ class Joystick extends PositionComponent with VisibleComponent {
         radius: GameSettings.knobRadius,
         paint: Paint()
           // white circle with a shader to create a 3D effect
-          ..shader =
-              const RadialGradient(
-                colors: [AppTheme.white, AppTheme.white, Color.fromARGB(255, 176, 176, 178)],
-                stops: [0.0, 0.8, 1.0],
-              ).createShader(
-                Rect.fromCircle(center: Offset(GameSettings.knobRadius, GameSettings.knobRadius), radius: GameSettings.knobRadius),
-              ),
+          ..shader = const RadialGradient(
+            colors: [AppTheme.white, AppTheme.white, .fromARGB(255, 176, 176, 178)],
+            stops: [0.0, 0.8, 1.0],
+          ).createShader(.fromCircle(center: Offset(GameSettings.knobRadius, GameSettings.knobRadius), radius: GameSettings.knobRadius)),
       ),
       background: _JoystickBackground(),
-      anchor: Anchor.topLeft,
+      anchor: .topLeft,
     );
     add(_joystick);
   }
@@ -85,7 +82,7 @@ class Joystick extends PositionComponent with VisibleComponent {
 ///
 /// Purely decorative: it doesn’t handle input itself, it just renders the base UI for the joystick.
 class _JoystickBackground extends PositionComponent {
-  _JoystickBackground() : super(size: Vector2.all(GameSettings.joystickRadius * 2));
+  _JoystickBackground() : super(size: .all(GameSettings.joystickRadius * 2));
 
   // styling
   static final Color _bgColor = AppTheme.tileBlur; // [Adjustable]
@@ -101,18 +98,13 @@ class _JoystickBackground extends PositionComponent {
 
   void _setUpBackground() {
     // circle background
-    final bg = CircleComponent(
-      radius: GameSettings.joystickRadius,
-      paint: Paint()..color = _bgColor,
-      anchor: Anchor.center,
-      position: size / 2,
-    );
+    final bg = CircleComponent(radius: GameSettings.joystickRadius, paint: Paint()..color = _bgColor, anchor: .center, position: size / 2);
 
     // arrows
     final center = size / 2;
     final dx = GameSettings.joystickRadius * _arrowDistanceFromCenter;
-    final leftArrow = ArrowIndicator(dir: ArrowDir.left, arrowSize: _arrowSize, color: _arrowColor, position: center + Vector2(-dx, 0));
-    final rightArrow = ArrowIndicator(dir: ArrowDir.right, arrowSize: _arrowSize, color: _arrowColor, position: center + Vector2(dx, 0));
+    final leftArrow = ArrowIndicator(dir: .left, arrowSize: _arrowSize, color: _arrowColor, position: center + Vector2(-dx, 0));
+    final rightArrow = ArrowIndicator(dir: .right, arrowSize: _arrowSize, color: _arrowColor, position: center + Vector2(dx, 0));
 
     addAll([bg, leftArrow, rightArrow]);
   }

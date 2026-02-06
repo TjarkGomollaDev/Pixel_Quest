@@ -36,7 +36,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   // current state
-  _OverlayState _state = _OverlayState.notVisible;
+  _OverlayState _state = .notVisible;
 
   // internal opacity
   double _opacity = 1;
@@ -62,7 +62,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   late final VisibleTextComponent _stageInfoText;
 
   // getter
-  bool get isShown => _state != _OverlayState.notVisible;
+  bool get isShown => _state != .notVisible;
 
   // animation keys
   static const String _keyZoomAndFadeOut = 'zoom-and-fade-out';
@@ -80,17 +80,17 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   @override
   void update(double dt) {
-    if (_state == _OverlayState.notVisible) return;
+    if (_state == .notVisible) return;
     _particleTimer.update(dt);
     super.update(dt);
   }
 
   @override
   void renderTree(Canvas canvas) {
-    if (_state == _OverlayState.notVisible || _opacity <= 0) return;
+    if (_state == .notVisible || _opacity <= 0) return;
 
     // render entire overlay, including children, into an alpha layer
-    _overlayPaint.color = Color.fromRGBO(255, 255, 255, _opacity);
+    _overlayPaint.color = .fromRGBO(255, 255, 255, _opacity);
 
     canvas.saveLayer(null, _overlayPaint);
     super.renderTree(canvas);
@@ -120,11 +120,11 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _inputBlocker.disable();
 
     // initial state
-    _state = _OverlayState.notVisible;
+    _state = .notVisible;
   }
 
   void _setUpRoot() {
-    _root = PositionComponent()..scale = Vector2.all(_worldToScreenScale);
+    _root = PositionComponent()..scale = .all(_worldToScreenScale);
     add(_root);
   }
 
@@ -137,12 +137,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     final scenes = BackgroundScene.loadingChoices.isNotEmpty ? BackgroundScene.loadingChoices : const [BackgroundScene.defaultScene];
     _backgrounds = {
       for (final scene in scenes)
-        scene: BackgroundParallax.scene(
-          scene: scene,
-          baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay,
-          size: size,
-          show: false,
-        ),
+        scene: .scene(scene: scene, baseVelocity: GameSettings.parallaxBaseVelocityLoadingOverlay, size: size, show: false),
     };
     _root.addAll(_backgrounds.values);
   }
@@ -154,11 +149,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
 
   void _setUpStageInfo() {
     // stage info text
-    _stageInfoText = VisibleTextComponent(
-      text: game.l10n.loadingLevel(0, 12),
-      anchor: Anchor.center,
-      textRenderer: AppTheme.hudText.asTextPaint,
-    );
+    _stageInfoText = VisibleTextComponent(text: game.l10n.loadingLevel(0, 12), anchor: .center, textRenderer: AppTheme.hudText.asTextPaint);
 
     // stage info background
     final stageInfoBgSize = Vector2(_stageInfoText.size.x + 15, GameSettings.hudBgTileSize);
@@ -170,7 +161,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
         _safePadding.minLeft(GameSettings.hudHorizontalMinMargin) + stageInfoBgSize.x / 2,
         size.y - stageInfoBgSize.y / 2 - GameSettings.hudVerticalMargin,
       ),
-      anchor: Anchor.center,
+      anchor: .center,
     );
     _stageInfoText.position = _stageInfoBg.position + Vector2(1, 0);
 
@@ -212,12 +203,12 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   }
 
   Future<void> show(LevelMetadata levelMetadata) async {
-    if (_state != _OverlayState.notVisible) return;
-    _state = _OverlayState.transition;
+    if (_state != .notVisible) return;
+    _state = .transition;
     final token = bumpToken();
 
     // reset visuals in every show
-    scale = Vector2.all(1);
+    scale = .all(1);
     _opacity = 1;
 
     // show and enable all components
@@ -233,12 +224,12 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     if (token != animationToken) return;
 
     // update state
-    _state = _OverlayState.visible;
+    _state = .visible;
   }
 
   Future<void> hide({VoidCallback? onAfterDummyFallOut}) async {
-    if (_state != _OverlayState.visible) return;
-    _state = _OverlayState.transition;
+    if (_state != .visible) return;
+    _state = .transition;
     final token = bumpToken();
 
     // dummy character falls out and then particle timer stops
@@ -256,7 +247,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     if (token != animationToken) return;
 
     // update state
-    _state = _OverlayState.notVisible;
+    _state = .notVisible;
 
     // input blocker can now also be disabled
     _inputBlocker.disable();
@@ -265,7 +256,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
   Future<void> _zoomAndFadeOut({double zoomDuration = 0.8, double fadeOutDuration = 0.4, double targetScale = 5}) {
     // create effect
     final effect = CombinedEffect([
-      ScaleEffect.to(Vector2.all(targetScale), EffectController(duration: zoomDuration, curve: Curves.easeInQuad)),
+      ScaleEffect.to(.all(targetScale), EffectController(duration: zoomDuration, curve: Curves.easeInQuad)),
       OpacityEffect.to(0, EffectController(duration: fadeOutDuration, startDelay: zoomDuration - fadeOutDuration)),
     ]);
     return registerEffect(_keyZoomAndFadeOut, effect);
@@ -277,7 +268,7 @@ class LoadingOverlay extends PositionComponent with HasGameReference<PixelQuest>
     _inputBlocker.disable();
     final prevState = _state;
     final prevOpacity = _opacity;
-    _state = _OverlayState.visible;
+    _state = .visible;
     _opacity = 0.001;
     await yieldFrame();
     _opacity = prevOpacity;

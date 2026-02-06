@@ -4,7 +4,6 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_quest/app_theme.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/utils/corner_outline.dart';
 import 'package:pixel_quest/game/utils/curves.dart';
 import 'package:pixel_quest/game/utils/load_sprites.dart';
@@ -85,8 +84,8 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
   late FutureOr<void> Function() _onPressed;
 
   // scale values for press animation
-  static final Vector2 _normalScale = Vector2.all(1);
-  static final Vector2 _maxScale = Vector2.all(1.05);
+  static final Vector2 _normalScale = .all(1);
+  static final Vector2 _maxScale = .all(1.05);
 
   // all three flags are combined ensuring the button
   // reacts only when it is ready, visible, and not animating
@@ -117,7 +116,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     _hadTapDown = true;
     scale = _maxScale;
     if (_holdMode) _isHeld = true;
-    game.audioCenter.playSound(Sfx.tap, SfxType.ui);
+    game.audioCenter.playSound(.tap, .ui);
 
     super.onTapDown(event);
   }
@@ -181,7 +180,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     _onPressed = onPressed;
     _initialShow = show;
     _holdMode = holdMode;
-    anchor = Anchor.center;
+    anchor = .center;
   }
 
   /// Sets the original (intended) size of the button.
@@ -249,7 +248,7 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     if (_animating) return;
     _animating = true;
     show();
-    scale = Vector2.zero();
+    scale = .zero();
     final completer = Completer<void>();
 
     // add visual effect
@@ -286,10 +285,10 @@ mixin _BaseBtn on PositionComponent, HasGameReference<PixelQuest>, TapCallbacks 
     // add visual effect
     add(
       ScaleEffect.to(
-        Vector2.zero(),
+        .zero(),
         EffectController(duration: duration, startDelay: delay, curve: FastStartAccelerateCurve()),
         onComplete: () {
-          size = Vector2.zero();
+          size = .zero();
           _animating = false;
           completer.complete();
         },
@@ -435,7 +434,7 @@ enum SpriteBtnType {
   static final Vector2 _btnSize = Vector2(21, 22);
   static final Vector2 _btnSizeSmall = Vector2(15, 16);
   static final Vector2 _btnSizeBlank = Vector2(15, 72);
-  static final Vector2 _btnOffset = Vector2.all(2);
+  static final Vector2 _btnOffset = .all(2);
 
   // size getter
   static Vector2 get btnSize => _btnSize;
@@ -501,10 +500,8 @@ class SpriteBtn extends SpriteComponent with HasGameReference<PixelQuest>, TapCa
     _textComponent = TextComponent(
       text: _textOnBtn,
       position: size / 2,
-      anchor: Anchor(0.5, 0.42),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white),
-      ),
+      anchor: .center,
+      textRenderer: AppTheme.textBtnStandard.asTextPaint,
     );
     add(_textComponent!);
   }
@@ -582,14 +579,7 @@ class SpriteToggleBtn extends SpriteBtn {
   @override
   void _addTextOnBtn() {
     if (_textOnBtn == null && _textOnBtn_2 == null) return;
-    _textComponent = TextComponent(
-      text: '',
-      position: size / 2,
-      anchor: Anchor(0.5, 0.42),
-      textRenderer: TextPaint(
-        style: const TextStyle(fontFamily: 'Pixel Font', fontSize: 6, color: AppTheme.white),
-      ),
-    );
+    _textComponent = TextComponent(text: '', position: size / 2, anchor: .center, textRenderer: AppTheme.textBtnStandard.asTextPaint);
     add(_textComponent!);
     _setTextToState();
   }
@@ -677,7 +667,7 @@ class RadioOptionText extends RadioOption {
     return TextComponent(
       text: text,
       position: btnSize / 2,
-      anchor: Anchor.center,
+      anchor: .center,
       textRenderer: TextPaint(style: textStyle ?? AppTheme.dialogTextStandard),
     );
   }
@@ -704,8 +694,8 @@ class RadioOptionSprite extends RadioOption {
   }) {
     return RoundedSpriteComponent(
       sprite: loadSprite(game, path),
-      position: btnSize / 2 + (spriteOffset ?? Vector2.zero()),
-      anchor: Anchor.center,
+      position: btnSize / 2 + (spriteOffset ?? .zero()),
+      anchor: .center,
       size: spriteSize,
       cornerRadius: spriteCornerRadius ?? 0,
     );
@@ -773,13 +763,13 @@ class _RadioBtn extends PositionComponent with HasGameReference<PixelQuest>, Tap
 
   @override
   void show() {
-    _content.scale = Vector2.all(1);
+    _content.scale = .all(1);
     super.show();
   }
 
   @override
   void hide() {
-    _content.scale = Vector2.zero();
+    _content.scale = .zero();
     super.hide();
   }
 }
@@ -892,7 +882,7 @@ class RadioComponent extends PositionComponent {
       cornerLength: _outlineCornerLength,
       strokeWidth: _outlineStrokeWidth,
       color: _outlineColor,
-      anchor: Anchor.center,
+      anchor: .center,
       position: _centerOfIndex[_selectedIndex],
       show: _show,
     );

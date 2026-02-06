@@ -15,7 +15,7 @@ mixin DebugOutlineOnly on PositionComponent {
   void renderDebugMode(Canvas canvas) {
     final paint = Paint()
       ..color = debugColor
-      ..style = PaintingStyle.stroke;
+      ..style = .stroke;
 
     canvas.drawRect(size.toRect(), paint);
   }

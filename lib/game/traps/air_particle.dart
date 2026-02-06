@@ -32,7 +32,7 @@ class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, Deb
        _baseWidth = baseWidth;
 
   // size
-  static final List<Vector2> _sizeList = [Vector2.all(14), Vector2.all(12), Vector2.all(8), Vector2.all(6)]; // [Adjustable]
+  static final List<Vector2> _sizeList = [.all(14), .all(12), .all(8), .all(6)]; // [Adjustable]
 
   // opacity
   static final List<double> _opacityList = [0.2, 0.25, 0.3, 0.4]; // [Adjustable]
@@ -108,6 +108,6 @@ class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, Deb
 
     final newPosition = position + _velocity * dt;
     position.x = newPosition.x.clamp(_borders.y, _borders.z);
-    position.y = newPosition.y.clamp(_borders.x, double.infinity);
+    position.y = newPosition.y.clamp(_borders.x, .infinity);
   }
 }

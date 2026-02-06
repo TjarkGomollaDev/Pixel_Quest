@@ -62,7 +62,7 @@ class DialogPage extends Component with HasGameReference<PixelQuest>, TapCallbac
   }
 
   void _setUpRoot() {
-    _root = PositionComponent()..scale = Vector2.all(game.worldToScreenScale);
+    _root = PositionComponent()..scale = .all(game.worldToScreenScale);
     add(_root);
   }
 
