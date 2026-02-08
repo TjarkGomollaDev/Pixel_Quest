@@ -6,6 +6,15 @@
 Pixel Quest is a retro-inspired **2D platformer** built with the Flutter **Flame Engine**. It blends classic jump’n’run gameplay with exploration across multiple worlds, packed with varied traps, enemies, and a distinctive graphic art style. Levels are built with **Tiled**.
 This repository contains everything you need to run the game locally.
 
+## 📍 Roadmap to Release
+
+**Stable Alpha** – core gameplay and systems are complete and fully functional.
+
+- [ ] New world (**12 levels**) + new enemies & traps
+- [ ] Player progression system (fruit currency + unlockable abilities)
+- [ ] Functional shop system + expanded inventory (buy & equip items/sounds)
+- [ ] Save & resume (single-slot in-level save with overwrite confirmation)
+
 ## 🧩 Core Features
 
 ### Gameplay & Content

@@ -36,11 +36,11 @@ class _SplashScreenState extends State<SplashScreen> {
       children: [
         // background image
         Positioned.fill(
-          child: Image.asset('assets/images/Splash/Splash_Background2.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
+          child: Image.asset('assets/images/Splash/Splash_Background2.png', fit: .cover, filterQuality: .none),
         ),
         // foreground image
         Positioned.fill(
-          child: Image.asset('assets/images/Splash/Splash_Foreground.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
+          child: Image.asset('assets/images/Splash/Splash_Foreground.png', fit: .cover, filterQuality: .none),
         ),
         // blur layer
         Positioned.fill(
