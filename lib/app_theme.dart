@@ -125,26 +125,26 @@ abstract class AppTheme {
   // #### ALL TEXT STYLES ######################################
 
   // Dialog Text Styles
-  static const TextStyle dialogTextStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 5.5, color: AppTheme.white, height: 1.2);
-  static const TextStyle dialogHeadingStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 1.7);
-  static const TextStyle textBtnStandard = TextStyle(fontFamily: 'Pixel Font', fontSize: 9, color: AppTheme.white, height: 1.4);
-  static const double dialogTextStandardHeight = 7;
-  static const double textBtnStandardHeight = 13;
-
-  // HUD Text Styles
-  static const TextStyle hudText = TextStyle(fontFamily: 'Pixel Font', fontSize: 8, color: AppTheme.white, height: 2.4);
-  static const TextStyle pausedHeading = TextStyle(fontFamily: 'Pixel Font', fontSize: 16, color: AppTheme.white, height: 3.4);
-  static const TextStyle jumpBtn = TextStyle(fontFamily: 'Pixel Font', fontSize: 12, color: AppTheme.white, height: 1.8);
-
-  // Splash Text Styles
-  static const TextStyle splashText = TextStyle(
+  static const TextStyle dialogTextStandard = TextStyle(
     fontFamily: 'Pixel Font',
-    fontSize: 12,
+    fontSize: 5.5,
     color: AppTheme.white,
     height: 1.2,
     decoration: .none,
   );
-  static final TextStyle splashDeveloperText = splashText.copyWith(fontSize: 8);
+  static final TextStyle dialogHeadingStandard = dialogTextStandard.copyWith(fontSize: 8, height: 1.7);
+  static final TextStyle textBtnStandard = dialogTextStandard.copyWith(fontSize: 9, height: 1.4);
+  static const double dialogTextStandardHeight = 7;
+  static const double textBtnStandardHeight = 13;
+
+  // HUD Text Styles
+  static final TextStyle hudText = dialogTextStandard.copyWith(fontSize: 8, height: 2.4);
+  static final TextStyle pausedHeading = dialogTextStandard.copyWith(fontSize: 16, height: 3.4);
+  static final TextStyle jumpBtn = dialogTextStandard.copyWith(fontSize: 12, height: 1.8);
+
+  // Splash Text Styles
+  static final TextStyle splashText = dialogTextStandard.copyWith(fontSize: 12);
+  static final TextStyle splashDeveloperText = dialogTextStandard.copyWith(fontSize: 8);
 }
 
 extension TextStyleExtension on TextStyle {

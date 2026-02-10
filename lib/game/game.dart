@@ -23,7 +23,6 @@ import 'package:pixel_quest/game/game_settings.dart';
 import 'package:pixel_quest/l10n/app_localizations.dart';
 import 'package:pixel_quest/game/menu/menu_page.dart';
 import 'package:pixel_quest/game/game_router.dart';
-
 import 'background/background.dart';
 
 /// Main Flame game root that bootstraps the whole app.
@@ -60,6 +59,9 @@ class PixelQuest extends FlameGame
   // padding that depends on the device and is converted to the pixel size of the game
   late final GameSafePadding safePadding;
 
+  // the spotlight center from the menu, which we also need on other pages
+  late final Vector2 spotlightCenterMenu;
+
   // mini map background images
   late final Map<BackgroundScene, Image> _miniMapBackgroundPatterns;
 
@@ -90,19 +92,13 @@ class PixelQuest extends FlameGame
     _setUpServices();
     _setUpCameraDefault();
     _setUpSafePadding();
+    _setUpSpotlightCenterMenu();
     _setUpRouter();
     _setUpLoadingOverlay();
     await _setUpMiniMapBackgroundPatterns();
     await _completeLoading();
-
-    spotlightCenterMenu = Vector2(
-      size.x / 2 - 12 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
-      5 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
-    );
     return super.onLoad();
   }
-
-  late final Vector2 spotlightCenterMenu;
 
   @override
   Future<void> onMount() async {
@@ -242,7 +238,7 @@ class PixelQuest extends FlameGame
     setRefollowForLevelCamera(player);
   }
 
-  /// Re-attaches the level camera follow target to the given player (used after respawn/camera resets).
+  /// Re-attaches the level camera follow target to the given player (used after camera effects).
   void setRefollowForLevelCamera(Player player) {
     camera.follow(PlayerHitboxPositionProvider(player), horizontalOnly: true);
   }
@@ -253,6 +249,14 @@ class PixelQuest extends FlameGame
       bottom: _flutterSafePadding.bottom / worldToScreenScale,
       left: _flutterSafePadding.left / worldToScreenScale,
       right: _flutterSafePadding.right / worldToScreenScale,
+    );
+  }
+
+  void _setUpSpotlightCenterMenu() {
+    // must be set manually when a new foreground is set in the menu
+    spotlightCenterMenu = Vector2(
+      size.x / 2 - 12 * GameSettings.tileSize + DummyCharacter.gridSize.x / 2,
+      5 * GameSettings.tileSize + DummyCharacter.gridSize.y / 2,
     );
   }
 
@@ -275,6 +279,7 @@ class PixelQuest extends FlameGame
     _miniMapBackgroundPatterns = await createMiniMapBackgroundPatterns(BackgroundScene.levelChoices);
   }
 
+  /// Returns the mini map background pattern for a specific background scene.
   Image miniMapPatternFor(BackgroundScene scene) =>
       _miniMapBackgroundPatterns[scene] ?? _miniMapBackgroundPatterns[BackgroundScene.defaultScene]!;
 }
