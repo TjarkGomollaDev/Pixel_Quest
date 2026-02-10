@@ -1,9 +1,11 @@
 import 'package:flame/extensions.dart';
 
 abstract class GameSettings {
-  // custom debug mode
+  // test mode
   static const bool testMode = false;
-  static const bool customDebugMode = false;
+  static const bool showDebug = false;
+  static const bool startInLevel = false;
+  static const List<int> initialWorldLevel = [1, 12];
 
   // mobile cotrols
   static const bool showMobileControls = true;

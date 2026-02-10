@@ -6,6 +6,7 @@ import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
 import 'package:pixel_quest/game/enemies/turtle.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
 import 'package:pixel_quest/game/traps/fire.dart';
@@ -80,7 +81,7 @@ class PlantBullet extends SpriteComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
@@ -89,12 +90,13 @@ class PlantBullet extends SpriteComponent
     // general
     priority = GameSettings.enemieBulletLayerLevel;
     add(_hitbox);
-    _moveDirection = _isLeft ? -1 : 1;
     marker = EntityMiniMapMarker(layer: .none);
+    game.eventBus.emit(RegisterEntityOnMiniMapLate(this));
   }
 
   void _loadSprite() {
     sprite = loadSprite(game, _path);
+    _moveDirection = _isLeft ? -1 : 1;
   }
 
   void _movement(double dt) {

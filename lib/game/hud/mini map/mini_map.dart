@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
 import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_quest/game/hud/mini%20map/mini_map_arrow_layer.dart';
 import 'package:pixel_quest/game/hud/mini%20map/mini_map_view.dart';
@@ -70,7 +71,7 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
     position.y -= _frameOverhangAdjust;
   }
 
-  // splitting the original list of passed entities into sublists
+  // derived lists created by indexing `_miniMapEntities`
   final List<EntityOnMiniMap> _entitiesAboveForeground = [];
   final List<EntityOnMiniMap> _entitiesBehindForeground = [];
   final List<EntityOnMiniMap> _arrowCandidates = [];
@@ -91,6 +92,9 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   static const double _frameBorderWidth = 12; // [Adjustable]
   static const double _frameOverhangAdjust = 3; // [Adjustable]
 
+  // y range in which entities can be obscured by the mini map
+  late final Vector2 obscureYRangeTopBottom;
+
   // btns
   late final SpriteToggleBtn _hideBtn;
   late final SpriteBtn _scrollLeftBtn;
@@ -104,57 +108,90 @@ class MiniMap extends PositionComponent with HasGameReference<PixelQuest> {
   static const double _arrowLayerSpacing = 1; // [Adjustable]
   late final MiniMapArrowLayer _arrowLayer;
 
+  // subscription for game events
+  GameSubscription? _sub;
+
   @override
   FutureOr<void> onLoad() {
-    _splitEntities();
+    _computeObscureYRange();
+    _indexInitialEntities();
     _setUpMiniMapView();
     _setUpFrame();
     _setUpBtns();
     _setUpArrowLayer();
+    _addSubscription();
     return super.onLoad();
   }
 
-  /// Splits the passed entity list into:
-  /// - layer lists for [`MiniMapView`],
-  /// - a filtered list of arrow candidates for [`MiniMapArrowLayer`].
-  ///
-  /// This also wires `onRemovedFromLevel` such that entities remove themselves
-  /// from every list they were registered in, keeping references consistent.
-  void _splitEntities() {
-    // y range in which entities can be obscured by the mini map
+  @override
+  void onRemove() {
+    _removeSubscription();
+    super.onRemove();
+  }
+
+  void _addSubscription() {
+    _sub = game.eventBus.listen<RegisterEntityOnMiniMapLate>((event) {
+      _indexEntity(event.entity);
+    });
+  }
+
+  void _removeSubscription() {
+    _sub?.cancel();
+    _sub = null;
+  }
+
+  /// Computes the screen-space Y-range covered by the mini map frame.
+  /// Stored as Vector2(x=top, y=bottom).
+  /// Used to pre-filter arrow candidates based on an entity's `yMoveRange`.
+  void _computeObscureYRange() {
     final rangeTop = game.cameraWorldYBounds.top + frameTopLeftToScreenTopRightOffset.y;
     final rangeBottom = rangeTop + frameSize.y;
+    obscureYRangeTopBottom = Vector2(rangeTop, rangeBottom);
+  }
 
+  /// Loops over `_miniMapEntities` and delegates the per-entity indexing to [_indexEntity].
+  void _indexInitialEntities() {
     for (final entity in _miniMapEntities) {
-      final membershipLists = [_miniMapEntities];
-
-      // in which layer of the mini map view should the entity appear
-      final layerList = switch (entity.marker.layer) {
-        EntityMiniMapMarkerLayer.aboveForeground => _entitiesAboveForeground,
-        EntityMiniMapMarkerLayer.behindForeground => _entitiesBehindForeground,
-        EntityMiniMapMarkerLayer.none => null,
-      };
-      if (layerList != null) {
-        layerList.add(entity);
-        membershipLists.add(layerList);
-      }
-
-      // arrow candidates where the arrow layer must be checked to see if they are obscured by the mini map,
-      // in reality, you could simply pass the entire list _miniMapEntities to the arrow layer,
-      // however, we can sort out the entities in beforehand, which, due to their yMoveRange,
-      // can never be obscured by the mini map anyway, it saves us arrow layer performance later on
-      if (checkRangeIntersection(entity.yMoveRange.x, entity.yMoveRange.y, rangeTop, rangeBottom)) {
-        _arrowCandidates.add(entity);
-        membershipLists.add(_arrowCandidates);
-      }
-
-      // when the entity disappears from the level, it should automatically remove itself from the corresponding lists
-      entity.onRemovedFromLevel = (removed) {
-        for (final list in membershipLists) {
-          list.remove(removed);
-        }
-      };
+      _indexEntity(entity);
     }
+  }
+
+  /// Adds a single entity to the derived mini map lists:
+  /// - Above/behind foreground marker layer (depending on `entity.marker.layer`)
+  /// - Arrow candidates if its `yMoveRange` can intersect the mini map's screen area
+  ///
+  /// Also wires `entity.onRemovedFromLevel` so the entity removes itself from every
+  /// list it was added to.
+  void _indexEntity(EntityOnMiniMap entity) {
+    final membershipLists = [_miniMapEntities];
+
+    // in which layer of the mini map view should the entity appear
+    final layerList = switch (entity.marker.layer) {
+      EntityMiniMapMarkerLayer.aboveForeground => _entitiesAboveForeground,
+      EntityMiniMapMarkerLayer.behindForeground => _entitiesBehindForeground,
+      EntityMiniMapMarkerLayer.none => null,
+    };
+    if (layerList != null && !layerList.contains(entity)) {
+      layerList.add(entity);
+      membershipLists.add(layerList);
+    }
+
+    // arrow candidates where the arrow layer must be checked to see if they are obscured by the mini map,
+    // in reality, you could simply pass the entire list _miniMapEntities to the arrow layer,
+    // however, we can sort out the entities in beforehand, which, due to their yMoveRange,
+    // can never be obscured by the mini map anyway, it saves us arrow layer performance later on
+    if (checkRangeIntersection(entity.yMoveRange.x, entity.yMoveRange.y, obscureYRangeTopBottom.x, obscureYRangeTopBottom.y) &&
+        !_arrowCandidates.contains(entity)) {
+      _arrowCandidates.add(entity);
+      membershipLists.add(_arrowCandidates);
+    }
+
+    // when the entity disappears from the level, it should automatically remove itself from the corresponding lists
+    entity.onRemovedFromLevel = (removed) {
+      for (final list in membershipLists) {
+        list.remove(removed);
+      }
+    };
   }
 
   /// Adds a decorative frame around the mini map.

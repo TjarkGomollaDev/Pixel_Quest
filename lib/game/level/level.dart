@@ -313,12 +313,12 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     final overrideScene = game.storageCenter.inventory.levelBackground.resolveChoice();
     if (overrideScene != null) return _addBackgroundHelper(BackgroundParallax.scene(scene: overrideScene, position: position, size: size));
 
-    // otherwise, check whether a special background is set in the map file.
+    // otherwise, check whether a special background is set in the map file
     final type = backgroundLayer.properties.getValue<String?>('BackgroundType');
     final fromLayer = BackgroundParallax.fromType(type: type, position: position, size: size);
     if (fromLayer != null) return _addBackgroundHelper(fromLayer);
 
-    // if none of these apply, use the scene set in the world of the leve
+    // if none of these apply, use the scene set in the world of the level
     _addBackgroundHelper(
       .scene(scene: game.staticCenter.worldById(_levelMetadata.worldUuid).backgroundScene, position: position, size: size),
     );
@@ -749,7 +749,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   void _addFpsDisplay() {
-    if (!GameSettings.customDebugMode) return _fpsDisplay = null;
+    if (!GameSettings.showDebug) return _fpsDisplay = null;
     _fpsDisplay = VisibleFpsTextComponent(position: _gameHud.position + Vector2(0, _gameHud.size.y), show: false);
     game.camera.viewport.add(_fpsDisplay!);
   }

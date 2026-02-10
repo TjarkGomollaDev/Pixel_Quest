@@ -67,7 +67,7 @@ class AirParticle extends SpriteComponent with HasGameReference<PixelQuest>, Deb
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
     }

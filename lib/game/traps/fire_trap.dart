@@ -73,7 +73,7 @@ class FireTrap extends SpriteAnimationGroupComponent with WorldCollision, HasGam
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorWorldBlock;
     }
@@ -152,7 +152,7 @@ class _FireTrapEntityCollider extends PositionComponent with EntityCollision, Co
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;
     }

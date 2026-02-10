@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_quest/game/level/mobile%20controls/mobile_controls.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
 part 'package:pixel_quest/game/events/game_events.dart';

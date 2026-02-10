@@ -118,7 +118,7 @@ class Plant extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorEnemie;
       _hitbox.debugColor = AppTheme.debugColorEnemieHitbox;

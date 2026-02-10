@@ -50,7 +50,7 @@ class SpikedBall extends PositionComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;

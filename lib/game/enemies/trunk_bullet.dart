@@ -6,6 +6,8 @@ import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
 import 'package:pixel_quest/game/enemies/turtle.dart';
+import 'package:pixel_quest/game/events/game_event_bus.dart';
+import 'package:pixel_quest/game/hud/mini%20map/entity_on_mini_map.dart';
 import 'package:pixel_quest/game/level/player/player.dart';
 import 'package:pixel_quest/game/traps/fire.dart';
 import 'package:pixel_quest/game/traps/saw.dart';
@@ -20,7 +22,8 @@ import 'package:pixel_quest/game/game.dart';
 ///
 /// The bullet moves straight left/right, damages the player on hit,
 /// and disappears when colliding with solid world/trap/enemy objects.
-class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, DebugOutlineOnly {
+class TrunkBullet extends SpriteComponent
+    with EntityCollision, HasGameReference<PixelQuest>, CollisionCallbacks, EntityOnMiniMap, DebugOutlineOnly {
   // constructor parameters
   final bool _isLeft;
   final Player _player;
@@ -84,7 +87,7 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorParticle;
       _hitbox.debugColor = AppTheme.debugColorParticleHitbox;
@@ -94,6 +97,8 @@ class TrunkBullet extends SpriteComponent with EntityCollision, HasGameReference
     priority = GameSettings.enemieBulletLayerLevel;
     opacity = 0;
     add(_hitbox);
+    marker = EntityMiniMapMarker(layer: .none);
+    game.eventBus.emit(RegisterEntityOnMiniMapLate(this));
   }
 
   void _loadSprite() {

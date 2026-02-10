@@ -1,93 +1,167 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="156">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="184">
  <tileset firstgid="1" source="Pixel Quest.tsx"/>
  <layer id="1" name="Background" width="80" height="16">
   <properties>
-   <property name="BackgroundType" value="green"/>
+   <property name="BackgroundType" value="scene1"/>
   </properties>
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,211,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,211,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,107,107,107,107,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,129,109,110,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,109,110,129,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,129,129,109,110,130,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,150,151,151,151,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,216,216,216,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,216,216,0,216,216,0,0,216,0,0,216,216,0,0,0,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,216,216,216,216,216,216,216,216,216,216,216,216,216,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,216,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,0,0,0,0,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184
+184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,0,0,0,0,0,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184,184
 </data>
  </layer>
  <objectgroup id="2" name="Spawning">
-  <object id="71" name="Rock Head" type="Rock Head" x="784" y="0" width="48" height="48">
+  <object id="71" name="Rock Head" type="Rock Head" x="528" y="0" width="48" height="48">
    <properties>
     <property name="delay" type="float" value="0"/>
-    <property name="offsetPos" type="float" value="10"/>
+    <property name="offsetPos" type="float" value="7"/>
    </properties>
   </object>
-  <object id="86" name="Finish" type="Finish" x="320" y="176" width="64" height="64"/>
-  <object id="88" name="ArrowUp" type="ArrowUp" x="544" y="0" width="32" height="32"/>
-  <object id="89" name="Start" type="Start" x="64" y="176" width="64" height="64"/>
-  <object id="93" name="Spiked Ball" type="Spiked Ball" x="368" y="16" width="16" height="16">
+  <object id="89" name="Start" type="Start" x="368" y="176" width="64" height="64"/>
+  <object id="93" name="Spiked Ball" type="Spiked Ball" x="768" y="0" width="16" height="16">
    <properties>
-    <property name="radius" type="int" value="6"/>
+    <property name="radius" type="int" value="8"/>
     <property name="startLeft" type="bool" value="true"/>
-    <property name="swingArcDec" type="int" value="180"/>
-    <property name="swingSpeed" type="int" value="360"/>
+    <property name="swingArcDec" type="int" value="170"/>
+    <property name="swingSpeed" type="int" value="420"/>
    </properties>
   </object>
-  <object id="94" name="Kiwi" type="Fruit" x="272" y="160" width="32" height="32"/>
-  <object id="95" name="Apple" type="Fruit" x="272" y="128" width="32" height="32"/>
-  <object id="106" name="Moving Platform" type="Moving Platform" x="32" y="48" width="32" height="16">
+  <object id="106" name="Moving Platform" type="Moving Platform" x="32" y="16" width="32" height="16">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
     <property name="isVertical" type="bool" value="false"/>
     <property name="offsetNeg" type="float" value="2"/>
-    <property name="offsetPos" type="float" value="1"/>
-   </properties>
-  </object>
-  <object id="130" name="Spikes" type="Spikes" x="0" y="224" width="32" height="16">
-   <properties>
-    <property name="side" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="136" name="ArrowUp" type="ArrowUp" x="512" y="0" width="32" height="32"/>
-  <object id="139" name="FireTrap" type="FireTrap" x="576" y="224" width="16" height="32"/>
-  <object id="140" name="FireTrap" type="FireTrap" x="560" y="224" width="16" height="32"/>
-  <object id="141" name="FireTrap" type="FireTrap" x="544" y="224" width="16" height="32"/>
-  <object id="142" name="FireTrap" type="FireTrap" x="592" y="224" width="16" height="32"/>
-  <object id="143" name="ArrowUp" type="ArrowUp" x="576" y="0" width="32" height="32"/>
-  <object id="145" name="Fire" type="Fire" x="944" y="224" width="32" height="16">
-   <properties>
-    <property name="side" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="150" name="Blue Bird" type="Blue Bird" x="880" y="96" width="32" height="32">
-   <properties>
-    <property name="isLeft" type="bool" value="false"/>
-    <property name="offsetNeg" type="float" value="2"/>
     <property name="offsetPos" type="float" value="4"/>
    </properties>
   </object>
-  <object id="152" name="Slime" type="Slime" x="1008" y="208" width="48" height="32">
+  <object id="145" name="Fire" type="Fire" x="480" y="144" width="32" height="16">
    <properties>
-    <property name="isLeft" type="bool" value="true"/>
-    <property name="offsetNeg" type="float" value="2"/>
-    <property name="offsetPos" type="float" value="8"/>
+    <property name="side" type="int" value="1"/>
    </properties>
   </object>
-  <object id="155" name="Chicken" type="Chicken" x="176" y="192" width="32" height="48">
+  <object id="156" name="Mushroom" type="Mushroom" x="224" y="208" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="5"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="157" name="Blue Bird" type="Blue Bird" x="176" y="16" width="32" height="32">
    <properties>
     <property name="isLeft" type="bool" value="true"/>
     <property name="offsetNeg" type="float" value="2"/>
     <property name="offsetPos" type="float" value="6"/>
    </properties>
   </object>
+  <object id="158" name="Ghost" type="Ghost" x="160" y="64" width="48" height="32">
+   <properties>
+    <property name="delay" type="float" value="5"/>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="1"/>
+    <property name="offsetPos" type="float" value="6"/>
+   </properties>
+  </object>
+  <object id="159" name="Chicken" type="Chicken" x="80" y="192" width="32" height="48">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="5"/>
+    <property name="offsetPos" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="160" name="Slime" type="Slime" x="208" y="112" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="4"/>
+    <property name="offsetPos" type="float" value="3"/>
+   </properties>
+  </object>
+  <object id="161" name="Plant" type="Plant" x="480" y="16" width="48" height="48">
+   <properties>
+    <property name="delay" type="float" value="2.5"/>
+    <property name="doubleShot" type="bool" value="true"/>
+    <property name="isLeft" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="162" name="Moving Platform" type="Moving Platform" x="80" y="64" width="32" height="16">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="isVertical" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="1"/>
+    <property name="offsetPos" type="float" value="4"/>
+   </properties>
+  </object>
+  <object id="163" name="Spike Head" type="Spike Head" x="576" y="0" width="64" height="64">
+   <properties>
+    <property name="delay" type="float" value="2"/>
+    <property name="offsetPos" type="float" value="6"/>
+   </properties>
+  </object>
+  <object id="164" name="Trunk" type="Trunk" x="400" y="64" width="64" height="32">
+   <properties>
+    <property name="extandNegAttack" type="float" value="39"/>
+    <property name="extandPosAttack" type="float" value="0"/>
+    <property name="isLeft" type="bool" value="true"/>
+    <property name="offsetNeg" type="float" value="5"/>
+    <property name="offsetPos" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="165" name="Fan" type="Fan" x="688" y="176" width="32" height="16">
+   <properties>
+    <property name="alwaysOn" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="166" name="SawCircle" type="SawCircle" x="928" y="32" width="96" height="80">
+   <properties>
+    <property name="clockwise" type="bool" value="true"/>
+    <property name="doubleSaw" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="167" name="FireTrap" type="FireTrap" x="752" y="224" width="16" height="32"/>
+  <object id="168" name="FireTrap" type="FireTrap" x="768" y="224" width="16" height="32"/>
+  <object id="169" name="FireTrap" type="FireTrap" x="784" y="224" width="16" height="32"/>
+  <object id="170" name="FireTrap" type="FireTrap" x="800" y="224" width="16" height="32"/>
+  <object id="171" name="FireTrap" type="FireTrap" x="816" y="224" width="16" height="32"/>
+  <object id="172" name="Saw" type="Saw" x="912" y="144" width="32" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="false"/>
+    <property name="isVertical" type="bool" value="false"/>
+    <property name="offsetNeg" type="float" value="4"/>
+    <property name="offsetPos" type="float" value="2"/>
+    <property name="showPath" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="173" name="Spikes" type="Spikes" x="432" y="144" width="32" height="16">
+   <properties>
+    <property name="side" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="174" name="Turtle" type="Turtle" x="16" y="96" width="48" height="32">
+   <properties>
+    <property name="isLeft" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="175" name="Apple" type="Fruit" x="1040" y="0" width="32" height="32"/>
+  <object id="176" name="Bananas" type="Fruit" x="1040" y="32" width="32" height="32"/>
+  <object id="177" name="Cherries" type="Fruit" x="1040" y="64" width="32" height="32"/>
+  <object id="178" name="Kiwi" type="Fruit" x="1040" y="96" width="32" height="32"/>
+  <object id="179" name="Melon" type="Fruit" x="1040" y="128" width="32" height="32"/>
+  <object id="180" name="Orange" type="Fruit" x="1040" y="160" width="32" height="32"/>
+  <object id="181" name="Strwaberry" type="Fruit" x="1040" y="192" width="32" height="32"/>
+  <object id="182" name="ArrowUp" type="ArrowUp" x="1088" y="128" width="32" height="32"/>
+  <object id="183" name="Trampoline" type="Trampoline" x="1088" y="208" width="32" height="32"/>
  </objectgroup>
 </map>

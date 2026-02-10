@@ -90,7 +90,7 @@ class Checkpoint extends SpriteAnimationGroupComponent with EntityCollision, Has
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
       _hitbox.debugColor = AppTheme.debugColorTrapHitbox;

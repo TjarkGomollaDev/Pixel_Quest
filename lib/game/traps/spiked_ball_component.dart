@@ -92,7 +92,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorTrap;
     }
@@ -140,7 +140,7 @@ class SpikedBallComponent extends PositionComponent with HasGameReference<PixelQ
     for (int i = 0; i < count; i++) {
       final chainComponent = DebugSpriteComponent(sprite: chainSprite)
         ..anchor = .center
-        ..debugMode = GameSettings.customDebugMode
+        ..debugMode = GameSettings.showDebug
         ..debugColor = AppTheme.debugColorTrapHitbox;
 
       final chainItem = _ChainItem(chainComponent: chainComponent, radiusToCenterOfChain: baseRadius + i * _textureSize.x);

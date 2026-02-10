@@ -352,7 +352,7 @@ class Player extends SpriteAnimationGroupComponent
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       _hitbox.debugMode = true;
       _hitbox.debugColor = AppTheme.debugColorPlayerHitbox;
     }

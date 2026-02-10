@@ -42,7 +42,7 @@ mixin DummyCharacter on SpriteAnimationGroupComponent, HasGameReference<PixelQue
 
   void _initialSetup() {
     // debug
-    if (GameSettings.customDebugMode) {
+    if (GameSettings.showDebug) {
       debugMode = true;
       debugColor = AppTheme.debugColorMenu;
     }

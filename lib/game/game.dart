@@ -6,6 +6,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' hide Route, Image;
 import 'package:pixel_quest/data/audio/ambient_loop_manager.dart';
+import 'package:pixel_quest/data/static/metadata/level_metadata.dart';
 import 'package:pixel_quest/data/static/static_center.dart';
 import 'package:pixel_quest/data/storage/storage_events.dart';
 import 'package:pixel_quest/data/storage/storage_center.dart';
@@ -256,8 +257,10 @@ class PixelQuest extends FlameGame
   }
 
   void _setUpRouter() {
-    router = createRouter(staticCenter: staticCenter);
-    // router = createRouter(staticCenter: staticCenter, initialRoute: staticCenter.allLevelsInWorldByIndex(0).levelByNumber(12).uuid);
+    final initialRoute = GameSettings.testMode && GameSettings.startInLevel
+        ? staticCenter.allLevelsInWorldByIndex(GameSettings.initialWorldLevel[0]).levelByNumber(GameSettings.initialWorldLevel[1]).uuid
+        : null;
+    router = createRouter(staticCenter: staticCenter, initialRoute: initialRoute);
     add(router);
   }
 

@@ -55,7 +55,7 @@ class WorldBlock extends PositionComponent with HasGameReference<PixelQuest>, Co
 /// blocks exist in the level.
 class _WorldBlockHitbox extends RectangleHitbox with HasGameReference<PixelQuest> {
   _WorldBlockHitbox({required super.size}) {
-    debugMode = GameSettings.customDebugMode;
+    debugMode = GameSettings.showDebug;
     debugColor = AppTheme.debugColorWorldBlock;
     collisionType = .passive;
   }

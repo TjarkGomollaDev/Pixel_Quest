@@ -49,3 +49,8 @@ class NewStarsEarned extends GameEvent {
     required this.levelStars,
   });
 }
+
+class RegisterEntityOnMiniMapLate extends GameEvent {
+  final EntityOnMiniMap entity;
+  const RegisterEntityOnMiniMapLate(this.entity);
+}
