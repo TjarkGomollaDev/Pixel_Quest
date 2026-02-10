@@ -144,7 +144,7 @@ abstract class AppTheme {
 
   // Splash Text Styles
   static final TextStyle splashText = dialogTextStandard.copyWith(fontSize: 12);
-  static final TextStyle splashDeveloperText = dialogTextStandard.copyWith(fontSize: 8);
+  static final TextStyle splashDeveloperText = dialogTextStandard.copyWith(fontSize: 8, height: 1.6);
 }
 
 extension TextStyleExtension on TextStyle {

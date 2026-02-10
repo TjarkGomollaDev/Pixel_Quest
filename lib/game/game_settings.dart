@@ -2,7 +2,7 @@ import 'package:flame/extensions.dart';
 
 abstract class GameSettings {
   // test mode
-  static const bool testMode = true;
+  static const bool testMode = false;
   static const bool showDebug = false;
   static const bool startInLevel = false;
   static const List<int> initialWorldLevel = [1, 12];
