@@ -6,6 +6,7 @@ import 'package:pixel_quest/game/utils/cancelable_effects.dart';
 import 'package:pixel_quest/game/utils/curves.dart';
 import 'package:pixel_quest/game/utils/dummy_character.dart';
 import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
 
 enum _DummyState { hidden, fallingIn, hovering, fallingOut }
 
@@ -96,7 +97,7 @@ class LoadingDummyCharacter extends SpriteAnimationGroupComponent with HasGameRe
     if (token != animationToken) return;
 
     // start hover loop
-    await Future.delayed(Duration(milliseconds: 50));
+    await delayInMs(50);
     if (token != animationToken) return;
     _startHoverLoop(token);
   }

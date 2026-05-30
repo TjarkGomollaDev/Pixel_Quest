@@ -44,6 +44,11 @@ class Spotlight extends PositionComponent with HasGameReference<PixelQuest>, Can
   static const String _keyExpandToFull = 'expand-to-full';
   static const String _keyShrinkToBlack = 'shrink-to-black';
 
+  // getter
+  Rect get targetRect => Rect.fromCircle(center: (position + _targetCenter).toOffset(), radius: playerTargetRadius);
+  Rect get spotlightRect =>
+      Rect.fromLTWH(position.x + _bufferPad, position.y + _bufferPad, width - _bufferPad * 2, height - _bufferPad * 2);
+
   @override
   FutureOr<void> onLoad() {
     _setUpSpotlight();

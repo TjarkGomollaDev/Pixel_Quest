@@ -30,3 +30,15 @@ List<Vector2> calculateStarPositions(Vector2 center, double radius) {
 mixin Respawnable on PositionComponent {
   void onRespawn();
 }
+
+String formatTime(double seconds) {
+  final totalMs = (seconds * 1000).floor();
+  final minutes = totalMs ~/ 60000;
+  final secs = (totalMs % 60000) ~/ 1000;
+  final centis = (totalMs % 1000) ~/ 10;
+
+  String two(int v) => v.toString().padLeft(2, '0');
+  return '${two(minutes)}:${two(secs)}:${two(centis)}';
+}
+
+Future<void> delayInMs(int milliseconds) => .delayed(Duration(milliseconds: milliseconds));

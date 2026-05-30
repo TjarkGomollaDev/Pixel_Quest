@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/rendering.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
 import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/data/storage/entities/level_entity.dart';
+import 'package:pixel_quest/game/animations/spotlight.dart';
+import 'package:pixel_quest/game/animations/star.dart';
 import 'package:pixel_quest/game/background/background.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
 import 'package:pixel_quest/game/checkpoints/start.dart';
@@ -105,6 +109,9 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   int _deathCount = 0;
   int _earnedStars = 0;
 
+  // gameplay timer
+  double _gameplayTimer = 0;
+
   // there are objects that can be collected by the player, but should reappear when the player respawns
   final List<Respawnable> _pendingRespawnables = [];
 
@@ -163,6 +170,13 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
   }
 
   @override
+  void update(double dt) {
+    if (!_isGameplayActive) return super.update(dt);
+    _gameplayTimer += dt;
+    super.update(dt);
+  }
+
+  @override
   Future<void> onRemove() async {
     _removeSubscription();
     _removeGameHud();
@@ -189,8 +203,8 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _guard(token);
   }
 
-  Future<void> _guardDelay(int token, Duration d) async {
-    await Future.delayed(d);
+  Future<void> _guardDelay(int token, int delayMs) async {
+    await delayInMs(delayMs);
     _guard(token);
   }
 
@@ -221,7 +235,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
       // the overlay should be displayed for a minimum amount of time
       final elapsedMs = DateTime.now().difference(_startTime).inMilliseconds;
       final delayMs = 1400;
-      if (elapsedMs < delayMs) await _guardDelay(token, Duration(milliseconds: delayMs - elapsedMs));
+      if (elapsedMs < delayMs) await _guardDelay(token, delayMs - elapsedMs);
       await game.loadingOverlay.hide(onAfterDummyFallOut: () => timeScale = 1);
       _guard(token);
     } else {
@@ -231,7 +245,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     }
 
     // delay for visual reasons only
-    await _guardDelay(token, Duration(milliseconds: 100));
+    await _guardDelay(token, 100);
 
     // this method spawns the player and initiates the level start
     _player.appearInLevel();
@@ -776,6 +790,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _fpsDisplay?.show();
   }
 
+  /// Level has officially started after all spawn animations and gameplay is activated.
   void beginGameplay() {
     _isGameplayActive = true;
     _showAllOverlays();
@@ -783,11 +798,15 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     game.audioCenter.unmuteGameSfx();
   }
 
+  /// The level is completed once the player has reached the finish.
   void endGameplay() {
     _isGameplayActive = false;
     _removeAllOverlays();
     game.audioCenter.stopBackgroundMusic();
     unawaited(game.audioCenter.muteGameSfx());
+
+    // now that the gameplay is over, we can store the data
+    unawaited(_saveData());
   }
 
   void _handleLevelLifecycleChanged(LevelLifecycleChanged event) {
@@ -865,7 +884,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     _gameHud.updateDeathCount(++_deathCount);
   }
 
-  Future<void> saveData() async {
+  Future<void> _saveData() async {
     _calculateEarnedStars();
     await game.storageCenter.saveLevel(
       LevelEntity(
@@ -874,6 +893,7 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
         totalFruits: _totalFruitsCount,
         earnedFruits: _playerFruitsCount,
         deaths: _deathCount,
+        time: _gameplayTimer,
       ),
       _levelMetadata.worldUuid,
     );
@@ -893,5 +913,79 @@ class Level extends World with HasGameReference<PixelQuest>, HasTimeScale, TapCa
     game.audioCenter.stopBackgroundMusic();
     game.audioCenter.muteGameSfx();
     _playerInput.clearInput();
+  }
+
+  Future<void> finishSequenz(ShapeHitbox finish, Player player) async {
+    // place spotlight in visible world rect and transform player center in local space
+    final playerCenter = player.hitboxAbsoluteRect.center.toVector2();
+    final topLeft = game.camera.visibleWorldRect.topLeft.toVector2();
+    final spotlight = Spotlight(localTargetCenter: playerCenter - topLeft, position: topLeft);
+    add(spotlight);
+
+    // spotlight animation
+    await spotlight.focusOnTarget();
+    game.audioCenter.startBackgroundMusic(BackgroundMusic.win);
+    await delayInMs(200);
+
+    // gameplay time
+    final time = TextComponent(
+      text: formatTime(_gameplayTimer),
+      position: spotlight.targetRect.bottomCenter.toVector2() + Vector2(0, 8),
+      textRenderer: AppTheme.hudText.asTextPaint,
+      anchor: .topCenter,
+      priority: GameSettings.spotlightAnimationContentLayer,
+    );
+    add(time);
+
+    // star positions
+    final starRadius = Spotlight.playerTargetRadius * 1.5;
+    final starPositions = calculateStarPositions(playerCenter, starRadius);
+    final outlineStars = [];
+    final stars = [];
+
+    // outline stars
+    for (final position in starPositions) {
+      final outlineStar = Star(variant: .outline, size: .all(38), position: position, spawnSizeZero: true);
+      add(outlineStar);
+      outlineStars.add(outlineStar);
+      unawaited(outlineStar.scaleIn());
+    }
+    await delayInMs(800);
+
+    // earned stars
+    for (int i = 0; i < earnedStars; i++) {
+      final star = Star(variant: .filled, size: .all(38), position: playerCenter, spawnSizeZero: true);
+      add(star);
+      stars.add(star);
+
+      // flies to the outline star position
+      await star.flyToAndScaleIn(starPositions[i]);
+      await delayInMs(80);
+    }
+
+    // delete all outline stars that are behind the earned stars
+    for (int i = 0; i < stars.length; i++) {
+      remove(outlineStars[0]);
+      outlineStars.removeAt(0);
+    }
+    await delayInMs(620);
+
+    // player animations
+    await player.finishJumpAndDisappearingAnimation();
+
+    // fade stars out, remove content and shrink light circle to zero
+    for (final e in outlineStars) {
+      unawaited(e.fadeOut());
+    }
+    for (final e in stars) {
+      unawaited(e.fadeOut());
+    }
+    remove(time);
+    game.audioCenter.stopBackgroundMusic();
+    await spotlight.shrinkToBlack();
+    await delayInMs(320);
+
+    // go back to menu
+    game.router.pushReplacementNamed(RouteNames.menu);
   }
 }

@@ -12,6 +12,7 @@ import 'package:pixel_quest/game/utils/curves.dart';
 import 'package:pixel_quest/game/utils/load_sprites.dart';
 import 'package:pixel_quest/game/game_settings.dart';
 import 'package:pixel_quest/game/game.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
 
 enum _PlayerEffectState implements AnimationState {
   appearing('Appearing', 7, loop: false, special: true),
@@ -128,7 +129,7 @@ class PlayerEffects extends SpriteAnimationGroupComponent with HasGameReference<
       final offset = Vector2(offsetX, 0);
 
       game.camera.moveTo(originalPos + offset);
-      await Future.delayed(Duration(milliseconds: (duration * 1000).toInt()));
+      await delayInMs((duration * 1000).toInt());
     }
     game.camera.moveTo(originalPos);
   }

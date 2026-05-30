@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/image_composition.dart';
@@ -8,8 +7,6 @@ import 'package:pixel_quest/app_theme.dart';
 import 'package:pixel_quest/game/collision/collision.dart';
 import 'package:pixel_quest/game/collision/entity_collision.dart';
 import 'package:pixel_quest/game/collision/world_collision.dart';
-import 'package:pixel_quest/game/animations/spotlight.dart';
-import 'package:pixel_quest/game/animations/star.dart';
 import 'package:pixel_quest/game/checkpoints/finish.dart';
 import 'package:pixel_quest/game/checkpoints/start.dart';
 import 'package:pixel_quest/game/events/game_event_bus.dart';
@@ -19,11 +16,9 @@ import 'package:pixel_quest/game/traps/fire_trap.dart';
 import 'package:pixel_quest/game/traps/moving_platform.dart';
 import 'package:pixel_quest/game/utils/animation_state.dart';
 import 'package:pixel_quest/game/utils/load_sprites.dart';
-import 'package:pixel_quest/data/audio/audio_center.dart';
 import 'package:pixel_quest/game/utils/misc_utils.dart';
 import 'package:pixel_quest/game/game_settings.dart';
 import 'package:pixel_quest/game/game.dart';
-import 'package:pixel_quest/game/game_router.dart';
 import 'package:pixel_quest/game/utils/visible_components.dart';
 
 enum PlayerState implements AnimationState {
@@ -535,94 +530,34 @@ class Player extends SpriteAnimationGroupComponent
     _respawnPosition = checkpointPosition;
   }
 
-  Future<void> _delayAnimation(int milliseconds) => .delayed(Duration(milliseconds: milliseconds));
-
   Future<void> reachedFinish(ShapeHitbox finish) async {
+    // the level is really over, from this point on, the user can no longer do anything
     _moveX = 0;
     _isSpawnProtectionActive = true;
     world.endGameplay();
-    unawaited(world.saveData());
 
-    // delays are not functional, but purely for a more visually appealing result
-    final delays = [200, 800, 80, 620, 120, 600, 400, 320];
-    int delayIndex = 0;
-
-    // player moves to the horizontal center of the finish
+    // we let the player automatically run to the center of the finish, but this is no longer part of the gameplay
     await _waitUntilPlayerIsAtX(finish.toAbsoluteRect().center.dx);
 
-    // place spotlight in visible world rect and transform player center in local space
-    final playerCenter = hitboxAbsoluteRect.center.toVector2();
-    final topLeft = game.camera.visibleWorldRect.topLeft.toVector2();
-    final spotlight = Spotlight(localTargetCenter: playerCenter - topLeft, position: topLeft);
-    world.add(spotlight);
+    // the finish animation sequence starts here
+    world.finishSequenz(finish, this);
+  }
 
-    // spotlight animation
-    await spotlight.focusOnTarget();
-    game.audioCenter.startBackgroundMusic(BackgroundMusic.win);
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
-
-    // star positions
-    final starRadius = Spotlight.playerTargetRadius * 1.5;
-    final starPositions = calculateStarPositions(playerCenter, starRadius);
-    final outlineStars = [];
-    final stars = [];
-
-    // outline stars
-    for (final position in starPositions) {
-      final outlineStar = Star(variant: .outline, size: .all(38), position: position, spawnSizeZero: true);
-      world.add(outlineStar);
-      outlineStars.add(outlineStar);
-      unawaited(outlineStar.scaleIn());
-    }
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
-
-    // earned stars
-    for (int i = 0; i < world.earnedStars; i++) {
-      final star = Star(variant: .filled, size: .all(38), position: playerCenter, spawnSizeZero: true);
-      world.add(star);
-      stars.add(star);
-
-      // flies to the outline star position
-      await star.flyToAndScaleIn(starPositions[i]);
-      await _delayAnimation(delays[delayIndex]);
-    }
-    delayIndex++;
-
-    // delete all outline stars that are behind the earned stars
-    for (int i = 0; i < stars.length; i++) {
-      world.remove(outlineStars[0]);
-      outlineStars.removeAt(0);
-    }
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
-
+  Future<void> finishJumpAndDisappearingAnimation() async {
     // jump animation
     game.audioCenter.playSound(.jump, .player);
     bounceUp(jumpForce: 320);
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
+    await delayInMs(120);
     current = PlayerState.doubleJump;
     await animationTickers![PlayerState.doubleJump]!.completed;
     await _waitUntilPlayerIsOnGround();
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
+    await delayInMs(600);
 
     // player disapperaing animation
     isVisible = false;
     game.audioCenter.playSound(.disappearing, .level);
     await _effect.playDisappearing(scale.x > 0 ? position : position - Vector2(width, 0));
-    await _delayAnimation(delays[delayIndex]).whenComplete(() => delayIndex++);
-
-    // fade stars out and shrink light circle to zero
-    for (final e in outlineStars) {
-      unawaited(e.fadeOut());
-    }
-    for (final e in stars) {
-      unawaited(e.fadeOut());
-    }
-    game.audioCenter.stopBackgroundMusic();
-    await spotlight.shrinkToBlack();
-    await _delayAnimation(delays[delayIndex]);
-
-    // level official finished, go back to menu
-    game.router.pushReplacementNamed(RouteNames.menu);
+    await delayInMs(400);
   }
 
   void _respawn(CollisionSide collisionSide) async {

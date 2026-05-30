@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pixel_quest/game/utils/misc_utils.dart';
 
 class AnimatedStars extends StatefulWidget {
   const AnimatedStars({super.key});
@@ -28,7 +29,7 @@ class AnimatedStarsState extends State<AnimatedStars> with TickerProviderStateMi
     for (int i = 0; i < _controllers.length; i++) {
       await _controllers[i].forward();
       await _controllers[i].reverse();
-      await Future.delayed(const Duration(milliseconds: 40));
+      await delayInMs(40);
     }
   }
 
